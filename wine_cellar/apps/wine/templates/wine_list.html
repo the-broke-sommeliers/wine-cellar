@@ -3,7 +3,7 @@
     Wine List
 {% endblock title %}
 {% block content %}
-    <div class="pure-g center-container">
+    <div class="pure-g">
         {% for wine in wines %}
             <div class="pure-u-1-8 wine-card">
                 <h2>{{ wine.name }}</h2>
@@ -26,6 +26,12 @@
                 {% endif %}
                 <p>
                     <strong>Rating:</strong> {{ wine.rating }}
+                </p>
+            </div>
+        {% empty %}
+            <div class="pure-u-1 center-container"/>
+                <p>
+                    <strong>There are no wines yet</strong>
                 </p>
             </div>
         {% endfor %}

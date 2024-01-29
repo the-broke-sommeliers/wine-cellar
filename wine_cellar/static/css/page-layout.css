@@ -40,6 +40,11 @@ The content `<div>` is where all your content goes.
   line-height: 1.6em;
 }
 
+.center-container {
+  display: flex;
+  justify-content: center;
+}
+
 .header {
   margin: 0;
   color: #333;

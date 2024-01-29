@@ -1,7 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import F, OuterRef, Q, Subquery
 from django.shortcuts import redirect, render
-from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
@@ -9,6 +7,17 @@ from django.views.generic import ListView
 
 from wine_cellar.apps.wine.forms import WineForm
 from wine_cellar.apps.wine.models import Wine
+
+
+class HomePageView(View):
+    template_name = "base.html"
+
+    @method_decorator(csrf_exempt)
+    async def dispatch(self, *args, **kwargs):
+        return await super().dispatch(*args, **kwargs)
+
+    async def get(self, request, *args, **kwargs):
+        return render(request, self.template_name)
 
 
 class WineCreateView(View):
@@ -54,10 +63,10 @@ class WineCreateView(View):
             comment=comment,
             rating=rating,
         )
-        wine.asave()
+        await wine.asave()
 
 
-class WineListView(ListView):
+class WineListView(LoginRequiredMixin, ListView):
     model = Wine
     template_name = "wine_list.html"
     context_object_name = "wines"

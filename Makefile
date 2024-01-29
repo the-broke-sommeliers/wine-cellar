@@ -74,14 +74,14 @@ lint-html-fix:
 	$(VIRTUAL_ENV)/bin/djlint $(ARGUMENTS) --reformat --profile=django --ignore=H030,H031,T002 || EXIT_STATUS=$$?; \
 	exit $${EXIT_STATUS}
 
-.PHONY: lint-html-files
+.PHONY: lint-html
 lint-html:
 	EXIT_STATUS=0; \
 	$(VIRTUAL_ENV)/bin/djlint $(ARGUMENTS) --profile=django --ignore=H030,H031,T002 || EXIT_STATUS=$$?; \
 	exit $${EXIT_STATUS}
 
 .PHONY: lint-py
-lint-python-files:
+lint-py:
 	EXIT_STATUS=0; \
 	$(VIRTUAL_ENV)/bin/black $(ARGUMENTS) || EXIT_STATUS=$$?; \
 	$(VIRTUAL_ENV)/bin/isort $(ARGUMENTS) --filter-files || EXIT_STATUS=$$?; \
