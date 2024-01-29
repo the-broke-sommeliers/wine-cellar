@@ -4,7 +4,7 @@ from django.core import validators
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django import forms
 
-from wine_cellar.apps.wine.models import Wine, Categories, Rating
+from wine_cellar.apps.wine.models import Categories
 
 
 class WineForm(forms.Form):
@@ -15,11 +15,10 @@ class WineForm(forms.Form):
     vintage = forms.IntegerField(
         validators=[
             validators.MinValueValidator(1900),
-            validators.MaxValueValidator(datetime.now().year)],
+            validators.MaxValueValidator(datetime.now().year),
+        ],
     )
     comment = forms.CharField(max_length=250, required=False, widget=forms.Textarea)
     rating = forms.IntegerField(
-        validators=[
-            MinValueValidator(0),
-            MaxValueValidator(10)],
+        validators=[MinValueValidator(0), MaxValueValidator(10)],
     )

@@ -1,7 +1,6 @@
 from datetime import datetime
 
-from django.contrib.auth.models import User
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -22,29 +21,23 @@ class Wine(models.Model):
     abv = models.FloatField()
     capacity = models.FloatField()
     vintage = models.PositiveIntegerField(
-        validators=[
-            MinValueValidator(1900),
-            MaxValueValidator(datetime.now().year)],
+        validators=[MinValueValidator(1900), MaxValueValidator(datetime.now().year)],
     )
     comment = models.CharField(max_length=250, blank=True)
+    rating = models.PositiveIntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(10)],
+    )
 
     def get_absolute_url(self):
         return reverse("wine-detail", kwargs={"pk": self.pk})
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['name', 'wine_type', 'abv', 'capacity', 'vintage'], name='unique appversion')
+            models.UniqueConstraint(
+                fields=["name", "wine_type", "abv", "capacity", "vintage"],
+                name="unique appversion",
+            )
         ]
-
-
-class Rating(models.Model):
-    value = models.PositiveIntegerField(
-        validators=[
-            MinValueValidator(0),
-            MaxValueValidator(10)],
-    )
-    wine = models.ForeignKey(Wine, on_delete=models.CASCADE, related_name='rating')
-    user = models.ForeignKey(User, on_delete=models.CharField)
 
 
 class Winery(models.Model):

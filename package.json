@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "husky": "^9.0.7"
+  },
+  "scripts": {
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "lint-staged": "^15.2.0"
+  }
+}

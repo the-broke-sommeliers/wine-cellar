@@ -1,0 +1,15 @@
+{
+   "*.{js,jsx}": [
+     "eslint"
+   ],
+   "*.css": [
+     "stylelint"
+   ],
+   "*.html": [
+     "make lint-html"
+   ],
+   "*.py": [
+     "make lint-py"
+   ]
+}
+
