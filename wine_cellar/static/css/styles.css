@@ -1,0 +1,44 @@
+body {
+    font-family: 'Helvetica', sans-serif;
+    background-color: #f4f4f4;
+    width: 100%;
+}
+
+.login-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-top: 50px;
+}
+
+.pure-form input[type="text"],
+.pure-form input[type="password"] {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.pure-form input[type="submit"] {
+    width: 100%;
+    background-color: #007BFF;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+.pure-form input[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+.center-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Adjust this value based on your design needs */
+}
+
+.pure-g {
+    width: 100%; /* Ensure the content takes the full width of the container */
+}
