@@ -61,7 +61,6 @@ class WineListView(ListView):
         qs = super().get_queryset()
         rating = Rating.objects.filter(wine=OuterRef("pk")).filter(user=self.request.user)
         qs = qs.annotate(user_rating=Subquery(rating.values("value")))
-        print(qs.first().user_rating)
         return qs
 
 
