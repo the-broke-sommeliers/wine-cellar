@@ -1,54 +1,45 @@
 {% extends 'base.html' %}
-
-{% block title %}Create/Edit Wine{% endblock %}
-
+{% block title %}Create/Edit Wine{% endblock title %}
 {% block content %}
-  <div class="pure-g">
-    <div class="pure-u-1-2">
-      <h2>Create/Edit Wine</h2>
-      <form method="post" class="pure-form pure-form-aligned">
-        {% csrf_token %}
-        <fieldset>
-          <div class="pure-control-group">
-            <label for="id_name">Name:</label>
-            {{ form.name }}
-          </div>
-
-          <div class="pure-control-group">
-            <label for="id_wine_type">Wine Type:</label>
-            {{ form.wine_type }}
-          </div>
-
-          <div class="pure-control-group">
-            <label for="id_abv">ABV:</label>
-            {{ form.abv }}
-          </div>
-
-          <div class="pure-control-group">
-            <label for="id_capacity">Capacity:</label>
-            {{ form.capacity }}
-          </div>
-
-          <div class="pure-control-group">
-            <label for="id_vintage">Vintage:</label>
-            {{ form.vintage }}
-          </div>
-
-          <div class="pure-control-group">
-            <label for="id_comment">Comment:</label>
-            {{ form.comment }}
-          </div>
-
-          <div class="pure-control-group">
-            <label for="id_rating">Rating:</label>
-            {{ form.rating }}
-          </div>
-
-          <div class="pure-controls">
-            <button type="submit" class="pure-button pure-button-primary">Save</button>
-          </div>
-        </fieldset>
-      </form>
+    <div class="pure-g">
+        <div class="pure-u-1-2">
+            <h2 class="content-subhead">Create/Edit Wine</h2>
+            <form method="post" class="pure-form pure-form-aligned wine-form">
+                {% csrf_token %}
+                <fieldset>
+                    <div class="pure-control-group">
+                        <label for="id_name">Name:</label>
+                        {{ form.name }}
+                    </div>
+                    <div class="pure-control-group">
+                        <label for="id_wine_type">Wine Type:</label>
+                        {{ form.wine_type }}
+                    </div>
+                    <div class="pure-control-group">
+                        <label for="id_abv">ABV:</label>
+                        {{ form.abv }}
+                    </div>
+                    <div class="pure-control-group">
+                        <label for="id_capacity">Capacity:</label>
+                        {{ form.capacity }}
+                    </div>
+                    <div class="pure-control-group">
+                        <label for="id_vintage">Vintage:</label>
+                        {{ form.vintage }}
+                    </div>
+                    <div class="pure-control-group">
+                        <label for="id_rating">Rating:</label>
+                        {{ form.rating }}
+                    </div>
+                    <div class="pure-control-group">
+                        <label for="id_comment">Comment:</label>
+                        {{ form.comment }}
+                    </div>
+                    <div class="pure-controls">
+                        <button type="submit" class="pure-button pure-button-primary">Save</button>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
     </div>
-  </div>
-{% endblock %}
+{% endblock content %}

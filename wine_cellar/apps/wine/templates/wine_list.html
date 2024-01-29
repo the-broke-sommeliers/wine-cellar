@@ -1,21 +1,33 @@
 {% extends 'base.html' %}
-
-{% block title %}Wine List{% endblock %}
-
+{% block title %}
+    Wine List
+{% endblock title %}
 {% block content %}
-  <div class="pure-g center-container">
-      {% for wine in wines %}
-        <div class="pure-u-1-8 wine-card">
-          <h2>{{ wine.name }}</h2>
-          <p><strong>Type:</strong> {{ wine.get_wine_type_display }}</p>
-          <p><strong>ABV:</strong> {{ wine.abv }}</p>
-          <p><strong>Capacity:</strong> {{ wine.capacity }}</p>
-          <p><strong>Vintage:</strong> {{ wine.vintage }}</p>
-          {% if wine.comment %}
-            <p><strong>Comment:</strong> {{ wine.comment }}</p>
-          {% endif %}
-          <p><strong>Rating:</strong> {{ wine.user_rating }}</p>
-        </div>
-      {% endfor %}
-  </div>
-{% endblock %}
+    <div class="pure-g center-container">
+        {% for wine in wines %}
+            <div class="pure-u-1-8 wine-card">
+                <h2>{{ wine.name }}</h2>
+                <p>
+                    <strong>Type:</strong> {{ wine.get_wine_type_display }}
+                </p>
+                <p>
+                    <strong>ABV:</strong> {{ wine.abv }}
+                </p>
+                <p>
+                    <strong>Capacity:</strong> {{ wine.capacity }}
+                </p>
+                <p>
+                    <strong>Vintage:</strong> {{ wine.vintage }}
+                </p>
+                {% if wine.comment %}
+                    <p>
+                        <strong>Comment:</strong> {{ wine.comment }}
+                    </p>
+                {% endif %}
+                <p>
+                    <strong>Rating:</strong> {{ wine.rating }}
+                </p>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock content %}
