@@ -5,8 +5,8 @@
 {% block content %}
   <div class="pure-g">
     <div class="pure-u-1-2">
-      <h2>Create/Edit Wine</h2>
-      <form method="post" class="pure-form pure-form-aligned">
+      <h2 class="content-subhead">Create/Edit Wine</h2>
+      <form method="post" class="pure-form pure-form-aligned wine-form">
         {% csrf_token %}
         <fieldset>
           <div class="pure-control-group">
@@ -35,13 +35,13 @@
           </div>
 
           <div class="pure-control-group">
-            <label for="id_comment">Comment:</label>
-            {{ form.comment }}
+            <label for="id_rating">Rating:</label>
+            {{ form.rating }}
           </div>
 
           <div class="pure-control-group">
-            <label for="id_rating">Rating:</label>
-            {{ form.rating }}
+            <label for="id_comment">Comment:  </label>
+            {{ form.comment }}
           </div>
 
           <div class="pure-controls">
@@ -51,4 +51,5 @@
       </form>
     </div>
   </div>
+</div>
 {% endblock %}

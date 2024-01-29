@@ -1,0 +1,43 @@
+.pure-form input[type="submit"],
+.pure-form button[type="submit"]  {
+  background-color: var(--dark);
+}
+
+.pure-form input[type="submit"]:hover,
+.pure-form button[type="submit"]:hover  {
+  background-color: var(--darker);
+}
+
+.login-container {
+  margin: 0 auto;
+  padding: 20px;
+  background-color: var(--light);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+  .pure-form input[type="text"],
+  .pure-form input[type="password"] {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .pure-form input[type="submit"] {
+    width: 100%;
+    color: var(--light);
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+  }
+}
+
+.wine-form {
+  @media screen and (min-width: 48em) {
+    .pure-control-group {
+        display: flex;
+
+        input,
+        select {
+            flex-grow: 1;
+        }
+    }
+  }
+}
