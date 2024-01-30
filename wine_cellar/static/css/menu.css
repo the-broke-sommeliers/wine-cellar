@@ -38,6 +38,12 @@
 /* menu link styling */
 .pure-menu-link {
   color: var(--light);
+
+}
+
+.pure-menu .button {
+	background: none;
+	border: none;
 }
 
 .pure-menu-link:hover,

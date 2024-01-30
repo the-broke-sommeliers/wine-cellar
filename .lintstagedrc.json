@@ -2,9 +2,6 @@
    "*.{js,jsx}": [
      "eslint"
    ],
-   "*.css": [
-     "stylelint"
-   ],
    "*.html": [
      "make lint-html"
    ],

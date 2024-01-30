@@ -17,7 +17,10 @@ class HomePageView(View):
         return await super().dispatch(*args, **kwargs)
 
     async def get(self, request, *args, **kwargs):
-        return render(request, self.template_name)
+        user = await request.auser()
+        if not user.is_authenticated:
+            return redirect("login")
+        return render(request, self.template_name, {"user": user})
 
 
 class WineCreateView(View):
