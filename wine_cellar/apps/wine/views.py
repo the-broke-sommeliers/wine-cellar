@@ -35,7 +35,7 @@ class WineCreateView(View):
         if not user.is_authenticated:
             return redirect("login")
         form = WineForm()
-        return render(request, self.template_name, {"form": form})
+        return render(request, self.template_name, {"form": form, "user": user})
 
     async def post(self, request, *args, **kwargs):
         user = await request.auser()
@@ -45,7 +45,7 @@ class WineCreateView(View):
         if form.is_valid():
             await self.process_form_data(user, form.cleaned_data)
             return redirect("wine-list")
-        return render(request, self.template_name, {"form": form})
+        return render(request, self.template_name, {"form": form, "user": user})
 
     @staticmethod
     async def process_form_data(user, cleaned_data):
