@@ -12,8 +12,5 @@ source venv/bin/activate
 python manage.py createsuperuser
 ```
 
-## Import wine test data
-```
-source venv/bin/activate
-python manage.py import datasets/XWines_Test_100_wines.csv
-```
+## API Server
+Needs https://github.com/goapunk/wine-cellar-api running to use the search
