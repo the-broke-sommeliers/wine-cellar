@@ -73,3 +73,27 @@ class WineListView(LoginRequiredMixin, ListView):
     model = Wine
     template_name = "wine_list.html"
     context_object_name = "wines"
+
+
+class WineSearchView(View):
+    template_name = "wine_search.html"
+
+    @method_decorator(csrf_exempt)
+    async def dispatch(self, *args, **kwargs):
+        return await super().dispatch(*args, **kwargs)
+
+    async def get(self, request, *args, **kwargs):
+        user = await request.auser()
+        if not user.is_authenticated:
+            return redirect("login")
+        return render(request, self.template_name, {"user": user})
+
+    async def post(self, request, *args, **kwargs):
+        user = await request.auser()
+        if not user.is_authenticated:
+            return redirect("login")
+        form = WineForm(request.POST)
+        if form.is_valid():
+            await self.process_form_data(user, form.cleaned_data)
+            return redirect("wine-list")
+        return render(request, self.template_name, {"form": form, "user": user})

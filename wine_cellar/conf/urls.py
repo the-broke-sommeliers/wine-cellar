@@ -17,12 +17,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
-from wine_cellar.apps.wine.views import HomePageView, WineCreateView, WineListView
+from wine_cellar.apps.wine.views import HomePageView, WineCreateView, WineListView, WineSearchView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("django.contrib.auth.urls")),
     path("wine/add/", WineCreateView.as_view(), name="wine-add"),
+    path("wine/search/", WineSearchView.as_view(), name="wine-search"),
     path("wines/", WineListView.as_view(), name="wine-list"),
     path("", HomePageView.as_view(), name="homepage"),
 ]
