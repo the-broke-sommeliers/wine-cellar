@@ -2,32 +2,52 @@
 {% block title %}Search Wine{% endblock title %}
 {% block content %}
     <div class="pure-g">
-        <div class="pure-u-1-2">
+        <div class="pure-u-1-2" hx-ext="client-side-templates">
             <h2 class="content-subhead">Search Wine</h2>
             <form class="pure-form pure-form-stacked" method="post">
                 {% csrf_token %}
-                <label for="winesearch">Search:</label>
-                <input type="search" id="winesearch" name="winesearch" required
-                        hx-post="/search" 
+                <label for="search">Search:</label>
+                <input type="search" id="search" name="search" required
+                        hx-get="http://127.0.0.1:8009/wines/"
+                        hx-params="*"
                         hx-trigger="input changed delay:500ms, search" 
                         hx-target="#search-results" 
-                        hx-indicator=".htmx-indicator">
+                        hx-indicator=".htmx-indicator"
+                        mustache-template="foo"
+                >
                 <input type="submit" value="Search" class="pure-button pure-button-primary">
             </form>
-     
+
+              <template id="foo">
+      {% verbatim %}{{ #results }}
+                  <tr>
+                  <td>{{ name }}</td>
+                  <td>{{ wine_type }}</td>
+                  <td>{{ grapes }}</td>
+                  <td>{{ region }}</td>
+                  <td>{{ vintage }}</td>
+                  <td>{{ tags }}</td>
+                   </tr>
+                  {{ /results }}
+                  {% endverbatim %}
+    </template>
+
      <table class="table">
          <thead>
          <tr>
            <th>Wine</th>
-           <th>Vinyard</th>
            <th>Type</th>
+           <th>Grapes</th>
+           <th>Vinyard</th>
+           <th>Region</th>
+           <th>Vintage</th>
+           <th>Tags</th>
          </tr>
          </thead>
          <tbody id="search-results">
             no results
          </tbody>
      </table>
-
 
         </div>
     </div>
