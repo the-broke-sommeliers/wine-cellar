@@ -11,3 +11,9 @@ python manage.py runserver
 source venv/bin/activate
 python manage.py createsuperuser
 ```
+
+## Import wine test data
+```
+source venv/bin/activate
+python manage.py import datasets/XWines_Test_100_wines.csv
+```
