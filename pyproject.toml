@@ -2,3 +2,7 @@
 profile = "black"
 skip_gitignore = true
 line_length = 88
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "wine_cellar.conf.test"
+# -- recommended but optional:
+python_files = ["test_*.py", "*_test.py"]
