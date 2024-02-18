@@ -8,46 +8,18 @@
                 {% csrf_token %}
                 <label for="search">Search:</label>
                 <input type="search" id="search" name="search" required
-                        hx-get="http://127.0.0.1:8009/wines/"
+                        hx-get="{% url 'wine-remote-search' %}"
                         hx-params="*"
                         hx-trigger="input changed delay:500ms, search" 
                         hx-target="#search-results" 
                         hx-indicator=".htmx-indicator"
-                        mustache-template="foo"
                 >
                 <input type="submit" value="Search" class="pure-button pure-button-primary">
             </form>
 
-              <template id="foo">
-      {% verbatim %}{{ #results }}
-                  <tr>
-                  <td>{{ name }}</td>
-                  <td>{{ wine_type }}</td>
-                  <td>{{ grapes }}</td>
-                  <td>{{ region }}</td>
-                  <td>{{ vintage }}</td>
-                  <td>{{ food_pairings }}</td>
-                   </tr>
-                  {{ /results }}
-                  {% endverbatim %}
-    </template>
-
-     <table class="table">
-         <thead>
-         <tr>
-           <th>Wine</th>
-           <th>Type</th>
-           <th>Grapes</th>
-           <th>Vinyard</th>
-           <th>Region</th>
-           <th>Vintage</th>
-           <th>Food Pairing</th>
-         </tr>
-         </thead>
-         <tbody id="search-results">
+         <div id="search-results">
             no results
-         </tbody>
-     </table>
+         </div>
 
         </div>
     </div>

@@ -1,4 +1,6 @@
+import requests
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponseForbidden
 from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -97,3 +99,20 @@ class WineSearchView(View):
             await self.process_form_data(user, form.cleaned_data)
             return redirect("wine-list")
         return render(request, self.template_name, {"form": form, "user": user})
+
+
+class WineRemoteSearchView(View):
+    template_name = "wine_remote_search.html"
+
+    @method_decorator(csrf_exempt)
+    async def dispatch(self, *args, **kwargs):
+        return await super().dispatch(*args, **kwargs)
+
+    async def get(self, request, *args, **kwargs):
+        user = await request.auser()
+        if not user.is_authenticated:
+            return HttpResponseForbidden()
+        query = request.GET["search"]
+        r = requests.get("http://127.0.0.1:8009/wines/", params={"search": query})
+        results = r.json()
+        return render(request, self.template_name, {"results": results, "user": user})
