@@ -18,6 +18,14 @@ class Categories(models.TextChoices):
 class Grape(models.Model):
     name = models.CharField(max_length=100)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name"],
+                name="unique grape",
+            )
+        ]
+
     def __str__(self):
         if self.name:
             return self.name
@@ -29,31 +37,92 @@ class Region(models.Model):
     name = models.CharField(max_length=100)
     country = models.CharField(max_length=100)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name", "country"],
+                name="unique region",
+            )
+        ]
+
+    def __str__(self):
+        return self.name
+
 
 class Winery(models.Model):
     winery_id = models.BigIntegerField(null=True)
     name = models.CharField(max_length=100)
-    website = models.CharField(max_length=100)
+    website = models.CharField(max_length=100, null=True)
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name", "region"],
+                name="unique winery",
+            )
+        ]
+
+    def __str__(self):
+        return self.name
+
+
+class Vintage(models.Model):
+    name = models.PositiveIntegerField(
+        primary_key=True,
+        validators=[MinValueValidator(1900), MaxValueValidator(datetime.now().year)],
+    )
+
+    def __str__(self):
+        return str(self.name)
+
+
+class FoodPairing(models.Model):
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name"],
+                name="unique food pairing",
+            )
+        ]
+
+    def __str__(self):
+        return self.name
+
+
+class Classification(models.Model):
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name"],
+                name="unique classification",
+            )
+        ]
+
+    def __str__(self):
+        return self.name
 
 
 class Wine(models.Model):
     wine_id = models.BigIntegerField(null=True)
     name = models.CharField(max_length=100)
     wine_type = models.CharField(max_length=2, choices=Categories)
-    elaborate = models.CharField(max_length=100)
+    elaborate = models.CharField(max_length=100, null=True, blank=True)
     grapes = models.ManyToManyField(Grape)
-    # FIXME m2m relation
-    food_pairing = models.CharField(max_length=100, blank=True)
+    classification = models.ManyToManyField(Classification)
+    food_pairings = models.ManyToManyField(FoodPairing)
     body = models.CharField(max_length=100, blank=True)
     acidity = models.CharField(max_length=100, blank=True)
     abv = models.FloatField()
     capacity = models.FloatField(null=True, blank=True)
-    vintage = models.PositiveIntegerField(null=True,
-        validators=[MinValueValidator(1900), MaxValueValidator(datetime.now().year)],
-    )
+    vintage = models.ManyToManyField(Vintage)
     comment = models.CharField(max_length=250, blank=True)
-    rating = models.PositiveIntegerField(null=True,
+    rating = models.PositiveIntegerField(
+        null=True,
         validators=[MinValueValidator(0), MaxValueValidator(10)],
     )
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True)
@@ -70,13 +139,7 @@ class Wine(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["name", "wine_type", "abv", "capacity", "vintage"],
+                fields=["name", "wine_type", "abv", "capacity", "winery"],
                 name="unique wine",
             )
         ]
-
-
-
-
-class Tag(models.Model):
-    name = models.CharField(max_length=100)
