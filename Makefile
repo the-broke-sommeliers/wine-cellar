@@ -28,6 +28,10 @@ watch:
 	trap 'kill %1' KILL; \
 	$(VIRTUAL_ENV)/bin/python3 manage.py runserver 8003
 
+.PHONY: fixtures
+fixtures:
+	$(VIRTUAL_ENV)/bin/python3 manage.py loaddata fixtures/classification.json
+
 .PHONY: pytest
 pytest:
 	$(VIRTUAL_ENV)/bin/py.test --reuse-db
