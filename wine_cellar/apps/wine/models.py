@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models import ImageField
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -107,6 +108,11 @@ class Classification(models.Model):
         return self.name
 
 
+def user_directory_path(instance, filename):
+    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+    return "user_{0}/{1}".format(instance.user.id, filename)
+
+
 class Wine(models.Model):
     wine_id = models.BigIntegerField(null=True)
     name = models.CharField(max_length=100)
@@ -133,8 +139,11 @@ class Wine(models.Model):
 
     @property
     def get_grapes(self):
-        print(self.grapes)
         return "".join([str(grape) for grape in self.grapes.all()])
+
+    @property
+    def get_vintages(self):
+        return "".join([str(vintage) for vintage in self.vintage.all()])
 
     class Meta:
         constraints = [
@@ -143,3 +152,8 @@ class Wine(models.Model):
                 name="unique wine",
             )
         ]
+
+
+class WineImage(models.Model):
+    image = ImageField(upload_to=user_directory_path)
+    wine = models.ForeignKey(Wine)

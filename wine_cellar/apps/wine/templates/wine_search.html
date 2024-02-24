@@ -4,7 +4,11 @@
     <div class="pure-g">
         <div class="pure-u-1-2" hx-ext="client-side-templates">
             <h2 class="content-subhead">Search Wine</h2>
-            <form class="pure-form pure-form-stacked" method="post">
+    <form method="get">
+        {{ wine_filter.form.as_p }}
+        <input type="submit" />
+    </form>
+            <form class="pure-form pure-form-stacked" method="get">
                 {% csrf_token %}
                 <label for="search">Search:</label>
                 <input type="search" id="search" name="search" required

@@ -7,8 +7,9 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView
 
+from wine_cellar.apps.filters import WineFilter
 from wine_cellar.apps.wine.forms import WineForm
-from wine_cellar.apps.wine.models import Wine
+from wine_cellar.apps.wine.models import Vintage, Wine
 
 
 class HomePageView(View):
@@ -64,11 +65,12 @@ class WineCreateView(View):
             wine_type=wine_type,
             abv=abv,
             capacity=capacity,
-            vintage=vintage,
             comment=comment,
             rating=rating,
         )
         await wine.asave()
+        v, _ = await Vintage.objects.aget_or_create(name=vintage)
+        await wine.vintage.aadd(v)
 
 
 class WineListView(LoginRequiredMixin, ListView):
@@ -81,24 +83,17 @@ class WineSearchView(View):
     template_name = "wine_search.html"
 
     @method_decorator(csrf_exempt)
-    async def dispatch(self, *args, **kwargs):
-        return await super().dispatch(*args, **kwargs)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
 
-    async def get(self, request, *args, **kwargs):
-        user = await request.auser()
+    def get(self, request, *args, **kwargs):
+        user = request.user
         if not user.is_authenticated:
             return redirect("login")
-        return render(request, self.template_name, {"user": user})
-
-    async def post(self, request, *args, **kwargs):
-        user = await request.auser()
-        if not user.is_authenticated:
-            return redirect("login")
-        form = WineForm(request.POST)
-        if form.is_valid():
-            await self.process_form_data(user, form.cleaned_data)
-            return redirect("wine-list")
-        return render(request, self.template_name, {"form": form, "user": user})
+        wine_filter = WineFilter(request.GET, queryset=None)
+        return render(
+            request, self.template_name, {"user": user, "wine_filter": wine_filter}
+        )
 
 
 class WineRemoteSearchView(View):
@@ -112,7 +107,13 @@ class WineRemoteSearchView(View):
         user = await request.auser()
         if not user.is_authenticated:
             return HttpResponseForbidden()
-        query = request.GET["search"]
-        r = requests.get("http://127.0.0.1:8009/wines/", params={"search": query})
+        wine_filter = WineFilter(request.GET, queryset=Wine.objects.all())
+        # TODO: include local results
+        # r = requests.get("http://127.0.0.1:8003/wines/", params={**request.GET})
+        r = requests.get("http://127.0.0.1:8009/wines/", params={**request.GET})
         results = r.json()
-        return render(request, self.template_name, {"results": results, "user": user})
+        return render(
+            request,
+            self.template_name,
+            {"results": results, "user": user, "wine_filter": wine_filter},
+        )

@@ -3,6 +3,7 @@ from datetime import datetime
 from django import forms
 from django.core import validators
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.forms import ClearableFileInput
 
 from wine_cellar.apps.wine.models import Categories
 
@@ -22,3 +23,4 @@ class WineForm(forms.Form):
     rating = forms.IntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(10)],
     )
+    image = ClearableFileInput()

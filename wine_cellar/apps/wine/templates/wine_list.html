@@ -21,7 +21,7 @@
                     <strong>Capacity:</strong> {{ wine.capacity }}
                 </p>
                 <p>
-                    <strong>Vintage:</strong> {{ wine.vintage }}
+                    <strong>Vintage:</strong> {{ wine.get_vintages }}
                 </p>
                 {% if wine.comment %}
                     <p>
