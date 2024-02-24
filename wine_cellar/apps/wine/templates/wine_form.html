@@ -1,15 +1,19 @@
 {% extends 'base.html' %}
+
+{% load static i18n %}
+
 {% block title %}Create/Edit Wine{% endblock title %}
 {% block content %}
     <div class="pure-g">
         <div class="pure-u-1-2">
-            <h2 class="content-subhead">Create/Edit Wine</h2>
-            <form method="post" class="pure-form pure-form-aligned wine-form">
+            <h2 class="content-subhead">{% translate 'Add Wine' %}</h2>
+            <form method="post" enctype="multipart/form-data" class="pure-form pure-form-aligned wine-form">
                 {% csrf_token %}
                 <fieldset>
                     <div class="pure-control-group">
                         <label for="id_name">Name:</label>
                         {{ form.name }}
+                        <span>{{ form.name.help_text }}</span>
                     </div>
                     <div class="pure-control-group">
                         <label for="id_wine_type">Wine Type:</label>
@@ -26,6 +30,10 @@
                     <div class="pure-control-group">
                         <label for="id_vintage">Vintage:</label>
                         {{ form.vintage }}
+                    </div>
+                    <div class="pure-control-group">
+                        <label for="id_image">Image:</label>
+                        {{ form.image }}
                     </div>
                     <div class="pure-control-group">
                         <label for="id_rating">Rating:</label>

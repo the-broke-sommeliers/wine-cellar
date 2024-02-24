@@ -1,0 +1,30 @@
+{% load static i18n %}
+
+<div>
+     <h2>{{ wine.name }}</h2>
+      <img src="{{ wine.image.image.url }}" height="250px" width="auto" alt="Image of the wine bottle">
+     <p>
+         <strong>Type:</strong> {{ wine.get_wine_type_display }}
+     </p>
+      <p>
+         <strong>Grapes:</strong> {{ wine.get_grapes }}
+     </p>
+
+     <p>
+         <strong>ABV:</strong> {{ wine.abv }}
+     </p>
+     <p>
+         <strong>Capacity:</strong> {{ wine.capacity }}
+     </p>
+     <p>
+         <strong>Vintage:</strong> {{ wine.get_vintages }}
+     </p>
+     {% if wine.comment %}
+         <p>
+             <strong>Comment:</strong> {{ wine.comment }}
+         </p>
+     {% endif %}
+     <p>
+         <strong>Rating:</strong> {{ wine.rating }}
+     </p>
+</div>

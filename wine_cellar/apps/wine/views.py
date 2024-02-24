@@ -9,7 +9,7 @@ from django.views.generic import ListView
 
 from wine_cellar.apps.filters import WineFilter
 from wine_cellar.apps.wine.forms import WineForm
-from wine_cellar.apps.wine.models import Vintage, Wine
+from wine_cellar.apps.wine.models import Vintage, Wine, WineImage
 
 
 class HomePageView(View):
@@ -44,7 +44,7 @@ class WineCreateView(View):
         user = await request.auser()
         if not user.is_authenticated:
             return redirect("login")
-        form = WineForm(request.POST)
+        form = WineForm(request.POST, request.FILES)
         if form.is_valid():
             await self.process_form_data(user, form.cleaned_data)
             return redirect("wine-list")
@@ -59,6 +59,7 @@ class WineCreateView(View):
         vintage = cleaned_data["vintage"]
         comment = cleaned_data["comment"]
         rating = cleaned_data["rating"]
+        image = cleaned_data["image"]
 
         wine = Wine(
             name=name,
@@ -71,6 +72,7 @@ class WineCreateView(View):
         await wine.asave()
         v, _ = await Vintage.objects.aget_or_create(name=vintage)
         await wine.vintage.aadd(v)
+        await WineImage.objects.aget_or_create(image=image, wine=wine, user=user)
 
 
 class WineListView(LoginRequiredMixin, ListView):

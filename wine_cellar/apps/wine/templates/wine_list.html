@@ -1,36 +1,13 @@
 {% extends 'base.html' %}
-{% block title %}
-    Wine List
-{% endblock title %}
+
+{% load static i18n %}
 {% block content %}
     <div class="pure-g">
+        <div class="pure-u-1-1">
+        <h2>{% translate 'Wine List' %}</h2>
         {% for wine in wines %}
-            <div class="pure-u-1-8 wine-card">
-                <h2>{{ wine.name }}</h2>
-                <p>
-                    <strong>Type:</strong> {{ wine.get_wine_type_display }}
-                </p>
-                 <p>
-                    <strong>Grapes:</strong> {{ wine.get_grapes }}
-                </p>
-
-                <p>
-                    <strong>ABV:</strong> {{ wine.abv }}
-                </p>
-                <p>
-                    <strong>Capacity:</strong> {{ wine.capacity }}
-                </p>
-                <p>
-                    <strong>Vintage:</strong> {{ wine.get_vintages }}
-                </p>
-                {% if wine.comment %}
-                    <p>
-                        <strong>Comment:</strong> {{ wine.comment }}
-                    </p>
-                {% endif %}
-                <p>
-                    <strong>Rating:</strong> {{ wine.rating }}
-                </p>
+            <div class="pure-u-1-4 wine-card">
+                {% include 'wine_card.html' with wine=wine %}
             </div>
         {% empty %}
             <div class="pure-u-1 center-container">
@@ -39,5 +16,6 @@
                 </p>
             </div>
         {% endfor %}
+    </div>
     </div>
 {% endblock content %}

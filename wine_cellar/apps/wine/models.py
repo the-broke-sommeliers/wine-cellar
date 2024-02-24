@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import ImageField
@@ -108,11 +109,6 @@ class Classification(models.Model):
         return self.name
 
 
-def user_directory_path(instance, filename):
-    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-    return "user_{0}/{1}".format(instance.user.id, filename)
-
-
 class Wine(models.Model):
     wine_id = models.BigIntegerField(null=True)
     name = models.CharField(max_length=100)
@@ -145,6 +141,11 @@ class Wine(models.Model):
     def get_vintages(self):
         return "".join([str(vintage) for vintage in self.vintage.all()])
 
+    @property
+    def image(self):
+        i = self.wineimage_set.first()
+        return i
+
     class Meta:
         constraints = [
             models.UniqueConstraint(
@@ -154,6 +155,12 @@ class Wine(models.Model):
         ]
 
 
+def user_directory_path(instance, filename):
+    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+    return "user_{0}/{1}".format(instance.user.pk, filename)
+
+
 class WineImage(models.Model):
     image = ImageField(upload_to=user_directory_path)
-    wine = models.ForeignKey(Wine)
+    wine = models.ForeignKey(Wine, on_delete=models.CASCADE)
+    user = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True)
