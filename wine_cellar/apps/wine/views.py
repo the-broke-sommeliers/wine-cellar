@@ -5,7 +5,7 @@ from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import ListView
+from django_filters.views import FilterView
 
 from wine_cellar.apps.filters import WineFilter
 from wine_cellar.apps.wine.forms import WineForm
@@ -63,6 +63,7 @@ class WineCreateView(View):
 
         wine = Wine(
             name=name,
+            user=user,
             wine_type=wine_type,
             abv=abv,
             capacity=capacity,
@@ -75,10 +76,16 @@ class WineCreateView(View):
         await WineImage.objects.aget_or_create(image=image, wine=wine, user=user)
 
 
-class WineListView(LoginRequiredMixin, ListView):
+class WineListView(LoginRequiredMixin, FilterView):
     model = Wine
     template_name = "wine_list.html"
     context_object_name = "wines"
+    filterset_class = WineFilter
+    paginate_by = 10
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(user=self.request.user)
 
 
 class WineSearchView(View):

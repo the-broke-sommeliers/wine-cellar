@@ -111,6 +111,7 @@ class Classification(models.Model):
 
 class Wine(models.Model):
     wine_id = models.BigIntegerField(null=True)
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=100)
     wine_type = models.CharField(max_length=2, choices=Categories)
     elaborate = models.CharField(max_length=100, null=True, blank=True)

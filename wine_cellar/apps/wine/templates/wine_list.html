@@ -1,21 +1,26 @@
 {% extends 'base.html' %}
-
 {% load static i18n %}
 {% block content %}
     <div class="pure-g">
         <div class="pure-u-1-1">
-        <h2>{% translate 'Wine List' %}</h2>
-        {% for wine in wines %}
-            <div class="pure-u-1-4 wine-card">
-                {% include 'wine_card.html' with wine=wine %}
+            <h2>{% translate 'Wine List' %}</h2>
+            <div>
+                <h3>{% translate 'Filter' %}</h3>
+                {# TODO: extract form into own template and style #}
+                <form action="" method="get">
+                    {{ filter.form.as_p }}
+                    <input type="submit" />
+                </form>
             </div>
-        {% empty %}
-            <div class="pure-u-1 center-container">
-                <p>
-                    <strong>There are no wines yet</strong>
-                </p>
-            </div>
-        {% endfor %}
-    </div>
+            {% for wine in wines %}
+                <div class="pure-u-1-4 wine-card">{% include 'wine_card.html' with wine=wine %}</div>
+            {% empty %}
+                <div class="pure-u-1 center-container">
+                    <p>
+                        <strong>There are no wines yet</strong>
+                    </p>
+                </div>
+            {% endfor %}
+        </div>
     </div>
 {% endblock content %}
