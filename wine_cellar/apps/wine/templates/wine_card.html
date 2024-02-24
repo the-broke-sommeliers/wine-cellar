@@ -2,7 +2,7 @@
 
 <div>
      <h2>{{ wine.name }}</h2>
-      <img src="{{ wine.image.image.url }}" height="250px" width="auto" alt="Image of the wine bottle">
+      <img src="{{ wine.image }}" height="100px" width="auto" alt="Decorative Image">
      <p>
          <strong>Type:</strong> {{ wine.get_wine_type_display }}
      </p>
@@ -18,6 +18,9 @@
      </p>
      <p>
          <strong>Vintage:</strong> {{ wine.get_vintages }}
+     </p>
+     <p>
+         <strong>Stock:</strong> {{ wine.stock }}
      </p>
      {% if wine.comment %}
          <p>

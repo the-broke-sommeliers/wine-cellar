@@ -27,7 +27,7 @@ class HomePageView(View):
 
 
 class WineCreateView(View):
-    template_name = "wine_form.html"
+    template_name = "wine_create.html"
 
     @method_decorator(csrf_exempt)
     async def dispatch(self, *args, **kwargs):
@@ -73,7 +73,8 @@ class WineCreateView(View):
         await wine.asave()
         v, _ = await Vintage.objects.aget_or_create(name=vintage)
         await wine.vintage.aadd(v)
-        await WineImage.objects.aget_or_create(image=image, wine=wine, user=user)
+        if image:
+            await WineImage.objects.aget_or_create(image=image, wine=wine, user=user)
 
 
 class WineListView(LoginRequiredMixin, FilterView):
@@ -84,7 +85,7 @@ class WineListView(LoginRequiredMixin, FilterView):
     paginate_by = 10
 
     def get_queryset(self):
-        qs = super().get_queryset()
+        qs = super().get_queryset().order_by("pk")
         return qs.filter(user=self.request.user)
 
 

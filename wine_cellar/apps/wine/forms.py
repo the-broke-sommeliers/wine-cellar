@@ -25,4 +25,8 @@ class WineForm(forms.Form):
         required=False,
         validators=[MinValueValidator(0), MaxValueValidator(10)],
     )
-    image = ImageField()
+    image = ImageField(required=False)
+    stock = forms.IntegerField(
+        required=False,
+        validators=[MinValueValidator(0)],
+    )

@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import ImageField
+from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -130,6 +131,10 @@ class Wine(models.Model):
     )
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True)
     winery = models.ForeignKey(Winery, on_delete=models.SET_NULL, null=True)
+    stock = models.PositiveIntegerField(
+        default=0,
+        validators=[MinValueValidator(0)],
+    )
 
     def get_absolute_url(self):
         return reverse("wine-detail", kwargs={"pk": self.pk})
@@ -145,7 +150,9 @@ class Wine(models.Model):
     @property
     def image(self):
         i = self.wineimage_set.first()
-        return i
+        if not i:
+            return static("images/red_glass2.svg")
+        return i.image.url
 
     class Meta:
         constraints = [
