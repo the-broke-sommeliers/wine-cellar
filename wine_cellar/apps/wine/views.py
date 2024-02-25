@@ -7,7 +7,7 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django_filters.views import FilterView
 
-from wine_cellar.apps.filters import WineFilter
+from wine_cellar.apps.wine.filters import WineFilter
 from wine_cellar.apps.wine.forms import WineForm
 from wine_cellar.apps.wine.models import Vintage, Wine, WineImage
 
