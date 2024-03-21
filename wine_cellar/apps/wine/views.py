@@ -30,28 +30,26 @@ class WineCreateView(View):
     template_name = "wine_create.html"
 
     @method_decorator(csrf_exempt)
-    async def dispatch(self, *args, **kwargs):
-        return await super().dispatch(*args, **kwargs)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
 
-    async def get(self, request, *args, **kwargs):
-        user = await request.auser()
-        if not user.is_authenticated:
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
             return redirect("login")
         form = WineForm()
-        return render(request, self.template_name, {"form": form, "user": user})
+        return render(request, self.template_name, {"form": form})
 
-    async def post(self, request, *args, **kwargs):
-        user = await request.auser()
-        if not user.is_authenticated:
+    def post(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
             return redirect("login")
         form = WineForm(request.POST, request.FILES)
         if form.is_valid():
-            await self.process_form_data(user, form.cleaned_data)
+            self.process_form_data(request.user, form.cleaned_data)
             return redirect("wine-list")
-        return render(request, self.template_name, {"form": form, "user": user})
+        return render(request, self.template_name, {"form": form})
 
     @staticmethod
-    async def process_form_data(user, cleaned_data):
+    def process_form_data(user, cleaned_data):
         name = cleaned_data["name"]
         wine_type = cleaned_data["wine_type"]
         abv = cleaned_data["abv"]
@@ -70,11 +68,11 @@ class WineCreateView(View):
             comment=comment,
             rating=rating,
         )
-        await wine.asave()
-        v, _ = await Vintage.objects.aget_or_create(name=vintage)
-        await wine.vintage.aadd(v)
+        wine.save()
+        v, _ = Vintage.objects.get_or_create(name=vintage)
+        wine.vintage.add(v)
         if image:
-            await WineImage.objects.aget_or_create(image=image, wine=wine, user=user)
+            WineImage.objects.get_or_create(image=image, wine=wine, user=user)
 
 
 class WineListView(LoginRequiredMixin, FilterView):

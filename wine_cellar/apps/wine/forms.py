@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 
 from django import forms
@@ -6,7 +7,8 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.forms import ImageField
 from django.utils.translation import gettext as _
 
-from wine_cellar.apps.wine.models import Categories
+from wine_cellar.apps.wine.fields import OpenMultipleChoiceField
+from wine_cellar.apps.wine.models import Categories, Grape
 
 
 class WineForm(forms.Form):
@@ -20,6 +22,7 @@ class WineForm(forms.Form):
             validators.MaxValueValidator(datetime.now().year),
         ],
     )
+    grapes = OpenMultipleChoiceField(required=False, queryset=Grape.objects)
     classification = forms.CharField(
         max_length=100, help_text=_("Comma-separated list of grapes")
     )
@@ -32,6 +35,9 @@ class WineForm(forms.Form):
     stock = forms.IntegerField(
         required=False,
         validators=[MinValueValidator(0)],
+    )
+    grapes.widget.attrs.update(
+        {"data-tom_config": json.dumps({"create": True, "maxItems": None})}
     )
 
 

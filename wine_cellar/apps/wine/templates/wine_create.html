@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 
 {% load static i18n %}
+{% block extra_js %}
+{{ block.super }}
+<script src="{% static 'tom_select.js' %}" type="module" defer></script>
+{% endblock extra_js %}
 
 {% block title %}Create/Edit Wine{% endblock title %}
 {% block content %}
@@ -30,6 +34,10 @@
                     <div class="pure-control-group">
                         <label for="id_vintage">Vintage:</label>
                         {{ form.vintage }}
+                    </div>
+                    <div class="pure-control-group">
+                        <label for="id_grapes">Grapes:</label>
+                        {{ form.grapes }}
                     </div>
                     <div class="pure-control-group">
                         <label for="id_image">Image:</label>
