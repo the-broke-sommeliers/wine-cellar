@@ -5,7 +5,6 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import ImageField
 from django.templatetags.static import static
-from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 
@@ -32,7 +31,6 @@ class Grape(models.Model):
     def __str__(self):
         if self.name:
             return self.name
-        return "no grape"
 
 
 class Region(models.Model):
@@ -136,8 +134,8 @@ class Wine(models.Model):
         validators=[MinValueValidator(0)],
     )
 
-    def get_absolute_url(self):
-        return reverse("wine-detail", kwargs={"pk": self.pk})
+    # def get_absolute_url(self):
+    #    return reverse("wine-detail", kwargs={"pk": self.pk})
 
     @property
     def get_grapes(self):

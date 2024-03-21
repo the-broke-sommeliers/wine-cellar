@@ -3,6 +3,8 @@ import random
 import factory
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
+from factory import post_generation
+from factory.django import DjangoModelFactory, ImageField
 
 from wine_cellar.apps.wine.models import (
     Categories,
@@ -12,10 +14,12 @@ from wine_cellar.apps.wine.models import (
     Region,
     Vintage,
     Wine,
+    WineImage,
+    Winery,
 )
 
 
-class UserFactory(factory.django.DjangoModelFactory):
+class UserFactory(DjangoModelFactory):
     class Meta:
         model = get_user_model()
 
@@ -24,58 +28,100 @@ class UserFactory(factory.django.DjangoModelFactory):
     password = make_password("password")
 
 
-class RegionFactory(factory.Factory):
+class RegionFactory(DjangoModelFactory):
     class Meta:
         model = Region
 
     name = factory.Faker("city")
 
 
-class GrapeFactory(factory.Factory):
+class GrapeFactory(DjangoModelFactory):
     class Meta:
         model = Grape
 
     name = factory.Faker("name")
 
 
-class WineryFactory(factory.Factory):
+class WineryFactory(DjangoModelFactory):
     class Meta:
-        model = Grape
+        model = Winery
 
     name = factory.Faker("company")
     region = factory.SubFactory(RegionFactory)
 
 
-class VintageFactory(factory.Factory):
+class VintageFactory(DjangoModelFactory):
     class Meta:
         model = Vintage
 
-    name = "1977"
+    name = random.randint(1900, 2024)
 
 
-class FoodPairingFactory(factory.Factory):
+class FoodPairingFactory(DjangoModelFactory):
     class Meta:
         model = FoodPairing
 
-    name = "meat"
+    name = factory.Faker("name")
 
 
-class ClassificationFactory(factory.Factory):
+class ClassificationFactory(DjangoModelFactory):
     class Meta:
         model = Classification
 
-    name = "Wine"
+    name = factory.Faker("name")
 
 
-class WineFactory(factory.Factory):
+class WineFactory(DjangoModelFactory):
     class Meta:
         model = Wine
 
+    user = factory.SubFactory(UserFactory)
     name = factory.Faker("name")
     wine_type = random.choice(Categories.labels)
     elaborate = "Varietal/100%"
-    grapes = factory.SubFactory(GrapeFactory)
-    classification = factory.SubFactory(ClassificationFactory)
-    food_pairings = factory.RelatedFactoryList(
-        FoodPairingFactory, size=random.randint(1, 4)
-    )
+    region = factory.SubFactory(RegionFactory)
+    winery = factory.SubFactory(WineryFactory)
+    # classification = factory.RelatedFactoryList(
+    #    ClassificationFactory, size=random.randint(1, 4)
+    # )
+    # food_pairings = factory.RelatedFactoryList(
+    #    FoodPairingFactory, size=random.randint(1, 4)
+    # )
+    abv = 12.0
+
+    # vintage = factory.RelatedFactoryList(
+    #    VintageFactory, size=random.randint(1, 4)
+    # )
+
+    @post_generation
+    def vintage(obj, create, extracted, **kwargs):
+        if not create:
+            return
+        if not extracted:
+            vintage = VintageFactory()
+            obj.vintage.add(vintage)
+        else:
+            obj.save()
+            for vintage in extracted:
+                obj.vintage.add(vintage)
+
+    @post_generation
+    def grapes(obj, create, extracted, **kwargs):
+        if not create:
+            return
+        if not extracted:
+            grape = GrapeFactory()
+            obj.grapes.add(grape)
+        else:
+            obj.save()
+            for grape in extracted:
+                obj.grapes.add(grape)
+
+
+class WineImageFactory(DjangoModelFactory):
+    class Meta:
+        model = WineImage
+
+    image = ImageField()
+    wine = factory.SubFactory(WineFactory)
+    user = factory.SubFactory(UserFactory)
