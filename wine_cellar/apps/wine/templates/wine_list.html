@@ -7,9 +7,13 @@
             <div>
                 <h3>{% translate 'Filter' %}</h3>
                 {# TODO: extract form into own template and style #}
-                <form action="" method="get">
-                    {{ filter.form.as_p }}
-                    <input type="submit" />
+                <form action="" method="get" class="pure-form pure-form-stacked">
+                    <div class="pure-g">
+                        {% for field in filter.form %}
+                            {% include "wine_filter_field.html" %}
+                        {% endfor %}
+                    </div>
+                    <input type="submit" class="pure-button pure-button-primary" />
                 </form>
             </div>
             {% for wine in wines %}

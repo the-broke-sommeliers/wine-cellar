@@ -33,3 +33,7 @@ class WineForm(forms.Form):
         required=False,
         validators=[MinValueValidator(0)],
     )
+
+
+class WineFilterForm(forms.Form):
+    template_name = "wine_filter_field.html"
