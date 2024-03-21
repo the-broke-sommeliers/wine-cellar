@@ -20,6 +20,9 @@ class WineForm(forms.Form):
             validators.MaxValueValidator(datetime.now().year),
         ],
     )
+    classification = forms.CharField(
+        max_length=100, help_text=_("Comma-separated list of grapes")
+    )
     comment = forms.CharField(max_length=250, required=False, widget=forms.Textarea)
     rating = forms.IntegerField(
         required=False,
