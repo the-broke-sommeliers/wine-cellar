@@ -3,15 +3,15 @@
 @import url("forms.css");
 
 :root {
-    --darker: #430505;
-    --dark: #7D0A0A;
-    --red: #BF3131;
-    --beige: #EAD196;
-    --light: #F3EDC8;
+    --darker: #506653;
+    --dark: #748979;
+    /* --red: #748979; */
+    /* --beige: #dad5be; */
+    --light: #e8e5d8;
 }
 
 body {
-    font-family: 'Helvetica', sans-serif;
+    font-family: "Helvetica", sans-serif;
     background-color: var(--light);
     width: 100%;
 }
