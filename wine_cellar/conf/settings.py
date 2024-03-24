@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "widget_tweaks",
     "wine_cellar.apps.wine",
+    "wine_cellar.apps.user",
 ]
 
 MIDDLEWARE = [

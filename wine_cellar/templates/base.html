@@ -51,10 +51,10 @@
                                 <ul class="pure-menu-children">
                                     {% if user.is_authenticated %}
                                         <li class="pure-menu-item">
-                                            <a href="#" class="pure-menu-link">Profile</a>
+                                            <a href="{% url 'user-profile' %}" class="pure-menu-link">Profile</a>
                                         </li>
                                         <li class="pure-menu-item">
-                                            <a href="#" class="pure-menu-link">Settings</a>
+                                            <a href="{% url 'settings' %}" class="pure-menu-link">Settings</a>
                                         </li>
                                         <li class="pure-menu-item">
                                             <form action="{% url 'logout' %}" method="post">

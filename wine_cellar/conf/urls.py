@@ -19,6 +19,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
+from wine_cellar.apps.user.views import SettingsView, UserProfileView
 from wine_cellar.apps.wine.views import (
     HomePageView,
     WineCreateView,
@@ -37,6 +38,8 @@ urlpatterns = [
         "wine/search_remote/", WineRemoteSearchView.as_view(), name="wine-remote-search"
     ),
     path("", HomePageView.as_view(), name="homepage"),
+    path("accounts/profile/", UserProfileView.as_view(), name="user-profile"),
+    path("accounts/settings/", SettingsView.as_view(), name="settings"),
 ]
 
 if settings.DEBUG:
