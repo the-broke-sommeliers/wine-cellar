@@ -5,3 +5,7 @@ venv/
 .idea/
 *.pyc
 node_modules/
+static/
+build/
+*.egg-info/
+media/

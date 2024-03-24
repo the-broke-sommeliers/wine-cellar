@@ -58,6 +58,7 @@ class WineCreateView(View):
         comment = cleaned_data["comment"]
         rating = cleaned_data["rating"]
         image = cleaned_data["image"]
+        grapes = cleaned_data["grapes"]
 
         wine = Wine(
             name=name,
@@ -71,6 +72,7 @@ class WineCreateView(View):
         wine.save()
         v, _ = Vintage.objects.get_or_create(name=vintage)
         wine.vintage.add(v)
+        wine.grapes.set(grapes)
         if image:
             WineImage.objects.get_or_create(image=image, wine=wine, user=user)
 

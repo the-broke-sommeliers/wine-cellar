@@ -22,9 +22,11 @@ class WineForm(forms.Form):
             validators.MaxValueValidator(datetime.now().year),
         ],
     )
-    grapes = OpenMultipleChoiceField(required=False, queryset=Grape.objects)
+    grapes = OpenMultipleChoiceField(
+        required=False, queryset=Grape.objects.all(), field_name="name"
+    )
     classification = forms.CharField(
-        max_length=100, help_text=_("Comma-separated list of grapes")
+        required=False, max_length=100, help_text=_("Comma-separated list of grapes")
     )
     comment = forms.CharField(max_length=250, required=False, widget=forms.Textarea)
     rating = forms.IntegerField(
