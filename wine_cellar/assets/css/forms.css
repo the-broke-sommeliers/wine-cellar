@@ -30,6 +30,11 @@
 }
 
 .wine-form {
+        input,
+        select,
+        .ts-wrapper {
+            width: 435.2px;
+        }
   @media screen and (min-width: 48em) {
     .pure-control-group {
         display: flex;
@@ -42,6 +47,16 @@
   }
 }
 
+.form-container {
+    margin-bottom: 1em;
+}
+.form-hint {
+    font-style: italic;
+    color: var(--text-color-gray);
+    font-size: $font-size-sm;
+    margin-bottom: 0.5 * $spacer;
+}
+
 .ts-wrapper {
-  min-width: 100px;
+    margin-top: 0.25em;
 }

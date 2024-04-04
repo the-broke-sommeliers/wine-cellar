@@ -8,13 +8,21 @@ from django.templatetags.static import static
 from django.utils.translation import gettext_lazy as _
 
 
-class Categories(models.TextChoices):
+class WineType(models.TextChoices):
     WHITE = "WH", _("White")
     RED = "RE", _("Red")
     ROSE = "RO", _("Rose")
     SPARKLING = "SP", _("Sparkling")
     DESSERT = "DE", _("Dessert")
     FORTIFIED = "FO", _("Fortified")
+
+
+class Category(models.TextChoices):
+    DRY = "DR", _("Dry")
+    SEMI_DRY = "SD", _("Semi-Dry")
+    MEDIUM_SWEET = "MS", _("Medium Sweet")
+    SWEET = "SW", _("Sweet")
+    FEINHERB = "FH", _("Feinherb")
 
 
 class Grape(models.Model):
@@ -112,7 +120,9 @@ class Wine(models.Model):
     wine_id = models.BigIntegerField(null=True)
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=100)
-    wine_type = models.CharField(max_length=2, choices=Categories)
+    wine_type = models.CharField(max_length=2, choices=WineType)
+    category = models.CharField(max_length=2, choices=Category)
+    # FIXME: rename to wine_style and turn into ForeignKey
     elaborate = models.CharField(max_length=100, null=True, blank=True)
     grapes = models.ManyToManyField(Grape)
     classification = models.ManyToManyField(Classification)

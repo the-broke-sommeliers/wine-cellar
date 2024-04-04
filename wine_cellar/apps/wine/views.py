@@ -52,9 +52,11 @@ class WineCreateView(View):
     def process_form_data(user, cleaned_data):
         name = cleaned_data["name"]
         wine_type = cleaned_data["wine_type"]
+        #        category = cleaned_data["category"]
         abv = cleaned_data["abv"]
         capacity = cleaned_data["capacity"]
         vintage = cleaned_data["vintage"]
+        food_pairings = cleaned_data["food_pairings"]
         comment = cleaned_data["comment"]
         rating = cleaned_data["rating"]
         image = cleaned_data["image"]
@@ -73,6 +75,7 @@ class WineCreateView(View):
         v, _ = Vintage.objects.get_or_create(name=vintage)
         wine.vintage.add(v)
         wine.grapes.set(grapes)
+        wine.food_pairings.add(*food_pairings)
         if image:
             WineImage.objects.get_or_create(image=image, wine=wine, user=user)
 

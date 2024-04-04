@@ -79,9 +79,12 @@
                                 <li class="pure-menu-item">
                                     <a href="{% url 'wine-add' %}" class="pure-menu-link">Add Wine</a>
                                 </li>
+                                {% comment %}
+                                # disable for now
                                 <li class="pure-menu-item">
                                     <a href="{% url 'wine-search' %}" class="pure-menu-link">Search Wine</a>
                                 </li>
+                                {% endcomment %}
                             {% endif %}
                         </ul>
                     </div>

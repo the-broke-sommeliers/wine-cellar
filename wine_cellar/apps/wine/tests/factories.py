@@ -7,7 +7,6 @@ from factory import post_generation
 from factory.django import DjangoModelFactory, ImageField
 
 from wine_cellar.apps.wine.models import (
-    Categories,
     Classification,
     FoodPairing,
     Grape,
@@ -16,6 +15,7 @@ from wine_cellar.apps.wine.models import (
     Wine,
     WineImage,
     Winery,
+    WineType,
 )
 
 
@@ -77,7 +77,7 @@ class WineFactory(DjangoModelFactory):
 
     user = factory.SubFactory(UserFactory)
     name = factory.Faker("name")
-    wine_type = random.choice(Categories.labels)
+    wine_type = random.choice(WineType.labels)
     elaborate = "Varietal/100%"
     region = factory.SubFactory(RegionFactory)
     winery = factory.SubFactory(WineryFactory)

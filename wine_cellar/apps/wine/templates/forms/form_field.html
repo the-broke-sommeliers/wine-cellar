@@ -1,0 +1,12 @@
+{% load i18n %}
+<div class="form-container">
+    <label for="{{ field.id_for_label }}">
+        {{ field.label }}{% if field.field.required %} <span role="presentation" title="{% translate "This field is required" %}">*</span>{% endif %}
+    </label>
+     {% if field.help_text %}
+        <div class="form-hint">
+                {{ field.help_text }}
+        </div>
+    {% endif %}
+    {{ field }}
+</div>

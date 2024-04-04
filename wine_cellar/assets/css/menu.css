@@ -37,7 +37,7 @@
 
 /* menu link styling */
 .pure-menu-link {
-  color: var(--light);
+  color: white;
 
 }
 
@@ -53,8 +53,8 @@
 
 .pure-menu .pure-menu-heading {
   font-size: 110%;
-  color: var(--light);
-  margin: 0;
+  color: white;
+  margin-top: 0.5em;
 }
 
 /* -- Dynamic Button For Responsive Menu -------------------------------------*/
