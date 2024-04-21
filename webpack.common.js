@@ -8,6 +8,7 @@ module.exports = {
     base: {
       import: [
         './wine_cellar/assets/css/menu.css',
+        './wine_cellar/assets/css/card.css',
         './wine_cellar/assets/css/forms.css',
         './wine_cellar/assets/css/styles.css',
         './wine_cellar/assets/css/page-layout.css',

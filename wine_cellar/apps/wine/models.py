@@ -149,11 +149,25 @@ class Wine(models.Model):
 
     @property
     def get_grapes(self):
-        return "".join([str(grape) for grape in self.grapes.all()])
+        return "\n".join([str(grape) for grape in self.grapes.all()])
 
     @property
     def get_vintages(self):
         return "".join([str(vintage) for vintage in self.vintage.all()])
+
+    @property
+    def get_type(self):
+        return WineType(self.wine_type).label
+
+    @property
+    def get_type_image(self):
+        match self.wine_type:
+            case WineType.RED:
+                return static("images/red_glass_no_ice_no_shadow.svg")
+            case WineType.WHITE:
+                return static("images/white_glass.svg")
+            case _:
+                return static("images/white_glass.svg")
 
     @property
     def image(self):

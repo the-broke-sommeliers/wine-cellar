@@ -1,33 +1,22 @@
 {% load static i18n %}
 
-<div>
-     <h2>{{ wine.name }}</h2>
-      <img src="{{ wine.image }}" height="100px" width="auto" alt="Decorative Image">
-     <p>
-         <strong>Type:</strong> {{ wine.get_wine_type_display }}
-     </p>
-      <p>
-         <strong>Grapes:</strong> {{ wine.get_grapes }}
-     </p>
-
-     <p>
-         <strong>ABV:</strong> {{ wine.abv }}
-     </p>
-     <p>
-         <strong>Capacity:</strong> {{ wine.capacity }}
-     </p>
-     <p>
-         <strong>Vintage:</strong> {{ wine.get_vintages }}
-     </p>
-     <p>
-         <strong>Stock:</strong> {{ wine.stock }}
-     </p>
-     {% if wine.comment %}
-         <p>
-             <strong>Comment:</strong> {{ wine.comment }}
-         </p>
-     {% endif %}
-     <p>
-         <strong>Rating:</strong> {{ wine.rating }}
-     </p>
+<div class="wine_card pure-g">
+    <div class="pure-u-6-24">
+        <img src="{{ wine.get_type_image }}" height="42px" width="auto"
+             alt="Image of a glass of {{ wine.get_type }} wine">
+    </div>
+    <div class="pure-u-18-24">
+        <h2 class="wine_card__title">{{ wine.name }}</h2>
+    <div class="pure-u-1-1">
+        <span class="text--gray">Grape</span>
+        <p>{{ wine.get_grapes | linebreaksbr }}</p>
+    </div>
+    <div class="pure-u-1-1">
+        <span class="text--gray">Vintage</span>
+        <p>{{ wine.get_vintages }}</p>
+    </div>
+    </div>
+    <div class="pure-u-1-1 wine_card__stock">
+     <span>Stock: {{ wine.stock }}</span>
+    </div>
 </div>

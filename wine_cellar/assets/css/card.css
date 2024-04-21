@@ -1,0 +1,25 @@
+.wine_card {
+  background-color: white;
+  margin-top: 15px;
+  margin-right: 15px;
+  border-radius: 15px;
+  padding: 25px 25px 15px 25px;
+  line-height: 1.25em;
+  p {
+    margin: 0;
+  }
+}
+
+.wine_card__title {
+  margin-top: 0px;
+  margin-bottom: 10px;
+}
+
+.text--gray {
+  color: #6f766f;
+}
+
+.wine_card__stock {
+  display: flex;
+  justify-content: end;
+}
