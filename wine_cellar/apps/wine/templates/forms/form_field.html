@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n widget_tweaks %}
 <div class="form-container">
     <label for="{{ field.id_for_label }}">
         {{ field.label }}{% if field.field.required %} <span role="presentation" title="{% translate "This field is required" %}">*</span>{% endif %}
@@ -8,5 +8,13 @@
                 {{ field.help_text }}
         </div>
     {% endif %}
-    {{ field }}
+    {{ field|add_error_attr:"aria-invalid:true" }}
+    {% if field.errors %}
+    <ul class="form-errorlist" aria-live="assertive" aria-atomic="true">
+    {% for error in field.errors %}
+        <li>{{ error|escape }}</li>
+    {% endfor %}
+    </ul>
+{% endif %}
 </div>
+

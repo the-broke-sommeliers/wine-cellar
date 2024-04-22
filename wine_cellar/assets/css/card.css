@@ -5,8 +5,13 @@
   border-radius: 15px;
   padding: 25px 25px 15px 25px;
   line-height: 1.25em;
+  width: 100%;
   p {
     margin: 0;
+  }
+
+  @media screen and (min-width: 64em) {
+    width: 41.7%;
   }
 }
 
@@ -22,4 +27,12 @@
 .wine_card__stock {
   display: flex;
   justify-content: end;
+}
+
+.wine_card__container {
+  display: flex;
+  width: 100%;
+  align-items: stretch;
+  flex-direction: row;
+  flex-wrap: wrap;
 }

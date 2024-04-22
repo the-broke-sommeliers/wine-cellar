@@ -16,15 +16,17 @@
                     <input type="submit" class="pure-button pure-button-primary" />
                 </form>
             </div>
-            {% for wine in wines %}
-                <div class="pure-u-11-24 wine-card">{% include 'wine_card.html' with wine=wine %}</div>
-            {% empty %}
+            <div class="wine_card__container">
+                {% for wine in wines %}
+                <div class="wine_card">{% include 'wine_card.html' with wine=wine %}</div>
+                {% empty %}
                 <div class="pure-u-1 center-container">
                     <p>
                         <strong>There are no wines yet</strong>
                     </p>
                 </div>
-            {% endfor %}
+                {% endfor %}
+            </div>
         </div>
     </div>
 {% endblock content %}

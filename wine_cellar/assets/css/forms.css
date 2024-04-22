@@ -8,6 +8,10 @@
   background-color: var(--darker);
 }
 
+.pure-form input[aria-invalid="true"] {
+  border-color: #BB0000;
+}
+
 .login-container {
   margin: 0 auto;
   padding: 20px;
@@ -30,11 +34,12 @@
 }
 
 .wine-form {
-        input,
-        select,
-        .ts-wrapper {
-            width: 435.2px;
-        }
+  input,
+  select,
+  .ts-wrapper {
+      width: 435.2px;
+  }
+
   @media screen and (min-width: 48em) {
     .pure-control-group {
         display: flex;
@@ -59,4 +64,11 @@
 
 .ts-wrapper {
     margin-top: 0.25em;
+}
+
+.form-errorlist {
+  margin-top: 0;
+  color: #BB0000;
+  font-weight: bold;
+  padding-left: 1rem;
 }

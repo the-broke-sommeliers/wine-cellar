@@ -11,7 +11,7 @@
     <div class="pure-g center-container">
         <div class="pure-u-1-2">
             <h2 class="content-subhead">{% translate 'Add Wine' %}</h2>
-            <form method="post" enctype="multipart/form-data" class="pure-form pure-form-stacked wine-form">
+            <form method="post" enctype="multipart/form-data" class="pure-form pure-form-stacked wine-form" novalidate>
                 {% csrf_token %}
                 <fieldset>
                     {% for field in form %}
