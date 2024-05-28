@@ -10,6 +10,11 @@
     margin: 0;
   }
 
+  a {
+    text-decoration: inherit;
+    color: inherit;
+  }
+
   @media screen and (min-width: 64em) {
     width: 41.7%;
   }

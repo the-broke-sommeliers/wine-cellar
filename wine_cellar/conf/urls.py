@@ -23,15 +23,19 @@ from wine_cellar.apps.user.views import SettingsView, UserProfileView
 from wine_cellar.apps.wine.views import (
     HomePageView,
     WineCreateView,
+    WineDetailView,
     WineListView,
     WineRemoteSearchView,
     WineSearchView,
+    WineUpdateView,
 )
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("django.contrib.auth.urls")),
     path("wine/add/", WineCreateView.as_view(), name="wine-add"),
+    path("wine/<int:pk>", WineDetailView.as_view(), name="wine-detail"),
+    path("wine/edit/<int:pk>", WineUpdateView.as_view(), name="wine-edit"),
     path("wine/search/", WineSearchView.as_view(), name="wine-search"),
     path("wines/", WineListView.as_view(), name="wine-list"),
     path(

@@ -1,15 +1,16 @@
 import requests
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseForbidden
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import DetailView
 from django_filters.views import FilterView
 
 from wine_cellar.apps.wine.filters import WineFilter
-from wine_cellar.apps.wine.forms import WineForm
-from wine_cellar.apps.wine.models import Vintage, Wine, WineImage
+from wine_cellar.apps.wine.forms import WineEditForm, WineForm
+from wine_cellar.apps.wine.models import Wine, WineImage
 
 
 class HomePageView(View):
@@ -42,42 +43,109 @@ class WineCreateView(View):
     def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return redirect("login")
-        form = WineForm(request.POST, request.FILES)
+        form = WineForm(data=request.POST, files=request.FILES)
         if form.is_valid():
-            self.process_form_data(request.user, form.cleaned_data)
+            self.process_form_data(form, request.user, form.cleaned_data)
             return redirect("wine-list")
         return render(request, self.template_name, {"form": form})
 
     @staticmethod
-    def process_form_data(user, cleaned_data):
-        name = cleaned_data["name"]
-        wine_type = cleaned_data["wine_type"]
-        #        category = cleaned_data["category"]
+    def process_form_data(form, user, cleaned_data):
         abv = cleaned_data["abv"]
         capacity = cleaned_data["capacity"]
-        vintage = cleaned_data["vintage"]
-        food_pairings = cleaned_data["food_pairings"]
+        category = cleaned_data["category"]
         comment = cleaned_data["comment"]
-        rating = cleaned_data["rating"]
-        image = cleaned_data["image"]
+        country = cleaned_data["country"]
+        food_pairings = cleaned_data["food_pairings"]
         grapes = cleaned_data["grapes"]
+        image = cleaned_data["image"]
+        name = cleaned_data["name"]
+        rating = cleaned_data["rating"]
+        stock = cleaned_data["stock"]
+        vintage = cleaned_data["vintage"]
+        wine_type = cleaned_data["wine_type"]
 
         wine = Wine(
-            name=name,
-            user=user,
-            wine_type=wine_type,
             abv=abv,
             capacity=capacity,
-            comment=comment,
-            rating=rating,
+            category=category,
+            country=country,
+            name=name,
+            stock=stock if stock else 0,
+            user=user,
+            vintage=vintage,
+            wine_type=wine_type,
         )
+        wine.comment = comment
+        wine.rating = rating
         wine.save()
-        v, _ = Vintage.objects.get_or_create(name=vintage)
-        wine.vintage.add(v)
         wine.grapes.set(grapes)
         wine.food_pairings.add(*food_pairings)
         if image:
             WineImage.objects.get_or_create(image=image, wine=wine, user=user)
+
+
+class WineUpdateView(View):
+    template_name = "wine_create.html"
+
+    def get(self, request, pk, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect("login")
+        wine = get_object_or_404(Wine, pk=pk)
+        if not request.user == wine.user:
+            return HttpResponseForbidden()
+        form = WineEditForm(instance=wine)
+        return render(request, self.template_name, {"form": form})
+
+    def post(self, request, pk, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect("login")
+        wine = get_object_or_404(Wine, pk=pk)
+        if not request.user == wine.user:
+            return HttpResponseForbidden()
+        form = WineForm(data=request.POST, files=request.FILES)
+        if form.is_valid():
+            self.process_form_data(wine, request.user, form.cleaned_data)
+            return redirect("wine-list")
+        return render(request, self.template_name, {"form": form})
+
+    @staticmethod
+    def process_form_data(wine, user, cleaned_data):
+        abv = cleaned_data["abv"]
+        capacity = cleaned_data["capacity"]
+        category = cleaned_data["category"]
+        comment = cleaned_data["comment"]
+        country = cleaned_data["country"]
+        food_pairings = cleaned_data["food_pairings"]
+        grapes = cleaned_data["grapes"]
+        image = cleaned_data["image"]
+        name = cleaned_data["name"]
+        rating = cleaned_data["rating"]
+        stock = cleaned_data["stock"]
+        vintage = cleaned_data["vintage"]
+        wine_type = cleaned_data["wine_type"]
+
+        wine.abv = abv
+        wine.capacity = capacity
+        wine.category = category
+        wine.comment = comment
+        wine.country = country
+        wine.name = name
+        wine.rating = rating
+        wine.stock = stock if stock else 0
+        wine.vintage = vintage
+        wine.wine_type = wine_type
+
+        wine.grapes.set(grapes)
+        wine.food_pairings.set(food_pairings)
+        wine.save()
+        if image:
+            WineImage.objects.get_or_create(image=image, wine=wine, user=user)
+
+
+class WineDetailView(DetailView):
+    template_name = "wine_detail.html"
+    model = Wine
 
 
 class WineListView(LoginRequiredMixin, FilterView):

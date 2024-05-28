@@ -11,7 +11,6 @@ from wine_cellar.apps.wine.tests.factories import (
     GrapeFactory,
     RegionFactory,
     UserFactory,
-    VintageFactory,
     WineFactory,
     WineImageFactory,
     WineryFactory,
@@ -21,7 +20,6 @@ register(UserFactory)
 register(RegionFactory)
 register(WineFactory)
 register(GrapeFactory)
-register(VintageFactory)
 register(WineImageFactory)
 register(WineryFactory)
 register(FoodPairingFactory)

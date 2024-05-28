@@ -1,10 +1,11 @@
 import json
 from datetime import datetime
 
+import pycountry
 from django import forms
 from django.core import validators
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.forms import ImageField
+from django.forms import ImageField, model_to_dict
 from django.utils.translation import gettext as _
 
 from wine_cellar.apps.wine.fields import OpenMultipleChoiceField
@@ -17,7 +18,10 @@ from wine_cellar.apps.wine.models import (
 )
 
 
-class WineForm(forms.Form):
+class WineBaseForm(forms.Form):
+    class Meta:
+        abstract = True
+
     name = forms.CharField(
         max_length=100,
         help_text=_("Enter the name of the wine as indicated on the label."),
@@ -42,6 +46,7 @@ class WineForm(forms.Form):
     capacity = forms.FloatField(
         help_text=_("Please enter the volume of the wine bottle in liters, e.g. 0.75.")
     )
+
     vintage = forms.IntegerField(
         validators=[
             validators.MinValueValidator(1900),
@@ -52,6 +57,7 @@ class WineForm(forms.Form):
             " vintage years are prominently displayed on wine labels."
         ),
     )
+
     grapes = OpenMultipleChoiceField(
         required=False,
         queryset=Grape.objects.all(),
@@ -84,6 +90,22 @@ class WineForm(forms.Form):
             "flavors of this wine."
         ),
     )
+    country = forms.CharField(
+        max_length=250,
+        widget=forms.Select(
+            choices={country.alpha_2: country.name for country in pycountry.countries},
+        ),
+        help_text=_(
+            "Select the country the wine was produced in as indicated on the " "label."
+        ),
+    )
+    stock = forms.IntegerField(
+        required=False,
+        validators=[MinValueValidator(0)],
+        help_text=_(
+            "Enter the quantity of bottles you currently have in your collection"
+        ),
+    )
     comment = forms.CharField(
         max_length=250,
         required=False,
@@ -110,31 +132,90 @@ class WineForm(forms.Form):
             " identify the wine in your collection "
         ),
     )
-    stock = forms.IntegerField(
-        required=False,
-        validators=[MinValueValidator(0)],
-        help_text=_(
-            "Enter the quantity of bottles you currently have in your collection"
-        ),
-    )
-    grapes.widget.attrs.update(
-        {
-            "data-tom_config": json.dumps({"create": True, "maxItems": None}),
-            "clear": "true",
-        }
-    )
-    classification.widget.attrs.update(
-        {
-            "data-tom_config": json.dumps({"create": True, "maxItems": None}),
-            "clear": "true",
-        }
-    )
-    food_pairings.widget.attrs.update(
-        {
-            "data-tom_config": json.dumps({"create": True, "maxItems": None}),
-            "clear": "true",
-        }
-    )
+
+
+class WineForm(WineBaseForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["grapes"].widget.attrs.update(
+            {
+                "data-tom_config": json.dumps({"create": True, "maxItems": None}),
+                "data-clear": "true",
+            }
+        )
+        self.fields["classification"].widget.attrs.update(
+            {
+                "data-tom_config": json.dumps({"create": True, "maxItems": None}),
+                "data-clear": "true",
+            }
+        )
+        self.fields["food_pairings"].widget.attrs.update(
+            {
+                "data-tom_config": json.dumps({"create": True, "maxItems": None}),
+                "data-clear": "true",
+            }
+        )
+        self.fields["country"].widget.attrs.update(
+            {
+                "data-tom_config": json.dumps(
+                    {"create": False, "maxItems": 1, "maxOptions": None}
+                ),
+                "data-clear": "true",
+            }
+        )
+
+
+class WineEditForm(WineBaseForm):
+    def __init__(self, instance, *args, **kwargs):
+        initial = model_to_dict(instance)
+        super(forms.Form, self).__init__(initial, *args, **kwargs)
+
+        category = [initial["category"]]
+        grapes = [grape.pk for grape in initial["grapes"]]
+        classification = [c.pk for c in initial["classification"]]
+        food_pairing = [f.pk for f in initial["food_pairings"]]
+
+        self.fields["category"].widget.attrs.update(
+            {
+                "data-tom_config": json.dumps(
+                    {"create": "false", "items": category, "maxItems": 1}
+                ),
+            }
+        )
+        self.fields["grapes"].widget.attrs.update(
+            {
+                "data-tom_config": json.dumps(
+                    {"create": True, "items": grapes, "maxItems": None}
+                ),
+            }
+        )
+        self.fields["classification"].widget.attrs.update(
+            {
+                "data-tom_config": json.dumps(
+                    {"create": True, "items": classification, "maxItems": None}
+                ),
+            }
+        )
+        self.fields["food_pairings"].widget.attrs.update(
+            {
+                "data-tom_config": json.dumps(
+                    {"create": True, "items": food_pairing, "maxItems": None}
+                ),
+            }
+        )
+
+        self.fields["country"].widget.attrs.update(
+            {
+                "data-tom_config": json.dumps(
+                    {
+                        "create": False,
+                        "items": [instance.country],
+                        "maxItems": 1,
+                        "maxOptions": None,
+                    }
+                ),
+            }
+        )
 
 
 class WineFilterForm(forms.Form):

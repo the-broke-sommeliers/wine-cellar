@@ -1,10 +1,12 @@
 from datetime import datetime
 
+import pycountry
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import ImageField
 from django.templatetags.static import static
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 
@@ -76,16 +78,6 @@ class Winery(models.Model):
         return self.name
 
 
-class Vintage(models.Model):
-    name = models.PositiveIntegerField(
-        primary_key=True,
-        validators=[MinValueValidator(1900), MaxValueValidator(datetime.now().year)],
-    )
-
-    def __str__(self):
-        return str(self.name)
-
-
 class FoodPairing(models.Model):
     name = models.CharField(max_length=100)
 
@@ -122,20 +114,23 @@ class Wine(models.Model):
     name = models.CharField(max_length=100)
     wine_type = models.CharField(max_length=2, choices=WineType)
     category = models.CharField(max_length=2, choices=Category)
-    # FIXME: rename to wine_style and turn into ForeignKey
-    elaborate = models.CharField(max_length=100, null=True, blank=True)
     grapes = models.ManyToManyField(Grape)
     classification = models.ManyToManyField(Classification)
     food_pairings = models.ManyToManyField(FoodPairing)
-    body = models.CharField(max_length=100, blank=True)
-    acidity = models.CharField(max_length=100, blank=True)
     abv = models.FloatField()
     capacity = models.FloatField(null=True, blank=True)
-    vintage = models.ManyToManyField(Vintage)
+    vintage = models.PositiveIntegerField(
+        primary_key=True,
+        validators=[MinValueValidator(1900), MaxValueValidator(datetime.now().year)],
+    )
     comment = models.CharField(max_length=250, blank=True)
     rating = models.PositiveIntegerField(
         null=True,
         validators=[MinValueValidator(0), MaxValueValidator(10)],
+    )
+    country = models.CharField(
+        max_length=3,
+        choices={country.alpha_2: country.name for country in pycountry.countries},
     )
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True)
     winery = models.ForeignKey(Winery, on_delete=models.SET_NULL, null=True)
@@ -144,20 +139,31 @@ class Wine(models.Model):
         validators=[MinValueValidator(0)],
     )
 
-    # def get_absolute_url(self):
-    #    return reverse("wine-detail", kwargs={"pk": self.pk})
+    def get_absolute_url(self):
+        return reverse("wine-detail", kwargs={"pk": self.pk})
 
     @property
     def get_grapes(self):
         return "\n".join([str(grape) for grape in self.grapes.all()])
 
     @property
-    def get_vintages(self):
-        return "".join([str(vintage) for vintage in self.vintage.all()])
+    def get_classifications(self):
+        return "\n".join(
+            [str(classification) for classification in self.classification.all()]
+        )
+
+    @property
+    def get_food_pairings(self):
+        return "\n".join([str(pairing) for pairing in self.food_pairings.all()])
 
     @property
     def get_type(self):
         return WineType(self.wine_type).label
+
+    @property
+    def get_category(self):
+        if self.category:
+            return Category(self.category).label
 
     @property
     def get_type_image(self):
@@ -173,13 +179,29 @@ class Wine(models.Model):
     def image(self):
         i = self.wineimage_set.first()
         if not i:
-            return static("images/red_glass2.svg")
+            return static("images/bottle.svg")
         return i.image.url
+
+    @property
+    def country_name(self):
+        return pycountry.countries.get(alpha_2=self.country).name
+
+    @property
+    def country_icon(self):
+        return pycountry.countries.get(alpha_2=self.country).flag
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["name", "wine_type", "abv", "capacity", "winery"],
+                fields=[
+                    "name",
+                    "wine_type",
+                    "abv",
+                    "capacity",
+                    "winery",
+                    "vintage",
+                    "country",
+                ],
                 name="unique wine",
             )
         ]

@@ -8,11 +8,14 @@ module.exports = {
     base: {
       import: [
         './wine_cellar/assets/css/menu.css',
+        './wine_cellar/assets/css/detail.css',
+        './wine_cellar/assets/css/utility.css',
         './wine_cellar/assets/css/card.css',
         './wine_cellar/assets/css/forms.css',
         './wine_cellar/assets/css/styles.css',
         './wine_cellar/assets/css/page-layout.css',
-        './node_modules/tom-select/dist/css/tom-select.css'
+        './node_modules/tom-select/dist/css/tom-select.css',
+        './node_modules/@fortawesome/fontawesome-free/css/fontawesome.css',
       ]
     },
     tom_select: {

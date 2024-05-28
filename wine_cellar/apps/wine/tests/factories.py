@@ -11,7 +11,6 @@ from wine_cellar.apps.wine.models import (
     FoodPairing,
     Grape,
     Region,
-    Vintage,
     Wine,
     WineImage,
     Winery,
@@ -50,13 +49,6 @@ class WineryFactory(DjangoModelFactory):
     region = factory.SubFactory(RegionFactory)
 
 
-class VintageFactory(DjangoModelFactory):
-    class Meta:
-        model = Vintage
-
-    name = random.randint(1900, 2024)
-
-
 class FoodPairingFactory(DjangoModelFactory):
     class Meta:
         model = FoodPairing
@@ -78,9 +70,9 @@ class WineFactory(DjangoModelFactory):
     user = factory.SubFactory(UserFactory)
     name = factory.Faker("name")
     wine_type = random.choice(WineType.labels)
-    elaborate = "Varietal/100%"
     region = factory.SubFactory(RegionFactory)
     winery = factory.SubFactory(WineryFactory)
+    vintage = random.randint(1900, 2024)
     # classification = factory.RelatedFactoryList(
     #    ClassificationFactory, size=random.randint(1, 4)
     # )
@@ -88,22 +80,6 @@ class WineFactory(DjangoModelFactory):
     #    FoodPairingFactory, size=random.randint(1, 4)
     # )
     abv = 12.0
-
-    # vintage = factory.RelatedFactoryList(
-    #    VintageFactory, size=random.randint(1, 4)
-    # )
-
-    @post_generation
-    def vintage(obj, create, extracted, **kwargs):
-        if not create:
-            return
-        if not extracted:
-            vintage = VintageFactory()
-            obj.vintage.add(vintage)
-        else:
-            obj.save()
-            for vintage in extracted:
-                obj.vintage.add(vintage)
 
     @post_generation
     def grapes(obj, create, extracted, **kwargs):

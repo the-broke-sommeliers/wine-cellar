@@ -8,7 +8,7 @@ from pytest_django.asserts import (
     assertTemplateUsed,
 )
 
-from wine_cellar.apps.wine.models import Vintage, Wine
+from wine_cellar.apps.wine.models import Wine
 
 
 def test_homepage_unauthenticated(client):
@@ -73,7 +73,6 @@ def test_wine_create_post_empty(client, user):
     assertTemplateUsed(response=r, template_name="base.html")
     assertTemplateUsed(response=r, template_name="wine_create.html")
     assert not Wine.objects.exists()
-    assert not Vintage.objects.exists()
 
 
 @pytest.mark.django_db
@@ -84,7 +83,6 @@ def test_wine_create_post_unauthenticated(client):
     assertTemplateUsed(response=r, template_name="base.html")
     assertTemplateUsed(response=r, template_name="registration/login.html")
     assert not Wine.objects.exists()
-    assert not Vintage.objects.exists()
 
 
 @pytest.mark.django_db
@@ -93,12 +91,13 @@ def test_wine_create_post_valid(client, user):
     data = {
         "name": "Merlot",
         "wine_type": "RE",
+        "category": "DR",
         "abv": 13.0,
         "capacity": 1.0,
         "vintage": 2002,
+        "country": "DE",
     }
     assert not Wine.objects.exists()
-    assert not Vintage.objects.exists()
     r = client.post(reverse("wine-add"), data, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
@@ -110,9 +109,7 @@ def test_wine_create_post_valid(client, user):
     assert wine.wine_type == data["wine_type"]
     assert wine.abv == data["abv"]
     assert wine.capacity == data["capacity"]
-    assert Vintage.objects.exists()
-    assert wine.vintage.count() == 1
-    assert wine.vintage.first().name == data["vintage"]
+    assert wine.vintage == data["vintage"]
 
 
 @pytest.mark.django_db
@@ -123,13 +120,14 @@ def test_wine_create_post_single_grape_valid(client, user, grape_factory):
     data = {
         "name": "Wine Single Grape",
         "wine_type": "RE",
+        "category": "DR",
         "abv": 13.0,
         "capacity": 1.0,
         "vintage": 2002,
         "grapes": grape1.pk,
+        "country": "DE",
     }
     assert not Wine.objects.exists()
-    assert not Vintage.objects.exists()
     r = client.post(reverse("wine-add"), data, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
@@ -141,9 +139,7 @@ def test_wine_create_post_single_grape_valid(client, user, grape_factory):
     assert wine.wine_type == data["wine_type"]
     assert wine.abv == data["abv"]
     assert wine.capacity == data["capacity"]
-    assert Vintage.objects.exists()
-    assert wine.vintage.count() == 1
-    assert wine.vintage.first().name == data["vintage"]
+    assert wine.vintage == data["vintage"]
     assert wine.grapes.count() == 1
     assert wine.grapes.first() == grape1
 
@@ -156,13 +152,14 @@ def test_wine_create_post_multiple_grape_valid(client, user, grape_factory):
     data = {
         "name": "Wine Single Grape",
         "wine_type": "RE",
+        "category": "DR",
         "abv": 13.0,
         "capacity": 1.0,
         "vintage": 2002,
         "grapes": [grape1.pk, grape2.pk],
+        "country": "DE",
     }
     assert not Wine.objects.exists()
-    assert not Vintage.objects.exists()
     r = client.post(reverse("wine-add"), data, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
@@ -174,9 +171,7 @@ def test_wine_create_post_multiple_grape_valid(client, user, grape_factory):
     assert wine.wine_type == data["wine_type"]
     assert wine.abv == data["abv"]
     assert wine.capacity == data["capacity"]
-    assert Vintage.objects.exists()
-    assert wine.vintage.count() == 1
-    assert wine.vintage.first().name == data["vintage"]
+    assert wine.vintage == data["vintage"]
     assert wine.grapes.count() == 2
     assert wine.grapes.filter(id__in=[grape1.pk, grape2.pk])
 
@@ -187,13 +182,14 @@ def test_wine_create_post_new_grape_valid(client, user, grape_factory):
     data = {
         "name": "Wine Single Grape",
         "wine_type": "RE",
+        "category": "DR",
         "abv": 13.0,
         "capacity": 1.0,
         "vintage": 2002,
-        "grapes": "TestGrape",
+        "grapes": "tom_new_optTestGrape",
+        "country": "DE",
     }
     assert not Wine.objects.exists()
-    assert not Vintage.objects.exists()
     r = client.post(reverse("wine-add"), data, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
@@ -205,9 +201,7 @@ def test_wine_create_post_new_grape_valid(client, user, grape_factory):
     assert wine.wine_type == data["wine_type"]
     assert wine.abv == data["abv"]
     assert wine.capacity == data["capacity"]
-    assert Vintage.objects.exists()
-    assert wine.vintage.count() == 1
-    assert wine.vintage.first().name == data["vintage"]
+    assert wine.vintage == data["vintage"]
     assert wine.grapes.count() == 1
     assert wine.grapes.first().name == "TestGrape"
 
@@ -218,13 +212,14 @@ def test_wine_create_post_invalid_grape(client, user, grape_factory):
     data = {
         "name": "Wine Single Grape",
         "wine_type": "RE",
+        "category": "DR",
         "abv": 13.0,
         "capacity": 1.0,
         "vintage": 2002,
         "grapes": [1.0],
+        "country": "DE",
     }
     assert not Wine.objects.exists()
-    assert not Vintage.objects.exists()
     r = client.post(reverse("wine-add"), data, follow=True)
     assert r.status_code == HTTPStatus.OK
     f = r.context["form"]
@@ -235,13 +230,14 @@ def test_wine_create_post_invalid_grape(client, user, grape_factory):
     data = {
         "name": "Wine Single Grape",
         "wine_type": "RE",
+        "category": "DR",
         "abv": 13.0,
         "capacity": 1.0,
         "vintage": 2002,
         "grapes": 1,
+        "country": "DE",
     }
     assert not Wine.objects.exists()
-    assert not Vintage.objects.exists()
     r = client.post(reverse("wine-add"), data, follow=True)
     assert r.status_code == HTTPStatus.OK
     f = r.context["form"]
@@ -259,13 +255,14 @@ def test_wine_create_post_new_grape_multiple_valid(client, user, grape_factory):
     data = {
         "name": "Wine Single Grape",
         "wine_type": "RE",
+        "category": "DR",
         "abv": 13.0,
         "capacity": 1.0,
         "vintage": 2002,
-        "grapes": ["TestGrape", grape1.pk, grape2.pk],
+        "grapes": ["tom_new_optTestGrape", grape1.pk, grape2.pk],
+        "country": "DE",
     }
     assert not Wine.objects.exists()
-    assert not Vintage.objects.exists()
     r = client.post(reverse("wine-add"), data, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
@@ -277,9 +274,7 @@ def test_wine_create_post_new_grape_multiple_valid(client, user, grape_factory):
     assert wine.wine_type == data["wine_type"]
     assert wine.abv == data["abv"]
     assert wine.capacity == data["capacity"]
-    assert Vintage.objects.exists()
-    assert wine.vintage.count() == 1
-    assert wine.vintage.first().name == data["vintage"]
+    assert wine.vintage == data["vintage"]
     assert wine.grapes.count() == 3
     assert wine.grapes.filter(id__in=[grape1.pk, grape2.pk])
     assert wine.grapes.filter(name="TestGrape")

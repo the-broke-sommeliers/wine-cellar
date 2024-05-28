@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+{% block content %}
+    <div class="center-container wine-detail__container">
+        <div class="pure-g">
+            <div class="pure-u-1-1 center-container wine-detail__name">
+                <h2>{{ wine.name }}</h2>
+                <a class="wine-detail__edit" href="{% url 'wine-edit' wine.pk %}"><i class="fa-solid fa-pen-to-square"></i></a>
+            </div>
+            <div class="pure-u-1-1 center-container">
+                {% if wine.image %}
+                    <div class="wine-detail__image center-container">
+                        <img src="{{ wine.image }}"
+                             height="225"
+                             width="188"
+                             alt="{% translate 'Picture of a wine bottle' %}">
+                    </div>
+                {% else %}
+                    <div class="center-container">{% translate "No image"</div>
+                {% endif %}
+            </div>
+            <div class="pure-u-1-1 center-container">
+                <h3>{% translate "Country" %}</h3>
+            </div>
+            <div class="pure-u-1-1 center-container">
+                <span>{{ wine.country_icon }} {{ wine.country_name }}</span>
+            </div>
+            <div class="pure-u-1-1 center-container">
+                <h3>{% translate "Type" %}</h3>
+            </div>
+            <div class="pure-u-1-1 center-container">
+                <span>{{ wine.get_type }}</span>
+            </div>
+            <div class="pure-u-1-1 center-container">
+                <h3>{% translate "Category" %}</h3>
+            </div>
+            <div class="pure-u-1-1 center-container">
+                <span>{{ wine.get_category }}</span>
+            </div>
+            <div class="pure-u-1-1 center-container">
+                <h3>{% translate "ABV" %}</h3>
+            </div>
+            <div class="pure-u-1-1 center-container">
+                <span>{{ wine.abv }}</span>
+            </div>
+            <div class="pure-u-1-1 center-container">
+                <h3>{% translate "Capacity" %}</h3>
+            </div>
+            <div class="pure-u-1-1 center-container">
+                <span>{{ wine.capacity }} l</span>
+            </div>
+            <div class="pure-u-1-1 center-container">
+                <h3>{% translate "Vintage" %}</h3>
+            </div>
+            <div class="pure-u-1-1 center-container">
+                <div class="text-align-center">{{ wine.vintage }}</div>
+            </div>
+            <div class="pure-u-1-1 center-container">
+                <h3>{% translate "Grapes" %}</h3>
+            </div>
+            <div class="pure-u-1-1 center-container">
+                <div class="text-align-center">{{ wine.get_grapes | linebreaksbr }}</div>
+            </div>
+            {% if wine.get_classifications %}
+                <div class="pure-u-1-1 center-container">
+                    <h3>{% translate "Classification" %}</h3>
+                </div>
+                <div class="pure-u-1-1 center-container">
+                    <div class="text-align-center">
+                        {{ wine.get_classification | linebreaksbr }}
+                    </div>
+                </div>
+            {% endif %}
+            {% if wine.get_food_pairings %}
+                <div class="pure-u-1-1 center-container">
+                    <h3>{% translate "Food Pairings" %}</h3>
+                </div>
+                <div class="pure-u-1-1 center-container">
+                    <div class="text-align-center">
+                        {{ wine.get_food_pairings | linebreaksbr }}
+                    </div>
+                </div>
+            {% endif %}
+            <div class="pure-u-1-1 center-container">
+                <h3>{% translate "In Stock" %}</h3>
+            </div>
+            <div class="pure-u-1-1 center-container">
+                <div class="text-align-center">{{ wine.stock }}</div>
+            </div>
+            {% if wine.comment %}
+                <div class="pure-u-1-1 center-container">
+                    <h3>{% translate "Comment" %}</h3>
+                </div>
+                <div class="pure-u-1-1 center-container">
+                    <span>{{ wine.comment }}</span>
+                </div>
+            {% endif %}
+            <div class="pure-u-1-1 center-container">
+                <h3>{% translate "Rating" %}</h3>
+            </div>
+            <div class="pure-u-1-1 center-container">
+                {% if wine.rating %}
+                    <span>{{ wine.rating }} / 10</span>
+                {% else %}
+                    <span>{% translate "No rating yet" %}</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock content %}

@@ -9,13 +9,11 @@ from django.templatetags.static import static
 
 
 @pytest.mark.django_db
-def test_wine_model(user, wine_factory, grape_factory, vintage_factory):
+def test_wine_model(user, wine_factory, grape_factory):
     grape = grape_factory(name="Merlot")
-    vintage = vintage_factory(name=2021)
-    wine = wine_factory(user=user, grapes=[grape], vintage=[vintage])
+    wine = wine_factory(user=user, grapes=[grape])
     assert wine.get_grapes == grape.name
-    assert wine.get_vintages == str(vintage.name)
-    assert wine.image == static("images/red_glass2.svg")
+    assert wine.image == static("images/bottle.svg")
 
 
 @pytest.mark.django_db

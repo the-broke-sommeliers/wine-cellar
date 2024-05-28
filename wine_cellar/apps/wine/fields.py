@@ -11,9 +11,10 @@ class OpenMultipleChoiceField(ModelMultipleChoiceField):
            will be used to create it.
     """
 
-    def __init__(self, queryset, field_name, **kwargs):
+    def __init__(self, queryset, field_name, field_class=None, **kwargs):
         super().__init__(queryset, **kwargs)
         self.field_name = field_name
+        self.field_class = field_class if field_class else None
 
     def validate(self, value):
         if self.required and not value:
@@ -45,8 +46,11 @@ class OpenMultipleChoiceField(ModelMultipleChoiceField):
                 new_values.add(pk)
             except ValueError:
                 # assume not a pk but a new value
-                if isinstance(pk, str) and not pk.replace(".", "", 1).isdigit():
-                    new_value, _ = self.queryset.get_or_create(**{self.field_name: pk})
+                if isinstance(pk, str) and pk.startswith("tom_new_opt"):
+                    v = pk.removeprefix("tom_new_opt")
+                    if self.field_class:
+                        v = self.field_class(v)
+                    new_value, _ = self.queryset.get_or_create(**{self.field_name: v})
                     new_values.add(new_value.pk)
                 else:
                     raise ValidationError(
