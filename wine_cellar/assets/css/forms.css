@@ -34,7 +34,7 @@
 }
 
 .wine-form {
-  input,
+  input:not([type='checkbox']),
   select,
   .ts-wrapper {
       width: 435.2px;

@@ -1,4 +1,5 @@
 import requests
+from backgroundremover import bg
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
@@ -58,6 +59,7 @@ class WineCreateView(View):
         country = cleaned_data["country"]
         food_pairings = cleaned_data["food_pairings"]
         grapes = cleaned_data["grapes"]
+        remove_background = cleaned_data["remove_background"]
         image = cleaned_data["image"]
         name = cleaned_data["name"]
         rating = cleaned_data["rating"]
@@ -82,7 +84,26 @@ class WineCreateView(View):
         wine.grapes.set(grapes)
         wine.food_pairings.add(*food_pairings)
         if image:
-            WineImage.objects.get_or_create(image=image, wine=wine, user=user)
+            wine_image, _ = WineImage.objects.get_or_create(
+                image=image, wine=wine, user=user
+            )
+            if remove_background:
+                model_choices = ["u2net", "u2net_human_seg", "u2netp"]
+                f = open(wine_image.image.path, "rb")
+                data = f.read()
+                f.close()
+                img = bg.remove(
+                    data,
+                    model_name=model_choices[0],
+                    alpha_matting=True,
+                    alpha_matting_foreground_threshold=240,
+                    alpha_matting_background_threshold=10,
+                    alpha_matting_erode_structure_size=10,
+                    alpha_matting_base_size=1000,
+                )
+                f = open(wine_image.image.path, "wb")
+                f.write(img)
+                f.close()
 
 
 class WineUpdateView(View):

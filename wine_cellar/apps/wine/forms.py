@@ -125,6 +125,9 @@ class WineBaseForm(forms.Form):
         validators=[MinValueValidator(0), MaxValueValidator(10)],
         help_text=_("Rate this wine on a scale from 0 to 10"),
     )
+    remove_background = forms.BooleanField(
+        required=False, help_text=_("Remove background from image")
+    )
     image = ImageField(
         required=False,
         help_text=_(
