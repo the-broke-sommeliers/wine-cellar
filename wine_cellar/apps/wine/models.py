@@ -113,15 +113,15 @@ class Wine(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=100)
     wine_type = models.CharField(max_length=2, choices=WineType)
-    category = models.CharField(max_length=2, choices=Category)
+    category = models.CharField(max_length=2, choices=Category, null=True)
     grapes = models.ManyToManyField(Grape)
     classification = models.ManyToManyField(Classification)
     food_pairings = models.ManyToManyField(FoodPairing)
     abv = models.FloatField()
     capacity = models.FloatField(null=True, blank=True)
     vintage = models.PositiveIntegerField(
-        primary_key=True,
         validators=[MinValueValidator(1900), MaxValueValidator(datetime.now().year)],
+        null=True,
     )
     comment = models.CharField(max_length=250, blank=True)
     rating = models.PositiveIntegerField(
