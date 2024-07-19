@@ -12,10 +12,8 @@ class WineFilter(django_filters.FilterSet):
             "name",
             "wine_type",
             # "elaborate",
-            "grapes",
             "category",
             # "classification",
-            "food_pairings",
             # "body",
             # "acidity",
             # "abv",
@@ -23,4 +21,6 @@ class WineFilter(django_filters.FilterSet):
             "vintage",
             "region",
             "winery",
+            "grapes",
+            "food_pairings",
         ]

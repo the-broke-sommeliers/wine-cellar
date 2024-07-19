@@ -3,9 +3,9 @@
 {% block content %}
     <div class="pure-g">
         <div class="pure-u-1-1">
-            <h2>{% translate 'Wine List' %}</h2>
+            <h2 class="text-align-center">{% translate 'Wine List' %}</h2>
             <div>
-                <h3>{% translate 'Filter' %}</h3>
+                <h3 class="text-align-center">{% translate 'Filter' %}</h3>
                 {# TODO: extract form into own template and style #}
                 <form action="" method="get" class="pure-form pure-form-stacked">
                     <div class="pure-g">
@@ -13,20 +13,55 @@
                             {% include "wine_filter_field.html" %}
                         {% endfor %}
                     </div>
-                    <input type="submit" class="pure-button pure-button-primary" />
+                    <button type="submit" class="pure-button pure-button-primary">{% translate "Filter" %}</button>
                 </form>
             </div>
             <div class="wine_card__container">
                 {% for wine in wines %}
-                <div class="wine_card">{% include 'wine_card.html' with wine=wine %}</div>
+                    <div class="wine_card">{% include 'wine_card.html' with wine=wine %}</div>
                 {% empty %}
-                <div class="pure-u-1 center-container">
-                    <p>
-                        <strong>There are no wines yet</strong>
-                    </p>
-                </div>
+                    <div class="pure-u-1 center-container">
+                        <p>
+                            <strong>There are no wines yet</strong>
+                        </p>
+                    </div>
                 {% endfor %}
             </div>
+        </div>
+        <div class="pure-u-1-1">
+            {% if page_obj.has_other_pages %}
+                <ul class="pagination center-container">
+                    {% if page_obj.has_previous %}
+                        <li>
+                            <a href="?page={{ page_obj.previous_page_number }}">«</a>
+                        </li>
+                    {% else %}
+                        <li class="disabled">
+                            <span>«</span>
+                        </li>
+                    {% endif %}
+                    {% for i in page_obj.paginator.page_range %}
+                        {% if page_obj.number == i %}
+                            <li class="active">
+                                <span>{{ i }} <span class="sr-only">(current)</span></span>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a href="?page={{ i }}">{{ i }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                        <li>
+                            <a href="?page={{ page_obj.next_page_number }}">»</a>
+                        </li>
+                    {% else %}
+                        <li class="disabled">
+                            <span>»</span>
+                        </li>
+                    {% endif %}
+                </ul>
+            {% endif %}
         </div>
     </div>
 {% endblock content %}

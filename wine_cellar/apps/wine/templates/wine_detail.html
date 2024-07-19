@@ -66,9 +66,7 @@
                     <h3>{% translate "Classification" %}</h3>
                 </div>
                 <div class="pure-u-1-1 center-container">
-                    <div class="text-align-center">
-                        {{ wine.get_classification | linebreaksbr }}
-                    </div>
+                    <div class="text-align-center">{{ wine.get_classification | linebreaksbr }}</div>
                 </div>
             {% endif %}
             {% if wine.get_food_pairings %}
@@ -76,9 +74,7 @@
                     <h3>{% translate "Food Pairings" %}</h3>
                 </div>
                 <div class="pure-u-1-1 center-container">
-                    <div class="text-align-center">
-                        {{ wine.get_food_pairings | linebreaksbr }}
-                    </div>
+                    <div class="text-align-center">{{ wine.get_food_pairings | linebreaksbr }}</div>
                 </div>
             {% endif %}
             <div class="pure-u-1-1 center-container">

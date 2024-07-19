@@ -174,7 +174,7 @@ class WineListView(LoginRequiredMixin, FilterView):
     template_name = "wine_list.html"
     context_object_name = "wines"
     filterset_class = WineFilter
-    paginate_by = 10
+    paginate_by = 1
 
     def get_queryset(self):
         qs = super().get_queryset().order_by("pk")
@@ -202,12 +202,11 @@ class WineRemoteSearchView(View):
     template_name = "wine_remote_search.html"
 
     @method_decorator(csrf_exempt)
-    async def dispatch(self, *args, **kwargs):
-        return await super().dispatch(*args, **kwargs)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
 
-    async def get(self, request, *args, **kwargs):
-        user = await request.auser()
-        if not user.is_authenticated:
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
             return HttpResponseForbidden()
         wine_filter = WineFilter(request.GET, queryset=Wine.objects.all())
         # TODO: include local results
@@ -217,5 +216,5 @@ class WineRemoteSearchView(View):
         return render(
             request,
             self.template_name,
-            {"results": results, "user": user, "wine_filter": wine_filter},
+            {"results": results, "user": request.user, "wine_filter": wine_filter},
         )

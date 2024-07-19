@@ -16,10 +16,7 @@ class WineSerializer(serializers.ModelSerializer):
         fields = [
             "name",
             "wine_type",
-            "elaborate",
             "grapes",
-            "body",
-            "acidity",
             "abv",
             "capacity",
             "vintage",

@@ -1,30 +1,26 @@
 {% extends 'base.html' %}
-{% block title %}Search Wine{% endblock title %}
+{% block title %}
+    Search Wine
+{% endblock title %}
 {% block content %}
     <div class="pure-g">
         <div class="pure-u-1-2" hx-ext="client-side-templates">
             <h2 class="content-subhead">Search Wine</h2>
-    <form method="get">
-        {{ wine_filter.form.as_p }}
-        <input type="submit" />
-    </form>
             <form class="pure-form pure-form-stacked" method="get">
                 {% csrf_token %}
                 <label for="search">Search:</label>
-                <input type="search" id="search" name="search" required
-                        hx-get="{% url 'wine-remote-search' %}"
-                        hx-params="*"
-                        hx-trigger="input changed delay:500ms, search" 
-                        hx-target="#search-results" 
-                        hx-indicator=".htmx-indicator"
-                >
+                <input type="search"
+                       id="search"
+                       name="search"
+                       required
+                       hx-get="{% url 'wine-remote-search' %}"
+                       hx-params="*"
+                       hx-trigger="input changed delay:500ms, search"
+                       hx-target="#search-results"
+                       hx-indicator=".htmx-indicator">
                 <input type="submit" value="Search" class="pure-button pure-button-primary">
             </form>
-
-         <div id="search-results">
-            no results
-         </div>
-
+            <div id="search-results">no results</div>
         </div>
     </div>
 {% endblock content %}

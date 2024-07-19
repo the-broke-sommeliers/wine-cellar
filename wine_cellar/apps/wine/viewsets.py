@@ -20,7 +20,6 @@ class WineViewSet(viewsets.ModelViewSet):
         "capacity",
         "region",
         "classification",
-        "elaborate",
     ]
     search_fields = [
         "name",

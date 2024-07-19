@@ -36,7 +36,7 @@ The content `<div>` is where all your content goes.
   margin: 0 auto;
   padding: 0 2em;
   max-width: 800px;
-  margin-bottom: 50px;
+  margin-bottom: 25px;
   line-height: 1.6em;
 }
 
@@ -49,7 +49,7 @@ The content `<div>` is where all your content goes.
   margin: 0;
   color: #333;
   text-align: center;
-  padding: 2.5em 2em 0;
+  margin: 2.5em 2em 0;
   /* border-bottom: 1px solid var(--red); */
 }
 
@@ -70,6 +70,17 @@ The content `<div>` is where all your content goes.
   margin: 50px 0 20px 0;
   font-weight: 300;
   color: #333;
+}
+
+.pagination {
+margin-top: 2em;
+  list-style: none;
+  li {
+  display: inline-block;
+  margin-left: 4px;
+  margin-right: 4px;
+  font-size: 1.5rem;
+}
 }
 
 @media (min-width: 48em) {

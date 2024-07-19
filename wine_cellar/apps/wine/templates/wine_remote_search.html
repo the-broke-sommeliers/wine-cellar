@@ -1,28 +1,13 @@
 <div>
-     <table class="table">
-         <thead>
-         <tr>
-           <th>Wine</th>
-           <th>Type</th>
-           <th>Grapes</th>
-           <th>Vinyard</th>
-           <th>Region</th>
-           <th>Vintage</th>
-           <th>Food Pairing</th>
-         </tr>
-         </thead>
-         <tbody id="search-results">
-         {% for wine in results.results %}
-         <tr>
-                  <td>{{ wine.name }}</td>
-                  <td>{{ wine.wine_type }}</td>
-                  <td>{{ wine.grapes }}</td>
-                  <td>{{ wine.region }}</td>
-                  <td>{{ wine.vintage }}</td>
-                  <td>{{ wine.food_pairings }}</td>
-         </tr>
-         {% endfor %}
-         </tbody>
-     </table>
-
+    <div class="wine_card__container">
+        {% for wine in results.results %}
+            <div class="wine_card">{% include 'wine_remote_card.html' with wine=wine %}</div>
+        {% empty %}
+            <div class="pure-u-1 center-container">
+                <p>
+                    <strong>There are no wines yet</strong>
+                </p>
+            </div>
+        {% endfor %}
+    </div>
 </div>
