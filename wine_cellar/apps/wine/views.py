@@ -174,7 +174,7 @@ class WineListView(LoginRequiredMixin, FilterView):
     template_name = "wine_list.html"
     context_object_name = "wines"
     filterset_class = WineFilter
-    paginate_by = 1
+    paginate_by = 10
 
     def get_queryset(self):
         qs = super().get_queryset().order_by("pk")
