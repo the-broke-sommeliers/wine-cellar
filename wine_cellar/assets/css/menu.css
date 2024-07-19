@@ -20,7 +20,7 @@
 .pure-menu-children {
   left: 100px;
 
-  >.pure-menu-item {
+  > .pure-menu-item {
     width: 100px;
   }
 }
@@ -38,12 +38,11 @@
 /* menu link styling */
 .pure-menu-link {
   color: white;
-
 }
 
 .pure-menu .button {
-	background: none;
-	border: none;
+  background: none;
+  border: none;
 }
 
 .pure-menu-link:hover,
@@ -73,7 +72,7 @@
   padding: 0.1em 0.4em;
 
   span:before {
-    content: "\2261";
+    content: '\2261';
   }
 }
 
@@ -93,7 +92,7 @@
   z-index: 1001;
 
   span:before {
-    content: "\2261";
+    content: '\2261';
   }
 }
 

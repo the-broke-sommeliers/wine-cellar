@@ -1,6 +1,6 @@
 import TomSelect from 'tom-select/dist/js/tom-select.base.js'
 
-function initTomSelect() {
+function initTomSelect () {
   document.querySelectorAll('select').forEach((el) => {
     const rawConfig = el.dataset.tom_config
     const clear = el.dataset.clear
@@ -9,17 +9,16 @@ function initTomSelect() {
       create: false,
       maxItems: 1,
       // disable search
-      controlInput: null
+      controlInput: null,
     }
     if (rawConfig) {
       config = JSON.parse(rawConfig)
       if (config.create) {
-        config.create = function(input) {
+        config.create = function (input) {
           return { value: 'tom_new_opt' + input, text: input }
         }
       }
     }
-    // eslint-disable-next-line
     const ts = new TomSelect(el, config)
     if (clear) {
       ts.clear()

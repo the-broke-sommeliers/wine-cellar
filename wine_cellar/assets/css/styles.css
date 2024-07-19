@@ -1,18 +1,18 @@
-@import url("menu.css");
-@import url("page-layout.css");
-@import url("forms.css");
+@import url('menu.css');
+@import url('page-layout.css');
+@import url('forms.css');
 
 :root {
-    --darker: #506653;
-    --dark: #408048;
-    --red: #cc0000;
-    /* --beige: #dad5be; */
-    --light: #e8e5d8;
-    --text-color-gray: #666;
+  --darker: #506653;
+  --dark: #408048;
+  --red: #cc0000;
+  /* --beige: #dad5be; */
+  --light: #e8e5d8;
+  --text-color-gray: #666;
 }
 
 body {
-    font-family: "Helvetica", sans-serif;
-    background-color: var(--light);
-    width: 100%;
+  font-family: 'Helvetica', sans-serif;
+  background-color: var(--light);
+  width: 100%;
 }

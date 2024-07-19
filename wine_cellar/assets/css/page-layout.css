@@ -73,14 +73,14 @@ The content `<div>` is where all your content goes.
 }
 
 .pagination {
-margin-top: 2em;
+  margin-top: 2em;
   list-style: none;
   li {
-  display: inline-block;
-  margin-left: 4px;
-  margin-right: 4px;
-  font-size: 1.5rem;
-}
+    display: inline-block;
+    margin-left: 4px;
+    margin-right: 4px;
+    font-size: 1.5rem;
+  }
 }
 
 @media (min-width: 48em) {

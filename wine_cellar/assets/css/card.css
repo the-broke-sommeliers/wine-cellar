@@ -31,7 +31,7 @@
 
 .wine_card__stock {
   display: flex;
-  justify-content: end;
+  justify-content: flex-end;
 }
 
 .wine_card__container {
