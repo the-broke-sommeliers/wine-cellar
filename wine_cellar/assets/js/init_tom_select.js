@@ -21,7 +21,6 @@ function initTomSelect() {
     }
     // eslint-disable-next-line
     const ts = new TomSelect(el, config)
-    console.log(clear)
     if (clear) {
       ts.clear()
     }

@@ -136,36 +136,58 @@ class WineBaseForm(forms.Form):
         ),
     )
 
+    def set_tom_config(
+        self, name, create=False, items=[], max_items=None, max_options=50, clear=True
+    ):
+        tom_config = {"create": create, "maxItems": max_items}
+        if items:
+            tom_config["items"] = items
+        if max_options:
+            tom_config["max_options"] = max_options
+        self.fields[name].widget.attrs.update(
+            {
+                "data-tom_config": json.dumps(tom_config),
+                "data-clear": "true" if clear else "",
+            }
+        )
+
 
 class WineForm(WineBaseForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["grapes"].widget.attrs.update(
-            {
-                "data-tom_config": json.dumps({"create": True, "maxItems": None}),
-                "data-clear": "true",
-            }
-        )
-        self.fields["classification"].widget.attrs.update(
-            {
-                "data-tom_config": json.dumps({"create": True, "maxItems": None}),
-                "data-clear": "true",
-            }
-        )
-        self.fields["food_pairings"].widget.attrs.update(
-            {
-                "data-tom_config": json.dumps({"create": True, "maxItems": None}),
-                "data-clear": "true",
-            }
-        )
-        self.fields["country"].widget.attrs.update(
-            {
-                "data-tom_config": json.dumps(
-                    {"create": False, "maxItems": 1, "maxOptions": None}
-                ),
-                "data-clear": "true",
-            }
-        )
+        self.set_tom_config(name="grapes", create=True)
+        self.set_tom_config(name="classification", create=True)
+        self.set_tom_config(name="food_pairings", create=True)
+        self.set_tom_config(name="country", max_items=1, max_options=None)
+
+    def _post_clean(self):
+        """Update tom-select config to prevent data loss in the form"""
+        if hasattr(self, "cleaned_data"):
+            grapes = self.cleaned_data.get("grapes", [])
+            if grapes:
+                self.set_tom_config(
+                    name="grapes",
+                    create=True,
+                    items=[g.pk for g in grapes],
+                    clear=False,
+                )
+            classifications = self.cleaned_data.get("classification", [])
+            if classifications:
+                self.set_tom_config(
+                    name="classification",
+                    create=True,
+                    items=[c.pk for c in classifications],
+                    clear=False,
+                )
+            food_pairings = self.cleaned_data.get("food_pairings", [])
+            if food_pairings:
+                self.set_tom_config(
+                    name="food_pairings",
+                    create=True,
+                    items=[f.pk for f in food_pairings],
+                    clear=False,
+                )
+        self.set_tom_config(name="country", max_items=1, max_options=None, clear=False)
 
 
 class WineEditForm(WineBaseForm):
