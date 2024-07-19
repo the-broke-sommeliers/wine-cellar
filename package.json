@@ -1,5 +1,4 @@
 {
-  "type": "module",
   "scripts": {
     "build:prod": "webpack --config webpack.prod.js --mode production",
     "build": "webpack --config webpack.dev.js --mode development",
