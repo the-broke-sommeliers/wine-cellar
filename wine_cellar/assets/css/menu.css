@@ -67,7 +67,6 @@
   display: block;
   top: 0;
   left: 0;
-  background: #000;
   background: rgba(0, 0, 0, 0.7);
   font-size: 40px;
   z-index: 10;
@@ -87,14 +86,14 @@
 
 /* -- Responsive Styles (Media Queries) ------------------------------------- */
 .menu-toggle:checked ~ .menu-link {
-  position: relative;
+  background: rgba(0, 0, 0, 0.7);
+  position: fixed;
   width: fit-content;
-  left: 141px;
+  left: 200px;
   z-index: 1001;
-  background: none;
 
   span:before {
-    content: "\03a7";
+    content: "\2261";
   }
 }
 
