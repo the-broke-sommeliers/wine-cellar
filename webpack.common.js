@@ -20,7 +20,7 @@ module.exports = {
     },
     tom_select: {
       import: [
-        './wine_cellar/assets/js/init_tom_select.js'
+        './wine_cellar/assets/js/init_tom_select.ts'
       ],
     }
   },
@@ -41,6 +41,11 @@ module.exports = {
           presets: ['@babel/preset-env', '@babel/preset-react'].map(require.resolve),
           plugins: ['@babel/plugin-transform-runtime', '@babel/plugin-transform-modules-commonjs']
         }
+      },
+      {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
       },
       {
         test: /\.s?css$/,
@@ -93,7 +98,7 @@ module.exports = {
   },
   resolve: {
     fallback: { path: require.resolve('path-browserify') },
-    extensions: ['*', '.js', '.jsx', '.scss', '.css'],
+    extensions: ['*', '.js', '.jsx', '.scss', '.css', '.ts', '.tsx'],
     alias: {
     },
     // when using `npm link`, dependencies are resolved against the linked
