@@ -108,6 +108,21 @@ class Classification(models.Model):
         return self.name
 
 
+class Source(models.Model):
+    name = models.CharField(max_length=250)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name"],
+                name="unique source",
+            )
+        ]
+
+    def __str__(self):
+        return self.name
+
+
 class Wine(models.Model):
     wine_id = models.BigIntegerField(null=True)
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, null=True)
@@ -134,6 +149,7 @@ class Wine(models.Model):
     )
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True)
     winery = models.ForeignKey(Winery, on_delete=models.SET_NULL, null=True)
+    source = models.ManyToManyField(Source)
     stock = models.PositiveIntegerField(
         default=0,
         validators=[MinValueValidator(0)],

@@ -23,4 +23,5 @@ class WineFilter(django_filters.FilterSet):
             "winery",
             "grapes",
             "food_pairings",
+            "source",
         ]

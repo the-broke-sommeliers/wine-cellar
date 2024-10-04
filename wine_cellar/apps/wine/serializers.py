@@ -8,6 +8,7 @@ class WineSerializer(serializers.ModelSerializer):
     region = serializers.StringRelatedField()
     winery = serializers.StringRelatedField()
     food_pairings = serializers.StringRelatedField(many=True)
+    source = serializers.StringRelatedField(many=True)
     classification = serializers.StringRelatedField(many=True)
     vintage = serializers.StringRelatedField(many=True)
 
@@ -22,6 +23,7 @@ class WineSerializer(serializers.ModelSerializer):
             "vintage",
             "classification",
             "food_pairings",
+            "source",
             "region",
             "winery",
         ]

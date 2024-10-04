@@ -14,6 +14,7 @@ from wine_cellar.apps.wine.models import (
     Classification,
     FoodPairing,
     Grape,
+    Source,
     WineType,
 )
 
@@ -99,6 +100,12 @@ class WineBaseForm(forms.Form):
             "Select the country the wine was produced in as indicated on the " "label."
         ),
     )
+    source = OpenMultipleChoiceField(
+        required=False,
+        queryset=Source.objects.all(),
+        field_name="name",
+        help_text=_("Where did you get the wine from?"),
+    )
     stock = forms.IntegerField(
         required=False,
         validators=[MinValueValidator(0)],
@@ -158,6 +165,7 @@ class WineForm(WineBaseForm):
         self.set_tom_config(name="grapes", create=True)
         self.set_tom_config(name="classification", create=True)
         self.set_tom_config(name="food_pairings", create=True)
+        self.set_tom_config(name="source", create=True)
         self.set_tom_config(name="country", max_items=1, max_options=None)
 
     def _post_clean(self):
@@ -187,6 +195,14 @@ class WineForm(WineBaseForm):
                     items=[f.pk for f in food_pairings],
                     clear=False,
                 )
+            source = self.cleaned_data.get("source", [])
+            if source:
+                self.set_tom_config(
+                    name="source",
+                    create=True,
+                    items=[s.pk for s in source],
+                    clear=False,
+                )
         self.set_tom_config(name="country", max_items=1, max_options=None, clear=False)
 
 
@@ -199,6 +215,7 @@ class WineEditForm(WineBaseForm):
         grapes = [grape.pk for grape in initial["grapes"]]
         classification = [c.pk for c in initial["classification"]]
         food_pairing = [f.pk for f in initial["food_pairings"]]
+        source = [s.pk for s in initial["source"]]
 
         self.fields["category"].widget.attrs.update(
             {
@@ -225,6 +242,13 @@ class WineEditForm(WineBaseForm):
             {
                 "data-tom_config": json.dumps(
                     {"create": True, "items": food_pairing, "maxItems": None}
+                ),
+            }
+        )
+        self.fields["source"].widget.attrs.update(
+            {
+                "data-tom_config": json.dumps(
+                    {"create": True, "items": source, "maxItems": None}
                 ),
             }
         )

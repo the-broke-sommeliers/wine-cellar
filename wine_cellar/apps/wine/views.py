@@ -46,6 +46,7 @@ class WineCreateView(LoginRequiredMixin, FormView):
         comment = cleaned_data["comment"]
         country = cleaned_data["country"]
         food_pairings = cleaned_data["food_pairings"]
+        source = cleaned_data["source"]
         grapes = cleaned_data["grapes"]
         remove_background = cleaned_data["remove_background"]
         image = cleaned_data["image"]
@@ -70,7 +71,8 @@ class WineCreateView(LoginRequiredMixin, FormView):
         wine.rating = rating
         wine.save()
         wine.grapes.set(grapes)
-        wine.food_pairings.add(*food_pairings)
+        wine.food_pairings.set(food_pairings)
+        wine.source.set(source)
         if image:
             wine_image, _ = WineImage.objects.get_or_create(
                 image=image, wine=wine, user=user
@@ -126,6 +128,7 @@ class WineUpdateView(View):
         comment = cleaned_data["comment"]
         country = cleaned_data["country"]
         food_pairings = cleaned_data["food_pairings"]
+        source = cleaned_data["source"]
         grapes = cleaned_data["grapes"]
         image = cleaned_data["image"]
         name = cleaned_data["name"]
@@ -147,6 +150,7 @@ class WineUpdateView(View):
 
         wine.grapes.set(grapes)
         wine.food_pairings.set(food_pairings)
+        wine.source.set(source)
         wine.save()
         if image:
             WineImage.objects.get_or_create(image=image, wine=wine, user=user)
