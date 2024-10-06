@@ -3,10 +3,11 @@ from backgroundremover import bg
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import DetailView
+from django.views.generic import DetailView, FormView
 from django_filters.views import FilterView
 
 from wine_cellar.apps.wine.filters import WineFilter
@@ -28,30 +29,17 @@ class HomePageView(View):
         return render(request, self.template_name, {"user": user})
 
 
-class WineCreateView(View):
+class WineCreateView(LoginRequiredMixin, FormView):
     template_name = "wine_create.html"
+    form_class = WineForm
+    success_url = reverse_lazy("wine-list")
 
-    @method_decorator(csrf_exempt)
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return redirect("login")
-        form = WineForm()
-        return render(request, self.template_name, {"form": form})
-
-    def post(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return redirect("login")
-        form = WineForm(data=request.POST, files=request.FILES)
-        if form.is_valid():
-            self.process_form_data(form, request.user, form.cleaned_data)
-            return redirect("wine-list")
-        return render(request, self.template_name, {"form": form})
+    def form_valid(self, form):
+        self.process_form_data(self.request.user, form.cleaned_data)
+        return super().form_valid(form)
 
     @staticmethod
-    def process_form_data(form, user, cleaned_data):
+    def process_form_data(user, cleaned_data):
         abv = cleaned_data["abv"]
         capacity = cleaned_data["capacity"]
         category = cleaned_data["category"]
@@ -164,7 +152,7 @@ class WineUpdateView(View):
             WineImage.objects.get_or_create(image=image, wine=wine, user=user)
 
 
-class WineDetailView(DetailView):
+class WineDetailView(LoginRequiredMixin, DetailView):
     template_name = "wine_detail.html"
     model = Wine
 
