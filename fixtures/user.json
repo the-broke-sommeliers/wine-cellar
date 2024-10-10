@@ -1,0 +1,20 @@
+[
+    {
+        "model": "auth.user",
+        "pk": 1,
+        "fields": {
+            "password": "password",
+            "last_login": "2021-10-05T07:04:26.398Z",
+            "is_superuser": true,
+            "username": "super_user",
+            "first_name": "",
+            "last_name": "",
+            "email": "admin@dehm.net",
+            "is_staff": true,
+            "is_active": true,
+            "date_joined": "2021-09-30T11:27:31.898Z",
+            "groups": [],
+            "user_permissions": []
+        }
+    }   
+]
