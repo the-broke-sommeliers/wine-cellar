@@ -31,24 +31,37 @@ class WineBaseForm(forms.Form):
     wine_type = forms.CharField(
         max_length=2,
         widget=forms.Select(choices=WineType),
-        help_text=_("Select the category that best describes the type of wine. "),
+        help_text=_("Select the type of wine from the dropdown."),
     )
     category = forms.CharField(
+        label="Sweetness",
         max_length=2,
         widget=forms.Select(choices=Category),
-        help_text=_("Select the category of the wine."),
+        help_text=_("Select the sweetness level of the wine."),
+    )
+    country = forms.CharField(
+        max_length=250,
+        widget=forms.Select(
+            choices={country.alpha_2: country.name for country in pycountry.countries},
+        ),
+        help_text=_(
+            "Select the country the wine was produced in as indicated on the " "label."
+        ),
+    )
+    capacity = forms.FloatField(
+        label="Size",
+        help_text=_(
+            "Please enter the volume of bottle or box ect. in liters, e.g. 0.75."
+        ),
     )
     abv = forms.FloatField(
+        required=False,
         help_text=_(
             "Please enter the percentage of alcohol in the"
             " wine. This information is typically found on the label and indicates the"
             " strength of the wine."
-        )
+        ),
     )
-    capacity = forms.FloatField(
-        help_text=_("Please enter the volume of the wine bottle in liters, e.g. 0.75.")
-    )
-
     vintage = forms.IntegerField(
         required=False,
         validators=[
@@ -94,19 +107,11 @@ class WineBaseForm(forms.Form):
         ),
     )
     winery = OpenMultipleChoiceField(
+        label="Vineyard",
         required=False,
         queryset=Winery.objects.all(),
         field_name="name",
         help_text=_("Enter the name of the winery which produced the wine."),
-    )
-    country = forms.CharField(
-        max_length=250,
-        widget=forms.Select(
-            choices={country.alpha_2: country.name for country in pycountry.countries},
-        ),
-        help_text=_(
-            "Select the country the wine was produced in as indicated on the " "label."
-        ),
     )
     source = OpenMultipleChoiceField(
         required=False,
@@ -140,15 +145,15 @@ class WineBaseForm(forms.Form):
         validators=[MinValueValidator(0), MaxValueValidator(10)],
         help_text=_("Rate this wine on a scale from 0 to 10"),
     )
-    remove_background = forms.BooleanField(
-        required=False, help_text=_("Remove background from image")
-    )
     image = ImageField(
         required=False,
         help_text=_(
             "Upload a photo of the wine bottle or label. Adding an image helps visually"
             " identify the wine in your collection "
         ),
+    )
+    remove_background = forms.BooleanField(
+        required=False, help_text=_("Remove background from image")
     )
 
     def set_tom_config(

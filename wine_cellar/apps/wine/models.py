@@ -121,7 +121,7 @@ class Wine(models.Model):
     grapes = models.ManyToManyField(Grape)
     classification = models.ManyToManyField(Classification)
     food_pairings = models.ManyToManyField(FoodPairing)
-    abv = models.FloatField()
+    abv = models.FloatField(null=True, blank=True)
     capacity = models.FloatField(null=True, blank=True)
     vintage = models.PositiveIntegerField(
         validators=[MinValueValidator(1900), MaxValueValidator(datetime.now().year)],
