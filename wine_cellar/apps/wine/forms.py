@@ -163,11 +163,11 @@ class WineBaseForm(forms.Form):
         if items:
             tom_config["items"] = items
         if max_options:
-            tom_config["max_options"] = max_options
+            tom_config["maxOptions"] = None if max_options == -1 else max_options
         self.fields[name].widget.attrs.update(
             {
                 "data-tom_config": json.dumps(tom_config),
-                "data-clear": "true" if clear else "",
+                "data-clear": "true" if clear else "false",
             }
         )
 
@@ -179,8 +179,8 @@ class WineForm(WineBaseForm):
         self.set_tom_config(name="classification", create=True)
         self.set_tom_config(name="food_pairings", create=True)
         self.set_tom_config(name="source", create=True)
-        self.set_tom_config(name="winery", max_items=1, max_options=None)
-        self.set_tom_config(name="country", max_items=1, max_options=None)
+        self.set_tom_config(name="winery", max_items=1)
+        self.set_tom_config(name="country", max_items=1, max_options=-1)
 
     def _post_clean(self):
         """Update tom-select config to prevent data loss in the form"""
@@ -223,10 +223,18 @@ class WineForm(WineBaseForm):
                     name="winery",
                     items=[w.pk for w in winery],
                     max_items=1,
-                    max_options=None,
+                    max_options=-1,
                     clear=False,
                 )
-        self.set_tom_config(name="country", max_items=1, max_options=None, clear=False)
+            country = self.cleaned_data.get("country")
+            if country:
+                self.set_tom_config(
+                    name="country",
+                    items=[country],
+                    max_items=1,
+                    max_options=-1,
+                    clear=False,
+                )
 
 
 class WineEditForm(WineBaseForm):

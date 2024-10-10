@@ -52,6 +52,8 @@ class OpenMultipleChoiceField(ModelMultipleChoiceField):
                         v = self.field_class(v)
                     new_value, _ = self.queryset.get_or_create(**{self.field_name: v})
                     new_values.add(new_value.pk)
+                elif isinstance(pk, str) and not self.required and pk == "":
+                    continue
                 else:
                     raise ValidationError(
                         self.error_messages["invalid_pk_value"],
