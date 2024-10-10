@@ -41,35 +41,24 @@ class Grape(models.Model):
     def __str__(self):
         if self.name:
             return self.name
-
-
-class Region(models.Model):
-    region_id = models.BigIntegerField(null=True)
-    name = models.CharField(max_length=100)
-    country = models.CharField(max_length=100)
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["name", "country"],
-                name="unique region",
-            )
-        ]
-
-    def __str__(self):
-        return self.name
+        return ""
 
 
 class Winery(models.Model):
     winery_id = models.BigIntegerField(null=True)
     name = models.CharField(max_length=100)
     website = models.CharField(max_length=100, null=True)
-    region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True)
+    region = models.CharField(max_length=250, null=True)
+    country = models.CharField(
+        max_length=3,
+        null=True,
+        choices={country.alpha_2: country.name for country in pycountry.countries},
+    )
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["name", "region"],
+                fields=["name", "country", "region"],
                 name="unique winery",
             )
         ]
@@ -147,7 +136,6 @@ class Wine(models.Model):
         max_length=3,
         choices={country.alpha_2: country.name for country in pycountry.countries},
     )
-    region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True)
     winery = models.ForeignKey(Winery, on_delete=models.SET_NULL, null=True)
     source = models.ManyToManyField(Source)
     stock = models.PositiveIntegerField(

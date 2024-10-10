@@ -15,6 +15,7 @@ from wine_cellar.apps.wine.models import (
     FoodPairing,
     Grape,
     Source,
+    Winery,
     WineType,
 )
 
@@ -49,6 +50,7 @@ class WineBaseForm(forms.Form):
     )
 
     vintage = forms.IntegerField(
+        required=False,
         validators=[
             validators.MinValueValidator(1900),
             validators.MaxValueValidator(datetime.now().year),
@@ -90,6 +92,12 @@ class WineBaseForm(forms.Form):
             "Enter dishes, cuisines, or ingredients that complement the "
             "flavors of this wine."
         ),
+    )
+    winery = OpenMultipleChoiceField(
+        required=False,
+        queryset=Winery.objects.all(),
+        field_name="name",
+        help_text=_("Enter the name of the winery which produced the wine."),
     )
     country = forms.CharField(
         max_length=250,
@@ -166,6 +174,7 @@ class WineForm(WineBaseForm):
         self.set_tom_config(name="classification", create=True)
         self.set_tom_config(name="food_pairings", create=True)
         self.set_tom_config(name="source", create=True)
+        self.set_tom_config(name="winery", max_items=1, max_options=None)
         self.set_tom_config(name="country", max_items=1, max_options=None)
 
     def _post_clean(self):
@@ -201,6 +210,15 @@ class WineForm(WineBaseForm):
                     name="source",
                     create=True,
                     items=[s.pk for s in source],
+                    clear=False,
+                )
+            winery = self.cleaned_data.get("winery", [])
+            if winery:
+                self.set_tom_config(
+                    name="winery",
+                    items=[w.pk for w in winery],
+                    max_items=1,
+                    max_options=None,
                     clear=False,
                 )
         self.set_tom_config(name="country", max_items=1, max_options=None, clear=False)
@@ -249,6 +267,19 @@ class WineEditForm(WineBaseForm):
             {
                 "data-tom_config": json.dumps(
                     {"create": True, "items": source, "maxItems": None}
+                ),
+            }
+        )
+
+        self.fields["winery"].widget.attrs.update(
+            {
+                "data-tom_config": json.dumps(
+                    {
+                        "create": False,
+                        "items": [instance.winery],
+                        "maxItems": 1,
+                        "maxOptions": None,
+                    }
                 ),
             }
         )
