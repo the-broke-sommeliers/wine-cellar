@@ -16,14 +16,40 @@
                   class="pure-form pure-form-stacked wine-form"
                   novalidate>
                 {% csrf_token %}
-                <fieldset>
-                    {% for field in form %}
-                        {% include 'forms/form_field.html' %}
-                    {% endfor %}
-                    <div class="pure-controls">
-                        <button type="submit" class="pure-button pure-button-primary">Save</button>
-                    </div>
+                <fieldset id="create__fs_0"
+                          class="{% if form.form_step.value != 0 and form.form_step.value != '0' %}hidden{% endif %}">
+                    {% include 'forms/form_field.html' with field=form.name %}
+                    {% include 'forms/form_field.html' with field=form.wine_type %}
+                    {% include 'forms/form_field.html' with field=form.country %}
+                    {% include 'forms/form_field.html' with field=form.capacity %}
                 </fieldset>
+                <fieldset id="create__fs_1"
+                          class="{% if form.form_step.value != 1 and form.form_step.value != '1' %}hidden{% endif %}">
+                    {% include 'forms/form_field.html' with field=form.image %}
+                    {% include 'forms/form_field.html' with field=form.remove_background %}
+                </fieldset>
+                <fieldset id="create__fs_2"
+                          class="{% if form.form_step.value != 2 and form.form_step.value != '2' %}hidden{% endif %}">
+                    {% include 'forms/form_field.html' with field=form.grapes %}
+                    {% include 'forms/form_field.html' with field=form.vintage %}
+                    {% include 'forms/form_field.html' with field=form.abv %}
+                    {% include 'forms/form_field.html' with field=form.category %}
+                </fieldset>
+                <fieldset id="create__fs_3"
+                          class="{% if form.form_step.value != 3 and form.form_step.value != '3' %}hidden{% endif %}">
+                    {% include 'forms/form_field.html' with field=form.vineyard %}
+                    {% include 'forms/form_field.html' with field=form.source %}
+                </fieldset>
+                <fieldset id="create__fs_4"
+                          class="{% if form.form_step.value != 4 and form.form_step.value != '4' %}hidden{% endif %}">
+                    {% include 'forms/form_field.html' with field=form.food_pairing %}
+                    {% include 'forms/form_field.html' with field=form.rating %}
+                    {% include 'forms/form_field.html' with field=form.comment %}
+                </fieldset>
+                {{ form.form_step }}
+                <div class="pure-controls">
+                    <button type="submit" class="pure-button pure-button-primary">Continue</button>
+                </div>
             </form>
         </div>
     </div>

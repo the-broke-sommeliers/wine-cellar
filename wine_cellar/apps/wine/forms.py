@@ -35,6 +35,7 @@ class WineBaseForm(forms.Form):
     )
     category = forms.CharField(
         label="Sweetness",
+        required=False,
         max_length=2,
         widget=forms.Select(choices=Category),
         help_text=_("Select the sweetness level of the wine."),
@@ -156,6 +157,15 @@ class WineBaseForm(forms.Form):
         required=False, help_text=_("Remove background from image")
     )
 
+    form_step = forms.IntegerField(
+        widget=forms.HiddenInput(),
+        required=True,
+        validators=[
+            validators.MinValueValidator(0),
+            validators.MaxValueValidator(4),
+        ],
+    )
+
     def set_tom_config(
         self, name, create=False, items=[], max_items=None, max_options=50, clear=True
     ):
@@ -175,6 +185,7 @@ class WineBaseForm(forms.Form):
 class WineForm(WineBaseForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.initial["form_step"] = 0
         self.set_tom_config(name="grapes", create=True)
         self.set_tom_config(name="classification", create=True)
         self.set_tom_config(name="food_pairings", create=True)
