@@ -32,7 +32,9 @@ def test_homepage(client, user):
 def test_wine_create_unauthenticated(client, user):
     r = client.get(reverse("wine-add"), follow=True)
     assert r.status_code == HTTPStatus.OK
-    assertRedirects(response=r, expected_url=reverse("login"))
+    assertRedirects(
+        response=r, expected_url=reverse("login") + "?next=" + reverse("wine-add")
+    )
     assertTemplateUsed(response=r, template_name="base.html")
     assertTemplateUsed(response=r, template_name="registration/login.html")
 
@@ -79,7 +81,9 @@ def test_wine_create_post_empty(client, user):
 def test_wine_create_post_unauthenticated(client):
     r = client.post(reverse("wine-add"), follow=True)
     assert r.status_code == HTTPStatus.OK
-    assertRedirects(response=r, expected_url=reverse("login"))
+    assertRedirects(
+        response=r, expected_url=reverse("login") + "?next=" + reverse("wine-add")
+    )
     assertTemplateUsed(response=r, template_name="base.html")
     assertTemplateUsed(response=r, template_name="registration/login.html")
     assert not Wine.objects.exists()

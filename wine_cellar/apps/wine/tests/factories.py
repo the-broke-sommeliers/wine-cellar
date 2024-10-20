@@ -10,10 +10,9 @@ from wine_cellar.apps.wine.models import (
     Classification,
     FoodPairing,
     Grape,
-    Region,
+    Vineyard,
     Wine,
     WineImage,
-    Winery,
     WineType,
 )
 
@@ -27,13 +26,6 @@ class UserFactory(DjangoModelFactory):
     password = make_password("password")
 
 
-class RegionFactory(DjangoModelFactory):
-    class Meta:
-        model = Region
-
-    name = factory.Faker("city")
-
-
 class GrapeFactory(DjangoModelFactory):
     class Meta:
         model = Grape
@@ -41,12 +33,11 @@ class GrapeFactory(DjangoModelFactory):
     name = factory.Faker("name")
 
 
-class WineryFactory(DjangoModelFactory):
+class VineyardFactory(DjangoModelFactory):
     class Meta:
-        model = Winery
+        model = Vineyard
 
     name = factory.Faker("company")
-    region = factory.SubFactory(RegionFactory)
 
 
 class FoodPairingFactory(DjangoModelFactory):
@@ -70,8 +61,6 @@ class WineFactory(DjangoModelFactory):
     user = factory.SubFactory(UserFactory)
     name = factory.Faker("name")
     wine_type = random.choice(WineType.labels)
-    region = factory.SubFactory(RegionFactory)
-    winery = factory.SubFactory(WineryFactory)
     vintage = random.randint(1900, 2024)
     # classification = factory.RelatedFactoryList(
     #    ClassificationFactory, size=random.randint(1, 4)

@@ -4,9 +4,6 @@ import pytest
 from django.conf import settings
 from django.templatetags.static import static
 
-# from django.urls import reverse
-# from pytest_django.asserts import assertURLEqual
-
 
 @pytest.mark.django_db
 def test_wine_model(user, wine_factory, grape_factory):
@@ -17,13 +14,8 @@ def test_wine_model(user, wine_factory, grape_factory):
 
 
 @pytest.mark.django_db
-def test_region_model(region):
-    assert region.name == str(region)
-
-
-@pytest.mark.django_db
-def test_winery_model(winery):
-    assert winery.name == str(winery)
+def test_vineyard_model(vineyard):
+    assert vineyard.name == str(vineyard)
 
 
 @pytest.mark.django_db
