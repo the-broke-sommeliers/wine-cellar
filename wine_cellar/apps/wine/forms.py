@@ -57,6 +57,10 @@ class WineBaseForm(forms.Form):
     )
     abv = forms.FloatField(
         required=False,
+        validators=[
+            validators.MinValueValidator(0.0),
+            validators.MaxValueValidator(100.0),
+        ],
         help_text=_(
             "Please enter the percentage of alcohol in the"
             " wine. This information is typically found on the label and indicates the"
