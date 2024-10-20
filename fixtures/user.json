@@ -3,10 +3,10 @@
         "model": "auth.user",
         "pk": 1,
         "fields": {
-            "password": "password",
+            "password": "pbkdf2_sha256$870000$TE2cnYw7AT9XdsHFDREk1M$ZGa0TnTV680rYOzjSephmKdTIpLUA3n/2nFHDpJDbDE=",
             "last_login": "2021-10-05T07:04:26.398Z",
             "is_superuser": true,
-            "username": "super_user",
+            "username": "admin",
             "first_name": "",
             "last_name": "",
             "email": "admin@dehm.net",
