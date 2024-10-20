@@ -15,7 +15,7 @@ from wine_cellar.apps.wine.models import (
     FoodPairing,
     Grape,
     Source,
-    Winery,
+    Vineyard,
     WineType,
 )
 
@@ -106,12 +106,12 @@ class WineBaseForm(forms.Form):
             "flavors of this wine."
         ),
     )
-    winery = OpenMultipleChoiceField(
+    vineyard = OpenMultipleChoiceField(
         label="Vineyard",
         required=False,
-        queryset=Winery.objects.all(),
+        queryset=Vineyard.objects.all(),
         field_name="name",
-        help_text=_("Enter the name of the winery which produced the wine."),
+        help_text=_("Enter the names of the vineyards which produced the wine."),
     )
     source = OpenMultipleChoiceField(
         required=False,
@@ -179,7 +179,7 @@ class WineForm(WineBaseForm):
         self.set_tom_config(name="classification", create=True)
         self.set_tom_config(name="food_pairings", create=True)
         self.set_tom_config(name="source", create=True)
-        self.set_tom_config(name="winery", max_items=1)
+        self.set_tom_config(name="vineyard", create=True)
         self.set_tom_config(name="country", max_items=1, max_options=-1)
 
     def _post_clean(self):
@@ -217,13 +217,12 @@ class WineForm(WineBaseForm):
                     items=[s.pk for s in source],
                     clear=False,
                 )
-            winery = self.cleaned_data.get("winery", [])
-            if winery:
+            vineyard = self.cleaned_data.get("vineyard", [])
+            if vineyard:
                 self.set_tom_config(
-                    name="winery",
-                    items=[w.pk for w in winery],
-                    max_items=1,
-                    max_options=-1,
+                    name="vineyard",
+                    items=[v.pk for v in vineyard],
+                    create=True,
                     clear=False,
                 )
             country = self.cleaned_data.get("country")
@@ -247,6 +246,7 @@ class WineEditForm(WineBaseForm):
         classification = [c.pk for c in initial["classification"]]
         food_pairing = [f.pk for f in initial["food_pairings"]]
         source = [s.pk for s in initial["source"]]
+        vineyard = [v.pk for v in initial["vineyard"]]
 
         self.fields["category"].widget.attrs.update(
             {
@@ -284,13 +284,13 @@ class WineEditForm(WineBaseForm):
             }
         )
 
-        self.fields["winery"].widget.attrs.update(
+        self.fields["vineyard"].widget.attrs.update(
             {
                 "data-tom_config": json.dumps(
                     {
-                        "create": False,
-                        "items": [instance.winery],
-                        "maxItems": 1,
+                        "create": True,
+                        "items": vineyard,
+                        "maxItems": None,
                         "maxOptions": None,
                     }
                 ),

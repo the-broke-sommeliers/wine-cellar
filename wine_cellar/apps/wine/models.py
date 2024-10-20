@@ -44,8 +44,7 @@ class Grape(models.Model):
         return ""
 
 
-class Winery(models.Model):
-    winery_id = models.BigIntegerField(null=True)
+class Vineyard(models.Model):
     name = models.CharField(max_length=100)
     website = models.CharField(max_length=100, null=True)
     region = models.CharField(max_length=250, null=True)
@@ -59,7 +58,7 @@ class Winery(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=["name", "country", "region"],
-                name="unique winery",
+                name="unique vineyard",
             )
         ]
 
@@ -136,7 +135,7 @@ class Wine(models.Model):
         max_length=3,
         choices={country.alpha_2: country.name for country in pycountry.countries},
     )
-    winery = models.ForeignKey(Winery, on_delete=models.SET_NULL, null=True)
+    vineyard = models.ManyToManyField(Vineyard)
     source = models.ManyToManyField(Source)
     stock = models.PositiveIntegerField(
         default=0,
@@ -145,6 +144,10 @@ class Wine(models.Model):
 
     def get_absolute_url(self):
         return reverse("wine-detail", kwargs={"pk": self.pk})
+
+    @property
+    def get_vineyards(self):
+        return "\n".join([str(vineyard) for vineyard in self.vineyard.all()])
 
     @property
     def get_grapes(self):
@@ -202,7 +205,6 @@ class Wine(models.Model):
                     "wine_type",
                     "abv",
                     "capacity",
-                    "winery",
                     "vintage",
                     "country",
                 ],

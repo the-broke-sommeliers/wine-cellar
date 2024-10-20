@@ -19,7 +19,7 @@ class WineFilter(django_filters.FilterSet):
             # "abv",
             # "capacity",
             "vintage",
-            "winery",
+            "vineyard",
             "grapes",
             "food_pairings",
             "source",

@@ -7,7 +7,9 @@ from wine_cellar.apps.wine.serializers import WineSerializer
 
 class WineViewSet(viewsets.ModelViewSet):
     queryset = (
-        Wine.objects.all().select_related("region", "winery").prefetch_related("grapes")
+        Wine.objects.all()
+        .select_related("region", "vineyard")
+        .prefetch_related("grapes")
     )
     serializer_class = WineSerializer
     filter_backends = [filters.SearchFilter, django_filters.DjangoFilterBackend]
@@ -15,7 +17,7 @@ class WineViewSet(viewsets.ModelViewSet):
         "wine_type",
         "grapes",
         "vintage",
-        "winery",
+        "vineyard",
         "food_pairings",
         "capacity",
         "region",
@@ -24,5 +26,5 @@ class WineViewSet(viewsets.ModelViewSet):
     search_fields = [
         "name",
         "grapes__name",
-        "winery__name",
+        "vineyard__name",
     ]

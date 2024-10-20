@@ -6,7 +6,7 @@ from wine_cellar.apps.wine.models import Wine
 class WineSerializer(serializers.ModelSerializer):
     grapes = serializers.StringRelatedField(many=True)
     region = serializers.StringRelatedField()
-    winery = serializers.StringRelatedField()
+    vineyard = serializers.StringRelatedField()
     food_pairings = serializers.StringRelatedField(many=True)
     source = serializers.StringRelatedField(many=True)
     classification = serializers.StringRelatedField(many=True)
@@ -25,5 +25,5 @@ class WineSerializer(serializers.ModelSerializer):
             "food_pairings",
             "source",
             "region",
-            "winery",
+            "vineyard",
         ]

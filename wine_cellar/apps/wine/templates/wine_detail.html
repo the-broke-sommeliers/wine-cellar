@@ -26,6 +26,12 @@
                 <span>{{ wine.country_icon }} {{ wine.country_name }}</span>
             </div>
             <div class="pure-u-1-1 center-container">
+                <h3>{% translate "Vineyard" %}</h3>
+            </div>
+            <div class="pure-u-1-1 center-container">
+                <span>{{ wine.get_vineyards | linebreaksbr }}</span>
+            </div>
+            <div class="pure-u-1-1 center-container">
                 <h3>{% translate "Type" %}</h3>
             </div>
             <div class="pure-u-1-1 center-container">
