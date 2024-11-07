@@ -18,7 +18,9 @@
                 {% csrf_token %}
                 <fieldset>
                     {% for field in form %}
-                        {% include 'forms/form_field.html' %}
+                        {% if field.name != "form_step" %}
+                            {% include 'forms/form_field.html' %}
+                        {% endif %}
                     {% endfor %}
                     <div class="pure-controls">
                         <button type="submit" class="pure-button pure-button-primary">Save</button>

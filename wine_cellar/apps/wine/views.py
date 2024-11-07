@@ -106,7 +106,7 @@ class WineCreateView(LoginRequiredMixin, FormView):
 
 
 class WineUpdateView(View):
-    template_name = "wine_create.html"
+    template_name = "wine_edit.html"
 
     def get(self, request, pk, *args, **kwargs):
         if not request.user.is_authenticated:
