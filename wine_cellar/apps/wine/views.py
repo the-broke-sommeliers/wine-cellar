@@ -78,6 +78,7 @@ class WineCreateView(LoginRequiredMixin, FormView):
         wine.comment = comment
         wine.rating = rating
         wine.save()
+
         wine.vineyard.set(vineyards),
         wine.grapes.set(grapes)
         wine.food_pairings.set(food_pairings)
@@ -140,6 +141,7 @@ class WineUpdateView(View):
         source = cleaned_data["source"]
         vineyards = cleaned_data["vineyard"]
         grapes = cleaned_data["grapes"]
+        remove_background = cleaned_data["remove_background"]
         image = cleaned_data["image"]
         name = cleaned_data["name"]
         rating = cleaned_data["rating"]
@@ -157,14 +159,38 @@ class WineUpdateView(View):
         wine.stock = stock if stock else 0
         wine.vintage = vintage
         wine.wine_type = wine_type
+        wine.save()
 
         wine.vineyard.set(vineyards)
         wine.grapes.set(grapes)
         wine.food_pairings.set(food_pairings)
         wine.source.set(source)
-        wine.save()
+
         if image:
-            WineImage.objects.get_or_create(image=image, wine=wine, user=user)
+            existing_image = WineImage.objects.filter(wine=wine, user=user)
+            if existing_image.exists():
+                existing_image.first().image.delete()
+                existing_image.delete()
+            wine_image, _ = WineImage.objects.get_or_create(
+                image=image, wine=wine, user=user
+            )
+            if remove_background:
+                model_choices = ["u2net", "u2net_human_seg", "u2netp"]
+                f = open(wine_image.image.path, "rb")
+                data = f.read()
+                f.close()
+                img = bg.remove(
+                    data,
+                    model_name=model_choices[0],
+                    alpha_matting=True,
+                    alpha_matting_foreground_threshold=240,
+                    alpha_matting_background_threshold=10,
+                    alpha_matting_erode_structure_size=10,
+                    alpha_matting_base_size=1000,
+                )
+                f = open(wine_image.image.path, "wb")
+                f.write(img)
+                f.close()
 
 
 class WineDetailView(LoginRequiredMixin, DetailView):

@@ -163,7 +163,7 @@ class WineBaseForm(forms.Form):
 
     form_step = forms.IntegerField(
         widget=forms.HiddenInput(),
-        required=True,
+        required=False,
         validators=[
             validators.MinValueValidator(0),
             validators.MaxValueValidator(4),
