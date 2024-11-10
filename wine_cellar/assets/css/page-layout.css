@@ -20,14 +20,14 @@ This is the parent `<div>` that contains the menu and the content area.
   padding-left: 0;
 }
 
-#layout.active .pure-menu {
+/* #layout.active .pure-menu {
   left: 200px;
   width: 200px;
-}
+} */
 
-#layout.active .menu-link {
+/* #layout.active .menu-link {
   left: 200px;
-}
+} */
 
 /*
 The content `<div>` is where all your content goes.
@@ -84,11 +84,11 @@ The content `<div>` is where all your content goes.
 }
 
 @media (min-width: 48em) {
-  #layout {
+  /* #layout {
     padding-left: 200px;
     /* left col width ".pure-menu" */
-    left: 0;
-  }
+    /* left: 0;
+  } */
 
   .header,
   .content {

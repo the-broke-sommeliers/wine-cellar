@@ -28,70 +28,54 @@
     </head>
     <body>
         <div id="layout">
-            {% block sidebar %}
-                <nav class="menu-nav">
-                    <!-- Menu toggle -->
-                    <input class="menu-toggle" type="checkbox" id="menu-toggle" value="text">
-                    <label class="menu-link" for="menu-toggle">
-                    {# djlint:off #}
-                    <span></span>
-                    {# djlint:on #}
-                    </label>
-                    <div class="pure-menu">
-                        <a href="{% url 'homepage' %}" class="pure-menu-heading pure-menu-link">Wine Cellar</a>
-                        <!-- <span class="pure-menu-heading">
-                            {% if user.is_authenticated %}
-                                {{ user.username }}
-                            {% else %}
-                                User
-                            {% endif %}
-                        </span> -->
-                        <ul class="pure-menu-list">
-                            <!-- # disable for now -->
-                            <!-- <li class="pure-menu-item">
-                                <a href="{% url 'user-profile' %}" class="pure-menu-link">Profile</a>
-                            </li>
-                            <li class="pure-menu-item">
-                                <a href="{% url 'settings' %}" class="pure-menu-link">Settings</a>
-                            </li>
+            {% block menu %}
+            <nav class="pure-menu pure-menu-horizontal">
+                <a href="{% url 'homepage' %}" class="pure-menu-heading pure-menu-link">Wine Cellar</a>
+                <ul class="pure-menu-list">
+                    <!-- # disable for now -->
+                    <!-- <li class="pure-menu-item">
+                        <a href="{% url 'user-profile' %}" class="pure-menu-link">Profile</a>
+                    </li>
+                    <li class="pure-menu-item">
+                        <a href="{% url 'settings' %}" class="pure-menu-link">Settings</a>
+                    </li>
 
-                            </li> -->
-                            {% if user.is_authenticated %}
-                                <li class="pure-menu-item">
-                                    <a href="{% url 'wine-list' %}" class="pure-menu-link">Wines</a>
-                                </li>
-                                <li class="pure-menu-item">
-                                    <a href="{% url 'wine-add' %}" class="pure-menu-link">Add Wine</a>
-                                </li>
-                                <li class="pure-menu-item">
-                                    <form action="{% url 'logout' %}" method="post">
-                                        {% csrf_token %}
-                                        <button class="pure-menu-link button" type="submit">Log Out</button>
-                                    </form>
-                                </li>
-                            {% else %}
-                                <li class="pure-menu-item">
-                                    <a href="{% url 'login' %}" class="pure-menu-link">Login</a>
-                                </li>
-                                {% comment %}
-                                # disable for now
-                                <li class="pure-menu-item">
-                                    <a href="{% url 'wine-search' %}" class="pure-menu-link">Search Wine</a>
-                                </li>
-                                {% endcomment %}
-                            {% endif %}
-                        </ul>
-                    </div>
-                </nav>
-            {% endblock sidebar %}
+                    </li> -->
+                    {% if user.is_authenticated %}
+                        <li class="pure-menu-item">
+                            <a href="{% url 'wine-list' %}" class="pure-menu-link">Wines</a>
+                        </li>
+                        <li class="pure-menu-item">
+                            <a href="{% url 'wine-add' %}" class="pure-menu-link">Add Wine</a>
+                        </li>
+                        <li class="pure-menu-item">
+                            <form action="{% url 'logout' %}" method="post">
+                                {% csrf_token %}
+                                <button class="pure-menu-link button" type="submit">Log Out</button>
+                            </form>
+                        </li>
+                    {% else %}
+                        <li class="pure-menu-item">
+                            <a href="{% url 'login' %}" class="pure-menu-link">Login</a>
+                        </li>
+                        {% comment %}
+                        # disable for now
+                        <li class="pure-menu-item">
+                            <a href="{% url 'wine-search' %}" class="pure-menu-link">Search Wine</a>
+                        </li>
+                        {% endcomment %}
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endblock menu %}
             <div id="main">
-                <div class="header">
+                <header class="header">
                     <h1 class="brand-title">
                         {% block header %}
                             Django Wine Cellar
                         {% endblock header %}
                     </h1>
-                </div>
+                </header>
                 <div class="content">
                     {% block content %}
                     {% endblock content %}

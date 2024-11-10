@@ -1,16 +1,14 @@
-.wine-detail__container {
-  h3 {
-    margin-top: 0.25em;
-    margin-bottom: 0;
-  }
-}
-
 .wine-detail__image {
   height: 250px;
   width: 188px;
   background-color: white;
   border-radius: 15px;
-  margin-bottom: 15px;
+  text-align: center;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+
+
+  margin-inline-start: auto;
+  margin-inline-end: 2rem;
 
   img {
     padding-top: 12.5px;
@@ -21,11 +19,20 @@
 }
 
 .wine-detail__name {
-  margin-left: 0.45em;
+  display: inline-block;
+  margin-top: 0;
 }
 
 .wine-detail__edit {
   margin-top: 0.75em;
   margin-left: 0.25em;
   font-size: 1.25em;
+}
+
+.wine-detail__table {
+  text-align: left;
+
+  th {
+    min-width: 6rem;
+  }
 }

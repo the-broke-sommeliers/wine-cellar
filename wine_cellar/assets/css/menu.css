@@ -1,117 +1,22 @@
 .pure-menu {
-  margin-left: -200px;
-  /* ".pure-menu" width */
-  width: 200px;
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  z-index: 1000;
-  /* so the menu or its navicon stays above all content */
+  border-bottom-color: black;
+  border-radius: 0;
   background-color: var(--dark);
-  overflow-y: auto;
 }
 
-/* nested menu styling */
-.pure-menu-has-children {
-  position: relative;
-}
-
-.pure-menu-children {
-  left: 100px;
-
-  > .pure-menu-item {
-    width: 100px;
-  }
-}
-
-.pure-menu-allow-hover:hover > .pure-menu-children {
-  display: block;
-  position: absolute;
-}
-
-.pure-menu ul {
-  border: none;
-  background: transparent;
-}
-
-/* menu link styling */
 .pure-menu-link {
-  color: white;
+  padding: 1em .7em;
+    color: white;
+}
+
+.pure-menu-link:hover,
+.pure-menu-link:focus,
+.pure-menu .button:hover,
+.pure-menu .button:focus {
+  background: var(--darker);
 }
 
 .pure-menu .button {
   background: none;
   border: none;
-}
-
-.pure-menu-link:hover,
-.pure-menu-link:focus {
-  background: var(--darker);
-}
-
-.pure-menu .pure-menu-heading {
-  font-size: 110%;
-  color: white;
-  margin-top: 0.5em;
-}
-
-/* -- Dynamic Button For Responsive Menu -------------------------------------*/
-.menu-nav {
-  position: absolute;
-}
-
-.menu-link {
-  position: fixed;
-  display: block;
-  top: 0;
-  left: 0;
-  background: rgba(0, 0, 0, 0.7);
-  font-size: 40px;
-  z-index: 10;
-  padding: 0.1em 0.4em;
-
-  span:before {
-    content: '\2261';
-  }
-}
-
-.menu-toggle {
-  position: absolute;
-  top: 0;
-  left: 0;
-  opacity: 0;
-}
-
-/* -- Responsive Styles (Media Queries) ------------------------------------- */
-.menu-toggle:checked ~ .menu-link {
-  background: rgba(0, 0, 0, 0.7);
-  position: fixed;
-  width: fit-content;
-  left: 200px;
-  z-index: 1001;
-
-  span:before {
-    content: '\2261';
-  }
-}
-
-.menu-toggle:checked ~ .pure-menu {
-  left: 200px;
-}
-
-@media (min-width: 48em) {
-  .pure-menu {
-    left: 200px;
-  }
-
-  .menu-link {
-    position: fixed;
-    left: 200px;
-    display: none;
-  }
-
-  .menu-toggle {
-    display: none;
-  }
 }

@@ -1,11 +1,11 @@
 .wine_card {
   background-color: white;
   margin-top: 15px;
-  margin-right: 15px;
   border-radius: 15px;
-  padding: 25px 25px 15px 25px;
   line-height: 1.25em;
   width: 100%;
+  overflow: hidden;
+
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
   p {
     margin: 0;
@@ -17,8 +17,12 @@
   }
 
   @media screen and (min-width: 64em) {
-    width: 41.7%;
+    width: calc(50% - 20px); /* Half of container width minus the gap */
   }
+}
+
+.wine_card__content {
+  padding: 25px 25px 15px 25px;
 }
 
 .wine_card__title {
@@ -42,4 +46,5 @@
   align-items: stretch;
   flex-direction: row;
   flex-wrap: wrap;
+  gap: 20px;
 }
