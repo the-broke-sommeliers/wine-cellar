@@ -33,6 +33,7 @@
   text-align: left;
 
   th {
+    vertical-align: top;
     min-width: 6rem;
   }
 }
