@@ -52,6 +52,11 @@
     width: 435.2px;
   }
 
+  label {
+    margin-bottom: 0px;
+    line-height: 0.75rem;
+  }
+
   @media screen and (min-width: 48em) {
     .pure-control-group {
       display: flex;
