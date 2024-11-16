@@ -1,12 +1,9 @@
-import requests
 from backgroundremover import bg
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
-from django.utils.decorators import method_decorator
 from django.views import View
-from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView, FormView, TemplateView
 from django_filters.views import FilterView
 
@@ -23,8 +20,14 @@ class HomePageView(LoginRequiredMixin, TemplateView):
         wines = Wine.objects.count()
         wines_in_stock = Wine.objects.filter(stock__gt=0).count()
         countries = Wine.objects.values_list("country").distinct().count()
-        oldest = Wine.objects.earliest("vintage").vintage
-        youngest = Wine.objects.latest("vintage").vintage
+        oldest = "-"
+        youngest = "-"
+        try:
+            oldest = Wine.objects.earliest("vintage").vintage
+            youngest = Wine.objects.latest("vintage").vintage
+        except Wine.DoesNotExist:
+            pass
+
         context.update(
             {
                 "wines": wines,
@@ -43,12 +46,16 @@ class WineCreateView(LoginRequiredMixin, FormView):
     success_url = reverse_lazy("wine-list")
 
     def form_valid(self, form):
-        if form.cleaned_data["form_step"] < 4:
+        form_step = form.cleaned_data.get("form_step", 4)
+        # assume form_step is last step if not send
+        if form_step is None:
+            form_step = 4
+        if form_step < 4:
             # FIXME: hacky workaround to increase form_step field
             form.data = form.data.copy()
             form.data["form_step"] = str(form.cleaned_data["form_step"] + 1)
             return super().form_invalid(form)
-        elif form.cleaned_data["form_step"] == 4:
+        elif form_step == 4:
             self.process_form_data(self.request.user, form.cleaned_data)
             return super().form_valid(form)
         return super().form_invalid(form)
@@ -216,42 +223,3 @@ class WineListView(LoginRequiredMixin, FilterView):
     def get_queryset(self):
         qs = super().get_queryset().order_by("pk")
         return qs.filter(user=self.request.user)
-
-
-class WineSearchView(View):
-    template_name = "wine_search.html"
-
-    @method_decorator(csrf_exempt)
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get(self, request, *args, **kwargs):
-        user = request.user
-        if not user.is_authenticated:
-            return redirect("login")
-        wine_filter = WineFilter(request.GET, queryset=None)
-        return render(
-            request, self.template_name, {"user": user, "wine_filter": wine_filter}
-        )
-
-
-class WineRemoteSearchView(View):
-    template_name = "wine_remote_search.html"
-
-    @method_decorator(csrf_exempt)
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return HttpResponseForbidden()
-        wine_filter = WineFilter(request.GET, queryset=Wine.objects.all())
-        # TODO: include local results
-        # r = requests.get("http://127.0.0.1:8003/wines/", params={**request.GET})
-        r = requests.get("http://127.0.0.1:8009/wines/", params={**request.GET})
-        results = r.json()
-        return render(
-            request,
-            self.template_name,
-            {"results": results, "user": request.user, "wine_filter": wine_filter},
-        )

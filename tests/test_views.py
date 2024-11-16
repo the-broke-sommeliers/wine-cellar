@@ -14,7 +14,7 @@ from wine_cellar.apps.wine.models import Wine
 def test_homepage_unauthenticated(client):
     r = client.get(reverse("homepage"), follow=True)
     assert r.status_code == HTTPStatus.OK
-    assertRedirects(response=r, expected_url=reverse("login"))
+    assertRedirects(response=r, expected_url=reverse("login") + "?next=/")
     assertTemplateUsed(response=r, template_name="base.html")
     assertTemplateUsed(response=r, template_name="registration/login.html")
 
@@ -25,6 +25,7 @@ def test_homepage(client, user):
     r = client.get(reverse("homepage"), follow=True)
     assert r.status_code == HTTPStatus.OK
     assertTemplateUsed(response=r, template_name="base.html")
+    assertTemplateUsed(response=r, template_name="homepage.html")
     assertTemplateNotUsed(response=r, template_name="registration/login.html")
 
 
