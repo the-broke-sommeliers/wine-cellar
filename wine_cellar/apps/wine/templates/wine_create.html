@@ -7,11 +7,23 @@
 {% block title %}
     Create/Edit Wine
 {% endblock title %}
-{% block header %}{% endblock header %}
+{% block header %}
+{% endblock header %}
 {% block content %}
     <div class="pure-g center-container">
         <div class="pure-u-1-2">
-            <h1 class="content-subhead">{% translate 'Add Wine' %}</h1>
+            <h1 class="form-head">{% translate 'Add Wine' %}</h1>
+            {% if form.form_step.value == 0 or form.form_step.value == '0' %}
+                <h1 class="form-subhead text-color-gray">{% translate 'Details' %}</h1>
+            {% elif form.form_step.value == 1 or form.form_step.value == '1' %}
+                <h1 class="form-subhead text-color-gray">{% translate 'Characteristics' %}</h1>
+            {% elif form.form_step.value == 2 or form.form_step.value == '2' %}
+                <h1 class="form-subhead text-color-gray">{% translate 'Origin' %}</h1>
+            {% elif form.form_step.value == 3 or form.form_step.value == '3' %}
+                <h1 class="form-subhead text-color-gray">{% translate 'Personal Notes' %}</h1>
+            {% elif form.form_step.value == 4 or form.form_step.value == '4' %}
+                <h1 class="form-subhead text-color-gray">{% translate 'Image' %}</h1>
+            {% endif %}
             <form method="post"
                   enctype="multipart/form-data"
                   class="pure-form pure-form-stacked wine-form"
@@ -38,7 +50,7 @@
                 </fieldset>
                 <fieldset id="create__fs_3"
                           class="{% if form.form_step.value != 3 and form.form_step.value != '3' %}hidden{% endif %}">
-                    {% include 'forms/form_field.html' with field=form.food_pairing %}
+                    {% include 'forms/form_field.html' with field=form.food_pairings %}
                     {% include 'forms/form_field.html' with field=form.rating %}
                     {% include 'forms/form_field.html' with field=form.comment %}
                 </fieldset>
