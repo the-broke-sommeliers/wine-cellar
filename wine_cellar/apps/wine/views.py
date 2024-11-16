@@ -7,7 +7,7 @@ from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import DetailView, FormView
+from django.views.generic import DetailView, FormView, TemplateView
 from django_filters.views import FilterView
 
 from wine_cellar.apps.wine.filters import WineFilter
@@ -15,18 +15,26 @@ from wine_cellar.apps.wine.forms import WineEditForm, WineForm
 from wine_cellar.apps.wine.models import Wine, WineImage
 
 
-class HomePageView(View):
-    template_name = "base.html"
+class HomePageView(LoginRequiredMixin, TemplateView):
+    template_name = "homepage.html"
 
-    @method_decorator(csrf_exempt)
-    async def dispatch(self, *args, **kwargs):
-        return await super().dispatch(*args, **kwargs)
-
-    async def get(self, request, *args, **kwargs):
-        user = await request.auser()
-        if not user.is_authenticated:
-            return redirect("login")
-        return render(request, self.template_name, {"user": user})
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        wines = Wine.objects.count()
+        wines_in_stock = Wine.objects.filter(stock__gt=0).count()
+        countries = Wine.objects.values_list("country").distinct().count()
+        oldest = Wine.objects.earliest("vintage").vintage
+        youngest = Wine.objects.latest("vintage").vintage
+        context.update(
+            {
+                "wines": wines,
+                "wines_in_stock": wines_in_stock,
+                "countries": countries,
+                "oldest": oldest,
+                "youngest": youngest,
+            }
+        )
+        return context
 
 
 class WineCreateView(LoginRequiredMixin, FormView):
