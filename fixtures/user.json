@@ -9,7 +9,7 @@
             "username": "admin",
             "first_name": "",
             "last_name": "",
-            "email": "admin@dehm.net",
+            "email": "admin@example.org",
             "is_staff": true,
             "is_active": true,
             "date_joined": "2021-09-30T11:27:31.898Z",
