@@ -11,7 +11,6 @@
         <link rel="stylesheet"
               href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/grids-responsive-min.css" />
         <link rel="stylesheet" href="{% static 'base.css' %}">
-        <script src="https://unpkg.com/htmx.org@1.9.10"></script>
         <link rel="icon"
               type="image/x-icon"
               href="{% static 'images/red_glass2.svg' %}">
@@ -24,7 +23,6 @@
                 Django Wine Cellar
             {% endblock title %}
         </title>
-        <!-- Add additional stylesheets or scripts here -->
     </head>
     <body>
         <div id="layout">
@@ -32,15 +30,6 @@
             <nav class="pure-menu pure-menu-horizontal">
                 <a href="{% url 'homepage' %}" class="pure-menu-heading pure-menu-link">Wine Cellar</a>
                 <ul class="pure-menu-list">
-                    <!-- # disable for now -->
-                    <!-- <li class="pure-menu-item">
-                        <a href="{% url 'user-profile' %}" class="pure-menu-link">Profile</a>
-                    </li>
-                    <li class="pure-menu-item">
-                        <a href="{% url 'settings' %}" class="pure-menu-link">Settings</a>
-                    </li>
-
-                    </li> -->
                     {% if user.is_authenticated %}
                         <li class="pure-menu-item">
                             <a href="{% url 'wine-list' %}" class="pure-menu-link">Wines</a>
@@ -58,12 +47,6 @@
                         <li class="pure-menu-item">
                             <a href="{% url 'login' %}" class="pure-menu-link">Login</a>
                         </li>
-                        {% comment %}
-                        # disable for now
-                        <li class="pure-menu-item">
-                            <a href="{% url 'wine-search' %}" class="pure-menu-link">Search Wine</a>
-                        </li>
-                        {% endcomment %}
                     {% endif %}
                 </ul>
             </nav>
