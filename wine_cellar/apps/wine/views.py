@@ -23,8 +23,12 @@ class HomePageView(LoginRequiredMixin, TemplateView):
         oldest = "-"
         youngest = "-"
         try:
-            oldest = Wine.objects.earliest("vintage").vintage
-            youngest = Wine.objects.latest("vintage").vintage
+            oldest = (
+                Wine.objects.filter(vintage__isnull=False).earliest("vintage").vintage
+            )
+            youngest = (
+                Wine.objects.filter(vintage__isnull=False).latest("vintage").vintage
+            )
         except Wine.DoesNotExist:
             pass
 
