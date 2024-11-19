@@ -334,16 +334,27 @@ class WineFilterForm(forms.Form):
         self.set_tom_config(name="food_pairings", create=False)
         self.set_tom_config(name="source", create=False)
         self.set_tom_config(name="vineyard", create=False)
-        self.set_tom_config(name="country", max_items=1, max_options=-1)
+        self.set_tom_config(
+            name="country", create=False, max_options=-1, placeholder=""
+        )
 
     def set_tom_config(
-        self, name, create=False, items=[], max_items=None, max_options=50, clear=True
+        self,
+        name,
+        create=False,
+        items=[],
+        max_items=None,
+        max_options=50,
+        clear=True,
+        placeholder=None,
     ):
         tom_config = {"create": create, "maxItems": max_items}
         if items:
             tom_config["items"] = items
         if max_options:
             tom_config["maxOptions"] = None if max_options == -1 else max_options
+        if placeholder is not None:
+            tom_config["placeholder"] = placeholder
         self.fields[name].widget.attrs.update(
             {
                 "data-tom_config": json.dumps(tom_config),

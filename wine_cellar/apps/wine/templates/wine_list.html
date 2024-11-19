@@ -15,11 +15,13 @@
             {# TODO: extract form into own template and style #}
             <form action="" method="get" class="pure-form pure-form-stacked">
                 <fieldset>
-                    <legend>
-                        <h3 class="text-align-left">
-                            {% translate 'Filter by:' %}
-                        </h3>
-                    </legend>
+                    <div class="filter-legend">
+                        <legend>
+                            <h3 class="text-align-left">
+                                {% translate 'Filter by:' %}
+                            </h3>
+                        </legend>
+                    </div>
                     {% for field in filter.form %}
                         {% include "wine_filter_field.html" %}
                     {% endfor %}

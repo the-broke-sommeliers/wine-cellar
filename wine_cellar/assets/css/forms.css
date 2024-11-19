@@ -33,6 +33,10 @@
   }
 }
 
+.filter-legend {
+  padding-right: 20px;
+}
+
 .form-head {
   font-weight: 300;
   margin: 20px 0 0 0;
@@ -83,6 +87,10 @@
 
 .ts-wrapper {
   margin-top: 0.25em;
+}
+
+.ts-control {
+  height: 36px;
 }
 
 .form-errorlist {
