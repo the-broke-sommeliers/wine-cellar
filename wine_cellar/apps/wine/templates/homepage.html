@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
 {% load static i18n %}
 {% block header %}
-    My Wine Cellar
+    <h1 class="content-subhead">
+        My Wine Cellar
+    </h1>
 {% endblock header %}
 {% block content %}
     <div class="stats__container">
@@ -28,7 +30,7 @@
                             {% endblocktranslate %}
                         </p>
                     </div>
-                                        <div class="stats__card">
+                    <div class="stats__card">
                         <p class="stats__number">{{ countries }}</p>
                         <p class="stats__label">
                             {% blocktranslate count counter=countries %}
@@ -38,10 +40,6 @@
                             {% endblocktranslate %}
                         </p>
                     </div>
-                </div>
-            </div>
-                        <div class="pure-u-1-1">
-                <div class="stats__card-container">
                     <div class="stats__card">
                         <p class="stats__number">{{ oldest }}</p>
                         <p class="stats__label">{% translate "Oldest Wine" %}</p>

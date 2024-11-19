@@ -11,16 +11,11 @@ class WineFilter(django_filters.FilterSet):
         fields = [
             "name",
             "wine_type",
-            # "elaborate",
             "category",
-            # "classification",
-            # "body",
-            # "acidity",
-            # "abv",
-            # "capacity",
             "vintage",
             "vineyard",
             "grapes",
             "food_pairings",
             "source",
+            "country",
         ]

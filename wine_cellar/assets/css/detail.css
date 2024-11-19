@@ -5,9 +5,14 @@
   border-radius: 15px;
   text-align: center;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  margin: auto;
+  margin-block-end: 2rem;
 
-  margin-inline-start: auto;
-  margin-inline-end: 2rem;
+  @media screen and (min-width: 48em) {
+    margin-inline-start: auto;
+    margin-inline-end: 1rem;
+  
+  }
 
   img {
     padding-top: 12.5px;
@@ -30,9 +35,17 @@
 
 .wine-detail__table {
   text-align: left;
+  margin: auto;
+
+  @media screen and (min-width: 48em) {
+    margin-inline-start: 1rem;
+    margin-inline-end: auto;
+  }
 
   th {
     vertical-align: top;
-    min-width: 6rem;
+    min-width: 7rem;
   }
+
+
 }

@@ -8,22 +8,11 @@
     Create/Edit Wine
 {% endblock title %}
 {% block header %}
+    <h1 class="form-head">{% translate 'Add Wine' %}</h1>
 {% endblock header %}
 {% block content %}
     <div class="pure-g center-container">
-        <div class="pure-u-1-2">
-            <h1 class="form-head">{% translate 'Add Wine' %}</h1>
-            {% if form.form_step.value == 0 or form.form_step.value == '0' %}
-                <h1 class="form-subhead text-color-gray">{% translate 'Details' %}</h1>
-            {% elif form.form_step.value == 1 or form.form_step.value == '1' %}
-                <h1 class="form-subhead text-color-gray">{% translate 'Characteristics' %}</h1>
-            {% elif form.form_step.value == 2 or form.form_step.value == '2' %}
-                <h1 class="form-subhead text-color-gray">{% translate 'Origin' %}</h1>
-            {% elif form.form_step.value == 3 or form.form_step.value == '3' %}
-                <h1 class="form-subhead text-color-gray">{% translate 'Personal Notes' %}</h1>
-            {% elif form.form_step.value == 4 or form.form_step.value == '4' %}
-                <h1 class="form-subhead text-color-gray">{% translate 'Image' %}</h1>
-            {% endif %}
+        <div class="pure-u-1 pure-u-lg-1-2">
             <form method="post"
                   enctype="multipart/form-data"
                   class="pure-form pure-form-stacked wine-form"
@@ -31,6 +20,7 @@
                 {% csrf_token %}
                 <fieldset id="create__fs_0"
                           class="{% if form.form_step.value != 0 and form.form_step.value != '0' %}hidden{% endif %}">
+                    <legend><h2 class="form-subhead text-color-gray">{% translate 'Details' %}</h2></legend>
                     {% include 'forms/form_field.html' with field=form.name %}
                     {% include 'forms/form_field.html' with field=form.wine_type %}
                     {% include 'forms/form_field.html' with field=form.country %}
@@ -38,6 +28,7 @@
                 </fieldset>
                 <fieldset id="create__fs_1"
                           class="{% if form.form_step.value != 1 and form.form_step.value != '1' %}hidden{% endif %}">
+                    <legend><h2 class="form-subhead text-color-gray">{% translate 'Characteristics' %}</h2></legend>
                     {% include 'forms/form_field.html' with field=form.grapes %}
                     {% include 'forms/form_field.html' with field=form.vintage %}
                     {% include 'forms/form_field.html' with field=form.abv %}
@@ -45,17 +36,20 @@
                 </fieldset>
                 <fieldset id="create__fs_2"
                           class="{% if form.form_step.value != 2 and form.form_step.value != '2' %}hidden{% endif %}">
+                    <legend><h2 class="form-subhead text-color-gray">{% translate 'Origin' %}</h2></legend>
                     {% include 'forms/form_field.html' with field=form.vineyard %}
                     {% include 'forms/form_field.html' with field=form.source %}
                 </fieldset>
                 <fieldset id="create__fs_3"
                           class="{% if form.form_step.value != 3 and form.form_step.value != '3' %}hidden{% endif %}">
+                    <legend><h2 class="form-subhead text-color-gray">{% translate 'Personal Notes' %}</h2></legend>
                     {% include 'forms/form_field.html' with field=form.food_pairings %}
                     {% include 'forms/form_field.html' with field=form.rating %}
                     {% include 'forms/form_field.html' with field=form.comment %}
                 </fieldset>
                 <fieldset id="create__fs_4"
                           class="{% if form.form_step.value != 4 and form.form_step.value != '4' %}hidden{% endif %}">
+                    <legend><h2 class="form-subhead text-color-gray">{% translate 'Image' %}</h2></legend>
                     {% include 'forms/form_field.html' with field=form.image %}
                     {% include 'forms/form_field.html' with field=form.remove_background %}
                 </fieldset>

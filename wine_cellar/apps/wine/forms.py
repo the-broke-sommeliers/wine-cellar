@@ -327,4 +327,28 @@ class WineEditForm(WineBaseForm):
 
 
 class WineFilterForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.initial["form_step"] = 0
+        self.set_tom_config(name="grapes", create=False)
+        self.set_tom_config(name="food_pairings", create=False)
+        self.set_tom_config(name="source", create=False)
+        self.set_tom_config(name="vineyard", create=False)
+        self.set_tom_config(name="country", max_items=1, max_options=-1)
+
+    def set_tom_config(
+        self, name, create=False, items=[], max_items=None, max_options=50, clear=True
+    ):
+        tom_config = {"create": create, "maxItems": max_items}
+        if items:
+            tom_config["items"] = items
+        if max_options:
+            tom_config["maxOptions"] = None if max_options == -1 else max_options
+        self.fields[name].widget.attrs.update(
+            {
+                "data-tom_config": json.dumps(tom_config),
+                "data-clear": "true" if clear else "false",
+            }
+        )
+
     template_name = "wine_filter_field.html"

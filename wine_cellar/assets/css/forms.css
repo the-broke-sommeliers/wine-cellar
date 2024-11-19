@@ -40,6 +40,7 @@
 }
 
 .form-subhead {
+  font-size: 3vh;
   margin: 20px 0 10px 0;
   font-weight: 300;
   color: #333;
@@ -49,7 +50,7 @@
   input:not([type='checkbox']),
   select,
   .ts-wrapper {
-    width: 435.2px;
+    min-width: 100%;
   }
 
   label {
@@ -72,6 +73,7 @@
 .form-container {
   margin-bottom: 1em;
 }
+
 .form-hint {
   font-style: italic;
   color: var(--text-color-gray);

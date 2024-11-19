@@ -1,12 +1,22 @@
+.wine_card__container {
+  margin-block-start: 5rem;
+  display: flex;
+  width: 100%;
+  align-items: stretch;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
 .wine_card {
   background-color: white;
-  margin-top: 15px;
-  border-radius: 15px;
+  border-radius: 10px;
   line-height: 1.25em;
   width: 100%;
   overflow: hidden;
 
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  
   p {
     margin: 0;
   }
@@ -39,12 +49,3 @@
   justify-content: flex-end;
 }
 
-.wine_card__container {
-  margin-block-start: 5rem;
-  display: flex;
-  width: 100%;
-  align-items: stretch;
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: 20px;
-}

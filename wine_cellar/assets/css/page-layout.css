@@ -50,14 +50,13 @@ The content `<div>` is where all your content goes.
   color: #333;
   text-align: center;
   margin: 2.5em 2em 0;
-  /* border-bottom: 1px solid var(--red); */
 }
 
-.header h1 {
+/* .header h1 {
   margin: 0.2em 0;
   font-size: 3em;
   font-weight: 300;
-}
+} */
 
 .header h2 {
   font-weight: 300;
@@ -67,9 +66,11 @@ The content `<div>` is where all your content goes.
 }
 
 .content-subhead {
+  font-size: 5vh;
   margin: 50px 0 20px 0;
   font-weight: 300;
   color: #333;
+  text-align: center;
 }
 
 .pagination {

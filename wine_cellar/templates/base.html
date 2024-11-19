@@ -53,12 +53,13 @@
             {% endblock menu %}
             <div id="main">
                 <header class="header">
-                    <h1 class="brand-title">
-                        {% block header %}
+                    {% block header %}
+                        <h1 class="brand-title">
                             Django Wine Cellar
-                        {% endblock header %}
-                    </h1>
+                        </h1>
+                    {% endblock header %}
                 </header>
+                
                 <div class="content">
                     {% block content %}
                     {% endblock content %}
