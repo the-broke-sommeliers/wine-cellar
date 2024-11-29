@@ -55,6 +55,7 @@
   select,
   .ts-wrapper {
     min-width: 100%;
+    min-height: 40px;
   }
 
   label {
@@ -98,4 +99,13 @@
   color: #bb0000;
   font-weight: bold;
   padding-left: 1rem;
+}
+
+.filter-form {
+  input:not([type='checkbox']),
+  select,
+  .ts-wrapper
+  .ts-control {
+    min-height: 40px;
+  }
 }

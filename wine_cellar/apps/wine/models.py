@@ -151,7 +151,7 @@ class Wine(models.Model):
 
     @property
     def get_grapes(self):
-        return "\n".join([str(grape) for grape in self.grapes.all()])
+        return ", ".join([str(grape) for grape in self.grapes.all()])
 
     @property
     def get_classifications(self):

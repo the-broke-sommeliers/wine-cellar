@@ -4,7 +4,7 @@
         <div class="pure-g">
             <div class="pure-u-6-24">
                 <img src="{{ wine.get_type_image }}"
-                     height="42px"
+                     height="85%"
                      width="auto"
                      alt="Image of a glass of {{ wine.get_type }} wine">
             </div>
@@ -12,7 +12,7 @@
                 <h2 class="wine_card__title">{{ wine.name }}</h2>
                 <div class="pure-u-1-1">
                     <span class="text--gray">Grape</span>
-                    <p>{{ wine.get_grapes | linebreaksbr }}</p>
+                    <p>{{ wine.get_grapes | truncatechars:31 | title }}</p>
                 </div>
                 <div class="pure-u-1-1">
                     <span class="text--gray">Vintage</span>
