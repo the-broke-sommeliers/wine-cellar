@@ -49,6 +49,11 @@ class WineCreateView(LoginRequiredMixin, FormView):
     form_class = WineForm
     success_url = reverse_lazy("wine-list")
 
+    def form_invalid(self, form):
+        form.data = form.data.copy()
+        form.data["form_step"] = form.cleaned_data["form_step"]
+        return super().form_invalid(form)
+
     def form_valid(self, form):
         form_step = form.cleaned_data.get("form_step", 4)
         # assume form_step is last step if not send
@@ -57,7 +62,7 @@ class WineCreateView(LoginRequiredMixin, FormView):
         if form_step < 4:
             # FIXME: hacky workaround to increase form_step field
             form.data = form.data.copy()
-            form.data["form_step"] = str(form.cleaned_data["form_step"] + 1)
+            form.data["form_step"] = form.cleaned_data["form_step"] + 1
             return super().form_invalid(form)
         elif form_step == 4:
             self.process_form_data(self.request.user, form.cleaned_data)

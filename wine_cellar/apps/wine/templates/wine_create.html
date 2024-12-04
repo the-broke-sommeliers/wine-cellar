@@ -19,7 +19,7 @@
                   novalidate>
                 {% csrf_token %}
                 <fieldset id="create__fs_0"
-                          class="{% if form.form_step.value != 0 and form.form_step.value != '0' %}hidden{% endif %}">
+                          class="{% if form.form_step.value != 0 %}hidden{% endif %}">
                     <legend><h2 class="form-subhead text-color-gray">{% translate 'Details' %}</h2></legend>
                     {% include 'forms/form_field.html' with field=form.name %}
                     {% include 'forms/form_field.html' with field=form.wine_type %}
@@ -27,7 +27,7 @@
                     {% include 'forms/form_field.html' with field=form.capacity %}
                 </fieldset>
                 <fieldset id="create__fs_1"
-                          class="{% if form.form_step.value != 1 and form.form_step.value != '1' %}hidden{% endif %}">
+                          class="{% if form.form_step.value != 1 %}hidden{% endif %}">
                     <legend><h2 class="form-subhead text-color-gray">{% translate 'Characteristics' %}</h2></legend>
                     {% include 'forms/form_field.html' with field=form.grapes %}
                     {% include 'forms/form_field.html' with field=form.vintage %}
@@ -35,20 +35,20 @@
                     {% include 'forms/form_field.html' with field=form.category %}
                 </fieldset>
                 <fieldset id="create__fs_2"
-                          class="{% if form.form_step.value != 2 and form.form_step.value != '2' %}hidden{% endif %}">
+                          class="{% if form.form_step.value != 2 %}hidden{% endif %}">
                     <legend><h2 class="form-subhead text-color-gray">{% translate 'Origin' %}</h2></legend>
                     {% include 'forms/form_field.html' with field=form.vineyard %}
                     {% include 'forms/form_field.html' with field=form.source %}
                 </fieldset>
                 <fieldset id="create__fs_3"
-                          class="{% if form.form_step.value != 3 and form.form_step.value != '3' %}hidden{% endif %}">
+                          class="{% if form.form_step.value != 3 %}hidden{% endif %}">
                     <legend><h2 class="form-subhead text-color-gray">{% translate 'Personal Notes' %}</h2></legend>
                     {% include 'forms/form_field.html' with field=form.food_pairings %}
                     {% include 'forms/form_field.html' with field=form.rating %}
                     {% include 'forms/form_field.html' with field=form.comment %}
                 </fieldset>
                 <fieldset id="create__fs_4"
-                          class="{% if form.form_step.value != 4 and form.form_step.value != '4' %}hidden{% endif %}">
+                          class="{% if form.form_step.value != 4 %}hidden{% endif %}">
                     <legend><h2 class="form-subhead text-color-gray">{% translate 'Image' %}</h2></legend>
                     {% include 'forms/form_field.html' with field=form.image %}
                     {% include 'forms/form_field.html' with field=form.remove_background %}
