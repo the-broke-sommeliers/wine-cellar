@@ -30,7 +30,7 @@
 .wine-detail__edit {
   margin-top: 0.75em;
   margin-left: 0.25em;
-  font-size: 1.25em;
+  font-size: var(--font-md);
 }
 
 .wine-detail__table {

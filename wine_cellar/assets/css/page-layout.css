@@ -1,6 +1,3 @@
-/*
-Add transition to containers so they can push in and out.
-*/
 #layout,
 .pure-menu,
 .menu-link {
@@ -11,27 +8,12 @@ Add transition to containers so they can push in and out.
   transition: all 0.2s ease-out;
 }
 
-/*
-This is the parent `<div>` that contains the menu and the content area.
-*/
 #layout {
   position: relative;
   left: 0;
   padding-left: 0;
 }
 
-/* #layout.active .pure-menu {
-  left: 200px;
-  width: 200px;
-} */
-
-/* #layout.active .menu-link {
-  left: 200px;
-} */
-
-/*
-The content `<div>` is where all your content goes.
-*/
 .content {
   margin: 0 auto;
   padding: 0 2em;
@@ -52,12 +34,6 @@ The content `<div>` is where all your content goes.
   margin: 2.5em 2em 0;
 }
 
-/* .header h1 {
-  margin: 0.2em 0;
-  font-size: 3em;
-  font-weight: 300;
-} */
-
 .header h2 {
   font-weight: 300;
   color: #333;
@@ -66,7 +42,7 @@ The content `<div>` is where all your content goes.
 }
 
 .content-subhead {
-  font-size: 5vh;
+  font-size: var(--font-lg);
   margin: 50px 0 20px 0;
   font-weight: 300;
   color: #333;
@@ -80,7 +56,7 @@ The content `<div>` is where all your content goes.
     display: inline-block;
     margin-left: 4px;
     margin-right: 4px;
-    font-size: 1.5rem;
+    font-size: var(--font-md);
   }
 }
 
