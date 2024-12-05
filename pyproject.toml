@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "wine_cellar"
 authors = [
     {name = "Julian Dehm", email = "julian@dehm.dev"},
-    {name = "Philli", email = "hello@phillippa.net"},
+    {name = "Phillippa Morland"},
 ]
 description = "Self-hosted wine cellar"
 readme = "README.md"
