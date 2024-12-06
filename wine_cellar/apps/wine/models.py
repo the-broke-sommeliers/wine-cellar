@@ -10,6 +10,15 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 
+class UserContentModel(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
 class WineType(models.TextChoices):
     WHITE = "WH", _("White")
     RED = "RE", _("Red")
@@ -27,7 +36,7 @@ class Category(models.TextChoices):
     FEINHERB = "FH", _("Feinherb")
 
 
-class Grape(models.Model):
+class Grape(UserContentModel):
     name = models.CharField(max_length=100)
 
     class Meta:
@@ -44,7 +53,7 @@ class Grape(models.Model):
         return ""
 
 
-class Vineyard(models.Model):
+class Vineyard(UserContentModel):
     name = models.CharField(max_length=100)
     website = models.CharField(max_length=100, null=True)
     region = models.CharField(max_length=250, null=True)
@@ -57,7 +66,7 @@ class Vineyard(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["name", "country", "region"],
+                fields=["name", "country", "region", "user"],
                 name="unique vineyard",
             )
         ]
@@ -66,13 +75,13 @@ class Vineyard(models.Model):
         return self.name
 
 
-class FoodPairing(models.Model):
+class FoodPairing(UserContentModel):
     name = models.CharField(max_length=100)
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["name"],
+                fields=["name", "user"],
                 name="unique food pairing",
             )
         ]
@@ -81,13 +90,13 @@ class FoodPairing(models.Model):
         return self.name
 
 
-class Classification(models.Model):
+class Classification(UserContentModel):
     name = models.CharField(max_length=100)
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["name"],
+                fields=["name", "user"],
                 name="unique classification",
             )
         ]
@@ -96,13 +105,13 @@ class Classification(models.Model):
         return self.name
 
 
-class Source(models.Model):
+class Source(UserContentModel):
     name = models.CharField(max_length=250)
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["name"],
+                fields=["name", "user"],
                 name="unique source",
             )
         ]
@@ -111,7 +120,7 @@ class Source(models.Model):
         return self.name
 
 
-class Wine(models.Model):
+class Wine(UserContentModel):
     wine_id = models.BigIntegerField(null=True)
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=100)

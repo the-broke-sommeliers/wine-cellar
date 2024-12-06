@@ -5,6 +5,7 @@ import pycountry
 from django import forms
 from django.core import validators
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db.models import Q
 from django.forms import ImageField, model_to_dict
 from django.utils.translation import gettext as _
 
@@ -21,6 +22,25 @@ from wine_cellar.apps.wine.models import (
 
 
 class WineBaseForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user")
+        super().__init__(*args, **kwargs)
+        self.fields["grapes"].queryset = Grape.objects.filter(
+            Q(user=None) | Q(user=user)
+        )
+        self.fields["classification"].queryset = Classification.objects.filter(
+            Q(user=None) | Q(user=user)
+        )
+        self.fields["food_pairings"].queryset = FoodPairing.objects.filter(
+            Q(user=None) | Q(user=user)
+        )
+        self.fields["source"].queryset = Source.objects.filter(
+            Q(user=None) | Q(user=user)
+        )
+        self.fields["vineyard"].queryset = Vineyard.objects.filter(
+            Q(user=None) | Q(user=user)
+        )
+
     class Meta:
         abstract = True
 
@@ -81,7 +101,7 @@ class WineBaseForm(forms.Form):
 
     grapes = OpenMultipleChoiceField(
         required=False,
-        queryset=Grape.objects.all(),
+        queryset=Grape.objects.none(),
         field_name="name",
         help_text=_(
             "Select or add the grape "
@@ -93,7 +113,7 @@ class WineBaseForm(forms.Form):
     )
     classification = OpenMultipleChoiceField(
         required=False,
-        queryset=Classification.objects.all(),
+        queryset=Classification.objects.none(),
         field_name="name",
         help_text=_(
             "Select or add the classification or designation of the wine, such as "
@@ -104,7 +124,7 @@ class WineBaseForm(forms.Form):
     )
     food_pairings = OpenMultipleChoiceField(
         required=False,
-        queryset=FoodPairing.objects.all(),
+        queryset=FoodPairing.objects.none(),
         field_name="name",
         help_text=_(
             "Enter dishes, cuisines, or ingredients that complement the "
@@ -114,13 +134,13 @@ class WineBaseForm(forms.Form):
     vineyard = OpenMultipleChoiceField(
         label="Vineyard",
         required=False,
-        queryset=Vineyard.objects.all(),
+        queryset=Vineyard.objects.none(),
         field_name="name",
         help_text=_("Enter the names of the vineyards which produced the wine."),
     )
     source = OpenMultipleChoiceField(
         required=False,
-        queryset=Source.objects.all(),
+        queryset=Source.objects.none(),
         field_name="name",
         help_text=_("Where did you get the wine from?"),
     )
