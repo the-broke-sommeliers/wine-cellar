@@ -15,6 +15,7 @@ from wine_cellar.apps.wine.models import (
     Classification,
     FoodPairing,
     Grape,
+    Size,
     Source,
     Vineyard,
     WineType,
@@ -40,6 +41,7 @@ class WineBaseForm(forms.Form):
         self.fields["vineyard"].queryset = Vineyard.objects.filter(
             Q(user=None) | Q(user=user)
         )
+        self.fields["size"].queryset = Size.objects.filter(Q(user=None) | Q(user=user))
 
     class Meta:
         abstract = True
@@ -69,7 +71,10 @@ class WineBaseForm(forms.Form):
             "Select the country the wine was produced in as indicated on the " "label."
         ),
     )
-    capacity = forms.FloatField(
+    size = OpenMultipleChoiceField(
+        required=False,
+        queryset=Grape.objects.none(),
+        field_name="name",
         label="Size",
         help_text=_(
             "Please enter the volume of bottle or box ect. in liters, e.g. 0.75."
@@ -216,6 +221,7 @@ class WineForm(WineBaseForm):
         self.set_tom_config(name="source", create=True)
         self.set_tom_config(name="vineyard", create=True)
         self.set_tom_config(name="country", max_items=1, max_options=-1)
+        self.set_tom_config(name="size", max_items=1, max_options=-1)
 
     def _post_clean(self):
         """Update tom-select config to prevent data loss in the form"""
@@ -265,6 +271,15 @@ class WineForm(WineBaseForm):
                 self.set_tom_config(
                     name="country",
                     items=[country],
+                    max_items=1,
+                    max_options=-1,
+                    clear=False,
+                )
+            size = self.cleaned_data.get("size")
+            if size:
+                self.set_tom_config(
+                    name="size",
+                    items=[s.pk for s in size],
                     max_items=1,
                     max_options=-1,
                     clear=False,
@@ -338,6 +353,18 @@ class WineEditForm(WineBaseForm):
                     {
                         "create": False,
                         "items": [instance.country],
+                        "maxItems": 1,
+                        "maxOptions": None,
+                    }
+                ),
+            }
+        )
+        self.fields["size"].widget.attrs.update(
+            {
+                "data-tom_config": json.dumps(
+                    {
+                        "create": False,
+                        "items": [instance.size],
                         "maxItems": 1,
                         "maxOptions": None,
                     }

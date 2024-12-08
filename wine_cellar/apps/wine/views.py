@@ -49,6 +49,12 @@ class WineCreateView(LoginRequiredMixin, FormView):
     form_class = WineForm
     success_url = reverse_lazy("wine-list")
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        if "user" not in kwargs:
+            kwargs["user"] = self.request.user
+        return kwargs
+
     def form_invalid(self, form):
         form.data = form.data.copy()
         form.data["form_step"] = form.cleaned_data["form_step"]
@@ -72,7 +78,7 @@ class WineCreateView(LoginRequiredMixin, FormView):
     @staticmethod
     def process_form_data(user, cleaned_data):
         abv = cleaned_data["abv"]
-        capacity = cleaned_data["capacity"]
+        size = cleaned_data["size"][0]
         category = cleaned_data["category"]
         comment = cleaned_data["comment"]
         country = cleaned_data["country"]
@@ -90,7 +96,7 @@ class WineCreateView(LoginRequiredMixin, FormView):
 
         wine = Wine(
             abv=abv,
-            capacity=capacity,
+            size=size,
             category=category,
             country=country,
             name=name,
@@ -98,9 +104,9 @@ class WineCreateView(LoginRequiredMixin, FormView):
             user=user,
             vintage=vintage,
             wine_type=wine_type,
+            comment=comment,
+            rating=rating,
         )
-        wine.comment = comment
-        wine.rating = rating
         wine.save()
 
         wine.vineyard.set(vineyards),
@@ -157,7 +163,7 @@ class WineUpdateView(View):
     @staticmethod
     def process_form_data(wine, user, cleaned_data):
         abv = cleaned_data["abv"]
-        capacity = cleaned_data["capacity"]
+        size = cleaned_data["size"][0]
         category = cleaned_data["category"]
         comment = cleaned_data["comment"]
         country = cleaned_data["country"]
@@ -174,7 +180,7 @@ class WineUpdateView(View):
         wine_type = cleaned_data["wine_type"]
 
         wine.abv = abv
-        wine.capacity = capacity
+        wine.size = size
         wine.category = category
         wine.comment = comment
         wine.country = country

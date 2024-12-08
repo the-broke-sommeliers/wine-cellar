@@ -36,6 +36,13 @@ class Category(models.TextChoices):
     FEINHERB = "FH", _("Feinherb")
 
 
+class Size(UserContentModel):
+    name = models.FloatField()
+
+    def __str__(self):
+        return str(self.name)
+
+
 class Grape(UserContentModel):
     name = models.CharField(max_length=100)
 
@@ -121,7 +128,6 @@ class Source(UserContentModel):
 
 
 class Wine(UserContentModel):
-    wine_id = models.BigIntegerField(null=True)
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=100)
     wine_type = models.CharField(max_length=2, choices=WineType)
@@ -130,7 +136,7 @@ class Wine(UserContentModel):
     classification = models.ManyToManyField(Classification)
     food_pairings = models.ManyToManyField(FoodPairing)
     abv = models.FloatField(null=True, blank=True)
-    capacity = models.FloatField(null=True, blank=True)
+    size = models.ForeignKey(Size, on_delete=models.SET_NULL, null=True)
     vintage = models.PositiveIntegerField(
         validators=[MinValueValidator(1900), MaxValueValidator(datetime.now().year)],
         null=True,
@@ -213,7 +219,7 @@ class Wine(UserContentModel):
                     "name",
                     "wine_type",
                     "abv",
-                    "capacity",
+                    "size",
                     "vintage",
                     "country",
                 ],
