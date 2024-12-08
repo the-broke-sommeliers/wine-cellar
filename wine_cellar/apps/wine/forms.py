@@ -22,7 +22,39 @@ from wine_cellar.apps.wine.models import (
 )
 
 
-class WineBaseForm(forms.Form):
+class TomSelectMixin:
+    def set_tom_config(
+        self,
+        name,
+        create=False,
+        items=[],
+        max_items=None,
+        max_options=50,
+        clear=True,
+        placeholder=None,
+        closeAfterSelect=True,
+    ):
+        tom_config = {
+            "create": create,
+            "maxItems": max_items,
+            "closeAfterSelect": closeAfterSelect,
+        }
+        if items:
+            tom_config["items"] = items
+        if max_options:
+            tom_config["maxOptions"] = None if max_options == -1 else max_options
+        if placeholder is not None:
+            tom_config["placeholder"] = placeholder
+
+        self.fields[name].widget.attrs.update(
+            {
+                "data-tom_config": json.dumps(tom_config),
+                "data-clear": "true" if clear else "false",
+            }
+        )
+
+
+class WineBaseForm(TomSelectMixin, forms.Form):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop("user")
         super().__init__(*args, **kwargs)
@@ -194,21 +226,6 @@ class WineBaseForm(forms.Form):
         ],
     )
 
-    def set_tom_config(
-        self, name, create=False, items=[], max_items=None, max_options=50, clear=True
-    ):
-        tom_config = {"create": create, "maxItems": max_items}
-        if items:
-            tom_config["items"] = items
-        if max_options:
-            tom_config["maxOptions"] = None if max_options == -1 else max_options
-        self.fields[name].widget.attrs.update(
-            {
-                "data-tom_config": json.dumps(tom_config),
-                "data-clear": "true" if clear else "false",
-            }
-        )
-
 
 class WineForm(WineBaseForm):
     def __init__(self, *args, **kwargs):
@@ -372,7 +389,9 @@ class WineEditForm(WineBaseForm):
         )
 
 
-class WineFilterForm(forms.Form):
+class WineFilterForm(TomSelectMixin, forms.Form):
+    template_name = "wine_filter_field.html"
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.initial["form_step"] = 0
@@ -383,29 +402,3 @@ class WineFilterForm(forms.Form):
         self.set_tom_config(
             name="country", create=False, max_options=-1, placeholder=""
         )
-
-    def set_tom_config(
-        self,
-        name,
-        create=False,
-        items=[],
-        max_items=None,
-        max_options=50,
-        clear=True,
-        placeholder=None,
-    ):
-        tom_config = {"create": create, "maxItems": max_items}
-        if items:
-            tom_config["items"] = items
-        if max_options:
-            tom_config["maxOptions"] = None if max_options == -1 else max_options
-        if placeholder is not None:
-            tom_config["placeholder"] = placeholder
-        self.fields[name].widget.attrs.update(
-            {
-                "data-tom_config": json.dumps(tom_config),
-                "data-clear": "true" if clear else "false",
-            }
-        )
-
-    template_name = "wine_filter_field.html"

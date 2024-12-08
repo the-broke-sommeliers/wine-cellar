@@ -9,7 +9,8 @@ function initTomSelect (): void {
     const clearOpts : boolean = Boolean(JSON.parse(el.dataset.clearOpts ?? "false"))
     let config : RecursivePartial<TomSettings> = {
       create: false,
-      maxItems: 1,  
+      closeAfterSelect: true,
+      maxItems: 1,
       // disable search
       controlInput: '',
     }
