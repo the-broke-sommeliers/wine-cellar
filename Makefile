@@ -33,7 +33,6 @@ watch:
 .PHONY: fixtures
 fixtures:
 	$(VIRTUAL_ENV)/bin/python3 manage.py loaddata fixtures/user.json
-	$(VIRTUAL_ENV)/bin/python3 manage.py loaddata fixtures/user.json
 
 .PHONY: pytest
 pytest:
