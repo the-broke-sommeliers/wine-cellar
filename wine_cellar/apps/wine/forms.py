@@ -72,7 +72,6 @@ class WineBaseForm(forms.Form):
         ),
     )
     size = OpenMultipleChoiceField(
-        required=False,
         queryset=Grape.objects.none(),
         field_name="name",
         label="Size",
