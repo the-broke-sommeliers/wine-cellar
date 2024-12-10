@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n %}
 {% block title %}
     Login
 {% endblock title %}
@@ -13,11 +13,11 @@
             <div class="login-container">
                 <form class="pure-form" method="post">
                     {% csrf_token %}
-                    <label for="username">Username:</label>
+                    <label for="username">{% translate "Username" %}</label>
                     <input type="text" id="username" name="username" required>
-                    <label for="password">Password:</label>
+                    <label for="password">{% translate "Password" %}</label>
                     <input type="password" id="password" name="password" required>
-                    <input type="submit" value="Login" class="pure-button pure-button-primary">
+                    <input type="submit" value="{% translate 'Login' %}" class="pure-button pure-button-primary">
                 </form>
             </div>
         </div>
