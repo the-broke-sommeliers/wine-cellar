@@ -111,6 +111,7 @@
   select,
   .ts-wrapper
   .ts-control {
+    width: calc(100% - 20px);
     min-height: 40px;
   }
 }
