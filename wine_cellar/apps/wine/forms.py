@@ -6,7 +6,7 @@ from django import forms
 from django.core import validators
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models import Q
-from django.forms import ImageField, model_to_dict
+from django.forms import ImageField
 from django.utils.translation import gettext as _
 
 from wine_cellar.apps.wine.fields import OpenMultipleChoiceField
@@ -303,9 +303,9 @@ class WineForm(WineBaseForm):
 
 
 class WineEditForm(WineBaseForm):
-    def __init__(self, instance, *args, **kwargs):
-        initial = model_to_dict(instance)
-        super(forms.Form, self).__init__(initial, *args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        initial = self.initial
 
         category = [initial["category"]]
         grapes = [grape.pk for grape in initial["grapes"]]
@@ -313,6 +313,8 @@ class WineEditForm(WineBaseForm):
         food_pairing = [f.pk for f in initial["food_pairings"]]
         source = [s.pk for s in initial["source"]]
         vineyard = [v.pk for v in initial["vineyard"]]
+        country = initial["country"]
+        size = initial["size"]
 
         self.fields["category"].widget.attrs.update(
             {
@@ -349,7 +351,6 @@ class WineEditForm(WineBaseForm):
                 ),
             }
         )
-
         self.fields["vineyard"].widget.attrs.update(
             {
                 "data-tom_config": json.dumps(
@@ -362,13 +363,12 @@ class WineEditForm(WineBaseForm):
                 ),
             }
         )
-
         self.fields["country"].widget.attrs.update(
             {
                 "data-tom_config": json.dumps(
                     {
                         "create": False,
-                        "items": [instance.country],
+                        "items": country,
                         "maxItems": 1,
                         "maxOptions": None,
                     }
@@ -380,7 +380,7 @@ class WineEditForm(WineBaseForm):
                 "data-tom_config": json.dumps(
                     {
                         "create": False,
-                        "items": [instance.size],
+                        "items": size,
                         "maxItems": 1,
                         "maxOptions": None,
                     }

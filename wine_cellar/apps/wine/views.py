@@ -1,9 +1,9 @@
 from backgroundremover import bg
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.forms import model_to_dict
 from django.http import HttpResponseForbidden
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
-from django.views import View
 from django.views.generic import DetailView, FormView, TemplateView
 from django_filters.views import FilterView
 
@@ -136,29 +136,29 @@ class WineCreateView(LoginRequiredMixin, FormView):
                 f.close()
 
 
-class WineUpdateView(View):
+class WineUpdateView(LoginRequiredMixin, FormView):
     template_name = "wine_edit.html"
+    form_class = WineEditForm
+    success_url = reverse_lazy("wine-list")
 
-    def get(self, request, pk, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return redirect("login")
-        wine = get_object_or_404(Wine, pk=pk)
-        if not request.user == wine.user:
-            return HttpResponseForbidden()
-        form = WineEditForm(instance=wine)
-        return render(request, self.template_name, {"form": form})
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        if "user" not in kwargs:
+            kwargs["user"] = self.request.user
+        return kwargs
 
-    def post(self, request, pk, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return redirect("login")
-        wine = get_object_or_404(Wine, pk=pk)
-        if not request.user == wine.user:
+    def get_initial(self):
+        initial = super().get_initial()
+        wine = get_object_or_404(Wine, pk=self.kwargs["pk"])
+        initial.update(model_to_dict(wine))
+        return initial
+
+    def form_valid(self, form):
+        wine = get_object_or_404(Wine, pk=self.kwargs["pk"])
+        if not self.request.user == wine.user:
             return HttpResponseForbidden()
-        form = WineForm(data=request.POST, files=request.FILES)
-        if form.is_valid():
-            self.process_form_data(wine, request.user, form.cleaned_data)
-            return redirect("wine-list")
-        return render(request, self.template_name, {"form": form})
+        self.process_form_data(wine, self.request.user, form.cleaned_data)
+        return super().form_valid(form)
 
     @staticmethod
     def process_form_data(wine, user, cleaned_data):

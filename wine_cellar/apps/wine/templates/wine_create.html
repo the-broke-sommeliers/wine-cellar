@@ -8,7 +8,6 @@
     Create/Edit Wine
 {% endblock title %}
 {% block header %}
-    <h1 class="form-head">{% translate 'Add Wine' %}</h1>
 {% endblock header %}
 {% block content %}
     <div class="pure-g center-container">
@@ -39,6 +38,7 @@
                     <legend><h2 class="form-subhead text-color-gray">{% translate 'Origin' %}</h2></legend>
                     {% include 'forms/form_field.html' with field=form.vineyard %}
                     {% include 'forms/form_field.html' with field=form.source %}
+                    {% include 'forms/form_field.html' with field=form.stock %}
                 </fieldset>
                 <fieldset id="create__fs_3"
                           class="{% if form.form_step.value != 3 %}hidden{% endif %}">
