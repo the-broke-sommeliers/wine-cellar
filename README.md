@@ -26,7 +26,6 @@
   - [Load Fixtures](#6-load-fixtures)
 - [Directory Structure](#directory-structure)
 - [Running Tests](#running-tests)
-- [API Documentation](#api-documentation)
 - [Additional Information](#additional-information)
 
 ---
@@ -124,18 +123,6 @@ You can also run Django backend tests directly using:
 ```sh
 python manage.py test
 ```
-
----
-
-## API Documentation
-
-Wine Cellar provides a REST API for managing wines, inventory, food pairings, and user data. After the app is running, you can explore the API at:
-
-```plaintext
-http://127.0.0.1:8003/api/
-```
-
-API documentation is available under `/api/docs/` if enabled in the configuration.
 
 ---
 
