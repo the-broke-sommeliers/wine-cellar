@@ -3,6 +3,10 @@
 
 **Wine Cellar** is a self-hosted wine management app built with Django, designed for wine enthusiasts who want to keep track of the wines they've tried, store tasting notes, rate wines, and manage their wine inventory. Whether you're a casual wine drinker or a connoisseur with a growing collection, this app helps you organize and enjoy your wine journey. Additionally, you can add food pairings to wines for the perfect dining experience.
 
+<img src="https://github.com/user-attachments/assets/315280b8-9f87-45fd-ab88-507d88aef362" height="150" alt="Landing page showing different statistics about your wines">
+<img src="https://github.com/user-attachments/assets/645855e4-3c22-4253-9d59-9fd76f7f4c05" height="150" alt="Wine list view showing all wines in the database">
+<img src="https://github.com/user-attachments/assets/dec2345b-e276-43bf-aac9-e667f3a535b3" height="150" alt="wine detail view showing a picture of a wine and it's attributes">
+
 ## Features
 
 - **Wine Tracking**: Record wines you've tasted and whether you liked or disliked them.
