@@ -11,6 +11,8 @@ class OpenMultipleChoiceField(ModelMultipleChoiceField):
            will be used to create it.
     """
 
+    user = None
+
     def __init__(self, queryset, field_name, field_class=None, **kwargs):
         super().__init__(queryset, **kwargs)
         self.field_name = field_name
@@ -50,7 +52,9 @@ class OpenMultipleChoiceField(ModelMultipleChoiceField):
                     v = pk.removeprefix("tom_new_opt")
                     if self.field_class:
                         v = self.field_class(v)
-                    new_value, _ = self.queryset.get_or_create(**{self.field_name: v})
+                    new_value, _ = self.queryset.get_or_create(
+                        **{self.field_name: v, "user": self.user}
+                    )
                     new_values.add(new_value.pk)
                 elif isinstance(pk, str) and not self.required and pk == "":
                     continue

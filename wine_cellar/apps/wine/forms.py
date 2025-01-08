@@ -58,22 +58,19 @@ class WineBaseForm(TomSelectMixin, forms.Form):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop("user")
         super().__init__(*args, **kwargs)
-        self.fields["grapes"].queryset = Grape.objects.filter(
-            Q(user=None) | Q(user=user)
-        )
-        self.fields["classification"].queryset = Classification.objects.filter(
-            Q(user=None) | Q(user=user)
-        )
-        self.fields["food_pairings"].queryset = FoodPairing.objects.filter(
-            Q(user=None) | Q(user=user)
-        )
-        self.fields["source"].queryset = Source.objects.filter(
-            Q(user=None) | Q(user=user)
-        )
-        self.fields["vineyard"].queryset = Vineyard.objects.filter(
-            Q(user=None) | Q(user=user)
-        )
-        self.fields["size"].queryset = Size.objects.filter(Q(user=None) | Q(user=user))
+        user_fields = [
+            "vineyard",
+            "classification",
+            "grapes",
+            "food_pairings",
+            "source",
+            "size",
+        ]
+        for user_field in user_fields:
+            self.fields[user_field].queryset = self.fields[
+                user_field
+            ].queryset.model.objects.filter(Q(user=None) | Q(user=user))
+            self.fields[user_field].user = user
 
     class Meta:
         abstract = True
@@ -104,7 +101,7 @@ class WineBaseForm(TomSelectMixin, forms.Form):
         ),
     )
     size = OpenMultipleChoiceField(
-        queryset=Grape.objects.none(),
+        queryset=Size.objects.none(),
         field_name="name",
         label="Size",
         help_text=_(
