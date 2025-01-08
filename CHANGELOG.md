@@ -15,6 +15,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 - removed MaxValue validator from vintage field as it will cause a migration
 every year, the form already validates against a future vintage year input.
+- optimise WineBaseForm code
+- fix OpenMultipleChoiceField not adding the creating user 
 
 ## v0.0.1
 - initial release
