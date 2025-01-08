@@ -16,17 +16,30 @@ class HomePageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        wines = Wine.objects.count()
-        wines_in_stock = Wine.objects.filter(stock__gt=0).count()
-        countries = Wine.objects.values_list("country").distinct().count()
+        wines = Wine.objects.filter(user=self.request.user).count()
+        wines_in_stock = (
+            Wine.objects.filter(stock__gt=0).filter(user=self.request.user).count()
+        )
+        countries = (
+            Wine.objects.filter(user=self.request.user)
+            .values_list("country")
+            .distinct()
+            .count()
+        )
         oldest = "-"
         youngest = "-"
         try:
             oldest = (
-                Wine.objects.filter(vintage__isnull=False).earliest("vintage").vintage
+                Wine.objects.filter(user=self.request.user)
+                .filter(vintage__isnull=False)
+                .earliest("vintage")
+                .vintage
             )
             youngest = (
-                Wine.objects.filter(vintage__isnull=False).latest("vintage").vintage
+                Wine.objects.filter(user=self.request.user)
+                .filter(vintage__isnull=False)
+                .latest("vintage")
+                .vintage
             )
         except Wine.DoesNotExist:
             pass
