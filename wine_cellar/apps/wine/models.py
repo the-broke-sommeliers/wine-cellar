@@ -1,5 +1,3 @@
-from datetime import datetime
-
 import pycountry
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -138,7 +136,7 @@ class Wine(UserContentModel):
     abv = models.FloatField(null=True, blank=True)
     size = models.ForeignKey(Size, on_delete=models.SET_NULL, null=True)
     vintage = models.PositiveIntegerField(
-        validators=[MinValueValidator(1900), MaxValueValidator(datetime.now().year)],
+        validators=[MinValueValidator(1900)],
         null=True,
     )
     comment = models.CharField(max_length=250, blank=True)
