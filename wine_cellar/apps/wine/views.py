@@ -1,5 +1,4 @@
 from backgroundremover import bg
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms import model_to_dict
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404
@@ -12,7 +11,7 @@ from wine_cellar.apps.wine.forms import WineEditForm, WineForm
 from wine_cellar.apps.wine.models import Wine, WineImage
 
 
-class HomePageView(LoginRequiredMixin, TemplateView):
+class HomePageView(TemplateView):
     template_name = "homepage.html"
 
     def get_context_data(self, **kwargs):
@@ -44,7 +43,7 @@ class HomePageView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class WineCreateView(LoginRequiredMixin, FormView):
+class WineCreateView(FormView):
     template_name = "wine_create.html"
     form_class = WineForm
     success_url = reverse_lazy("wine-list")
@@ -136,7 +135,7 @@ class WineCreateView(LoginRequiredMixin, FormView):
                 f.close()
 
 
-class WineUpdateView(LoginRequiredMixin, FormView):
+class WineUpdateView(FormView):
     template_name = "wine_edit.html"
     form_class = WineEditForm
     success_url = reverse_lazy("wine-list")
@@ -223,12 +222,12 @@ class WineUpdateView(LoginRequiredMixin, FormView):
                 f.close()
 
 
-class WineDetailView(LoginRequiredMixin, DetailView):
+class WineDetailView(DetailView):
     template_name = "wine_detail.html"
     model = Wine
 
 
-class WineListView(LoginRequiredMixin, FilterView):
+class WineListView(FilterView):
     model = Wine
     template_name = "wine_list.html"
     context_object_name = "wines"

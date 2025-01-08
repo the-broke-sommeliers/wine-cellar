@@ -7,6 +7,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## Unreleased
 
+### Changed
+
+- use LoginRequiredMiddleware instead of LoginRequiredMixin
+
 ### Fixed
 
 - removed MaxValue validator from vintage field as it will cause a migration
