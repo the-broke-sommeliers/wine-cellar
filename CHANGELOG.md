@@ -17,6 +17,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 every year, the form already validates against a future vintage year input.
 - optimise WineBaseForm code
 - fix OpenMultipleChoiceField not adding the creating user 
+- prevent wine filters from leaking info about other users wines
 
 ## v0.0.1
 - initial release
