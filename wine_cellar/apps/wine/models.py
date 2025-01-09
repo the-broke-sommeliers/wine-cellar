@@ -128,6 +128,7 @@ class Source(UserContentModel):
 class Wine(UserContentModel):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=100)
+    barcode = models.CharField(max_length=100, null=True)
     wine_type = models.CharField(max_length=2, choices=WineType)
     category = models.CharField(max_length=2, choices=Category, null=True)
     grapes = models.ManyToManyField(Grape)

@@ -131,7 +131,6 @@ class WineBaseForm(TomSelectMixin, forms.Form):
             " vintage years are prominently displayed on wine labels."
         ),
     )
-
     grapes = OpenMultipleChoiceField(
         required=False,
         queryset=Grape.objects.none(),
@@ -176,6 +175,11 @@ class WineBaseForm(TomSelectMixin, forms.Form):
         queryset=Source.objects.none(),
         field_name="name",
         help_text=_("Where did you get the wine from?"),
+    )
+    barcode = forms.CharField(
+        max_length=100,
+        required=False,
+        help_text=_("Enter the barcode of the wine as indicated on the label."),
     )
     stock = forms.IntegerField(
         required=False,
