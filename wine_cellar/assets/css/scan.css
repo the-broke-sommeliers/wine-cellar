@@ -1,0 +1,48 @@
+.wine-scan__image {
+  height: 250px;
+  width: 188px;
+  background-color: white;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  margin: auto;
+  margin-block-end: 2rem;
+
+  img {
+    padding-top: 12.5px;
+    height: 225px;
+    width: auto;
+    max-width: 188px;
+  }
+}
+
+.wine-scan__container {
+  a {
+    text-decoration: inherit;
+    color: inherit;
+  }
+ a {
+  text-decoration: none;
+  display: inline-block;
+  padding: 8px 16px;
+}
+
+a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+.decrease {
+  background-color: var(--inverse-dark);
+  color: black;
+}
+
+.increase {
+  background-color: var(--dark);
+  color: white;
+}
+
+.round {
+  border-radius: 50%;
+}
+}

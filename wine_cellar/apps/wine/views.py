@@ -1,8 +1,8 @@
 from django.forms import model_to_dict
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, HttpResponseNotFound
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import DetailView, FormView, TemplateView
+from django.views.generic import DetailView, FormView, RedirectView, TemplateView
 from django_filters.views import FilterView
 
 from wine_cellar.apps.wine.filters import WineFilter
@@ -64,6 +64,8 @@ class WineCreateView(FormView):
         kwargs = super().get_form_kwargs()
         if "user" not in kwargs:
             kwargs["user"] = self.request.user
+        if "code" in self.kwargs:
+            kwargs["initial"].update({"barcode": self.kwargs["code"]})
         return kwargs
 
     def form_invalid(self, form):
@@ -91,6 +93,7 @@ class WineCreateView(FormView):
         abv = cleaned_data["abv"]
         size = cleaned_data["size"][0]
         category = cleaned_data["category"]
+        barcode = cleaned_data["barcode"]
         comment = cleaned_data["comment"]
         country = cleaned_data["country"]
         food_pairings = cleaned_data["food_pairings"]
@@ -110,6 +113,7 @@ class WineCreateView(FormView):
             category=category,
             country=country,
             name=name,
+            barcode=barcode,
             stock=stock if stock else 0,
             user=user,
             vintage=vintage,
@@ -156,6 +160,7 @@ class WineUpdateView(FormView):
         abv = cleaned_data["abv"]
         size = cleaned_data["size"][0]
         category = cleaned_data["category"]
+        barcode = cleaned_data["barcode"]
         comment = cleaned_data["comment"]
         country = cleaned_data["country"]
         food_pairings = cleaned_data["food_pairings"]
@@ -175,6 +180,7 @@ class WineUpdateView(FormView):
         wine.comment = comment
         wine.country = country
         wine.name = name
+        wine.barcode = barcode
         wine.rating = rating
         wine.stock = stock if stock else 0
         wine.vintage = vintage
@@ -210,3 +216,45 @@ class WineListView(FilterView):
     def get_queryset(self):
         qs = super().get_queryset().order_by("pk")
         return qs.filter(user=self.request.user)
+
+
+class WineScanView(TemplateView):
+    template_name = "scan_wine.html"
+
+
+class WineScannedView(TemplateView):
+    template_name = "scanned_wine.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        code = self.kwargs["code"]
+        try:
+            wine = (
+                Wine.objects.filter(barcode=code).filter(user=self.request.user).first()
+            )
+            context.update({"wine": wine, "code": code})
+        except Wine.DoesNotExist:
+            pass
+        return context
+
+
+class WineChangeStockView(RedirectView):
+    permanent = False
+    query_string = True
+    pattern_name = "wine-detail"
+
+    def get_redirect_url(self, *args, **kwargs):
+        # op = 0 decrease stock
+        # op = 1 increaste stock
+        pk = kwargs["pk"]
+        operation = kwargs.pop("op")
+        try:
+            wine = Wine.objects.filter(pk=pk).filter(user=self.request.user).first()
+        except Wine.DoesNotExist:
+            return HttpResponseNotFound("hello")
+        if operation == 1:
+            wine.stock += 1
+        else:
+            wine.stock -= 1
+        wine.save()
+        return super().get_redirect_url(*args, **kwargs)
