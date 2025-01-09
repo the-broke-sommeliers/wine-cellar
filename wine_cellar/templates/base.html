@@ -38,6 +38,9 @@
                             <a href="{% url 'wine-add' %}" class="pure-menu-link">Add Wine</a>
                         </li>
                         <li class="pure-menu-item">
+                            <a href="{% url 'wine-scan' %}" class="pure-menu-link">Scan Wine</a>
+                        </li>
+                        <li class="pure-menu-item">
                             <form action="{% url 'logout' %}" method="post">
                                 {% csrf_token %}
                                 <button class="pure-menu-link button" type="submit">Log Out</button>
