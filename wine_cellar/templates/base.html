@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-{% load static i18n %}
+{% load static settings i18n %}
 <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -64,6 +64,9 @@
                     {% block content %}
                     {% endblock content %}
                 </div>
+                <footer class="footer">
+                    <p>© Copyright 2025 | Version {% get_setting "VERSION" %} | <a href="https://github.com/goapunk/wine-cellar" target="_blank">Github <span class="sr-only">(opens in new tab)</span></a></p>
+                </footer>
             </div>
         </div>
     </body>
