@@ -51,7 +51,7 @@
 }
 
 .wine-form {
-  input:not([type='checkbox']),
+  input,
   select,
   textarea,
   .ts-wrapper {

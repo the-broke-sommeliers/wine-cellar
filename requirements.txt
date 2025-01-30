@@ -1,7 +1,5 @@
 Django==5.1.2
 Faker==30.3.0
-#backgroundremover==0.2.8
-git+https://github.com/goapunk/backgroundremover.git
 black==24.10.0
 django-debug-toolbar==4.4.6
 django-filter==24.3
