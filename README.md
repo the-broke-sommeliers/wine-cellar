@@ -20,6 +20,7 @@
 
 ## Table of Contents
 
+- [Docker](#docker)
 - [Prerequisites](#prerequisites)
 - [Getting Started](#getting-started)
   - [Clone the Repository](#1-clone-the-repository)
@@ -33,6 +34,27 @@
 - [Additional Information](#additional-information)
 
 ---
+
+## Docker
+
+**Do not run this in production or for any other purpose than development or
+a local demo**
+
+To run a development version of Wine Cellar follow these steps:
+
+```
+# copy .env.dev-sample to .env.dev
+cp .env-dev-sample .env.dev
+# build docker image
+docker build .
+# run wine cellar
+docker compose up
+```
+Once running open http://127.0.0.1:8000/ and login with the following
+credentials:
+
+user: admin
+password: pass
 
 ## Prerequisites
 
