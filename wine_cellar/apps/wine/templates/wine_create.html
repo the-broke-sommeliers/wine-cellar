@@ -51,7 +51,6 @@
                           class="{% if form.form_step.value != 4 %}hidden{% endif %}">
                     <legend><h2 class="form-subhead text-color-gray">{% translate 'Image' %}</h2></legend>
                     {% include 'forms/form_field.html' with field=form.image %}
-                    {% include 'forms/form_field.html' with field=form.remove_background %}
                 </fieldset>
                 {{ form.form_step }}
                 <div class="pure-controls">

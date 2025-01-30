@@ -210,9 +210,6 @@ class WineBaseForm(TomSelectMixin, forms.Form):
             " identify the wine in your collection "
         ),
     )
-    remove_background = forms.BooleanField(
-        required=False, help_text=_("Remove background from image")
-    )
 
     form_step = forms.IntegerField(
         widget=forms.HiddenInput(),
