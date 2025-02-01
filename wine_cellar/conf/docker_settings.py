@@ -1,4 +1,5 @@
 import os
+
 from wine_cellar.conf.settings import *
 
 DEBUG = bool(os.environ.get("DEBUG", default=0))
@@ -14,3 +15,9 @@ DATABASES = {
         "PORT": os.environ.get("SQL_PORT", "5432"),
     }
 }
+
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "mediafiles"
