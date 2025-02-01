@@ -5,8 +5,8 @@ FROM python:3.12.8-slim-bookworm
 WORKDIR /usr/src/app
 
 # set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 # install system dependencies
 RUN apt-get update && apt-get upgrade && apt-get install git netcat-traditional curl libpq-dev libpq5 -y
