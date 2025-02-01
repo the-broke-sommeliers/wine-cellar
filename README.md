@@ -37,24 +37,35 @@
 
 ## Docker
 
+### Development / Demo
 **Do not run this in production or for any other purpose than development or
 a local demo**
 
 To run a development version of Wine Cellar follow these steps:
-
 ```
 # copy .env.dev-sample to .env.dev
-cp .env-dev-sample .env.dev
+cp .env.dev-sample .env.dev
 # build docker image
 docker build .
 # run wine cellar
 docker compose up
 ```
-Once running open http://127.0.0.1:8000/ and login with the following
-credentials:
 
-user: admin
-password: pass
+### Prod
+**This is still in development, the django settings haven't been really checked
+for production, so use with care**
+This assumes you have a reverse proxy running. Copy and edit the .env files (add
+a proper db password and Django secret).
+```
+# copy .env.prod.db-sample to .env.prod.db
+cp .env.prod.db-sample .env.prod.db
+# copy .env.prod-sample to .env.prod
+cp .env.prod-sample .env.prod
+# Edit both files
+# start the container
+docker compose up -f docker-compose.prod.yml
+```
+Your reverse proxy needs to point to `http://127.0.0.1:8085`.
 
 ## Prerequisites
 
