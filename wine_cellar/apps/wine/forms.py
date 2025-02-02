@@ -179,7 +179,7 @@ class WineBaseForm(TomSelectMixin, forms.Form):
     barcode = forms.CharField(
         max_length=100,
         required=False,
-        help_text=_("Enter the barcode of the wine as indicated on the label."),
+        help_text=_("Enter the barcode number of the wine as indicated on the label."),
     )
     stock = forms.IntegerField(
         required=False,

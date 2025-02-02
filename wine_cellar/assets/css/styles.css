@@ -3,9 +3,10 @@
 @import url('forms.css');
 
 :root {
-  --darker: #506653;
-  --dark: #408048;
-  --inverse-dark: #804078;
+  --darker-green: #506653;
+  --dark-green: #408048;
+  --dark-purple: #4d1445;
+  --darker-purple: #2c0527;
   --red: #cc0000;
   --light: #f6f5ef;
   --text-color-gray: #525252;

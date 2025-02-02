@@ -1,12 +1,12 @@
-.pure-form input[type='submit'],
+/* .pure-form input[type='submit'],
 .pure-form button[type='submit'] {
-  background-color: var(--dark);
-}
+  background-color: var(--dark-green);
+} */
 
-.pure-form input[type='submit']:hover,
+/* .pure-form input[type='submit']:hover,
 .pure-form button[type='submit']:hover {
-  background-color: var(--darker);
-}
+  background-color: var(--darker-green);
+} */
 
 .pure-form input[aria-invalid='true'] {
   border-color: #bb0000;
@@ -24,13 +24,13 @@
     margin-bottom: 10px;
   }
 
-  .pure-form input[type='submit'] {
+  /* .pure-form input[type='submit'] {
     width: 100%;
     color: var(--light);
     padding: 10px;
     border: none;
     cursor: pointer;
-  }
+  } */
 }
 
 .filter-legend {
