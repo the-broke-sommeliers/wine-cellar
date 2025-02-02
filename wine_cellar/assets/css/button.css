@@ -1,0 +1,17 @@
+.button__primary {
+    background-color: var(--dark-green);
+    color: var(--light);
+
+    &:hover {
+        background-color: var(--darker-green);
+    }
+}
+
+.button__secondary {
+    background-color: var(--dark-purple);
+    color: var(--light);
+
+    &:hover {
+        background-color: var(--darker-purple);
+    }
+}

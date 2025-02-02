@@ -1,7 +1,7 @@
 .pure-menu {
   border-bottom-color: black;
   border-radius: 0;
-  background-color: var(--dark);
+  background-color: var(--dark-green);
 }
 
 .pure-menu-link {
@@ -13,7 +13,7 @@
 .pure-menu-link:focus,
 .pure-menu .button:hover,
 .pure-menu .button:focus {
-  background: var(--darker);
+  background: var(--darker-green);
 }
 
 .pure-menu .button {
