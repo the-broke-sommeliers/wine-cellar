@@ -28,7 +28,7 @@
     "css-loader": "6.11.0",
     "eslint": "9.7.0",
     "eslint-plugin-promise": "6.6.0",
-    "husky": "9.0.11",
+    "husky": "9.1.7",
     "lint-staged": "15.2.2",
     "mini-css-extract-plugin": "2.8.1",
     "neostandard": "0.11.1",
