@@ -40,7 +40,7 @@
     "sass-loader": "14.1.0",
     "stylelint": "16.2.1",
     "stylelint-config-standard-scss": "13.0.0",
-    "stylelint-declaration-strict-value": "1.10.4",
+    "stylelint-declaration-strict-value": "1.10.7",
     "ts-loader": "9.5.1",
     "typescript": "5.5.4",
     "webpack": "5.90.3",
