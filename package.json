@@ -12,7 +12,7 @@
     "react": "19.0.0",
     "react-barcode-scanner": "3.0.1",
     "react-dom": "19.0.0",
-    "tom-select": "2.3.1"
+    "tom-select": "2.4.2"
   },
   "devDependencies": {
     "@babel/core": "7.26.8",
