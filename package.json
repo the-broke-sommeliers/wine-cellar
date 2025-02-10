@@ -29,7 +29,7 @@
     "eslint": "9.20.0",
     "eslint-plugin-promise": "6.6.0",
     "husky": "9.1.7",
-    "lint-staged": "15.2.2",
+    "lint-staged": "15.4.3",
     "mini-css-extract-plugin": "2.8.1",
     "neostandard": "0.11.1",
     "path-browserify": "1.0.1",
