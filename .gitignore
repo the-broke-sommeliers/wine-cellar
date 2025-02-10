@@ -9,3 +9,6 @@ static/
 build/
 *.egg-info/
 media/
+.env.dev
+.env.prod
+.env.prod.db

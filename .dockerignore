@@ -1,2 +1,7 @@
 node_modules/
 venv/
+datasets/
+.env.dev
+.env.prod
+.env.prod.db
+db.sqlite3
