@@ -16,7 +16,7 @@ DATABASES = {
     }
 }
 
-CSRF_TRUSTED_ORIGINS = ["http://localhost:8085"]
+CSRF_TRUSTED_ORIGINS = os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS").split(" ")
 
 STATIC_URL = "/static/"
 STATIC_ROOT = "staticfiles"
