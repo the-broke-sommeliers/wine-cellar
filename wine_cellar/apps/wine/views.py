@@ -197,9 +197,8 @@ class WineUpdateView(FormView):
             if existing_image.exists():
                 existing_image.first().image.delete()
                 existing_image.delete()
-            WineImage.objects.get_or_create(
-                image=image, wine=wine, user=user
-            )
+            WineImage.objects.get_or_create(image=image, wine=wine, user=user)
+
 
 class WineDetailView(DetailView):
     template_name = "wine_detail.html"
