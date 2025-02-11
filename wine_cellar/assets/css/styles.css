@@ -3,29 +3,28 @@
 @import url('forms.css');
 
 :root {
-  --darker-green: #506653;
-  --dark-green: #408048;
-  --dark-purple: #4d1445;
-  --darker-purple: #2c0527;
-  --red: #cc0000;
-  --light: #f6f5ef;
-  --text-color-gray: #525252;
-  --font-sm: 1rem;
-  --font-md: 1.25rem;
-  --font-lg: 2rem;
-  --font-xl: 3rem; 
+    --darker-green: #506653;
+    --dark-green: #408048;
+    --dark-purple: #4d1445;
+    --darker-purple: #2c0527;
+    --red: #cc0000;
+    --light: #f6f5ef;
+    --text-color-gray: #525252;
+    --font-sm: 1rem;
+    --font-md: 1.25rem;
+    --font-lg: 2rem;
+    --font-xl: 3rem;
 }
 
-html, body {
-  font-family: 'Helvetica', sans-serif;
-  background-color: var(--light);
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
+html, .content, .layout {
+    font-family: 'Helvetica', sans-serif;
+    background-color: var(--light);
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
 }
 
-main {
-  flex: 1; /* for footer placement */
+.main {
+   flex: 1; /* for footer placement */
 }
