@@ -3,7 +3,9 @@
     "build:prod": "webpack --config webpack.prod.js --mode production",
     "build": "webpack --config webpack.dev.js --mode development",
     "prepare": "husky",
-    "watch": "webpack --config webpack.dev.js --watch --mode development"
+    "watch": "webpack --config webpack.dev.js --watch --mode development",
+    "lint": "eslint wine_cellar/assets",
+    "lint-fix": "eslint --fix wine_cellar"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "6.7.2",
@@ -27,6 +29,7 @@
     "copy-webpack-plugin": "12.0.2",
     "css-loader": "7.1.2",
     "eslint": "9.20.0",
+    "eslint-config-prettier": "10.0.1",
     "eslint-plugin-promise": "7.2.1",
     "husky": "9.1.7",
     "lint-staged": "15.4.3",
