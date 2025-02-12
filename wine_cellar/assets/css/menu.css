@@ -1,22 +1,87 @@
 .pure-menu {
-  border-bottom-color: black;
-  border-radius: 0;
-  background-color: var(--dark-green);
+    background-color: var(--dark-green);
 }
 
 .pure-menu-link {
-  padding: 1em 0.7em;
-  color: white;
+    color: white;
+    padding: 1em 0.7em;
 }
 
-.pure-menu-link:hover,
-.pure-menu-link:focus,
+.pure-menu a:hover,
+.pure-menu a:focus,
+.pure-menu a:focus-visible,
 .pure-menu .button:hover,
-.pure-menu .button:focus {
-  background: var(--darker-green);
+.pure-menu .button:focus,
+.pure-menu .button:focus-visible {
+    background: var(--darker-green);
 }
 
+/* remove styling for logout */
 .pure-menu .button {
-  background: none;
-  border: none;
+    background: none;
+    border: none;
+}
+
+/* responsive styling for large and small menus */
+.menu__md {
+    display: none;
+}
+
+.menu__sm .pure-menu {
+    margin-left: -200px;
+    width: 200px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 1000; /* so the menu or its navicon stays above all content */
+    background-color: var(--dark-green);
+    overflow-y: auto;
+}
+
+.menu__sm .menu-link {
+    position: fixed;
+    display: block;
+    top: 0;
+    left: 0;
+    background: var(--dark-green);
+    font-size: 40px;
+    z-index: 10;
+    padding: 0.1em 0.4em;
+
+    span:before {
+        content: '\2261';
+        color: var(--light);
+    }
+}
+
+.menu-toggle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+}
+
+.menu-toggle:checked ~ .menu-link {
+    background: var(--dark-green);
+    position: fixed;
+    width: fit-content;
+    left: 140px;
+    z-index: 1001;
+    span:before {
+        content: '\00d7';
+    }
+}
+
+.menu-toggle:checked ~ .pure-menu {
+    margin-left: 0;
+}
+
+@media screen and (min-width: 35.5em) {
+    .menu__md {
+        display: block;
+    }
+    .menu__sm {
+        display: none;
+    }
 }
