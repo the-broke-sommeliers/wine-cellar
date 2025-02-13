@@ -1,0 +1,13 @@
+:80 {
+
+@files {
+	path /static/* /media/*
+}
+handle @files {
+		file_server
+	}
+
+handle {
+	reverse_proxy web:8000
+}
+}

@@ -13,6 +13,7 @@ fi
 
 python manage.py migrate
 python manage.py collectstatic --no-input --clear
+python manage.py compilemessages
 
 cat <<EOF | python manage.py shell
 from django.contrib.auth import get_user_model
