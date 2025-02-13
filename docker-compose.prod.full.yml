@@ -20,8 +20,12 @@ services:
   caddy:
     image: caddy:latest
     restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
     ports:
-      - 8085:80
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
     volumes:
       - ./caddy:/etc/caddy/
       - static_volume:/srv/static
