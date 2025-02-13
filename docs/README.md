@@ -15,6 +15,14 @@
 - **Food Pairings**: Add recommended food pairings.
 - **Self-hosted**: Full control over your data.
 
-## Documentations
+## Code & Contributing
 
-Find the full documentation [here](https://goapunk.github.io/wine-cellar/)
+You can find the source code for **Wine Cellar** on <a href="https://github.com/goapunk/wine-cellar" target="_blank">:simple-github: GitHub</a>.
+
+- **Report Issues**: If you encounter any bugs or have suggestions for improvements, feel free to <a href="https://github.com/goapunk/wine-cellar/issues" target="_blank">open an issue</a>.
+- **Feature Requests**: If you have an idea for a new feature, submit a <a href="https://github.com/goapunk/wine-cellar/issues" target="_blank">feature request</a>.
+- **Chat & Discussion**: Join the conversation, ask questions, or chat about wine management at <a href="https://github.com/goapunk/wine-cellar/discussions" target="_blank">discussions</a>.
+
+## License
+
+This project is licensed under the <a href="https://opensource.org/licenses/AGPL-3.0" target="_blank">AGPL-3.0 License</a>.
