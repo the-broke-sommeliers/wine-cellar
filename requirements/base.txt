@@ -13,5 +13,5 @@ pycountry==24.6.1
 pytest-cov==5.0.0
 pytest-django==4.9.0
 pytest-factoryboy==2.7.0
-pytest==8.3.3
+pytest==8.3.4
 requests==2.32.3
