@@ -6,7 +6,7 @@ import 'react-barcode-scanner/polyfill'
 const Scanner = () => {
   const handleCapture = (captured) => {
     if (captured.length > 0) {
-      window.location.href = '/wine/scan?code=' + captured[0]
+      window.location.href = '/wine/scan?code=' + captured[0].rawValue
     }
   }
 
