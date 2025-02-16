@@ -11,7 +11,7 @@ services:
     depends_on:
       - db
   db:
-    image: postgres:16
+    image: postgres:17
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
