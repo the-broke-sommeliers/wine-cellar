@@ -18,8 +18,4 @@ DATABASES = {
 
 CSRF_TRUSTED_ORIGINS = os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS").split(" ")
 
-STATIC_URL = "/static/"
-STATIC_ROOT = "staticfiles"
-
-MEDIA_URL = "/media/"
 MEDIA_ROOT = "mediafiles"
