@@ -5,7 +5,7 @@ django-debug-toolbar==4.4.6
 django-filter==24.3
 django-widget-tweaks==1.5.0
 djlint===1.35.2
-factory-boy==3.3.1
+factory-boy==3.3.3
 flake8==7.1.1
 isort==5.13.2
 pillow==11.0.0
