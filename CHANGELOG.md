@@ -5,6 +5,42 @@ All notable changes to this project will be documented in this file.
 Since version v0.0.1 the format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.0.5
+
+### Added
+
+- add github actions ci
+- docker image for a standalone setup (without needing a reverse proxy or manua
+tls setup)
+
+### Changed
+
+- replace nginx with caddy in docker images
+- make menu responsible
+- improve wine cards responsiveness
+- requirements: refactor python deps
+- add static folder to default settings
+- update dependency django to v5.1.6
+- update babel monorepo to v7.26.9
+- update dependency eslint to v9.20.1
+- update dependency factory-boy to v3.3.3
+- update dependency prettier to v3.5.1
+- update dependency tom-select to v2.4.3
+- update dependency webpack to v5.98.0
+- update python docker tag to v3.13.2
+- update dependency pytest to v8.3.4
+- update dependency psycopg to v3.2.4
+- update dependency sass-loader to v16.0.5
+- update dependency sass to v1.85.0
+
+### Fixed
+
+- fix footer not being sticky at bottom of the page
+- fix barcode scan forward not working
+- fix missing md module for mkdocs
+
+**Full Changelog**: https://github.com/goapunk/wine-cellar/compare/v0.0.4...v0.0.5
+
 ## v0.0.4
 
 ### Added

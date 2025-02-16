@@ -1,6 +1,6 @@
 services:
   web:
-    image: ghcr.io/goapunk/wine-cellar-web:v0.0.4
+    image: ghcr.io/goapunk/wine-cellar-web:v0.0.5
     command: gunicorn wine_cellar.conf.wsgi:application --bind 0.0.0.0:8000
     volumes:
       - static_volume:/home/app/web/staticfiles
