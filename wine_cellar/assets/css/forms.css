@@ -109,3 +109,18 @@ p.form-hint {
     min-height: 40px;
   }
 }
+
+
+.form__scanner {
+  width: 100%;
+  padding-top: 100%; /* 1:1 Aspect Ratio */
+  position: relative;
+
+  video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+  }
+}
