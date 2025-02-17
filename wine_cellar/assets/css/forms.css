@@ -76,17 +76,17 @@
 }
 
 .form-container {
-  margin-bottom: 1em;
+  margin-bottom: 1rem;
 }
 
-.form-hint {
+p.form-hint {
   font-style: italic;
   color: var(--text-color-gray);
-  margin-bottom: 0.5 * 1rem;
+  margin: 0.25rem 0;
 }
 
 .ts-wrapper {
-  margin-top: 0.25em;
+  margin-top: 0.25rem;
 }
 
 .ts-control {

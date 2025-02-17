@@ -3,10 +3,10 @@
     <label for="{{ field.id_for_label }}">
         {{ field.label }}
         {% if not field.field.required %}
-            <span role="presentation" title="{% translate "This field is optional" %}">(Optional)</span>
+            <p class="d-inline" role="presentation" title="{% translate "This field is optional" %}">(Optional)</p>
         {% endif %}
     </label>
-    {% if field.help_text %}<div class="form-hint">{{ field.help_text }}</div>{% endif %}
+    {% if field.help_text %}<p class="form-hint">{{ field.help_text }}</p>{% endif %}
     {{ field|add_error_attr:"aria-invalid:true" }}
     {% if field.errors %}
         <ul class="form-errorlist" aria-live="assertive" aria-atomic="true">
