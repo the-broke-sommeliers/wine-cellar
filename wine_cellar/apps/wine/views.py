@@ -213,7 +213,7 @@ class WineListView(FilterView):
     paginate_by = 10
 
     def get_queryset(self):
-        qs = super().get_queryset().order_by("pk")
+        qs = super().get_queryset().order_by("-created")
         return qs.filter(user=self.request.user)
 
 
