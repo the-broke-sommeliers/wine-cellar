@@ -1,3 +1,11 @@
+html {
+  font-family: 'Helvetica', sans-serif;
+  background-color: var(--light);
+  height: 100%;
+  margin: 0;
+  line-height: 1.6em;
+}
+
 .layout,
 .pure-menu,
 .menu-link {
@@ -8,24 +16,17 @@
   transition: all 0.2s ease-out;
 }
 
+/* for footer placement */
 .layout {
+  min-height: 99vh;
   position: relative;
-  left: 0;
-  padding-left: 0;
 }
 
-.content {
-  margin: 0 auto;
-  padding: 0 2em;
+.main {
   max-width: 1140px;
-  margin-bottom: 25px;
-  line-height: 1.6em;
-}
-
-.center-container {
-  display: flex;
-  justify-content: center;
-}
+  padding: 0 2rem 4rem 2rem;
+  margin: 0 auto;
+ }
 
 .header__title {
   font-size: var(--font-lg);
@@ -38,6 +39,7 @@
 .pagination {
   margin-top: 2em;
   list-style: none;
+
   li {
     display: inline-block;
     margin-left: 4px;
@@ -49,13 +51,12 @@
 .footer {
   text-align: center;
   width: 100%;
+  position: absolute;
   bottom: 0;
   left: 0;
-}
 
-@media (min-width: 48em) {
-  .content {
-    padding-left: 2em;
-    padding-right: 2em;
+  p {
+    margin-bottom: 0;
   }
 }
+
