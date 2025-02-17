@@ -150,3 +150,11 @@ p.form-hint {
     right: 0;
   }
 }
+
+.wine__stock-buttons {
+  margin-top: 20px;
+
+  @media screen and (max-width: 48em) {
+    text-align: center;
+  }
+}
