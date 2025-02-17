@@ -30,17 +30,6 @@
                 {% endif %}
             </div>
         </div>
-        <div class="pure-u-1 pure-u-md-1-1 text-align-center">
-            {% if wine %}
-                {% if wine.stock > 0 %}
-                    <a href="{% url 'change-stock' wine.pk 0 %}"
-                       class="pure-button button__secondary">{% translate "Remove from stock" %}</a>
-                {% endif %}
-                <a href="{% url 'change-stock' wine.pk 1 %}"
-                   class="pure-button button__primary">{% translate "Add to stock" %}</a>
-            {% else %}
-                <a href="{% url 'wine-add' code %}" class="pure-button button__primary">{% translate "Add new wine" %}</a>
-            {% endif %}
-        </div>
+        {% include "includes/stock_buttons.html" %}
     </div>
 {% endblock content %}
