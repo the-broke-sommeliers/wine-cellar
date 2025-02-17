@@ -7,11 +7,12 @@
 {% block title %}
     Create/Edit Wine
 {% endblock title %}
-{% block header %}{% endblock header %}
+{% block header %}
+    <h1 class="header__title">{% translate 'Edit Wine' %}</h1>
+{% endblock header %}
 {% block content %}
     <div class="pure-g center-container">
         <div class="pure-u-1-2">
-            <h1 class="content-subhead">{% translate 'Add Wine' %}</h1>
             <form method="post"
                   enctype="multipart/form-data"
                   class="pure-form pure-form-stacked wine-form"
