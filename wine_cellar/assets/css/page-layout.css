@@ -39,12 +39,21 @@ html {
 .pagination {
   margin-top: 2em;
   list-style: none;
+  padding: 0;
+  text-align: center;
 
   li {
     display: inline-block;
-    margin-left: 4px;
-    margin-right: 4px;
     font-size: var(--font-md);
+
+    &.active {
+      color: var(--darker-purple);
+    }
+
+    a {
+      padding: 8px;
+      color: var(--dark-purple);
+    }
   }
 }
 
