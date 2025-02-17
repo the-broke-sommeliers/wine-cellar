@@ -1,8 +1,10 @@
 {% extends 'base.html' %}
 {% load static i18n %}
 {% block header %}
-    <h1 class="wine-detail__name">{{ wine.name }}</h1>
-    <a class="wine-detail__edit" href="{% url 'wine-edit' wine.pk %}"><i class="fa-solid fa-pen-to-square"></i></a>
+    <div class="header__title">
+        <h1 class="header__title d-inline">{{ wine.name }}</h1>
+        <a class="wine-detail__edit" href="{% url 'wine-edit' wine.pk %}"><i class="fa-solid fa-pen-to-square"></i></a>
+    </div>
 {% endblock header %}
 {% block content %}
     <div class="wine-detail__container">

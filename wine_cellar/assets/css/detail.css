@@ -1,14 +1,9 @@
 .wine-detail__image {
-  @media screen and (min-width: 48em) {
+  @media screen and (min-width: 768px) {
     margin-inline-start: auto;
     margin-inline-end: 1rem;
   
   }
-}
-
-.wine-detail__name {
-  display: inline-block;
-  margin-top: 0;
 }
 
 .wine-detail__edit {
@@ -21,7 +16,7 @@
   text-align: left;
   margin: auto;
 
-  @media screen and (min-width: 48em) {
+  @media screen and (min-width: 768px) {
     margin-inline-start: 1rem;
     margin-inline-end: auto;
   }

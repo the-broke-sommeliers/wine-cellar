@@ -37,12 +37,6 @@
   padding-right: 20px;
 }
 
-.form-head {
-  font-weight: 300;
-  margin: 20px 0 0 0;
-  color: var(--text-color-gray);
-}
-
 .form-subhead {
   font-size: var(--font-lg);
   margin: 20px 0 10px 0;
@@ -69,7 +63,7 @@
     line-height: 0.75rem;
   }
 
-  @media screen and (min-width: 48em) {
+  @media screen and (min-width: 768px) {
     .pure-control-group {
       display: flex;
 
@@ -85,10 +79,10 @@
   margin-bottom: 1em;
 }
 
-.form-hint {
+p.form-hint {
   font-style: italic;
   color: var(--text-color-gray);
-  margin-bottom: 0.5 * 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .ts-wrapper {
@@ -115,3 +109,18 @@
     min-height: 40px;
   }
 }
+
+.form__scanner {
+  width: 100%;
+  padding-top: 100%; /* 1:1 Aspect Ratio */
+  position: relative;
+
+  video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+  }
+}
+

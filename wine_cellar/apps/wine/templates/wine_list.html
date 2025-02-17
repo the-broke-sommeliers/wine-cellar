@@ -5,7 +5,7 @@
     <script src="{% static 'tom_select.js' %}" type="module" defer></script>
 {% endblock extra_js %}
 {% block header %}
-    <h1 class="form-head">
+    <h1 class="header__title">
         {% translate 'Wine List' %}
     </h1>
 {% endblock header %}
@@ -34,7 +34,7 @@
                 {% for wine in wines %}
                     <div class="wine_card">{% include 'wine_card.html' with wine=wine %}</div>
                 {% empty %}
-                    <div class="pure-u-1 center-container">
+                    <div class="pure-u-1 m-auto">
                         <p>
                             <strong>There are no wines yet</strong>
                         </p>
@@ -42,7 +42,7 @@
                 {% endfor %}
             </div>
             {% if page_obj.has_other_pages %}
-            <ul class="pagination center-container">
+            <ul class="pagination m-auto">
                 {% if page_obj.has_previous %}
                     <li>
                         <a href="?page={{ page_obj.previous_page_number }}">«</a>

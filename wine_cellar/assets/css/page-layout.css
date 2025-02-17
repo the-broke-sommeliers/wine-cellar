@@ -1,4 +1,31 @@
-.layout,
+html {
+  font-family: 'Helvetica', sans-serif;
+  background-color: var(--light);
+  height: 100%;
+  margin: 0;
+  line-height: 1.6em;
+}
+
+.page__layout {
+  display: flex;
+  flex-flow: column wrap;
+  align-content: flex-start;
+}
+
+.page__layout > * { flex: 0 0 auto; }
+
+.main {
+  max-width: 1140px;
+  margin: 0 auto;
+  flex-grow: 1;
+}
+
+.footer {
+  margin-block-start: 2rem;
+  text-align: center;
+  width: 100%;
+}
+
 .pure-menu,
 .menu-link {
   -webkit-transition: all 0.2s ease-out;
@@ -8,45 +35,12 @@
   transition: all 0.2s ease-out;
 }
 
-.layout {
-  position: relative;
-  left: 0;
-  padding-left: 0;
-}
-
-.content {
-  margin: 0 auto;
-  padding: 0 2em;
-  max-width: 1140px;
-  margin-bottom: 25px;
-  line-height: 1.6em;
-}
-
-.center-container {
-  display: flex;
-  justify-content: center;
-}
-
-.header {
-  margin: 0;
-  color: #333;
-  text-align: center;
-  margin: 2.5em 2em 0;
-}
-
-.header h2 {
-  font-weight: 300;
-  color: #333;
-  padding: 0;
-  margin-top: 0;
-}
-
-.content-subhead {
-  font-size: var(--font-lg);
-  margin: 50px 0 20px 0;
-  font-weight: 300;
-  color: #333;
-  text-align: center;
+.header__title {
+    font-size: var(--font-lg);
+    font-weight: 300;
+    text-align: center;
+    color: var(--text-color-gray);
+    margin: 3.5rem 0 1rem;
 }
 
 .pagination {
@@ -60,14 +54,7 @@
   }
 }
 
-.footer {
-  text-align: center;
-  width: 100%;
-  bottom: 0;
-  left: 0;
-}
-
-@media (min-width: 48em) {
+@media (min-width: 768px) {
   .header,
   .content {
     padding-left: 2em;
