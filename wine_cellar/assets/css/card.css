@@ -1,11 +1,15 @@
 .wine_card__container {
-  margin-block-start: 5rem;
   display: flex;
   width: 100%;
   align-items: stretch;
   flex-direction: row;
   flex-wrap: wrap;
   gap: 20px;
+  margin-block-start: 2rem;
+
+  @media screen and (min-width: 48em) {
+    margin-block-start: 5rem;    
+  }
 }
 
 .wine_card {
