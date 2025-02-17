@@ -6,11 +6,6 @@
   }
 }
 
-.wine-detail__name {
-  display: inline-block;
-  margin-top: 0;
-}
-
 .wine-detail__edit {
   margin-top: 0.75em;
   margin-left: 0.25em;

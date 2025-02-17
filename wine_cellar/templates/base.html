@@ -27,6 +27,7 @@
     <body class="layout">
         {% block menu %}
         {% spaceless %}
+        <header>
         <!-- small screen menu -->
         <nav class="menu__sm">
             <!-- Menu toggle -->
@@ -97,17 +98,16 @@
                 {% endif %}
             </ul>
         </nav>
+    </header>
         {% endspaceless %}
         {% endblock menu %}
         <article class="content">
-            <header class="header">
+            <main class="main">
                 {% block header %}
                     <h1 class="brand-title">
                         Django Wine Cellar
                     </h1>
                 {% endblock header %}
-            </header>
-            <main class="main">
                 {% block content %}
                 {% endblock content %}
             </main>

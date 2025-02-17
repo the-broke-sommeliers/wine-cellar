@@ -27,25 +27,11 @@
   justify-content: center;
 }
 
-.header {
-  margin: 0;
-  color: #333;
-  text-align: center;
-  margin: 2.5em 2em 0;
-}
-
-.header h2 {
-  font-weight: 300;
-  color: #333;
-  padding: 0;
-  margin-top: 0;
-}
-
-.content-subhead {
+.header__title {
   font-size: var(--font-lg);
   margin: 50px 0 20px 0;
   font-weight: 300;
-  color: #333;
+  color: var(--text-color-gray);
   text-align: center;
 }
 
@@ -68,7 +54,6 @@
 }
 
 @media (min-width: 48em) {
-  .header,
   .content {
     padding-left: 2em;
     padding-right: 2em;
