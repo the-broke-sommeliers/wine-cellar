@@ -37,8 +37,8 @@
                 <span></span>
                 {# djlint:on #}
                 </label>
+                <a href="{% url 'homepage' %}" class="pure-menu-heading pure-menu-link">Wine Cellar</a>
                 <div class="pure-menu">
-                    <a href="{% url 'homepage' %}" class="pure-menu-heading pure-menu-link">Wine Cellar</a>
                     <ul class="pure-menu-list">
                         {% if user.is_authenticated %}
                             <li class="pure-menu-item">
