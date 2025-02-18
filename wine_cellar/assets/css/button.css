@@ -5,6 +5,15 @@
     &:hover {
         background-color: var(--darker-green);
     }
+
+    &:focus {
+        outline: revert;
+        background-color: var(--darker-green);
+    }
+
+    &:active {
+        background-color: var(--darkest-green);
+    }
 }
 
 .button__secondary {
@@ -14,4 +23,10 @@
     &:hover {
         background-color: var(--darker-purple);
     }
+}
+
+.ts-control:focus-within,
+.pure-control-group > input[type="number"]:focus,
+.pure-control-group > input[type="text"]:focus {
+    border: 2px solid #3584E4 !important; /* Blue glow effect */
 }
