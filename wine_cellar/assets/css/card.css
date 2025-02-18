@@ -41,6 +41,7 @@
 .wine_card__title {
   margin-top: 0px;
   margin-bottom: 10px;
+  overflow-wrap: anywhere;
 }
 
 .text--gray {
