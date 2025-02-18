@@ -111,14 +111,14 @@ p.form-hint {
     content: '  +';
     font-size: 27px;
     font-weight: 400;
-    vertical-align: baseline;
+    vertical-align: text-bottom;
   }
 
   details[open] summary:before { 
     content: "  –";
     font-size: 27px;
     font-weight: 400;
-    vertical-align: top;
+    vertical-align: unset;
   }
 
   .filter-form__header {
