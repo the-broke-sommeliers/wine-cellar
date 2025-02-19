@@ -36,7 +36,7 @@
     "mini-css-extract-plugin": "2.9.2",
     "neostandard": "0.12.1",
     "path-browserify": "1.0.1",
-    "postcss": "8.5.2",
+    "postcss": "8.5.3",
     "postcss-loader": "8.1.1",
     "prettier": "3.5.1",
     "sass": "1.85.0",
