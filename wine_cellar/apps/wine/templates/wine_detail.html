@@ -21,78 +21,77 @@
                     <div>{% translate "No image"}</div>
                 {% endif %}
             </div>
-
             <div class="pure-u-1 pure-u-md-1-2">
-            <table class="wine-detail__table">
-                <tr>
-                    <th>{% translate "Country" %}</th>
-                    <td>{{ wine.country_icon }} {{ wine.country_name }}</td>
-                </tr>
-                {% if wine.get_vineyards %}
-                <tr>
-                    <th>{% translate "Vineyard" %}</th>
-                    <td>{{ wine.get_vineyards | linebreaksbr }}</td>
-                </tr>
-                {% endif %}
-                <tr>
-                    <th>{% translate "Type" %}</th>
-                    <td>{{ wine.get_type }}</td>
-                </tr>
-                <tr>
-                    <th>{% translate "Category" %}</th>
-                    <td>{{ wine.get_category }}</td>
-                </tr>
-                <tr>
-                    <th>{% translate "ABV" %}</th>
-                    <td>{{ wine.abv }}</td>
-                </tr>
-                <tr>
-                    <th>{% translate "Size" %}</th>
-                    <td>{{ wine.size }}</td>
-                </tr>
-                <tr>
-                    <th>{% translate "Vintage" %}</th>
-                    <td>{{ wine.vintage }}</td>
-                </tr>
-                <tr>
-                    <th>{% translate "Grapes" %}</th>
-                    <td>{{ wine.get_grapes | linebreaksbr }}</td>
-                </tr>
-                {% if wine.get_classifications %}
-                <tr>
-                    <th>{% translate "Classification" %}</th>
-                    <td>{{ wine.get_classification | linebreaksbr }}</td>
-                </tr>
-                {% endif %}
-                {% if wine.get_food_pairings %}
-                <tr>
-                    <th>{% translate "Food Pairings" %}</th>
-                    <td>{{ wine.get_food_pairings | linebreaksbr }}</td>
-                </tr>
-                {% endif %}
-                <tr>
-                    <th>{% translate "In Stock" %}</th>
-                    <td>{{ wine.stock }}</td>
-                </tr>
-                {% if wine.comment %}
-                <tr>
-                    <th>{% translate "Comment" %}</th>
-                    <td>{{ wine.comment }}</td>
-                </tr>
-                {% endif %}
-                <tr>
-                    <th>{% translate "Rating" %}</th>
-                    <td>
-                        {% if wine.rating %}
-                            {{ wine.rating }} / 10
-                        {% else %}
-                            {% translate "No rating yet" %}
-                        {% endif %}
-                    </td>
-                </tr>
-            </table>  
-        {% include "includes/stock_buttons.html" %}
-            </div>          
+                <table class="wine-detail__table">
+                    <tr>
+                        <th>{% translate "Country" %}</th>
+                        <td>{{ wine.country_icon }} {{ wine.country_name }}</td>
+                    </tr>
+                    {% if wine.get_vineyards %}
+                        <tr>
+                            <th>{% translate "Vineyard" %}</th>
+                            <td>{{ wine.get_vineyards | linebreaksbr }}</td>
+                        </tr>
+                    {% endif %}
+                    <tr>
+                        <th>{% translate "Type" %}</th>
+                        <td>{{ wine.get_type }}</td>
+                    </tr>
+                    <tr>
+                        <th>{% translate "Category" %}</th>
+                        <td>{{ wine.get_category }}</td>
+                    </tr>
+                    <tr>
+                        <th>{% translate "ABV" %}</th>
+                        <td>{{ wine.abv }}</td>
+                    </tr>
+                    <tr>
+                        <th>{% translate "Size" %}</th>
+                        <td>{{ wine.size }}</td>
+                    </tr>
+                    <tr>
+                        <th>{% translate "Vintage" %}</th>
+                        <td>{{ wine.vintage }}</td>
+                    </tr>
+                    <tr>
+                        <th>{% translate "Grapes" %}</th>
+                        <td>{{ wine.get_grapes | linebreaksbr }}</td>
+                    </tr>
+                    {% if wine.get_classifications %}
+                        <tr>
+                            <th>{% translate "Classification" %}</th>
+                            <td>{{ wine.get_classification | linebreaksbr }}</td>
+                        </tr>
+                    {% endif %}
+                    {% if wine.get_food_pairings %}
+                        <tr>
+                            <th>{% translate "Food Pairings" %}</th>
+                            <td>{{ wine.get_food_pairings | linebreaksbr }}</td>
+                        </tr>
+                    {% endif %}
+                    <tr>
+                        <th>{% translate "In Stock" %}</th>
+                        <td>{{ wine.stock }}</td>
+                    </tr>
+                    {% if wine.comment %}
+                        <tr>
+                            <th>{% translate "Comment" %}</th>
+                            <td>{{ wine.comment }}</td>
+                        </tr>
+                    {% endif %}
+                    <tr>
+                        <th>{% translate "Rating" %}</th>
+                        <td>
+                            {% if wine.rating %}
+                                {{ wine.rating }} / 10
+                            {% else %}
+                                {% translate "No rating yet" %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+                {% include "includes/stock_buttons.html" %}
+            </div>
         </div>
     </div>
 {% endblock content %}

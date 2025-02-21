@@ -1,9 +1,7 @@
 {% extends 'base.html' %}
 {% load static i18n %}
 {% block header %}
-    <h1 class="header__title">
-       {% translate "Scan Wine" %}
-    </h1>
+    <h1 class="header__title">{% translate "Scan Wine" %}</h1>
 {% endblock header %}
 {% block content %}
     <div class="pure-g">
@@ -12,7 +10,6 @@
         </div>
     </div>
 {% endblock content %}
-
 {% block extra_js %}
-<script src="{% static 'barcode_scanner.js' %}"></script>
+    <script src="{% static 'barcode_scanner.js' %}"></script>
 {% endblock extra_js %}

@@ -11,16 +11,16 @@
             <div class="pure-u-16-24">
                 <h2 class="wine_card__title">{{ wine.name }}</h2>
                 {% if wine.get_grapes %}
-                <div class="pure-u-1-1">
-                    <span class="text--gray">Grape</span>
-                    <p>{{ wine.get_grapes | truncatechars:31 | title }}</p>
-                </div>
+                    <div class="pure-u-1-1">
+                        <span class="text--gray">Grape</span>
+                        <p>{{ wine.get_grapes | truncatechars:31 | title }}</p>
+                    </div>
                 {% endif %}
                 {% if wine.vintage %}
-                <div class="pure-u-1-1">
-                    <span class="text--gray">Vintage</span>
-                    <p>{{ wine.vintage }}</p>
-                </div>
+                    <div class="pure-u-1-1">
+                        <span class="text--gray">Vintage</span>
+                        <p>{{ wine.vintage }}</p>
+                    </div>
                 {% endif %}
             </div>
             <div class="pure-u-1-1 wine_card__stock">
