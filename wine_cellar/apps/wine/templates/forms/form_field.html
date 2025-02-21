@@ -5,7 +5,7 @@
         {% if not field.field.required %}
             <p class="d-inline"
                role="presentation"
-               title="{% translate "This field is optional" %}">(Optional)</p>
+               title="{% translate "This field is optional" %}">{% translate "(Optional)" %}</p>
         {% endif %}
     </label>
     {% if field.help_text %}<p class="form-hint">{{ field.help_text }}</p>{% endif %}

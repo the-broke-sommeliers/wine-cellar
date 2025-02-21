@@ -56,7 +56,7 @@
                 {% empty %}
                     <div class="pure-u-1 m-auto">
                         <p>
-                            <strong>There are no wines yet</strong>
+                            <strong>{% translate "There are no wines yet" %}</strong>
                         </p>
                     </div>
                 {% endfor %}
@@ -75,7 +75,7 @@
                     {% for i in page_obj.paginator.page_range %}
                         {% if page_obj.number == i %}
                             <li class="active">
-                                <span>{{ i }} <span class="sr-only">(current)</span></span>
+                                <span>{{ i }} <span class="sr-only">{% translate "(current)" %}</span></span>
                             </li>
                         {% else %}
                             <li>
