@@ -9,6 +9,7 @@ from wine_cellar.apps.wine.tests.factories import (
     ClassificationFactory,
     FoodPairingFactory,
     GrapeFactory,
+    SourceFactory,
     UserFactory,
     VineyardFactory,
     WineFactory,
@@ -22,6 +23,7 @@ register(WineImageFactory)
 register(VineyardFactory)
 register(FoodPairingFactory)
 register(ClassificationFactory)
+register(SourceFactory)
 
 
 @pytest.fixture
