@@ -65,7 +65,6 @@ jobs:
           npm install
           npm run build
           pip install -r requirements/dev.txt
-          pip install coveralls
       - name: Run Tests
         env:
           PGPASSWORD: postgres
@@ -76,3 +75,5 @@ jobs:
           isort --diff -c wine_cellar tests
           python manage.py makemigrations --dry-run --check --noinput
           flake8 wine_cellar tests --exclude migrations,settings
+      - name: Coveralls
+        uses: coverallsapp/github-action@v2
