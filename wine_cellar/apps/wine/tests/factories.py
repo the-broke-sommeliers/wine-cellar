@@ -10,6 +10,7 @@ from wine_cellar.apps.wine.models import (
     Classification,
     FoodPairing,
     Grape,
+    Size,
     Source,
     Vineyard,
     Wine,
@@ -32,6 +33,13 @@ class GrapeFactory(DjangoModelFactory):
         model = Grape
 
     name = factory.Faker("name")
+
+
+class SizeFactory(DjangoModelFactory):
+    class Meta:
+        model = Size
+
+    name = random.randint(0, 100)
 
 
 class VineyardFactory(DjangoModelFactory):

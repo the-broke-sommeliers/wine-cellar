@@ -9,6 +9,7 @@ from wine_cellar.apps.wine.tests.factories import (
     ClassificationFactory,
     FoodPairingFactory,
     GrapeFactory,
+    SizeFactory,
     SourceFactory,
     UserFactory,
     VineyardFactory,
@@ -23,6 +24,7 @@ register(WineImageFactory)
 register(VineyardFactory)
 register(FoodPairingFactory)
 register(ClassificationFactory)
+register(SizeFactory)
 register(SourceFactory)
 
 
