@@ -35,14 +35,14 @@ class Category(models.TextChoices):
 
 
 class Size(UserContentModel):
-    name = models.FloatField()
+    name = models.FloatField(verbose_name=_("Size"))
 
     def __str__(self):
         return str(self.name)
 
 
 class Grape(UserContentModel):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, verbose_name=_("Grape"))
 
     class Meta:
         constraints = [
@@ -81,7 +81,7 @@ class Vineyard(UserContentModel):
 
 
 class FoodPairing(UserContentModel):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, verbose_name=_("Food"))
 
     class Meta:
         constraints = [
