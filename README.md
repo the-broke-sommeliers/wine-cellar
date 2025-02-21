@@ -1,5 +1,7 @@
 # Wine Cellar
 
+[![Coverage Status](https://coveralls.io/repos/github/goapunk/wine-cellar/badge.svg?branch=main)](https://coveralls.io/github/goapunk/wine-cellar?branch=main)
+
 **Wine Cellar** is a self-hosted wine management app built with Django, designed for wine enthusiasts to track wines, store tasting notes, rate wines, and manage inventory. Whether you're a casual drinker or a connoisseur, this app helps organize your collection.
 
 <img src="https://github.com/user-attachments/assets/315280b8-9f87-45fd-ab88-507d88aef362" height="150" alt="Landing page showing different statistics about your wines">
