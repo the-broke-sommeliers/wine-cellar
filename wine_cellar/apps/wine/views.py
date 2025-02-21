@@ -153,6 +153,7 @@ class WineUpdateView(FormView):
         if not self.request.user == wine.user:
             return HttpResponseForbidden()
         self.process_form_data(wine, self.request.user, form.cleaned_data)
+        self.success_url = reverse_lazy("wine-detail", kwargs={"pk": wine.pk})
         return super().form_valid(form)
 
     @staticmethod

@@ -10,6 +10,7 @@ from wine_cellar.apps.wine.models import (
     Classification,
     FoodPairing,
     Grape,
+    Source,
     Vineyard,
     Wine,
     WineImage,
@@ -50,6 +51,13 @@ class FoodPairingFactory(DjangoModelFactory):
 class ClassificationFactory(DjangoModelFactory):
     class Meta:
         model = Classification
+
+    name = factory.Faker("name")
+
+
+class SourceFactory(DjangoModelFactory):
+    class Meta:
+        model = Source
 
     name = factory.Faker("name")
 
