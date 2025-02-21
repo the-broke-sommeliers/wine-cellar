@@ -3,7 +3,9 @@
     <label for="{{ field.id_for_label }}">
         {{ field.label }}
         {% if not field.field.required %}
-            <p class="d-inline" role="presentation" title="{% translate "This field is optional" %}">(Optional)</p>
+            <p class="d-inline"
+               role="presentation"
+               title="{% translate "This field is optional" %}">(Optional)</p>
         {% endif %}
     </label>
     {% if field.help_text %}<p class="form-hint">{{ field.help_text }}</p>{% endif %}

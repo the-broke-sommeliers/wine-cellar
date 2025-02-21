@@ -5,9 +5,7 @@
     <script src="{% static 'tom_select.js' %}" type="module" defer></script>
 {% endblock extra_js %}
 {% block header %}
-    <h1 class="header__title">
-        {% translate 'Wine List' %}
-    </h1>
+    <h1 class="header__title">{% translate 'Wine List' %}</h1>
 {% endblock header %}
 {% block content %}
     <div class="pure-g">
@@ -20,11 +18,11 @@
                         <h2 class="filter-form__header">{% translate "Filter & Sorting" %}</h2>
                     </summary>
                     <div>
-                        <form action="" method="get" class="filter-form pure-form pure-form-stacked">
+                        <form action=""
+                              method="get"
+                              class="filter-form pure-form pure-form-stacked">
                             <fieldset>
-                                <legend class="filter-legend">
-                                        {% translate 'Narrow Your Selection' %}
-                                </legend>
+                                <legend class="filter-legend">{% translate 'Narrow Your Selection' %}</legend>
                                 {% for field in filter.form %}
                                     {% include "wine_filter_field.html" %}
                                 {% endfor %}
@@ -35,14 +33,13 @@
                 </details>
             </div>
             <!-- Filter toggle ends-->
-
-            <form action="" method="get" class="filter-form--lg pure-form pure-form-stacked">
+            <form action=""
+                  method="get"
+                  class="filter-form--lg pure-form pure-form-stacked">
                 <fieldset>
                     <div class="filter-legend">
                         <legend>
-                            <h3 class="text-align-left">
-                                {% translate "Filter & Sorting" %}
-                            </h3>
+                            <h3 class="text-align-left">{% translate "Filter & Sorting" %}</h3>
                         </legend>
                     </div>
                     {% for field in filter.form %}
@@ -65,38 +62,38 @@
                 {% endfor %}
             </div>
             {% if page_obj.has_other_pages %}
-            <ul class="pagination">
-                {% if page_obj.has_previous %}
-                    <li>
-                        <a href="?page={{ page_obj.previous_page_number }}">«</a>
-                    </li>
-                {% else %}
-                    <li class="disabled">
-                        <span>«</span>
-                    </li>
-                {% endif %}
-                {% for i in page_obj.paginator.page_range %}
-                    {% if page_obj.number == i %}
-                        <li class="active">
-                            <span>{{ i }} <span class="sr-only">(current)</span></span>
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                        <li>
+                            <a href="?page={{ page_obj.previous_page_number }}">«</a>
                         </li>
                     {% else %}
-                        <li>
-                            <a href="?page={{ i }}">{{ i }}</a>
+                        <li class="disabled">
+                            <span>«</span>
                         </li>
                     {% endif %}
-                {% endfor %}
-                {% if page_obj.has_next %}
-                    <li>
-                        <a href="?page={{ page_obj.next_page_number }}">»</a>
-                    </li>
-                {% else %}
-                    <li class="disabled">
-                        <span>»</span>
-                    </li>
-                {% endif %}
-            </ul>
-        {% endif %}
+                    {% for i in page_obj.paginator.page_range %}
+                        {% if page_obj.number == i %}
+                            <li class="active">
+                                <span>{{ i }} <span class="sr-only">(current)</span></span>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a href="?page={{ i }}">{{ i }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                        <li>
+                            <a href="?page={{ page_obj.next_page_number }}">»</a>
+                        </li>
+                    {% else %}
+                        <li class="disabled">
+                            <span>»</span>
+                        </li>
+                    {% endif %}
+                </ul>
+            {% endif %}
         </div>
     </div>
 {% endblock content %}
