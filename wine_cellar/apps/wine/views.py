@@ -1,7 +1,7 @@
 from django.forms import model_to_dict
 from django.http import HttpResponseForbidden, HttpResponseNotFound
-from django.shortcuts import get_object_or_404
-from django.urls import reverse_lazy
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse, reverse_lazy
 from django.views.generic import DetailView, FormView, RedirectView, TemplateView
 from django_filters.views import FilterView
 
@@ -224,17 +224,13 @@ class WineScanView(TemplateView):
 class WineScannedView(TemplateView):
     template_name = "scanned_wine.html"
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def dispatch(self, request, *args, **kwargs):
         code = self.kwargs["code"]
-        try:
-            wine = (
-                Wine.objects.filter(barcode=code).filter(user=self.request.user).first()
-            )
-            context.update({"wine": wine, "code": code})
-        except Wine.DoesNotExist:
-            pass
-        return context
+        wine = Wine.objects.filter(barcode=code).filter(user=self.request.user).first()
+        if wine:
+            return redirect(reverse("wine-detail", kwargs={"pk": wine.pk}))
+
+        return super().dispatch(request, *args, **kwargs)
 
 
 class WineChangeStockView(RedirectView):
