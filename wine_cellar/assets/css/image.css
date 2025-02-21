@@ -5,8 +5,12 @@
   border-radius: 15px;
   text-align: center;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-  margin: auto;
   margin-block-end: 2rem;
+
+
+  @media screen and (max-width: 48em) {
+    margin: 0 auto 20px auto;
+  }
   
   img {
     padding-top: 12.5px;
