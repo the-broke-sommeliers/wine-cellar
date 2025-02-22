@@ -76,14 +76,8 @@ class WineFactory(DjangoModelFactory):
 
     user = factory.SubFactory(UserFactory)
     name = factory.Faker("name")
-    wine_type = random.choice(WineType.labels)
+    wine_type = random.choice(WineType.choices)[0]
     vintage = random.randint(1900, 2024)
-    # classification = factory.RelatedFactoryList(
-    #    ClassificationFactory, size=random.randint(1, 4)
-    # )
-    # food_pairings = factory.RelatedFactoryList(
-    #    FoodPairingFactory, size=random.randint(1, 4)
-    # )
     abv = 12.0
 
     @post_generation

@@ -68,11 +68,6 @@ class WineCreateView(FormView):
             kwargs["initial"].update({"barcode": self.kwargs["code"]})
         return kwargs
 
-    def form_invalid(self, form):
-        form.data = form.data.copy()
-        form.data["form_step"] = form.cleaned_data["form_step"]
-        return super().form_invalid(form)
-
     def form_valid(self, form):
         form_step = form.cleaned_data.get("form_step", 4)
         # assume form_step is last step if not send
