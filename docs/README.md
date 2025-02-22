@@ -10,6 +10,8 @@
 
 - **Wine Tracking**: Record and review wines you've tasted.
 - **Inventory Management**: Monitor bottle stock levels.
+- **Barcode Scanning**: Easy adding and removing wines by scanning their
+barcode.
 - **Tasting Notes**: Save aroma, flavor, and experience details.
 - **Wine Ratings**: Rate wines to track preferences.
 - **Food Pairings**: Add recommended food pairings.
