@@ -1,4 +1,5 @@
 # Deployment
+The easiest way to run Wine Cellar is by using docker as described below.
 
 ## Docker Deployment
 
@@ -30,6 +31,11 @@
 !!! Note
 
     This setup is under development. Proceed with caution.
+
+!!! Note
+
+    When using podman instead of docker you might have to add `:z` to the
+    volumes to allow sharing them between containers and make SELinux happy.
 
 #### Option 1: Using a Reverse Proxy
 
