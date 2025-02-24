@@ -10,7 +10,7 @@ const Scanner = () => {
     }
   }
 
-  return <BarcodeScanner onCapture={handleCapture} options={{ formats: ['ean_13', 'ean_8', 'upc_a'] }} />
+  return <BarcodeScanner onCapture={handleCapture} options={{ formats: ['ean_13', 'ean_8', 'upc_a', 'code_39', 'itf'] }} />
 }
 
 const initScanner = () => {
