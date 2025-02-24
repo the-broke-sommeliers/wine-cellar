@@ -1,9 +1,10 @@
 site_name: Wine Cellar Documentation
 nav:
   - Home: README.md
-  - Installation: setup.md
-  - Deployment: deployment.md
-  - Testing: testing.md
+  - Getting Started: deployment.md
+  - Development:
+    - Setup: setup.md
+    - Testing: testing.md
 
 theme:
   name: material
