@@ -29,7 +29,7 @@ RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requir
 RUN npm install
 # build js
 RUN npm run build:prod
-Run touch wine_cellar/static/index.js.map
+RUN touch wine_cellar/static/index.js.map
 
 #########
 # FINAL #
