@@ -1,4 +1,3 @@
-const webpack = require('webpack')
 const path = require('path')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
@@ -122,10 +121,16 @@ module.exports = {
       chunkFilename: '[name].css'
     }),
     new CopyWebpackPlugin({
-      patterns: [{
+      patterns: [
+        {
         from: './wine_cellar/assets/images/**/*',
         to: 'images/[name][ext]'
-      }]
+        },
+        {
+          from: './wine_cellar/assets/js/index.js.map',
+          to: '[name][ext]'
+        }
+      ]
     })
   ]
 }
