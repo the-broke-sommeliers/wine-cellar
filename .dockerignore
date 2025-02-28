@@ -5,3 +5,5 @@ datasets/
 .env.prod
 .env.prod.db
 db.sqlite3
+media/
+test_db.sqlite3
