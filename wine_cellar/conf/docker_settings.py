@@ -2,7 +2,7 @@ import os
 
 from wine_cellar.conf.prod import *  # noqa: F403
 
-DEBUG = bool(os.environ.get("DEBUG", default=0))
+DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
 SECRET_KEY = os.environ.get("SECRET_KEY")
 DATABASES = {
