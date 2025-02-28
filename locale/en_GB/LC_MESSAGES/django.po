@@ -1,0 +1,461 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-28 14:23+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: wine_cellar/apps/wine/fields.py:21
+#, python-format
+msgid "“%(pk)s” is not a valid value."
+msgstr "“%(pk)s” is not a valid value."
+
+#: wine_cellar/apps/wine/filters.py:13
+msgid "Recently Added"
+msgstr "Recently Added"
+
+#: wine_cellar/apps/wine/filters.py:14
+msgid "Least Recently Added"
+msgstr "Least Recently Added"
+
+#: wine_cellar/apps/wine/filters.py:15
+msgid "Name Descending"
+msgstr "Name Descending"
+
+#: wine_cellar/apps/wine/filters.py:16
+msgid "Name Ascending"
+msgstr "Name Ascending"
+
+#: wine_cellar/apps/wine/filters.py:17
+msgid "Newest First"
+msgstr "Newest First"
+
+#: wine_cellar/apps/wine/filters.py:18
+msgid "Oldest First"
+msgstr "Oldest First"
+
+#: wine_cellar/apps/wine/filters.py:20
+msgid "Sorting"
+msgstr "Sorting"
+
+#: wine_cellar/apps/wine/forms.py:80
+msgid "Enter the name of the wine as indicated on the label."
+msgstr "Enter the name of the wine as indicated on the label."
+
+#: wine_cellar/apps/wine/forms.py:85
+msgid "Select the type of wine from the dropdown."
+msgstr "Select the type of wine from the dropdown."
+
+#: wine_cellar/apps/wine/forms.py:92
+msgid "Select the sweetness level of the wine."
+msgstr "Select the sweetness level of the wine."
+
+#: wine_cellar/apps/wine/forms.py:100
+msgid "Select the country the wine was produced in as indicated on the label."
+msgstr "Select the country the wine was produced in as indicated on the label."
+
+#: wine_cellar/apps/wine/forms.py:108
+msgid "Please enter the volume of bottle or box ect. in liters, e.g. 0.75."
+msgstr "Please enter the volume of bottle or box ect. in liters, e.g. 0.75."
+
+#: wine_cellar/apps/wine/forms.py:118
+msgid ""
+"Please enter the percentage of alcohol in the wine. This information is "
+"typically found on the label and indicates the strength of the wine."
+msgstr ""
+"Please enter the percentage of alcohol in the wine. This information is "
+"typically found on the label and indicates the strength of the wine."
+
+#: wine_cellar/apps/wine/forms.py:130
+msgid ""
+"Enter the year the grapes were harvested to produce the wine. Typically, "
+"vintage years are prominently displayed on wine labels."
+msgstr ""
+"Enter the year the grapes were harvested to produce the wine. Typically, "
+"vintage years are prominently displayed on wine labels."
+
+#: wine_cellar/apps/wine/forms.py:139
+msgid ""
+"Select or add the grape varieties usedto produce the wine. You can select "
+"multiple options if applicable."
+msgstr ""
+"Select or add the grape varieties usedto produce the wine. You can select "
+"multiple options if applicable."
+
+#: wine_cellar/apps/wine/forms.py:151
+msgid ""
+"Select or add the classification or designation of the wine, such as Vin de "
+"Table, Vin de Pays, or Appellation d'Origine Contrôlée (AOC). This helps "
+"categorize the wine based on its regional or quality classification."
+msgstr ""
+"Select or add the classification or designation of the wine, such as Vin de "
+"Table, Vin de Pays, or Appellation d'Origine Contrôlée (AOC). This helps "
+"categorize the wine based on its regional or quality classification."
+
+#: wine_cellar/apps/wine/forms.py:162
+msgid ""
+"Enter dishes, cuisines, or ingredients that complement the flavors of this "
+"wine."
+msgstr ""
+"Enter dishes, cuisines, or ingredients that complement the flavors of this "
+"wine."
+
+#: wine_cellar/apps/wine/forms.py:171
+msgid "Enter the names of the vineyards which produced the wine."
+msgstr "Enter the names of the vineyards which produced the wine."
+
+#: wine_cellar/apps/wine/forms.py:177
+msgid "Where did you get the wine from?"
+msgstr "Where did you get the wine from?"
+
+#: wine_cellar/apps/wine/forms.py:182
+msgid "Enter the barcode number of the wine as indicated on the label."
+msgstr "Enter the barcode number of the wine as indicated on the label."
+
+#: wine_cellar/apps/wine/forms.py:188
+msgid "Enter the quantity of bottles you currently have in your collection"
+msgstr "Enter the quantity of bottles you currently have in your collection"
+
+#: wine_cellar/apps/wine/forms.py:196
+msgid ""
+"Share your thoughts, tasting experiences, or any anecdotes related to this "
+"wine."
+msgstr ""
+"Share your thoughts, tasting experiences, or any anecdotes related to this "
+"wine."
+
+#: wine_cellar/apps/wine/forms.py:208
+msgid "Rate this wine on a scale from 0 to 10"
+msgstr "Rate this wine on a scale from 0 to 10"
+
+#: wine_cellar/apps/wine/forms.py:213
+msgid ""
+"Upload a photo of the wine bottle or label. Adding an image helps visually "
+"identify the wine in your collection "
+msgstr ""
+"Upload a photo of the wine bottle or label. Adding an image helps visually "
+"identify the wine in your collection "
+
+#: wine_cellar/apps/wine/models.py:21
+msgid "White"
+msgstr "White"
+
+#: wine_cellar/apps/wine/models.py:22
+msgid "Red"
+msgstr "Red"
+
+#: wine_cellar/apps/wine/models.py:23
+msgid "Rose"
+msgstr "Rose"
+
+#: wine_cellar/apps/wine/models.py:24
+msgid "Sparkling"
+msgstr "Sparkling"
+
+#: wine_cellar/apps/wine/models.py:25
+msgid "Dessert"
+msgstr "Dessert"
+
+#: wine_cellar/apps/wine/models.py:26
+msgid "Fortified"
+msgstr "Fortified"
+
+#: wine_cellar/apps/wine/models.py:30
+msgid "Dry"
+msgstr "Dry"
+
+#: wine_cellar/apps/wine/models.py:31
+msgid "Semi-Dry"
+msgstr "Semi-Dry"
+
+#: wine_cellar/apps/wine/models.py:32
+msgid "Medium Sweet"
+msgstr "Medium Sweet"
+
+#: wine_cellar/apps/wine/models.py:33
+msgid "Sweet"
+msgstr "Sweet"
+
+#: wine_cellar/apps/wine/models.py:34
+msgid "Feinherb"
+msgstr "Feinherb"
+
+#: wine_cellar/apps/wine/models.py:38
+#: wine_cellar/apps/wine/templates/wine_detail.html:49
+msgid "Size"
+msgstr "Size"
+
+#: wine_cellar/apps/wine/models.py:45
+msgid "Grape"
+msgstr "Grape"
+
+#: wine_cellar/apps/wine/models.py:84
+msgid "Food"
+msgstr "Food"
+
+#: wine_cellar/apps/wine/templates/forms/form_field.html:8
+msgid "This field is optional"
+msgstr "This field is optional"
+
+#: wine_cellar/apps/wine/templates/forms/form_field.html:8
+msgid "(Optional)"
+msgstr "(Optional)"
+
+#: wine_cellar/apps/wine/templates/homepage.html:4
+msgid "My Wine Cellar"
+msgstr "My Wine Cellar"
+
+#: wine_cellar/apps/wine/templates/homepage.html:13
+msgid ""
+"\n"
+"                            Wine in Stock\n"
+"                        "
+msgid_plural ""
+"\n"
+"                            Wines in Stock\n"
+"                        "
+msgstr[0] ""
+"\n"
+"                            Wine in Stock\n"
+"                        "
+msgstr[1] ""
+"\n"
+"                            Wines in Stock\n"
+"                        "
+
+#: wine_cellar/apps/wine/templates/homepage.html:23
+msgid ""
+"\n"
+"                            recorded Wine\n"
+"                        "
+msgid_plural ""
+"\n"
+"                            recorded Wines\n"
+"                        "
+msgstr[0] ""
+"\n"
+"                            recorded Wine\n"
+"                        "
+msgstr[1] ""
+"\n"
+"                            recorded Wines\n"
+"                        "
+
+#: wine_cellar/apps/wine/templates/homepage.html:33
+msgid ""
+"\n"
+"                            Country\n"
+"                        "
+msgid_plural ""
+"\n"
+"                            Countries\n"
+"                        "
+msgstr[0] ""
+"\n"
+"                            Country\n"
+"                        "
+msgstr[1] ""
+"\n"
+"                            Countries\n"
+"                        "
+
+#: wine_cellar/apps/wine/templates/homepage.html:42
+msgid "Oldest Wine"
+msgstr "Oldest Wine"
+
+#: wine_cellar/apps/wine/templates/homepage.html:46
+msgid "Youngest Wine"
+msgstr "Youngest Wine"
+
+#: wine_cellar/apps/wine/templates/includes/stock_buttons.html:5
+msgid "Add bottle"
+msgstr "Add bottle"
+
+#: wine_cellar/apps/wine/templates/includes/stock_buttons.html:8
+msgid "Remove bottle"
+msgstr "Remove bottle"
+
+#: wine_cellar/apps/wine/templates/includes/stock_buttons.html:11
+msgid "Add new wine"
+msgstr "Add new wine"
+
+#: wine_cellar/apps/wine/templates/scan_wine.html:4
+msgid "Scan Barcode"
+msgstr "Scan Barcode"
+
+#: wine_cellar/apps/wine/templates/scan_wine.html:10
+msgid ""
+"Scan the barcode of a bottle to quickly add or remove a wine from your "
+"cellar."
+msgstr ""
+"Scan the barcode of a bottle to quickly add or remove a wine from your "
+"cellar."
+
+#: wine_cellar/apps/wine/templates/scanned_wine.html:4
+msgid "No wine found"
+msgstr "No wine found"
+
+#: wine_cellar/apps/wine/templates/scanned_wine.html:10
+msgid "Would you like to add a new wine with that barcode?"
+msgstr "Would you like to add a new wine with that barcode?"
+
+#: wine_cellar/apps/wine/templates/wine_card.html:27
+msgid "Stock:"
+msgstr "Stock:"
+
+#: wine_cellar/apps/wine/templates/wine_create.html:11
+#: wine_cellar/templates/base.html:48 wine_cellar/templates/base.html:76
+msgid "Add Wine"
+msgstr "Add Wine"
+
+#: wine_cellar/apps/wine/templates/wine_create.html:24
+msgid "Details"
+msgstr "Details"
+
+#: wine_cellar/apps/wine/templates/wine_create.html:34
+msgid "Characteristics"
+msgstr "Characteristics"
+
+#: wine_cellar/apps/wine/templates/wine_create.html:44
+msgid "Origin"
+msgstr "Origin"
+
+#: wine_cellar/apps/wine/templates/wine_create.html:54
+msgid "Personal Notes"
+msgstr "Personal Notes"
+
+#: wine_cellar/apps/wine/templates/wine_create.html:63
+msgid "Image"
+msgstr "Image"
+
+#: wine_cellar/apps/wine/templates/wine_create.html:69
+msgid "Continue"
+msgstr "Continue"
+
+#: wine_cellar/apps/wine/templates/wine_detail.html:18
+msgid "Picture of a wine bottle"
+msgstr "Picture of a wine bottle"
+
+#: wine_cellar/apps/wine/templates/wine_detail.html:21
+msgid "No image"
+msgstr "No image"
+
+#: wine_cellar/apps/wine/templates/wine_detail.html:27
+msgid "Country"
+msgstr "Country"
+
+#: wine_cellar/apps/wine/templates/wine_detail.html:32
+msgid "Vineyard"
+msgstr "Vineyard"
+
+#: wine_cellar/apps/wine/templates/wine_detail.html:37
+msgid "Type"
+msgstr "Type"
+
+#: wine_cellar/apps/wine/templates/wine_detail.html:41
+msgid "Category"
+msgstr "Category"
+
+#: wine_cellar/apps/wine/templates/wine_detail.html:45
+msgid "ABV"
+msgstr "ABV"
+
+#: wine_cellar/apps/wine/templates/wine_detail.html:53
+msgid "Vintage"
+msgstr "Vintage"
+
+#: wine_cellar/apps/wine/templates/wine_detail.html:57
+msgid "Grapes"
+msgstr "Grapes"
+
+#: wine_cellar/apps/wine/templates/wine_detail.html:62
+msgid "Classification"
+msgstr "Classification"
+
+#: wine_cellar/apps/wine/templates/wine_detail.html:68
+msgid "Food Pairings"
+msgstr "Food Pairings"
+
+#: wine_cellar/apps/wine/templates/wine_detail.html:73
+msgid "In Stock"
+msgstr "In Stock"
+
+#: wine_cellar/apps/wine/templates/wine_detail.html:78
+msgid "Comment"
+msgstr "Comment"
+
+#: wine_cellar/apps/wine/templates/wine_detail.html:83
+msgid "Rating"
+msgstr "Rating"
+
+#: wine_cellar/apps/wine/templates/wine_detail.html:88
+msgid "No rating yet"
+msgstr "No rating yet"
+
+#: wine_cellar/apps/wine/templates/wine_edit.html:11
+msgid "Edit Wine"
+msgstr "Edit Wine"
+
+#: wine_cellar/apps/wine/templates/wine_edit.html:28
+msgid "Save"
+msgstr "Save"
+
+#: wine_cellar/apps/wine/templates/wine_list.html:8
+msgid "Wine List"
+msgstr "Wine List"
+
+#: wine_cellar/apps/wine/templates/wine_list.html:18
+#: wine_cellar/apps/wine/templates/wine_list.html:42
+msgid "Filter & Sorting"
+msgstr "Filter & Sorting"
+
+#: wine_cellar/apps/wine/templates/wine_list.html:25
+msgid "Narrow Your Selection"
+msgstr "Narrow Your Selection"
+
+#: wine_cellar/apps/wine/templates/wine_list.html:30
+#: wine_cellar/apps/wine/templates/wine_list.html:49
+msgid "Filter"
+msgstr "Filter"
+
+#: wine_cellar/apps/wine/templates/wine_list.html:59
+msgid "There are no wines yet"
+msgstr "There are no wines yet"
+
+#: wine_cellar/apps/wine/templates/wine_list.html:78
+msgid "(current)"
+msgstr "(current)"
+
+#: wine_cellar/templates/base.html:45 wine_cellar/templates/base.html:73
+msgid "Wines"
+msgstr "Wines"
+
+#: wine_cellar/templates/base.html:51 wine_cellar/templates/base.html:79
+msgid "Scan Wine"
+msgstr "Scan Wine"
+
+#: wine_cellar/templates/base.html:56 wine_cellar/templates/base.html:84
+msgid "Log Out"
+msgstr "Log Out"
+
+#: wine_cellar/templates/base.html:61 wine_cellar/templates/base.html:89
+#: wine_cellar/templates/registration/login.html:21
+msgid "Login"
+msgstr "Login"
+
+#: wine_cellar/templates/base.html:106
+msgid "Version"
+msgstr "Version"
