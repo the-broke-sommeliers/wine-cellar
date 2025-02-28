@@ -9,7 +9,7 @@
             <p class="form-hint">
                 {% blocktranslate %}Scan the barcode of a bottle to quickly add or remove a wine from your cellar.{% endblocktranslate %}
             </p>
-            <div class="form__scanner" id="scanner"></div>
+            <div id="scanner" data-zxing_wasm_url="{% static 'zxing_reader.wasm' %}"></div>
         </div>
     </div>
 {% endblock content %}

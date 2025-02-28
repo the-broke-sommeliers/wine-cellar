@@ -1,5 +1,5 @@
 import eslintConfigPrettier from 'eslint-config-prettier'
-import neostandard, { plugins } from 'neostandard'
+import neostandard from 'neostandard'
 
 export default [
   ...neostandard({ts:true}),
@@ -9,4 +9,3 @@ export default [
     ignores: ['node_modules/', 'venv/', 'static/', 'wine_cellar/static/'],
   },
 ]
-//export default neostandard({ignores: ["webpack.common.js"]})

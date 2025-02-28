@@ -19,25 +19,21 @@ module.exports = {
         './node_modules/tom-select/dist/css/tom-select.css',
         './node_modules/@fortawesome/fontawesome-free/css/fontawesome.css',
         './node_modules/@fortawesome/fontawesome-free/css/solid.css',
-      ]
+      ],
     },
     tom_select: {
-      import: [
-        './wine_cellar/assets/js/init_tom_select.ts'
-      ],
+      import: ['./wine_cellar/assets/js/init_tom_select.ts'],
     },
     barcode_scanner: {
-      import: [
-        './wine_cellar/react/react_bar_code.jsx'
-      ],
-    }
+      import: ['./wine_cellar/react/react_bar_code.tsx'],
+    },
   },
   output: {
     path: path.resolve('./wine_cellar/static/'),
-    publicPath: '/static/'
+    publicPath: '/static/',
   },
   externals: {
-    django: 'django'
+    django: 'django',
   },
   module: {
     rules: [
@@ -46,9 +42,14 @@ module.exports = {
         exclude: /node_modules\/.*/, // exclude most dependencies
         loader: 'babel-loader',
         options: {
-          presets: ['@babel/preset-env', '@babel/preset-react'].map(require.resolve),
-          plugins: ['@babel/plugin-transform-runtime', '@babel/plugin-transform-modules-commonjs']
-        }
+          presets: ['@babel/preset-env', '@babel/preset-react'].map(
+            require.resolve
+          ),
+          plugins: [
+            '@babel/plugin-transform-runtime',
+            '@babel/plugin-transform-modules-commonjs',
+          ],
+        },
       },
       {
         test: /\.tsx?$/,
@@ -59,7 +60,7 @@ module.exports = {
         test: /\.s?css$/,
         use: [
           {
-            loader: MiniCssExtractPlugin.loader
+            loader: MiniCssExtractPlugin.loader,
           },
           {
             loader: 'css-loader',
@@ -72,53 +73,50 @@ module.exports = {
                   } else {
                     return false
                   }
-                }
-              }
-            }
+                },
+              },
+            },
           },
           {
             loader: 'postcss-loader',
             options: {
               postcssOptions: {
-                plugins: [
-                  require('autoprefixer')
-                ]
-              }
-            }
+                plugins: [require('autoprefixer')],
+              },
+            },
           },
-        ]
+        ],
       },
       {
         test: /fonts\/.*\.(svg|woff2?|ttf|eot)(\?.*)?$/,
         type: 'asset/resource',
         generator: {
-          filename: 'fonts/[name][ext]'
-        }
+          filename: 'fonts/[name][ext]',
+        },
       },
       {
         test: /\.svg$|\.png$/,
         type: 'asset/resource',
         generator: {
-          filename: 'images/[name][ext]'
-        }
-      }
-    ]
+          filename: 'images/[name][ext]',
+        },
+      },
+    ],
   },
   resolve: {
     fallback: { path: require.resolve('path-browserify') },
     extensions: ['*', '.js', '.jsx', '.scss', '.css', '.ts', '.tsx'],
-    alias: {
-    },
+    alias: {},
     // when using `npm link`, dependencies are resolved against the linked
     // folder by default. This may result in dependencies being included twice.
     // Setting `resolve.root` forces webpack to resolve all dependencies
     // against the local directory.
-    modules: [path.resolve('./node_modules')]
+    modules: [path.resolve('./node_modules')],
   },
   plugins: [
     new MiniCssExtractPlugin({
       filename: '[name].css',
-      chunkFilename: '[name].css'
+      chunkFilename: '[name].css',
     }),
     new CopyWebpackPlugin({
       patterns: [
@@ -129,7 +127,11 @@ module.exports = {
         {
           from: './wine_cellar/assets/js/index.js.map',
           to: '[name][ext]'
-        }
+        },
+        {
+          from: './node_modules/zxing-wasm/dist/reader/zxing_reader.wasm',
+          to: '[name][ext]',
+        },
       ]
     })
   ]
