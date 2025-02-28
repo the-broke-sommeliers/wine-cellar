@@ -148,6 +148,53 @@ p.form-hint {
   }
 }
 
+.overlay {
+  --border-style: 3px solid red;
+  --border-space: 20px;
+
+  position: absolute;
+  top: 37.5%;
+  left: 10%;
+  right: 10%;
+  bottom: 37.5%;
+  height: 35%;
+  width: 80%;
+}
+
+.overlay-element {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+}
+
+.overlay .top-left {
+  border-left: var(--border-style);
+  border-top: var(--border-style);
+  top: var(--border-space);
+  left: var(--border-space);
+}
+
+.overlay .top-right {
+  border-right: var(--border-style);
+  border-top: var(--border-style);
+  top: var(--border-space);
+  right: var(--border-space);
+}
+
+.overlay .bottom-left {
+  border-left: var(--border-style);
+  border-bottom: var(--border-style);
+  bottom: var(--border-space);
+  left: var(--border-space);
+}
+
+.overlay .bottom-right {
+  border-right: var(--border-style);
+  border-bottom: var(--border-style);
+  bottom: var(--border-space);
+  right: var(--border-space);
+}
+
 .form__scanner {
   width: 100%;
   padding-top: 100%; /* 1:1 Aspect Ratio */
@@ -160,6 +207,10 @@ p.form-hint {
     bottom: 0;
     right: 0;
   }
+}
+
+.form__scanner__details {
+  padding-bottom: 16px;
 }
 
 .wine__stock-buttons {
