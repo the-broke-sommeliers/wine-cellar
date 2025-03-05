@@ -18,7 +18,7 @@
                         <h2 class="filter-form__header">{% translate "Filter & Sorting" %}</h2>
                     </summary>
                     <div>
-                        <form action=""
+                        <form action="."
                               method="get"
                               class="filter-form pure-form pure-form-stacked">
                             <fieldset>
@@ -27,13 +27,16 @@
                                     {% include "wine_filter_field.html" %}
                                 {% endfor %}
                             </fieldset>
+                            <a href="?" role="button" class="pure-button button__secondary" aria-label='{% translate "Clear all filters and reset the form" %}'>
+                                {% translate "Clear" %}
+                            </a>
                             <button type="submit" class="pure-button button__primary">{% translate "Filter" %}</button>
                         </form>
                     </div>
                 </details>
             </div>
             <!-- Filter toggle ends-->
-            <form action=""
+            <form action="."
                   method="get"
                   class="filter-form--lg pure-form pure-form-stacked">
                 <fieldset>
@@ -46,6 +49,9 @@
                         {% include "wine_filter_field.html" %}
                     {% endfor %}
                 </fieldset>
+                <a href="?" role="button" class="pure-button button__secondary" aria-label='{% translate "Clear all filters and reset the form" %}'>
+                    {% translate "Clear" %}
+                </a>
                 <button type="submit" class="pure-button button__primary">{% translate "Filter" %}</button>
             </form>
         </div>
