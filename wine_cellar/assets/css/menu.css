@@ -23,6 +23,11 @@
     border: none;
 }
 
+.menu__container {
+    max-width: 1140px;
+    margin: 0 auto;
+}
+
 /* responsive styling for large and small menus */
 .menu__md {
     display: none;
