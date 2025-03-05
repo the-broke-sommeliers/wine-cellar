@@ -34,7 +34,7 @@
                         <input class="menu-toggle" type="checkbox" id="menu-toggle" value="text">
                         <label class="menu-link" for="menu-toggle">
                             {# djlint:off #}
-                <span></span>
+                            <span></span>
                             {# djlint:on #}
                         </label>
                         <a href="{% url 'homepage' %}" class="pure-menu-heading pure-menu-link">Wine Cellar</a>
@@ -66,30 +66,32 @@
                     </nav>
                     <!-- large screen menu -->
                     <nav class="pure-menu pure-menu-horizontal menu__md">
-                        <a href="{% url 'homepage' %}" class="pure-menu-heading pure-menu-link">Wine Cellar</a>
-                        <ul class="pure-menu-list">
-                            {% if user.is_authenticated %}
-                                <li class="pure-menu-item">
-                                    <a href="{% url 'wine-list' %}" class="pure-menu-link">{% translate "Wines" %}</a>
-                                </li>
-                                <li class="pure-menu-item">
-                                    <a href="{% url 'wine-add' %}" class="pure-menu-link">{% translate "Add Wine" %}</a>
-                                </li>
-                                <li class="pure-menu-item">
-                                    <a href="{% url 'wine-scan' %}" class="pure-menu-link">{% translate "Scan Wine" %}</a>
-                                </li>
-                                <li class="pure-menu-item">
-                                    <form action="{% url 'logout' %}" method="post">
-                                        {% csrf_token %}
-                                        <button class="pure-menu-link button" type="submit">{% translate "Log Out" %}</button>
-                                    </form>
-                                </li>
-                            {% else %}
-                                <li class="pure-menu-item">
-                                    <a href="{% url 'login' %}" class="pure-menu-link">{% translate "Login" %}</a>
-                                </li>
-                            {% endif %}
-                        </ul>
+                        <div class="menu__container">
+                            <a href="{% url 'homepage' %}" class="pure-menu-heading pure-menu-link">Wine Cellar</a>
+                            <ul class="pure-menu-list">
+                                {% if user.is_authenticated %}
+                                    <li class="pure-menu-item">
+                                        <a href="{% url 'wine-list' %}" class="pure-menu-link">{% translate "Wines" %}</a>
+                                    </li>
+                                    <li class="pure-menu-item">
+                                        <a href="{% url 'wine-add' %}" class="pure-menu-link">{% translate "Add Wine" %}</a>
+                                    </li>
+                                    <li class="pure-menu-item">
+                                        <a href="{% url 'wine-scan' %}" class="pure-menu-link">{% translate "Scan Wine" %}</a>
+                                    </li>
+                                    <li class="pure-menu-item">
+                                        <form action="{% url 'logout' %}" method="post">
+                                            {% csrf_token %}
+                                            <button class="pure-menu-link button" type="submit">{% translate "Log Out" %}</button>
+                                        </form>
+                                    </li>
+                                {% else %}
+                                    <li class="pure-menu-item">
+                                        <a href="{% url 'login' %}" class="pure-menu-link">{% translate "Login" %}</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
                     </nav>
                 </header>
             {% endspaceless %}
