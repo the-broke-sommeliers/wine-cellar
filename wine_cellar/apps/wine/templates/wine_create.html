@@ -66,7 +66,10 @@
                 </fieldset>
                 {{ form.form_step }}
                 <div class="pure-controls">
-                    <button type="submit" class="pure-button button__primary">{% translate "Continue" %}</button>
+                    <button type="submit" name="save_finish" class="pure-button button__secondary">{% translate "Save and Finish" %}</button>
+                    {% if form.form_step.value < 4 %}
+                        <button type="submit" name="continue" class="pure-button button__primary">{% translate "Continue" %}</button>
+                    {% endif %}
                 </div>
             </form>
         </div>
