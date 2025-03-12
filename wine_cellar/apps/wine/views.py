@@ -71,21 +71,18 @@ class WineCreateView(FormView):
     def form_valid(self, form):
         form_step = form.cleaned_data.get("form_step", 4)
 
-        if "save_finish" in self.request.POST:
-            self.process_form_data(self.request.user, form.cleaned_data)
-            return super().form_valid(form)
-
         # assume form_step is last step if not send
         if form_step is None:
             form_step = 4
-        if form_step < 4:
+        if form_step == 4 or "save_finish" in self.request.POST:
+            self.process_form_data(self.request.user, form.cleaned_data)
+            return super().form_valid(form)
+        elif form_step < 4:
             # FIXME: hacky workaround to increase form_step field
             form.data = form.data.copy()
             form.data["form_step"] = form.cleaned_data["form_step"] + 1
             return super().form_invalid(form)
-        elif form_step == 4:
-            self.process_form_data(self.request.user, form.cleaned_data)
-            return super().form_valid(form)
+
         return super().form_invalid(form)
 
     @staticmethod
