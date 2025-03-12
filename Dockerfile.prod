@@ -14,7 +14,7 @@ ENV PYTHONUNBUFFERED=1
 
 # install system dependencies
 RUN apt-get update && \
-    apt-get install -y curl libpq-dev
+    apt-get install -y curl libpq-dev git
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs \
     build-essential
@@ -29,7 +29,6 @@ RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requir
 RUN npm install
 # build js
 RUN npm run build:prod
-RUN touch wine_cellar/static/index.js.map
 
 #########
 # FINAL #
@@ -65,6 +64,7 @@ RUN chmod +x  $APP_HOME/entrypoint.prod.sh
 
 # copy project
 COPY . $APP_HOME
+COPY --from=builder /usr/src/app/wine_cellar/static wine_cellar/static
 
 # chown all the files to the app user
 RUN chown -R app:app $APP_HOME
