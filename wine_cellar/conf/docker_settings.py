@@ -20,5 +20,3 @@ CSRF_TRUSTED_ORIGINS = os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS").split(" ")
 
 MEDIA_ROOT = "mediafiles"
 STATIC_ROOT = "staticfiles"
-
-WHITENOISE_KEEP_ONLY_HASHED_FILES = True
