@@ -13,3 +13,7 @@
 .d-inline {
   display: inline;
 }
+
+.j-center {
+  justify-content: center;
+}

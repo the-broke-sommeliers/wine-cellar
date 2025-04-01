@@ -4,48 +4,58 @@
     <h1 class="header__title">{% translate "My Wine Cellar" %}</h1>
 {% endblock header %}
 {% block content %}
-    <div class="pure-g">
-        <div class="pure-u-1-1">
-            <div class="stats__card-container">
-                <div class="stats__card">
-                    <p class="stats__number">{{ wines_in_stock }}</p>
-                    <p class="stats__label">
-                        {% blocktranslate count counter=wines_in_stock %}
-                            Wine in Stock
-                        {% plural %}
-                            Wines in Stock
-                        {% endblocktranslate %}
-                    </p>
-                </div>
-                <div class="stats__card">
-                    <p class="stats__number">{{ wines }}</p>
-                    <p class="stats__label">
-                        {% blocktranslate count counter=wines %}
-                            recorded Wine
-                        {% plural %}
-                            recorded Wines
-                        {% endblocktranslate %}
-                    </p>
-                </div>
-                <div class="stats__card">
-                    <p class="stats__number">{{ countries }}</p>
-                    <p class="stats__label">
-                        {% blocktranslate count counter=countries %}
-                            Country
-                        {% plural %}
-                            Countries
-                        {% endblocktranslate %}
-                    </p>
-                </div>
-                <div class="stats__card">
-                    <p class="stats__number">{{ oldest }}</p>
-                    <p class="stats__label">{% translate "Oldest Wine" %}</p>
-                </div>
-                <div class="stats__card">
-                    <p class="stats__number">{{ youngest }}</p>
-                    <p class="stats__label">{% translate "Youngest Wine" %}</p>
-                </div>
-            </div>
+    <div class="pure-g j-center">
+        <div class="pure-u-2-3">
+            <ul class="stats__card-container">
+                <li class="stats__card">
+                    <a class="stats__link" href="{% url 'wine-list' %}?stock=1">
+                        <p class="stats__number">{{ wines_in_stock }}</p>
+                        <h2 class="stats__label">
+                            {% blocktranslate count counter=wines_in_stock %}
+                                Wine in Stock
+                            {% plural %}
+                                Wines in Stock
+                            {% endblocktranslate %}
+                        </h2>
+                    </a>
+                </li>
+                <li class="stats__card">
+                    <a class="stats__link" href="{% url 'wine-list' %}">
+                        <p class="stats__number">{{ wines }}</p>
+                        <h2 class="stats__label">
+                            {% blocktranslate count counter=wines %}
+                                Recorded Wine
+                            {% plural %}
+                                Recorded Wines
+                            {% endblocktranslate %}
+                        </h2>
+                    </a>
+                </li>
+                <li class="stats__card">
+                    <a class="stats__link" href="{% url 'wine-list' %}">
+                        <p class="stats__number">{{ countries }}</p>
+                        <h2 class="stats__label">
+                            {% blocktranslate count counter=countries %}
+                                Country
+                            {% plural %}
+                                Countries
+                            {% endblocktranslate %}
+                        </h2>
+                    </a>
+                </li>
+                <li class="stats__card">
+                    <a class="stats__link" href="{% url 'wine-list' %}?name=&wine_type=&category=&vintage=&order=vintage">
+                        <p class="stats__number">{{ oldest }}</p>
+                        <h2 class="stats__label">{% translate "Oldest Wine" %}</h2>
+                    </a>
+                </li>
+                <li class="stats__card">
+                    <a class="stats__link" href="{% url 'wine-list' %}?name=&wine_type=&category=&vintage=&order=-vintage">
+                        <p class="stats__number">{{ youngest }}</p>
+                        <h2 class="stats__label">{% translate "Youngest Wine" %}</h2>
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
 {% endblock content %}

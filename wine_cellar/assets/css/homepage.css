@@ -3,29 +3,48 @@
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
-  gap: 20px;
-  margin: 5px;
+  gap: 1rem;
+
+  list-style: none;
+  padding: 0;
 }
 
 .stats__card {
+  width: 125px;
+  max-width: 30vw;
+  aspect-ratio: 1 / 1;
+}
+
+.stats__link {
+  display: block;
+  height: 100%;
   background: white;
   border-radius: 10px;
-  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
   text-align: center;
   align-content: center;
-  padding: 20px;
-  width: 100px;
-  height: 100px;
+
+  text-decoration: none;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  transition: box-shadow 0.2s, background-color 0.2s;
 }
+
+.stats__link:hover,
+.stats__link:focus {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
 .stats__number {
   font-size: var(--font-lg);
   color: #333;
   margin: 0;
   line-height: initial;
 }
+
 .stats__label {
   font-size: var(--font-sm);
   color: var(--text-color-gray);
+  font-weight: lighter;
+  padding: 0 1rem;
   margin: 0 0 0 0;
   line-height: initial;
 }
