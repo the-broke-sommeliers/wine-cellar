@@ -6,6 +6,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
+from django.views.i18n import JavaScriptCatalog
 
 from wine_cellar.apps.wine.views import (
     HomePageView,
@@ -34,6 +35,7 @@ urlpatterns = [
         name="change-stock",
     ),
     path("", HomePageView.as_view(), name="homepage"),
+    path("jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"),
 ]
 
 if settings.DEBUG:
