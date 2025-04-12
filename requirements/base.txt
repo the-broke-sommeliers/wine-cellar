@@ -1,7 +1,7 @@
 Django==5.2
 django-filter==25.1
 django-widget-tweaks==1.5.0
-pillow==11.2.0
+pillow==11.2.1
 pycountry==24.6.1
 requests==2.32.3
 whitenoise[brotli]==6.9.0
