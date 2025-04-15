@@ -27,6 +27,15 @@ module.exports = {
     barcode_scanner: {
       import: ['./wine_cellar/react/react_bar_code.tsx'],
     },
+    maps: {
+      import: [
+        'leaflet/dist/leaflet.css',
+        'maplibre-gl/dist/maplibre-gl.css',
+        'leaflet.markercluster/dist/MarkerCluster.css',
+        './wine_cellar/assets/css/map.css',
+        './wine_cellar/react/maps/react_maps.tsx'
+      ]
+    }
   },
   output: {
     path: path.resolve('./wine_cellar/static/'),

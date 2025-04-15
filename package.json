@@ -11,10 +11,14 @@
     "@fortawesome/fontawesome-free": "6.7.2",
     "@fortawesome/fontawesome-svg-core": "6.7.2",
     "@fortawesome/free-solid-svg-icons": "6.7.2",
+    "@maplibre/maplibre-gl-leaflet": "0.1.0",
     "barcode-detector": "3.0.5",
+    "leaflet": "1.9.4",
+    "leaflet.markercluster": "1.5.3",
     "react": "19.1.0",
     "react-barcode-scanner": "4.0.0",
     "react-dom": "19.1.0",
+    "react-leaflet": "5.0.0",
     "tom-select": "2.4.3"
   },
   "devDependencies": {
