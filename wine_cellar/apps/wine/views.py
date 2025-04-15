@@ -251,3 +251,18 @@ class WineChangeStockView(RedirectView):
             wine.stock -= 1
         wine.save()
         return super().get_redirect_url(*args, **kwargs)
+
+
+class WineMapView(TemplateView):
+    template_name = "wine_map.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        wines = Wine.objects.filter(user=self.request.user)
+
+        context.update(
+            {
+                "wines": wines,
+            }
+        )
+        return context
