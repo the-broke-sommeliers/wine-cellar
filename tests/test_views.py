@@ -615,3 +615,20 @@ def test_wine_increase_stock(
     assertTemplateUsed(response=r, template_name="wine_detail.html")
     wine.refresh_from_db()
     assert wine.stock == 0
+
+
+@pytest.mark.django_db
+def test_wine_filter_in_stock(client, user, wine_factory):
+    wine_in_stock = wine_factory(user=user, stock=1, vintage=2020)
+    wine_not_in_stock = wine_factory(user=user, stock=0, vintage=2021)
+    client.force_login(user)
+    r = client.get(reverse("wine-list"))
+    assert r.status_code == HTTPStatus.OK
+    assertTemplateUsed(response=r, template_name="base.html")
+    assertTemplateUsed(response=r, template_name="wine_list.html")
+    assert set(r.context_data["wines"]) == {wine_in_stock, wine_not_in_stock}
+    r = client.get(reverse("wine-list") + "?stock=1")
+    assert r.status_code == HTTPStatus.OK
+    assertTemplateUsed(response=r, template_name="base.html")
+    assertTemplateUsed(response=r, template_name="wine_list.html")
+    assert list(r.context_data["wines"]) == [wine_in_stock]

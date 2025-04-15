@@ -1,13 +1,20 @@
 import django_filters
 from django.db.models import Q
 from django.utils.translation import gettext as _
-from django_filters import OrderingFilter
+from django_filters import ChoiceFilter, OrderingFilter
 
 from wine_cellar.apps.wine.forms import WineFilterForm
 from wine_cellar.apps.wine.models import Wine
 
 
 class WineFilter(django_filters.FilterSet):
+    stock = ChoiceFilter(
+        method="filter_stock",
+        label=_("Show only in stock"),
+        choices=((0, _("No")), (1, _("Yes"))),
+        empty_label=None,
+        null_label=None,
+    )
     order = OrderingFilter(
         choices=(
             ("-created", _("Recently Added")),
@@ -22,6 +29,12 @@ class WineFilter(django_filters.FilterSet):
         null_label=None,
     )
 
+    def filter_stock(self, queryset, name, value):
+        if value == "1":
+            return queryset.filter(stock__gt=0)
+        else:
+            return queryset
+
     class Meta:
         form = WineFilterForm
         model = Wine
@@ -35,6 +48,7 @@ class WineFilter(django_filters.FilterSet):
             "food_pairings",
             "source",
             "country",
+            "stock",
         ]
 
     def __init__(self, data=None, queryset=None, *, request=None, prefix=None):
