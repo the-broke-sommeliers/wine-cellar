@@ -1,0 +1,72 @@
+.marker-cluster {
+    background-clip: padding-box;
+    border-radius: 20px;
+    background-color: rgb(64, 128, 72, 0.6);
+
+    div {
+        width: 30px;
+        height: 30px;
+        margin-left: 5px;
+        margin-top: 5px;
+        text-align: center;
+        border-radius: 15px;
+        font-size: 12px;
+        background-color: var(--dark-green);
+        color: white;
+        line-height: 30px;
+    }
+}
+
+.map-popup {
+  width: 220px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  text-align: center;
+}
+
+.popup-image img {
+  display: block;
+  margin: 0 auto;
+  max-height: 100px;
+  max-width: 100%;
+  object-fit: cover;
+}
+
+.popup-content {
+  padding: 10px;
+}
+
+.popup-title {
+  display: block;
+  font-weight: bold;
+  font-size: var(--font-sm);
+  text-decoration: none;
+  margin-bottom: 8px;
+}
+
+.popup-title:hover {
+  text-decoration: underline;
+}
+
+.popup-details {
+  font-size: var(--font-xs);
+  color: var(--text-color-gray);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  text-align: left;
+}
+
+.popup-detail {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.popup-label {
+  font-weight: 600;
+  color: black;
+}
