@@ -104,7 +104,10 @@ module.exports = {
     ],
   },
   resolve: {
-    fallback: { path: require.resolve('path-browserify') },
+    fallback: {
+      path: require.resolve('path-browserify'),
+      url: require.resolve('url/'),
+    },
     extensions: ['*', '.js', '.jsx', '.scss', '.css', '.ts', '.tsx'],
     alias: {},
     // when using `npm link`, dependencies are resolved against the linked
@@ -121,18 +124,18 @@ module.exports = {
     new CopyWebpackPlugin({
       patterns: [
         {
-        from: './wine_cellar/assets/images/**/*',
-        to: 'images/[name][ext]'
+          from: './wine_cellar/assets/images/**/*',
+          to: 'images/[name][ext]',
         },
         {
           from: './wine_cellar/assets/js/index.js.map',
-          to: '[name][ext]'
+          to: '[name][ext]',
         },
         {
           from: './node_modules/zxing-wasm/dist/reader/zxing_reader.wasm',
           to: '[name][ext]',
         },
-      ]
-    })
-  ]
+      ],
+    }),
+  ],
 }
