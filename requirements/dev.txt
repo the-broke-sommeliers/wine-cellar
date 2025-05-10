@@ -7,7 +7,7 @@ djlint==1.36.4
 factory-boy==3.3.3
 flake8==7.2.0
 isort==6.0.1
-mkdocs-material==9.6.12
+mkdocs-material==9.6.13
 pytest-cov==6.1.1
 pytest-django==4.11.1
 pytest-factoryboy==2.7.0
