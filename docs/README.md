@@ -20,11 +20,11 @@ barcode.
 
 ## Code & Contributing
 
-You can find the source code for **Wine Cellar** on <a href="https://github.com/goapunk/wine-cellar" target="_blank">:simple-github: GitHub</a>.
+You can find the source code for **Wine Cellar** on <a href="https://github.com/the-broke-sommeliers/wine-cellar" target="_blank">:simple-github: GitHub</a>.
 
-- **Report Issues**: If you encounter any bugs or have suggestions for improvements, feel free to <a href="https://github.com/goapunk/wine-cellar/issues" target="_blank">open an issue</a>.
-- **Feature Requests**: If you have an idea for a new feature, submit a <a href="https://github.com/goapunk/wine-cellar/issues" target="_blank">feature request</a>.
-- **Chat & Discussion**: Join the conversation, ask questions, or chat about wine management at <a href="https://github.com/goapunk/wine-cellar/discussions" target="_blank">discussions</a>.
+- **Report Issues**: If you encounter any bugs or have suggestions for improvements, feel free to <a href="https://github.com/the-broke-sommeliers/wine-cellar/issues" target="_blank">open an issue</a>.
+- **Feature Requests**: If you have an idea for a new feature, submit a <a href="https://github.com/the-broke-sommeliers/wine-cellar/issues" target="_blank">feature request</a>.
+- **Chat & Discussion**: Join the conversation, ask questions, or chat about wine management at <a href="https://github.com/the-broke-sommeliers/wine-cellar/discussions" target="_blank">discussions</a>.
 
 ## License
 

@@ -13,7 +13,7 @@ Ensure your system has:
 ### 1. Clone the Repository
 
 ```sh
-git clone https://github.com/yourusername/wine-cellar.git
+git clone https://github.com/the-broke-sommeliers/wine-cellar.git
 cd wine-cellar
 ```
 
