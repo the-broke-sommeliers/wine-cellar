@@ -22,4 +22,4 @@ barcode.
 
 ## Documentations
 
-Find the full documentation [here](https://goapunk.github.io/wine-cellar/)
+Find the full documentation [here](https://the-broke-sommeliers.github.io/wine-cellar/)
