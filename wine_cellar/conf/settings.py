@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 
+from django.utils.translation import gettext_lazy as _
+
 from wine_cellar import __version__
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -44,12 +46,14 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "widget_tweaks",
     "wine_cellar.apps.wine",
+    "wine_cellar.apps.user",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -114,13 +118,23 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = "en"
+LANGUAGE_CODE = "en-gb"
 
 TIME_ZONE = "Europe/Berlin"
 
 USE_I18N = True
 
 USE_TZ = True
+
+LANGUAGES = [
+    ("de-DE", _("German")),
+    ("en-GB", _("British English")),
+]
+
+CURRENCIES = [
+    ("EUR", _("Euro")),
+    ("USD", _("Dollar")),
+]
 
 
 # Static files (CSS, JavaScript, Images)

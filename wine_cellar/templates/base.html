@@ -52,6 +52,9 @@
                                         <a href="{% url 'wine-scan' %}" class="pure-menu-link">{% translate "Scan Wine" %}</a>
                                     </li>
                                     <li class="pure-menu-item">
+                                        <a href="{% url 'user-settings' %}" class="pure-menu-link">{% translate "Settings" %}</a>
+                                    </li>
+                                    <li class="pure-menu-item">
                                         <form action="{% url 'logout' %}" method="post">
                                             {% csrf_token %}
                                             <button class="pure-menu-link button" type="submit">{% translate "Log Out" %}</button>
@@ -81,9 +84,12 @@
                                         <a href="{% url 'wine-scan' %}" class="pure-menu-link">{% translate "Scan Wine" %}</a>
                                     </li>
                                     <li class="pure-menu-item">
+                                        <a href="{% url 'user-settings' %}" class="pure-menu-link">{% translate "Settings" %}</a>
+                                    </li>
+                                    <li class="pure-menu-item">
                                         <form action="{% url 'logout' %}" method="post">
                                             {% csrf_token %}
-                                            <button class="pure-menu-link button" type="submit">{% translate "Log Out" %}</button>
+                                            <button class="pure-menu-link button" type="submit">{% translate "Logout" %}</button>
                                         </form>
                                     </li>
                                 {% else %}
