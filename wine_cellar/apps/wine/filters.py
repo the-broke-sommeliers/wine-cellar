@@ -21,7 +21,7 @@ class WineFilter(django_filters.FilterSet):
             ("created", _("Least Recently Added")),
             ("-name", _("Name Descending")),
             ("name", _("Name Ascending")),
-            ("-vintage", _("Newest First")),
+            ("-vintage", _("Youngest First")),
             ("vintage", _("Oldest First")),
         ),
         label=_("Sorting"),
