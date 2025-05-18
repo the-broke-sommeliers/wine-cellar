@@ -11,11 +11,7 @@
                     <a class="stats__link" href="{% url 'wine-list' %}?stock=1">
                         <p class="stats__number">{{ wines_in_stock }}</p>
                         <h2 class="stats__label">
-                            {% blocktranslate count counter=wines_in_stock %}
-                                Wine in Stock
-                            {% plural %}
-                                Wines in Stock
-                            {% endblocktranslate %}
+                            {% blocktranslate count counter=wines_in_stock %}Wine in Stock{% plural %}Wines in Stock{% endblocktranslate %}
                         </h2>
                     </a>
                 </li>
@@ -23,11 +19,7 @@
                     <a class="stats__link" href="{% url 'wine-list' %}">
                         <p class="stats__number">{{ wines }}</p>
                         <h2 class="stats__label">
-                            {% blocktranslate count counter=wines %}
-                                Recorded Wine
-                            {% plural %}
-                                Recorded Wines
-                            {% endblocktranslate %}
+                            {% blocktranslate count counter=wines %}Recorded Wine{% plural %}Recorded Wines{% endblocktranslate %}
                         </h2>
                     </a>
                 </li>
@@ -35,11 +27,7 @@
                     <a class="stats__link" href="{% url 'wine-list' %}">
                         <p class="stats__number">{{ countries }}</p>
                         <h2 class="stats__label">
-                            {% blocktranslate count counter=countries %}
-                                Country
-                            {% plural %}
-                                Countries
-                            {% endblocktranslate %}
+                            {% blocktranslate context "stats" count counter=countries %}Country{% plural %}Countries{% endblocktranslate %}
                         </h2>
                     </a>
                 </li>

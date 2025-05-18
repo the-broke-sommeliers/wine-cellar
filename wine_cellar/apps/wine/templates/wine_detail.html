@@ -24,7 +24,7 @@
             <div class="pure-u-1 pure-u-md-1-2">
                 <table class="wine-detail__table">
                     <tr>
-                        <th>{% translate "Country" %}</th>
+                        <th>{% translate "Country" context "Singular" %}</th>
                         <td>{{ wine.country_icon }} {{ wine.country_name }}</td>
                     </tr>
                     {% if wine.get_vineyards %}
