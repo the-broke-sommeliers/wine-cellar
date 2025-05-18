@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-18 15:52+0200\n"
+"POT-Creation-Date: 2025-05-18 16:10+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -73,8 +73,10 @@ msgid "Name Ascending"
 msgstr "Name Ascending"
 
 #: wine_cellar/apps/wine/filters.py:24
-msgid "Newest First"
-msgstr "Newest First"
+#, fuzzy
+#| msgid "Youngest Wine"
+msgid "Youngest First"
+msgstr "Youngest Wine"
 
 #: wine_cellar/apps/wine/filters.py:25
 msgid "Oldest First"
@@ -509,19 +511,19 @@ msgstr "There are no wines yet"
 msgid "(current)"
 msgstr "(current)"
 
-#: wine_cellar/conf/settings.py:129
+#: wine_cellar/conf/settings.py:130
 msgid "German"
 msgstr "German"
 
-#: wine_cellar/conf/settings.py:130
+#: wine_cellar/conf/settings.py:131
 msgid "British English"
 msgstr "British English"
 
-#: wine_cellar/conf/settings.py:134
+#: wine_cellar/conf/settings.py:135
 msgid "Euro"
 msgstr "Euro"
 
-#: wine_cellar/conf/settings.py:135
+#: wine_cellar/conf/settings.py:136
 msgid "Dollar"
 msgstr "Dollar"
 
@@ -549,6 +551,9 @@ msgstr "Logout"
 #: wine_cellar/templates/base.html:115
 msgid "Version"
 msgstr "Version"
+
+#~ msgid "Newest First"
+#~ msgstr "Newest First"
 
 #~ msgid "Your Profile"
 #~ msgstr "Your Profile"
