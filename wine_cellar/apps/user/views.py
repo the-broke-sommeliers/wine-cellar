@@ -21,6 +21,10 @@ class UserSettingsView(UpdateView):
 
     def get_object(self, queryset=None):
         user = self.request.user
-        if not hasattr(user, "user_settings"):
-            user.user_settings = UserSettings()
-        return user.user_settings
+        return get_user_settings(user)
+
+
+def get_user_settings(user):
+    if not hasattr(user, "user_settings"):
+        user.user_settings = UserSettings()
+    return user.user_settings

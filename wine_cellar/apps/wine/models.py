@@ -1,5 +1,7 @@
 import pycountry
+from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.humanize.templatetags.humanize import intcomma
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import ImageField
@@ -160,6 +162,7 @@ class Wine(UserContentModel):
     )
     vineyard = models.ManyToManyField(Vineyard)
     source = models.ManyToManyField(Source)
+    price = models.DecimalField(max_digits=6, decimal_places=2, null=True)
     stock = models.PositiveIntegerField(
         default=0,
         validators=[MinValueValidator(0)],
@@ -180,6 +183,13 @@ class Wine(UserContentModel):
     def get_classifications(self):
         return "\n".join(
             [str(classification) for classification in self.classification.all()]
+        )
+
+    @property
+    def get_price_with_currency(self):
+        return (
+            str(intcomma(self.price))
+            + settings.CURRENCY_SYMBOLS[self.user.user_settings.currency]
         )
 
     @property
