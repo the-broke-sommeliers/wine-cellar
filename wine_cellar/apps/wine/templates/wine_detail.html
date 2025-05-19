@@ -77,6 +77,12 @@
                         <th>{% translate "In Stock" %}</th>
                         <td>{{ wine.stock }}</td>
                     </tr>
+                    {% if wine.price %}
+                    <tr>
+                        <th>{% translate "Price" %}</th>
+                        <td>{{ wine.get_price_with_currency }}</td>
+                    </tr>
+                    {% endif %}
                     {% if wine.comment %}
                         <tr>
                             <th>{% translate "Comment" %}</th>

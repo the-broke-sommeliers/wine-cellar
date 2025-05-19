@@ -134,11 +134,15 @@ LANGUAGES = [
     ("en-gb", _("British English")),
 ]
 
+# LOCALE_PATHS = [BASE_DIR / "locale"]
+
 CURRENCIES = [
     ("EUR", _("Euro")),
     ("USD", _("Dollar")),
     ("GBP", _("Pound Sterling")),
 ]
+
+CURRENCY_SYMBOLS = {"EUR": "€", "USD": "$", "GBP": "£"}
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/

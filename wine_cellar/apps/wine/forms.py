@@ -3,12 +3,14 @@ from datetime import datetime
 
 import pycountry
 from django import forms
+from django.conf import settings
 from django.core import validators
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models import Q
 from django.forms import DateField, ImageField
 from django.utils.translation import gettext_lazy as _
 
+from wine_cellar.apps.user.views import get_user_settings
 from wine_cellar.apps.wine.fields import OpenMultipleChoiceField
 from wine_cellar.apps.wine.models import (
     Category,
@@ -71,6 +73,10 @@ class WineBaseForm(TomSelectMixin, forms.Form):
                 user_field
             ].queryset.model.objects.filter(Q(user=None) | Q(user=user))
             self.fields[user_field].user = user
+        user_settings = get_user_settings(user)
+        self.fields["price"].help_text = _(
+            "Enter the price of the bottle in %(currency)s."
+        ) % {"currency": settings.CURRENCY_SYMBOLS[user_settings.currency]}
 
     class Meta:
         abstract = True
@@ -178,6 +184,12 @@ class WineBaseForm(TomSelectMixin, forms.Form):
         queryset=Source.objects.none(),
         field_name="name",
         help_text=_("Where did you get the wine from?"),
+    )
+    price = forms.DecimalField(
+        required=False,
+        max_digits=6,
+        decimal_places=2,
+        localize=True,
     )
     barcode = forms.CharField(
         max_length=100,
