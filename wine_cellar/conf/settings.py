@@ -17,6 +17,7 @@ from django.utils.translation import gettext_lazy as _
 from wine_cellar import __version__
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+ROOT_DIR = Path(__file__).resolve().parent.parent.parent
 BASE_DIR = Path(__file__).resolve().parent.parent
 VERSION = __version__
 
@@ -126,16 +127,17 @@ USE_I18N = True
 
 USE_TZ = True
 
+LOCALE_PATHS = [ROOT_DIR / "locale"]
+
 LANGUAGES = [
     ("de-DE", _("German")),
-    ("en-GB", _("British English")),
+    ("en-gb", _("British English")),
 ]
 
 CURRENCIES = [
     ("EUR", _("Euro")),
     ("USD", _("Dollar")),
 ]
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-19 17:34+0200\n"
+"POT-Creation-Date: 2025-05-21 11:35+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -123,14 +123,18 @@ msgstr ""
 "vintage years are prominently displayed on wine labels."
 
 #: wine_cellar/apps/wine/forms.py:139
+#, fuzzy
+#| msgid ""
+#| "Select or add the grape varieties usedto produce the wine. You can select "
+#| "multiple options if applicable."
 msgid ""
-"Select or add the grape varieties usedto produce the wine. You can select "
+"Select or add the grape varieties used to produce the wine. You can select "
 "multiple options if applicable."
 msgstr ""
 "Select or add the grape varieties usedto produce the wine. You can select "
 "multiple options if applicable."
 
-#: wine_cellar/apps/wine/forms.py:151
+#: wine_cellar/apps/wine/forms.py:148
 msgid ""
 "Select or add the classification or designation of the wine, such as Vin de "
 "Table, Vin de Pays, or Appellation d'Origine Contrôlée (AOC). This helps "
@@ -140,7 +144,7 @@ msgstr ""
 "Table, Vin de Pays, or Appellation d'Origine Contrôlée (AOC). This helps "
 "categorize the wine based on its regional or quality classification."
 
-#: wine_cellar/apps/wine/forms.py:162
+#: wine_cellar/apps/wine/forms.py:159
 msgid ""
 "Enter dishes, cuisines, or ingredients that complement the flavors of this "
 "wine."
@@ -148,23 +152,25 @@ msgstr ""
 "Enter dishes, cuisines, or ingredients that complement the flavors of this "
 "wine."
 
-#: wine_cellar/apps/wine/forms.py:171
+#: wine_cellar/apps/wine/forms.py:168
 msgid "Enter the names of the vineyards which produced the wine."
 msgstr "Enter the names of the vineyards which produced the wine."
 
-#: wine_cellar/apps/wine/forms.py:177
+#: wine_cellar/apps/wine/forms.py:174
 msgid "Where did you get the wine from?"
 msgstr "Where did you get the wine from?"
 
-#: wine_cellar/apps/wine/forms.py:182
+#: wine_cellar/apps/wine/forms.py:179
 msgid "Enter the barcode number of the wine as indicated on the label."
 msgstr "Enter the barcode number of the wine as indicated on the label."
 
-#: wine_cellar/apps/wine/forms.py:188
-msgid "Enter the quantity of bottles you currently have in your collection"
+#: wine_cellar/apps/wine/forms.py:185
+#, fuzzy
+#| msgid "Enter the quantity of bottles you currently have in your collection"
+msgid "Enter the quantity of bottles you currently have in your collection."
 msgstr "Enter the quantity of bottles you currently have in your collection"
 
-#: wine_cellar/apps/wine/forms.py:196
+#: wine_cellar/apps/wine/forms.py:193
 msgid ""
 "Share your thoughts, tasting experiences, or any anecdotes related to this "
 "wine."
@@ -172,14 +178,20 @@ msgstr ""
 "Share your thoughts, tasting experiences, or any anecdotes related to this "
 "wine."
 
-#: wine_cellar/apps/wine/forms.py:208
-msgid "Rate this wine on a scale from 0 to 10"
+#: wine_cellar/apps/wine/forms.py:200
+#, fuzzy
+#| msgid "Rate this wine on a scale from 0 to 10"
+msgid "Rate this wine on a scale from 0 to 10."
 msgstr "Rate this wine on a scale from 0 to 10"
 
-#: wine_cellar/apps/wine/forms.py:213
+#: wine_cellar/apps/wine/forms.py:205
+#, fuzzy
+#| msgid ""
+#| "Upload a photo of the wine bottle or label. Adding an image helps "
+#| "visually identify the wine in your collection "
 msgid ""
 "Upload a photo of the wine bottle or label. Adding an image helps visually "
-"identify the wine in your collection "
+"identify the wine in your collection."
 msgstr ""
 "Upload a photo of the wine bottle or label. Adding an image helps visually "
 "identify the wine in your collection "
@@ -451,26 +463,28 @@ msgid "Filter"
 msgstr "Filter"
 
 #: wine_cellar/apps/wine/templates/wine_list.html:65
-msgid "There are no wines yet"
+#, fuzzy
+#| msgid "There are no wines yet"
+msgid "There are no wines yet."
 msgstr "There are no wines yet"
 
 #: wine_cellar/apps/wine/templates/wine_list.html:84
 msgid "(current)"
 msgstr "(current)"
 
-#: wine_cellar/conf/settings.py:130
+#: wine_cellar/conf/settings.py:133
 msgid "German"
 msgstr "German"
 
-#: wine_cellar/conf/settings.py:131
+#: wine_cellar/conf/settings.py:134
 msgid "British English"
 msgstr "British English"
 
-#: wine_cellar/conf/settings.py:135
+#: wine_cellar/conf/settings.py:138
 msgid "Euro"
 msgstr "Euro"
 
-#: wine_cellar/conf/settings.py:136
+#: wine_cellar/conf/settings.py:139
 msgid "Dollar"
 msgstr "Dollar"
 
@@ -494,114 +508,3 @@ msgstr "Login"
 #: wine_cellar/templates/base.html:115
 msgid "Version"
 msgstr "Version"
-
-#~ msgid "Log Out"
-#~ msgstr "Log Out"
-
-#, fuzzy
-#~| msgid ""
-#~| "\n"
-#~| "                            Wine in Stock\n"
-#~| "                        "
-#~| msgid_plural ""
-#~| "\n"
-#~| "                            Wines in Stock\n"
-#~| "                        "
-#~ msgid ""
-#~ "\n"
-#~ "                                Wine in Stock\n"
-#~ "                            "
-#~ msgid_plural ""
-#~ "\n"
-#~ "                                Wines in Stock\n"
-#~ "                            "
-#~ msgstr[0] ""
-#~ "\n"
-#~ "                            Wine in Stock\n"
-#~ "                        "
-#~ msgstr[1] ""
-#~ "\n"
-#~ "                            Wines in Stock\n"
-#~ "                        "
-
-#, fuzzy
-#~| msgid ""
-#~| "\n"
-#~| "                            recorded Wine\n"
-#~| "                        "
-#~| msgid_plural ""
-#~| "\n"
-#~| "                            recorded Wines\n"
-#~| "                        "
-#~ msgid ""
-#~ "\n"
-#~ "                                Recorded Wine\n"
-#~ "                            "
-#~ msgid_plural ""
-#~ "\n"
-#~ "                                Recorded Wines\n"
-#~ "                            "
-#~ msgstr[0] ""
-#~ "\n"
-#~ "                            recorded Wine\n"
-#~ "                        "
-#~ msgstr[1] ""
-#~ "\n"
-#~ "                            recorded Wines\n"
-#~ "                        "
-
-#, fuzzy
-#~| msgid ""
-#~| "\n"
-#~| "                            Country\n"
-#~| "                        "
-#~| msgid_plural ""
-#~| "\n"
-#~| "                            Countries\n"
-#~| "                        "
-#~ msgid ""
-#~ "\n"
-#~ "                                Country\n"
-#~ "                            "
-#~ msgid_plural ""
-#~ "\n"
-#~ "                                Countries\n"
-#~ "                            "
-#~ msgstr[0] ""
-#~ "\n"
-#~ "                            Country\n"
-#~ "                        "
-#~ msgstr[1] ""
-#~ "\n"
-#~ "                            Countries\n"
-#~ "                        "
-
-#~ msgid "Newest First"
-#~ msgstr "Newest First"
-
-#~ msgid "Your Profile"
-#~ msgstr "Your Profile"
-
-#~ msgid "Select the category that best describes the type of wine. "
-#~ msgstr "Select the category that best describes the type of wine. "
-
-#, fuzzy
-#~| msgid "Select the sweetness level of the wine."
-#~ msgid "Select the category of the wine."
-#~ msgstr "Select the sweetness level of the wine."
-
-#, fuzzy
-#~| msgid "Please enter the volume of bottle or box ect. in liters, e.g. 0.75."
-#~ msgid "Please enter the volume of the wine bottle in liters, e.g. 0.75."
-#~ msgstr "Please enter the volume of bottle or box ect. in liters, e.g. 0.75."
-
-#~ msgid "Remove background from image"
-#~ msgstr "Remove background from image"
-
-#, fuzzy
-#~| msgid "This field is optional"
-#~ msgid "This field is required"
-#~ msgstr "This field is optional"
-
-#~ msgid "Capacity"
-#~ msgstr "Capacity"
