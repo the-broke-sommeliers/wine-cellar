@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-19 17:34+0200\n"
-"PO-Revision-Date: 2025-05-18 16:33+0200\n"
+"POT-Creation-Date: 2025-05-21 11:35+0200\n"
+"PO-Revision-Date: 2025-05-21 11:29+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: de_DE\n"
@@ -122,21 +122,25 @@ msgstr ""
 "stehen normalerweise gut sichtbar auf dem Weinetikett."
 
 #: wine_cellar/apps/wine/forms.py:139
+#, fuzzy
+#| msgid ""
+#| "Select or add the grape varieties usedto produce the wine. You can select "
+#| "multiple options if applicable."
 msgid ""
-"Select or add the grape varieties usedto produce the wine. You can select "
+"Select or add the grape varieties used to produce the wine. You can select "
 "multiple options if applicable."
 msgstr ""
 "Wähle die für den Wein verwendeten Rebsorten aus oder füge sie hinzu. Du "
 "kannst mehrere Optionen auswählen, falls zutreffend."
 
-#: wine_cellar/apps/wine/forms.py:151
+#: wine_cellar/apps/wine/forms.py:148
 msgid ""
 "Select or add the classification or designation of the wine, such as Vin de "
 "Table, Vin de Pays, or Appellation d'Origine Contrôlée (AOC). This helps "
 "categorize the wine based on its regional or quality classification."
 msgstr ""
 
-#: wine_cellar/apps/wine/forms.py:162
+#: wine_cellar/apps/wine/forms.py:159
 msgid ""
 "Enter dishes, cuisines, or ingredients that complement the flavors of this "
 "wine."
@@ -144,38 +148,38 @@ msgstr ""
 "Gib Gerichte, Küchenrichtungen oder Zutaten ein, die den Geschmack dieses "
 "Weins ergänzen."
 
-#: wine_cellar/apps/wine/forms.py:171
+#: wine_cellar/apps/wine/forms.py:168
 msgid "Enter the names of the vineyards which produced the wine."
 msgstr "Gib die Namen der Weingüter ein, die den Wein produziert haben."
 
-#: wine_cellar/apps/wine/forms.py:177
+#: wine_cellar/apps/wine/forms.py:174
 msgid "Where did you get the wine from?"
 msgstr "Woher hast du den Wein?"
 
-#: wine_cellar/apps/wine/forms.py:182
+#: wine_cellar/apps/wine/forms.py:179
 msgid "Enter the barcode number of the wine as indicated on the label."
 msgstr "Gib den Barcode des Weins ein, so wie er auf dem Etikett steht."
 
-#: wine_cellar/apps/wine/forms.py:188
-msgid "Enter the quantity of bottles you currently have in your collection"
+#: wine_cellar/apps/wine/forms.py:185
+msgid "Enter the quantity of bottles you currently have in your collection."
 msgstr ""
 "Gib die Anzahl der Flaschen ein, die du aktuell in deiner Sammlung hast."
 
-#: wine_cellar/apps/wine/forms.py:196
+#: wine_cellar/apps/wine/forms.py:193
 msgid ""
 "Share your thoughts, tasting experiences, or any anecdotes related to this "
 "wine."
 msgstr ""
 "Teile deine Gedanken, Verkostungserlebnisse oder Geschichten zu diesem Wein."
 
-#: wine_cellar/apps/wine/forms.py:208
-msgid "Rate this wine on a scale from 0 to 10"
+#: wine_cellar/apps/wine/forms.py:200
+msgid "Rate this wine on a scale from 0 to 10."
 msgstr "Bewerte diesen Wein auf einer Skala von 0 bis 10."
 
-#: wine_cellar/apps/wine/forms.py:213
+#: wine_cellar/apps/wine/forms.py:205
 msgid ""
 "Upload a photo of the wine bottle or label. Adding an image helps visually "
-"identify the wine in your collection "
+"identify the wine in your collection."
 msgstr ""
 "Lade ein Foto der Weinflasche oder des Etiketts hoch. Ein Bild hilft dabei, "
 "den Wein in deiner Sammlung besser zu erkennen."
@@ -250,29 +254,23 @@ msgid "My Wine Cellar"
 msgstr "Mein Weinkeller"
 
 #: wine_cellar/apps/wine/templates/homepage.html:14
-#, fuzzy
-#| msgid "In Stock"
 msgid "Wine in Stock"
 msgid_plural "Wines in Stock"
-msgstr[0] "Vorrätig"
-msgstr[1] "Vorrätig"
+msgstr[0] "Wein vorrätig"
+msgstr[1] "Weine vorrätig"
 
 #: wine_cellar/apps/wine/templates/homepage.html:22
-#, fuzzy
-#| msgid "Add Wine"
 msgid "Recorded Wine"
 msgid_plural "Recorded Wines"
-msgstr[0] "Wein hinzufügen"
-msgstr[1] "Wein hinzufügen"
+msgstr[0] "Erfasster Wein"
+msgstr[1] "Erfasste Weine"
 
 #: wine_cellar/apps/wine/templates/homepage.html:30
-#, fuzzy
-#| msgid "Country"
 msgctxt "stats"
 msgid "Country"
 msgid_plural "Countries"
 msgstr[0] "Land"
-msgstr[1] "Land"
+msgstr[1] "Länder"
 
 #: wine_cellar/apps/wine/templates/homepage.html:37
 msgid "Oldest Wine"
@@ -360,8 +358,6 @@ msgid "No image"
 msgstr "Kein Bild"
 
 #: wine_cellar/apps/wine/templates/wine_detail.html:27
-#, fuzzy
-#| msgid "Country"
 msgctxt "Singular"
 msgid "Country"
 msgstr "Land"
@@ -447,26 +443,26 @@ msgid "Filter"
 msgstr "Filtern"
 
 #: wine_cellar/apps/wine/templates/wine_list.html:65
-msgid "There are no wines yet"
+msgid "There are no wines yet."
 msgstr "Es gibt noch keine Weine."
 
 #: wine_cellar/apps/wine/templates/wine_list.html:84
 msgid "(current)"
 msgstr "(aktuelle)"
 
-#: wine_cellar/conf/settings.py:130
+#: wine_cellar/conf/settings.py:133
 msgid "German"
 msgstr ""
 
-#: wine_cellar/conf/settings.py:131
+#: wine_cellar/conf/settings.py:134
 msgid "British English"
 msgstr ""
 
-#: wine_cellar/conf/settings.py:135
+#: wine_cellar/conf/settings.py:138
 msgid "Euro"
 msgstr ""
 
-#: wine_cellar/conf/settings.py:136
+#: wine_cellar/conf/settings.py:139
 msgid "Dollar"
 msgstr ""
 
@@ -490,42 +486,3 @@ msgstr "Einloggen"
 #: wine_cellar/templates/base.html:115
 msgid "Version"
 msgstr "Version"
-
-#~ msgid "Log Out"
-#~ msgstr "Ausloggen"
-
-#~ msgid ""
-#~ "\n"
-#~ "                                Wine in Stock\n"
-#~ "                            "
-#~ msgid_plural ""
-#~ "\n"
-#~ "                                Wines in Stock\n"
-#~ "                            "
-#~ msgstr[0] ""
-#~ "\n"
-#~ "                                Wine in Stock\n"
-#~ "                            "
-#~ msgstr[1] "Weine vorrätig"
-
-#~ msgid ""
-#~ "\n"
-#~ "                                Recorded Wine\n"
-#~ "                            "
-#~ msgid_plural ""
-#~ "\n"
-#~ "                                Recorded Wines\n"
-#~ "                            "
-#~ msgstr[0] "Eingetragener Wein"
-#~ msgstr[1] "Eingetragene Weine"
-
-#~ msgid ""
-#~ "\n"
-#~ "                                Country\n"
-#~ "                            "
-#~ msgid_plural ""
-#~ "\n"
-#~ "                                Countries\n"
-#~ "                            "
-#~ msgstr[0] "Land"
-#~ msgstr[1] "Länder"
