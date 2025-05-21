@@ -482,22 +482,21 @@ msgstr "Wines"
 msgid "Scan Wine"
 msgstr "Scan Wine"
 
-#: wine_cellar/templates/base.html:60
-msgid "Log Out"
-msgstr "Log Out"
+#: wine_cellar/templates/base.html:60 wine_cellar/templates/base.html:92
+msgid "Logout"
+msgstr "Logout"
 
 #: wine_cellar/templates/base.html:65 wine_cellar/templates/base.html:97
 #: wine_cellar/templates/registration/login.html:21
 msgid "Login"
 msgstr "Login"
 
-#: wine_cellar/templates/base.html:92
-msgid "Logout"
-msgstr "Logout"
-
 #: wine_cellar/templates/base.html:115
 msgid "Version"
 msgstr "Version"
+
+#~ msgid "Log Out"
+#~ msgstr "Log Out"
 
 #, fuzzy
 #~| msgid ""

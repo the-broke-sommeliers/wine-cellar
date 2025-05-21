@@ -97,7 +97,7 @@ class WineBaseForm(TomSelectMixin, forms.Form):
             choices={country.alpha_2: country.name for country in pycountry.countries},
         ),
         help_text=_(
-            "Select the country the wine was produced in as indicated on the " "label."
+            "Select the country the wine was produced in as indicated on the label."
         ),
     )
     size = OpenMultipleChoiceField(
@@ -136,11 +136,8 @@ class WineBaseForm(TomSelectMixin, forms.Form):
         queryset=Grape.objects.none(),
         field_name="name",
         help_text=_(
-            "Select or add the grape "
-            "varieties used"
-            "to produce the wine. You can "
-            "select multiple options if "
-            "applicable."
+            "Select or add the grape varieties used to produce the wine. You can "
+            "select multiple options if applicable."
         ),
     )
     classification = OpenMultipleChoiceField(
@@ -185,7 +182,7 @@ class WineBaseForm(TomSelectMixin, forms.Form):
         required=False,
         validators=[MinValueValidator(0)],
         help_text=_(
-            "Enter the quantity of bottles you currently have in your collection"
+            "Enter the quantity of bottles you currently have in your collection."
         ),
     )
     comment = forms.CharField(
@@ -193,25 +190,20 @@ class WineBaseForm(TomSelectMixin, forms.Form):
         required=False,
         widget=forms.Textarea,
         help_text=_(
-            "Share your "
-            "thoughts, "
-            "tasting "
-            "experiences, "
-            "or any anecdotes "
-            "related to this "
-            "wine."
+            "Share your thoughts, tasting experiences, or any anecdotes"
+            " related to this wine."
         ),
     )
     rating = forms.IntegerField(
         required=False,
         validators=[MinValueValidator(0), MaxValueValidator(10)],
-        help_text=_("Rate this wine on a scale from 0 to 10"),
+        help_text=_("Rate this wine on a scale from 0 to 10."),
     )
     image = ImageField(
         required=False,
         help_text=_(
             "Upload a photo of the wine bottle or label. Adding an image helps visually"
-            " identify the wine in your collection "
+            " identify the wine in your collection."
         ),
     )
 
