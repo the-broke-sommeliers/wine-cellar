@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static i18n react_maps_tags %}
+{% block header %}
+    <h1 class="header__title">{% translate "Map of your wines" %}</h1>
+{% endblock header %}
+{% block styles %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'maps.css' %}" />
+{% endblock %}
+
+{% block content %}
+    <div class="pure-g">
+        <div class="pure-u-1-1 m-auto">
+            {% react_map wines %}
+        </div>
+    </div>
+{% endblock content %}
+{% block extra_js %}
+    <script src="{% static 'maps.js' %}"></script>
+{% endblock extra_js %}

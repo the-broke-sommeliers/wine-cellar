@@ -19,3 +19,22 @@
     max-width: 188px;
   }
 }
+
+.marker-cluster {
+    background-clip: padding-box;
+    border-radius: 20px;
+    background-color: rgb(64, 128, 72, 0.6);
+
+    div {
+        width: 30px;
+        height: 30px;
+        margin-left: 5px;
+        margin-top: 5px;
+        text-align: center;
+        border-radius: 15px;
+        font-size: 12px; 
+        background-color: var(--dark-green);
+        color: white;
+        line-height: 30px;
+    }
+}
