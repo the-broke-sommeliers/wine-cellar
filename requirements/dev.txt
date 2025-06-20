@@ -5,7 +5,7 @@ black==25.1.0
 django-debug-toolbar==5.2.0
 djlint==1.36.4
 factory-boy==3.3.3
-flake8==7.2.0
+flake8==7.3.0
 isort==6.0.1
 mkdocs-material==9.6.14
 pytest-cov==6.2.1
