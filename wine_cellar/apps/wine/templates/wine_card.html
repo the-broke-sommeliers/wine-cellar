@@ -22,6 +22,12 @@
                         <p>{{ wine.vintage }}</p>
                     </div>
                 {% endif %}
+                {% if wine.drink_by %}
+                    <div class="pure-u-1-1">
+                        <span class="text--gray">Drink By</span>
+                        <p>{{ wine.drink_by }}</p>
+                    </div>
+                {% endif %}
             </div>
             <div class="pure-u-1-1 wine_card__stock">
                 <span>{% translate "Stock:" %} {{ wine.stock }}</span>

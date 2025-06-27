@@ -103,6 +103,7 @@ class WineCreateView(FormView):
         stock = cleaned_data["stock"]
         vintage = cleaned_data["vintage"]
         wine_type = cleaned_data["wine_type"]
+        drink_by = cleaned_data["drink_by"]
 
         wine = Wine(
             abv=abv,
@@ -114,6 +115,7 @@ class WineCreateView(FormView):
             stock=stock if stock else 0,
             user=user,
             vintage=vintage,
+            drink_by=drink_by,
             wine_type=wine_type,
             comment=comment,
             rating=rating,
@@ -170,6 +172,7 @@ class WineUpdateView(FormView):
         rating = cleaned_data["rating"]
         stock = cleaned_data["stock"]
         vintage = cleaned_data["vintage"]
+        drink_by = cleaned_data["drink_by"]
         wine_type = cleaned_data["wine_type"]
 
         wine.abv = abv
@@ -182,6 +185,7 @@ class WineUpdateView(FormView):
         wine.rating = rating
         wine.stock = stock if stock else 0
         wine.vintage = vintage
+        wine.drink_by = drink_by
         wine.wine_type = wine_type
         wine.save()
 

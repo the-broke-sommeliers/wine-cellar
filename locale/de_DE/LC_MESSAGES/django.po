@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-21 11:35+0200\n"
+"POT-Creation-Date: 2025-06-27 18:18+0200\n"
 "PO-Revision-Date: 2025-05-21 11:29+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -79,7 +79,12 @@ msgstr "Jüngster zuerst"
 msgid "Oldest First"
 msgstr "Ältester zuerst"
 
-#: wine_cellar/apps/wine/filters.py:27
+#: wine_cellar/apps/wine/filters.py:26
+#: wine_cellar/apps/wine/templates/wine_detail.html:57
+msgid "Drink By"
+msgstr "Trinkbar bis"
+
+#: wine_cellar/apps/wine/filters.py:28
 msgid "Sorting"
 msgstr "Sortierung"
 
@@ -140,7 +145,13 @@ msgid ""
 "categorize the wine based on its regional or quality classification."
 msgstr ""
 
-#: wine_cellar/apps/wine/forms.py:159
+#: wine_cellar/apps/wine/forms.py:156
+#, fuzzy
+#| msgid "Select the type of wine from the dropdown."
+msgid "Select the date this wine should be drunk by."
+msgstr "Wähle aus, bis wann dieser Wein getrunken werden sollte."
+
+#: wine_cellar/apps/wine/forms.py:165
 msgid ""
 "Enter dishes, cuisines, or ingredients that complement the flavors of this "
 "wine."
@@ -148,35 +159,35 @@ msgstr ""
 "Gib Gerichte, Küchenrichtungen oder Zutaten ein, die den Geschmack dieses "
 "Weins ergänzen."
 
-#: wine_cellar/apps/wine/forms.py:168
+#: wine_cellar/apps/wine/forms.py:174
 msgid "Enter the names of the vineyards which produced the wine."
 msgstr "Gib die Namen der Weingüter ein, die den Wein produziert haben."
 
-#: wine_cellar/apps/wine/forms.py:174
+#: wine_cellar/apps/wine/forms.py:180
 msgid "Where did you get the wine from?"
 msgstr "Woher hast du den Wein?"
 
-#: wine_cellar/apps/wine/forms.py:179
+#: wine_cellar/apps/wine/forms.py:185
 msgid "Enter the barcode number of the wine as indicated on the label."
 msgstr "Gib den Barcode des Weins ein, so wie er auf dem Etikett steht."
 
-#: wine_cellar/apps/wine/forms.py:185
+#: wine_cellar/apps/wine/forms.py:191
 msgid "Enter the quantity of bottles you currently have in your collection."
 msgstr ""
 "Gib die Anzahl der Flaschen ein, die du aktuell in deiner Sammlung hast."
 
-#: wine_cellar/apps/wine/forms.py:193
+#: wine_cellar/apps/wine/forms.py:199
 msgid ""
 "Share your thoughts, tasting experiences, or any anecdotes related to this "
 "wine."
 msgstr ""
 "Teile deine Gedanken, Verkostungserlebnisse oder Geschichten zu diesem Wein."
 
-#: wine_cellar/apps/wine/forms.py:200
+#: wine_cellar/apps/wine/forms.py:206
 msgid "Rate this wine on a scale from 0 to 10."
 msgstr "Bewerte diesen Wein auf einer Skala von 0 bis 10."
 
-#: wine_cellar/apps/wine/forms.py:205
+#: wine_cellar/apps/wine/forms.py:211
 msgid ""
 "Upload a photo of the wine bottle or label. Adding an image helps visually "
 "identify the wine in your collection."
@@ -233,11 +244,11 @@ msgstr "Feinherb"
 msgid "Size"
 msgstr "Größe"
 
-#: wine_cellar/apps/wine/models.py:45
+#: wine_cellar/apps/wine/models.py:53
 msgid "Grape"
 msgstr "Traube"
 
-#: wine_cellar/apps/wine/models.py:84
+#: wine_cellar/apps/wine/models.py:92
 msgid "Food"
 msgstr "Speisen"
 
@@ -312,7 +323,7 @@ msgstr "Kein Wein gefunden"
 msgid "Would you like to add a new wine with that barcode?"
 msgstr "Möchtest du einen neuen Wein mit diesem Barcode hinzufügen?"
 
-#: wine_cellar/apps/wine/templates/wine_card.html:27
+#: wine_cellar/apps/wine/templates/wine_card.html:33
 msgid "Stock:"
 msgstr "Vorrat:"
 
@@ -337,15 +348,15 @@ msgstr "Herkunft"
 msgid "Personal Notes"
 msgstr "Persönliche Notizen"
 
-#: wine_cellar/apps/wine/templates/wine_create.html:59
+#: wine_cellar/apps/wine/templates/wine_create.html:60
 msgid "Image"
 msgstr "Bild"
 
-#: wine_cellar/apps/wine/templates/wine_create.html:68
+#: wine_cellar/apps/wine/templates/wine_create.html:69
 msgid "Continue"
 msgstr "Weiter"
 
-#: wine_cellar/apps/wine/templates/wine_create.html:75
+#: wine_cellar/apps/wine/templates/wine_create.html:76
 msgid "Save and Finish"
 msgstr "Speichern und fertig"
 
@@ -382,31 +393,31 @@ msgstr "Promille"
 msgid "Vintage"
 msgstr "Jahrgang"
 
-#: wine_cellar/apps/wine/templates/wine_detail.html:57
+#: wine_cellar/apps/wine/templates/wine_detail.html:61
 msgid "Grapes"
 msgstr "Trauben"
 
-#: wine_cellar/apps/wine/templates/wine_detail.html:62
+#: wine_cellar/apps/wine/templates/wine_detail.html:66
 msgid "Classification"
 msgstr ""
 
-#: wine_cellar/apps/wine/templates/wine_detail.html:68
+#: wine_cellar/apps/wine/templates/wine_detail.html:72
 msgid "Food Pairings"
 msgstr "Speiseempfehlung"
 
-#: wine_cellar/apps/wine/templates/wine_detail.html:73
+#: wine_cellar/apps/wine/templates/wine_detail.html:77
 msgid "In Stock"
 msgstr "Vorrätig"
 
-#: wine_cellar/apps/wine/templates/wine_detail.html:78
+#: wine_cellar/apps/wine/templates/wine_detail.html:82
 msgid "Comment"
 msgstr "Kommentar"
 
-#: wine_cellar/apps/wine/templates/wine_detail.html:83
+#: wine_cellar/apps/wine/templates/wine_detail.html:87
 msgid "Rating"
 msgstr "Bewertung"
 
-#: wine_cellar/apps/wine/templates/wine_detail.html:88
+#: wine_cellar/apps/wine/templates/wine_detail.html:92
 msgid "No rating yet"
 msgstr "Noch keine Bewertung"
 

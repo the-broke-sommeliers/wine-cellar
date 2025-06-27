@@ -148,6 +148,7 @@ class Wine(UserContentModel):
         validators=[MinValueValidator(1900)],
         null=True,
     )
+    drink_by = models.DateField(blank=True, null=True)
     comment = models.CharField(max_length=250, blank=True)
     rating = models.PositiveIntegerField(
         null=True,

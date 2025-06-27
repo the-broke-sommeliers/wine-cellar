@@ -1,3 +1,4 @@
+import datetime
 from http import HTTPStatus
 
 import pytest
@@ -141,6 +142,69 @@ def test_wine_create_post_with_barcode(client, user):
     assert wine.size == size
     assert wine.vintage == data["vintage"]
     assert wine.barcode == "12345"
+
+
+@pytest.mark.django_db
+def test_wine_create_post_with_drink_by(client, user):
+    client.force_login(user)
+    size = Size.objects.get(name=0.75)
+    data = {
+        "name": "Merlot",
+        "wine_type": "RE",
+        "category": "DR",
+        "abv": 13.0,
+        "size": size.pk,
+        "vintage": 2002,
+        "drink_by": "2003-02-25",
+        "country": "DE",
+        "form_step": 4,
+    }
+    assert not Wine.objects.exists()
+    r = client.get(reverse("wine-add", kwargs={"code": 12345}))
+    initial = r.context_data["form"].initial.copy()
+    initial.update(data)
+    r = client.post(
+        reverse("wine-add", kwargs={"code": 12345}), data=initial, follow=True
+    )
+    assert r.status_code == HTTPStatus.OK
+    assertRedirects(response=r, expected_url=reverse("wine-list"))
+    assertTemplateUsed(response=r, template_name="base.html")
+    assertTemplateUsed(response=r, template_name="wine_list.html")
+    assert Wine.objects.exists()
+    wine = Wine.objects.first()
+    assert wine.name == data["name"]
+    assert wine.wine_type == data["wine_type"]
+    assert wine.abv == data["abv"]
+    assert wine.size == size
+    assert wine.vintage == data["vintage"]
+    assert wine.barcode == "12345"
+    assert wine.drink_by == datetime.date(day=25, month=2, year=2003)
+
+
+@pytest.mark.django_db
+def test_wine_create_post_with_invalid_drink_by(client, user):
+    client.force_login(user)
+    size = Size.objects.get(name=0.75)
+    data = {
+        "name": "Merlot",
+        "wine_type": "RE",
+        "category": "DR",
+        "abv": 13.0,
+        "size": size.pk,
+        "vintage": 2002,
+        "drink_by": "02-02-2000",
+        "country": "DE",
+        "form_step": 4,
+    }
+    assert not Wine.objects.exists()
+    r = client.get(reverse("wine-add", kwargs={"code": 12345}))
+    initial = r.context_data["form"].initial.copy()
+    initial.update(data)
+    r = client.post(
+        reverse("wine-add", kwargs={"code": 12345}), data=initial, follow=True
+    )
+    assert r.status_code == HTTPStatus.OK
+    assert r.context_data["form"].errors
 
 
 @pytest.mark.django_db
