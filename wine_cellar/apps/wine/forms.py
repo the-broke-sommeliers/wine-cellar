@@ -6,7 +6,7 @@ from django import forms
 from django.core import validators
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models import Q
-from django.forms import ImageField
+from django.forms import DateField, ImageField
 from django.utils.translation import gettext as _
 
 from wine_cellar.apps.wine.fields import OpenMultipleChoiceField
@@ -150,6 +150,12 @@ class WineBaseForm(TomSelectMixin, forms.Form):
             "AOC). This helps categorize the wine based on its regional or "
             "quality classification."
         ),
+    )
+    drink_by = DateField(
+        required=False,
+        help_text=_("Select the date this wine should be drunk by."),
+        widget=forms.DateInput(attrs={"type": "date"}),
+        localize=True,
     )
     food_pairings = OpenMultipleChoiceField(
         required=False,

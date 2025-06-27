@@ -50,6 +50,7 @@
                         <legend>
                             <h2 class="form-subhead text-color-gray">{% translate "Personal Notes" %}</h2>
                         </legend>
+                        {% include 'forms/form_field.html' with field=form.drink_by %}
                         {% include 'forms/form_field.html' with field=form.food_pairings %}
                         {% include 'forms/form_field.html' with field=form.rating %}
                         {% include 'forms/form_field.html' with field=form.comment %}

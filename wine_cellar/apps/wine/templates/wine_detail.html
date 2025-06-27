@@ -54,6 +54,10 @@
                         <td>{{ wine.vintage }}</td>
                     </tr>
                     <tr>
+                        <th>{% translate "Drink By" %}</th>
+                        <td>{{ wine.drink_by }}</td>
+                    </tr>
+                    <tr>
                         <th>{% translate "Grapes" %}</th>
                         <td>{{ wine.get_grapes | linebreaksbr }}</td>
                     </tr>
