@@ -37,6 +37,14 @@ class Category(models.TextChoices):
 class Size(UserContentModel):
     name = models.FloatField(verbose_name=_("Size"))
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name", "user"],
+                name="unique size",
+            )
+        ]
+
     def __str__(self):
         return str(self.name)
 
@@ -47,7 +55,7 @@ class Grape(UserContentModel):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["name"],
+                fields=["name", "user"],
                 name="unique grape",
             )
         ]
