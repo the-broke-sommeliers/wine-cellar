@@ -7,7 +7,7 @@ from django.core import validators
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models import Q
 from django.forms import DateField, ImageField
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _
 
 from wine_cellar.apps.wine.fields import OpenMultipleChoiceField
 from wine_cellar.apps.wine.models import (
