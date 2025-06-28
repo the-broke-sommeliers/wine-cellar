@@ -1,6 +1,6 @@
 .image {
-  height: 250px;
-  width: 188px;
+  height: 243.75px;
+  width: 187.5px;
   background-color: white;
   border-radius: 15px;
   text-align: center;
@@ -13,9 +13,10 @@
   }
   
   img {
-    padding-top: 12.5px;
+    margin: 9.375px;
     height: 225px;
     width: auto;
     max-width: 188px;
+    border-radius: 12px;
   }
 }
