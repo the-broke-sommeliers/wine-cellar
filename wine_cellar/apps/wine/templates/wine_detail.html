@@ -67,6 +67,12 @@
                             <td>{{ wine.get_classification | linebreaksbr }}</td>
                         </tr>
                     {% endif %}
+                    {% if wine.get_sources %}
+                        <tr>
+                            <th>{% translate "Sources" %}</th>
+                            <td>{{ wine.get_sources | linebreaksbr }}</td>
+                        </tr>
+                    {% endif %}
                     {% if wine.get_food_pairings %}
                         <tr>
                             <th>{% translate "Food Pairings" %}</th>
