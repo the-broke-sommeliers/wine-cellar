@@ -177,6 +177,10 @@ class Wine(UserContentModel):
         return ", ".join([str(grape) for grape in self.grapes.all()])
 
     @property
+    def get_sources(self):
+        return ", ".join([str(s) for s in self.source.all()])
+
+    @property
     def get_classifications(self):
         return "\n".join(
             [str(classification) for classification in self.classification.all()]
