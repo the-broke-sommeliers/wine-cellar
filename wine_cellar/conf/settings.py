@@ -137,6 +137,7 @@ LANGUAGES = [
 CURRENCIES = [
     ("EUR", _("Euro")),
     ("USD", _("Dollar")),
+    ("GBP", _("Pound Sterling")),
 ]
 
 # Static files (CSS, JavaScript, Images)
