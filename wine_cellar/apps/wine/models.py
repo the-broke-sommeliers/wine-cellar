@@ -230,6 +230,7 @@ class Wine(UserContentModel):
                     "size",
                     "vintage",
                     "country",
+                    "user",
                 ],
                 name="unique wine",
             )
