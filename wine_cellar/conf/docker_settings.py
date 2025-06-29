@@ -30,8 +30,9 @@ EMAIL_PORT = os.environ.get("DJANGO_EMAIL_PORT")
 EMAIL_HOST_USER = os.environ.get("DJANGO_EMAIL_USER")
 EMAIL_HOST_PASSWORD = os.environ.get("DJANGO_EMAIL_PASSWORD")
 # USE_TLS and USE_SSL are mutual exclusive
-EMAIL_USE_TLS = os.environ.get("DJANGO_EMAIL_USE_TLS")
-EMAIL_USE_SSL = os.environ.get("DJANGO_EMAIL_USE_SSL")
+EMAIL_USE_TLS = os.environ.get("DJANGO_EMAIL_USE_TLS", "True") == "True"
+EMAIL_USE_SSL = os.environ.get("DJANGO_EMAIL_USE_SSL", "False") == "True"
+DEFAULT_FROM_EMAIL = os.environ.get("DJANGO_DEFAULT_FROM_EMAIL")
 
 if EMAIL_HOST:
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
@@ -42,6 +43,6 @@ CELERY_RESULT_BACKEND = "redis://redis:6379"
 CELERY_BEAT_SCHEDULE = {
     "drink_by_reminder": {
         "task": "drink_by_reminder",
-        "schedule": crontab(minute="10", hour="16"),
+        "schedule": crontab(minute="30", hour="2"),
     },
 }

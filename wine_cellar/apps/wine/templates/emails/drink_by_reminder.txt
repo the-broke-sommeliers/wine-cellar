@@ -1,5 +1,4 @@
 {% load static i18n settings %}
-
 {% blocktranslate %}
 Hello {{ user }},
 
