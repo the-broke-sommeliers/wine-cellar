@@ -160,7 +160,7 @@ class WineBaseForm(TomSelectMixin, forms.Form):
     drink_by = DateField(
         required=False,
         help_text=_("Select the date this wine should be drunk by."),
-        widget=forms.DateInput(attrs={"type": "date"}),
+        widget=forms.DateInput(format="%Y-%m-%d", attrs={"type": "date"}),
         localize=True,
     )
     food_pairings = OpenMultipleChoiceField(
