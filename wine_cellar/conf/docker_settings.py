@@ -1,5 +1,7 @@
 import os
 
+from celery.schedules import crontab
+
 from wine_cellar.conf.prod import *  # noqa: F403
 
 DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
@@ -20,3 +22,26 @@ CSRF_TRUSTED_ORIGINS = os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS").split(" ")
 
 MEDIA_ROOT = "mediafiles"
 STATIC_ROOT = "staticfiles"
+
+SITE_URL = os.environ.get("DJANGO_SITE_URL")
+
+EMAIL_HOST = os.environ.get("DJANGO_EMAIL_HOST")
+EMAIL_PORT = os.environ.get("DJANGO_EMAIL_PORT")
+EMAIL_HOST_USER = os.environ.get("DJANGO_EMAIL_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("DJANGO_EMAIL_PASSWORD")
+# USE_TLS and USE_SSL are mutual exclusive
+EMAIL_USE_TLS = os.environ.get("DJANGO_EMAIL_USE_TLS")
+EMAIL_USE_SSL = os.environ.get("DJANGO_EMAIL_USE_SSL")
+
+if EMAIL_HOST:
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+CELERY_BROKER_URL = "redis://redis:6379"
+CELERY_RESULT_BACKEND = "redis://redis:6379"
+
+CELERY_BEAT_SCHEDULE = {
+    "drink_by_reminder": {
+        "task": "drink_by_reminder",
+        "schedule": crontab(minute="10", hour="16"),
+    },
+}
