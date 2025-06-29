@@ -1,4 +1,6 @@
 Django==5.2.3
+celery==5.5.3
+django-celery-beat==2.8.1
 django-filter==25.1
 django-widget-tweaks==1.5.0
 pillow==11.2.1

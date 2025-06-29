@@ -5,10 +5,12 @@ from wine_cellar.apps.user.models import UserSettings
 
 
 class UserSettingsForm(ModelForm):
+
     class Meta:
         model = UserSettings
-        fields = ["language", "currency"]
+        fields = ["language", "currency", "notifications"]
         help_texts = {
             "language": _("The language the site is displayed in."),
             "currency": _("The default currency used for the price of a wine."),
+            "notifications": _("Receive email notifications."),
         }

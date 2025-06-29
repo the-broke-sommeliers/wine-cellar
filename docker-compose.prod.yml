@@ -1,6 +1,6 @@
 services:
   web:
-    image: ghcr.io/the-broke-sommeliers/wine-cellar-web:v0.0.9
+    image: ghcr.io/the-broke-sommeliers/wine-cellar-web:v0.0.10-rc2
     command: gunicorn wine_cellar.conf.wsgi:application --bind 0.0.0.0:8000
     volumes:
       - static_volume:/home/app/web/staticfiles
@@ -11,6 +11,7 @@ services:
       - ./.env.prod
     depends_on:
       - db
+      - redis
   db:
     image: postgres:16
     volumes:
@@ -30,7 +31,22 @@ services:
       - caddy_config:/config
     depends_on:
       - web
-
+  redis:
+    image: redis:alpine
+  celery:
+    image: ghcr.io/the-broke-sommeliers/wine-cellar-web:v0.0.10-rc2
+    command: celery -A wine_cellar.conf worker -l info
+    env_file:
+      - ./.env.prod
+    depends_on:
+      - redis
+  celery-beat:
+    image: ghcr.io/the-broke-sommeliers/wine-cellar-web:v0.0.10-rc2
+    command: celery -A wine_cellar.conf beat -l info
+    env_file:
+      - ./.env.prod
+    depends_on:
+      - redis
 volumes:
   postgres_data:
   static_volume:

@@ -17,3 +17,4 @@ class UserSettings(models.Model):
     currency = models.CharField(
         max_length=3, choices=settings.CURRENCIES, default="EUR"
     )
+    notifications = models.BooleanField(default=True)
