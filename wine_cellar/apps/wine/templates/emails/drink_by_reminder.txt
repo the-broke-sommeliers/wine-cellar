@@ -1,0 +1,12 @@
+{% load static i18n settings %}
+
+{% blocktranslate %}
+Hello {{ user }},
+
+this is a reminder that the following wine(s) in your cellar should be drunk soon:
+{% endblocktranslate %}
+{% for wine in wines %}
+{{ wine.stock}}x {{ wine.name }}: {% translate "drink by" %} {{ wine.drink_by }}
+{% endfor %}
+
+{% blocktranslate%}You can find your cellar here:{% endblocktranslate %} {% get_setting "SITE_URL" %}

@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_celery_beat",
     "widget_tweaks",
     "wine_cellar.apps.wine",
     "wine_cellar.apps.user",
@@ -164,3 +165,6 @@ MEDIA_ROOT = "media/"
 MEDIA_URL = "media/"
 
 MAP_BASEURL = "https://tiles.openfreemap.org/styles/liberty"
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+SITE_URL = "http://127.0.0.1:8003"

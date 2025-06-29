@@ -16,6 +16,7 @@ def test_user_settings_page(client, user):
     data = {
         "language": "de-DE",
         "currency": "EUR",
+        "notifications": True,
     }
     r = client.post(reverse("user-settings"), data, follow=True)
     assert r.status_code == HTTPStatus.OK
@@ -23,13 +24,16 @@ def test_user_settings_page(client, user):
     user_settings = user.user_settings
     assert user_settings.language == "de-DE"
     assert user_settings.currency == "EUR"
+    assert user_settings.notifications
 
     data = {
         "language": "en-gb",
         "currency": "EUR",
+        "notifications": False,
     }
     r = client.post(reverse("user-settings"), data, follow=True)
     assert r.status_code == HTTPStatus.OK
     user_settings.refresh_from_db()
     assert user_settings.language == "en-gb"
     assert user_settings.currency == "EUR"
+    assert not user_settings.notifications
