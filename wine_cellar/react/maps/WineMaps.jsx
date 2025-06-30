@@ -40,11 +40,11 @@ export const Map = React.forwardRef(function Map({ id, title, ...props }, ref) {
  */
 export const MapWithMarkers = ({ wines, withoutPopup, children, ...props }) => {
   const markers = wines.map((wine, index) => {
-    const feature = countries[wine.country]
+    const feature = Object.assign({}, countries[wine.country])
     if (!feature) {
         return null
     }
-    feature.properties = Object.assign(feature.properties, wine)
+    feature.properties = Object.assign(wine, feature.properties)
     return (
       <GeoJsonMarker key={index} feature={feature}>
           {!withoutPopup && <ItemPopup feature={feature} />}
