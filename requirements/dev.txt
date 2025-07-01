@@ -10,5 +10,5 @@ isort==6.0.1
 mkdocs-material==9.6.14
 pytest-cov==6.2.1
 pytest-django==4.11.1
-pytest-factoryboy==2.8.0
+pytest-factoryboy==2.8.1
 pytest==8.4.1
