@@ -6,7 +6,9 @@
   margin: 0 auto;
   padding: 20px;
   background-color: var(--light);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--container-box-shadow);
+
+  /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
 
   .pure-form input[type='text'],
   .pure-form input[type='password'] {
