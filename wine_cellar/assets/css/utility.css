@@ -17,3 +17,7 @@
 .j-center {
   justify-content: center;
 }
+
+.text--gray {
+  color: var(--text-color-gray);
+}

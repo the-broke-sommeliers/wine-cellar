@@ -12,9 +12,12 @@
     --red: #cc0000;
     --light: #f6f5ef;
     --text-color-gray: #525252;
+    --darker-gray:#333333;
     --font-xs: 0.8rem;
     --font-sm: 1rem;
     --font-md: 1.25rem;
     --font-lg: 2rem;
     --font-xl: 3rem;
+    --border-radius: 10px;
+    --container-box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }

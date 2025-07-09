@@ -21,7 +21,8 @@
   width: 220px;
   background-color: white;
   border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--container-box-shadow);
+  /* box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); */
   overflow: hidden;
   text-align: center;
 }
