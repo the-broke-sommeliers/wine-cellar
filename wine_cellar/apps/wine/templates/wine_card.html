@@ -2,13 +2,15 @@
 <div class="wine_card__content">
     <a href="{% url 'wine-detail' wine.pk %}">
         <div class="pure-g">
-            <div class="pure-u-8-24">
-                <img src="{{ wine.get_type_image }}"
-                     height="85%"
+            <div class="pure-u-9-24">
+                <img src="{{ wine.image }}"
+                class="wine_card__img"
+                     height="200"
                      width="auto"
+                     loading="lazy"
                      alt="Image of a glass of {{ wine.get_type }} wine">
             </div>
-            <div class="pure-u-16-24">
+            <div class="pure-u-15-24">
                 <h2 class="wine_card__title">{{ wine.name }}</h2>
                 {% if wine.get_grapes %}
                     <div class="pure-u-1-1">

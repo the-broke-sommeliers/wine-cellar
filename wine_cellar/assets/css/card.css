@@ -18,8 +18,7 @@
   width: 100%;
   overflow: hidden;
 
-  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-
+  box-shadow: var(--container-box-shadow);
   p {
     margin: 0;
   }
@@ -44,8 +43,11 @@
   overflow-wrap: anywhere;
 }
 
-.text--gray {
-  color: #6f766f;
+.wine_card__img {
+  max-height: 200px;
+  max-width: 100%;
+  object-fit: cover;
+  border-radius: var(--border-radius);
 }
 
 .wine_card__stock {
