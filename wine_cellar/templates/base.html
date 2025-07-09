@@ -13,7 +13,7 @@
         <link rel="stylesheet" href="{% static 'base.css' %}">
         <link rel="icon"
               type="image/x-icon"
-              href="{% static 'images/red_glass2.svg' %}">
+              href="{% static 'images/logo.svg' %}">
         <script src="{% url 'javascript-catalog' %}"></script>
         {% block styles %}
         {% endblock styles %}
@@ -38,7 +38,9 @@
                             <span></span>
                             {# djlint:on #}
                         </label>
-                        <a href="{% url 'homepage' %}" class="pure-menu-heading pure-menu-link">Wine Cellar</a>
+                        <a href="{% url 'homepage' %}" class="pure-menu-heading pure-menu-link">
+                            <img class="logo logo--mobile" src="{% static 'images/logo.svg' %}" width=30 height=30 alt="{% translate 'Decorational image' %}">
+                            Wine Cellar</a>
                         <div class="pure-menu">
                             <ul class="pure-menu-list">
                                 {% if user.is_authenticated %}
@@ -74,6 +76,7 @@
                     <!-- large screen menu -->
                     <nav class="pure-menu pure-menu-horizontal menu__md">
                         <div class="menu__container">
+                            <img class="logo" src="{% static 'images/logo.svg' %}" width=30 height=30 alt="{% translate 'Decorational image' %}">
                             <a href="{% url 'homepage' %}" class="pure-menu-heading pure-menu-link">Wine Cellar</a>
                             <ul class="pure-menu-list">
                                 {% if user.is_authenticated %}

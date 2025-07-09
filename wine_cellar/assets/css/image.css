@@ -20,3 +20,12 @@
     border-radius: 12px;
   }
 }
+
+.logo {
+  vertical-align: middle;
+  margin-left: 5px;
+}
+
+.logo--mobile {
+  margin-right: 5px;
+}
