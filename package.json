@@ -37,7 +37,7 @@
     "copy-webpack-plugin": "13.0.0",
     "css-loader": "7.1.2",
     "eslint": "9.31.0",
-    "eslint-config-prettier": "10.1.5",
+    "eslint-config-prettier": "10.1.7",
     "eslint-plugin-promise": "7.2.1",
     "husky": "9.1.7",
     "lint-staged": "16.1.2",
