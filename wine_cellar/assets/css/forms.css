@@ -39,7 +39,7 @@
   select,
   textarea,
   .ts-wrapper {
-    min-width: 100%;
+    width: 100%;
     min-height: 40px;
   }
 
