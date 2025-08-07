@@ -1,6 +1,6 @@
 services:
   web:
-    image: ghcr.io/the-broke-sommeliers/wine-cellar-web:v0.0.9
+    image: ghcr.io/the-broke-sommeliers/wine-cellar-web:v0.0.10
     command: gunicorn wine_cellar.conf.wsgi:application --bind 0.0.0.0:8000
     volumes:
       - static_volume:/home/app/web/staticfiles
