@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 Since version v0.0.1 the format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.0.10
+
+### Added
+
+- add 'Drink By' field to save a date until a wine should be drunk
+- add an email reminder to drink wines which will expire in 14 days.
+  - Requires a smtp server to be configured in your .env.prod
+- add pound sterlin as currency
+- add price field to wine
+- show wine sources in detail view
+- map with overview of the origin of all wines (country only for now)
+
+### Fixed
+
+- use gettext_lazy to fix some translations not being picked up
+- fix missing user from wine model unique constraint
+- fix bug in react map showing the wrong item popup data
+- fix sizing issue on small screens for the comment form field
+
+### Changed
+
+- make wine picture in detail view have rounded corners
+
 ## v0.0.9
 
 ### Fixed
@@ -13,6 +36,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   the same grape
 
 ### Changed
+
 - update dependencies
 
 ## v0.0.8
