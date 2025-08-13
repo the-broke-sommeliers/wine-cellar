@@ -1,8 +1,27 @@
 .wine-detail__image {
+    height: 237px;
+    width: 158px;
+    background-color: white;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: var(--container-box-shadow);
+    padding: 6px;
+    box-sizing: border-box;
+
+    margin-block-end: 2rem;
+    
+    img {
+      height: 100%;
+      width: auto;
+      max-width: 100%;
+      border-radius: 12px;
+      object-fit: cover;
+    }
+
   @media screen and (min-width: 48em) {
     margin-inline-start: auto;
     margin-inline-end: 1rem;
-  
+
   }
 }
 
