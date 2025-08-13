@@ -43,9 +43,15 @@
   overflow-wrap: anywhere;
 }
 
+.wine_card__detail_container {
+  margin-inline-start: 12px;
+}
+
 .wine_card__img {
   max-height: 200px;
   max-width: 100%;
+  margin: auto;
+  display: block;
   object-fit: cover;
   border-radius: var(--border-radius);
 }

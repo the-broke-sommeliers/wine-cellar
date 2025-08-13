@@ -4,33 +4,35 @@
         <div class="pure-g">
             <div class="pure-u-9-24">
                 <img src="{{ wine.image }}"
-                class="wine_card__img"
-                     height="200"
-                     width="auto"
-                     loading="lazy"
-                     alt="Image of a glass of {{ wine.get_type }} wine">
+                        class="wine_card__img"
+                        height="200"
+                        width="auto"
+                        loading="lazy"
+                        alt="Image of a glass of {{ wine.get_type }} wine">
             </div>
             <div class="pure-u-15-24">
-                <h2 class="wine_card__title">{{ wine.name }}</h2>
-                {% if wine.get_grapes %}
-                    <div class="pure-u-1-1">
-                        <span class="text--gray">Grape</span>
-                        <p>{{ wine.get_grapes | truncatechars:31 | title }}</p>
-                    </div>
-                {% endif %}
-                {% if wine.vintage %}
-                    <div class="pure-u-1-1">
-                        <span class="text--gray">Vintage</span>
-                        <p>{{ wine.vintage }}</p>
-                    </div>
-                {% endif %}
-                {% if wine.drink_by %}
-                    <div class="pure-u-1-1">
-                        <span class="text--gray">Drink By</span>
-                        <p>{{ wine.drink_by }}</p>
-                    </div>
-                {% endif %}
-            </div>
+                <div class="wine_card__detail_container">
+                    <h2 class="wine_card__title">{{ wine.name }}</h2>
+                    {% if wine.get_grapes %}
+                        <div class="pure-u-1-1">
+                            <span class="text--gray">Grape</span>
+                            <p>{{ wine.get_grapes | truncatechars:31 | title }}</p>
+                        </div>
+                    {% endif %}
+                    {% if wine.vintage %}
+                        <div class="pure-u-1-1">
+                            <span class="text--gray">Vintage</span>
+                            <p>{{ wine.vintage }}</p>
+                        </div>
+                    {% endif %}
+                    {% if wine.drink_by %}
+                        <div class="pure-u-1-1">
+                            <span class="text--gray">Drink By</span>
+                            <p>{{ wine.drink_by }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>  
             <div class="pure-u-1-1 wine_card__stock">
                 <span>{% translate "Stock:" %} {{ wine.stock }}</span>
             </div>
