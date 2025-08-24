@@ -52,7 +52,7 @@
     "stylelint": "16.23.1",
     "stylelint-config-standard-scss": "15.0.1",
     "stylelint-declaration-strict-value": "1.10.11",
-    "ts-loader": "9.5.2",
+    "ts-loader": "9.5.4",
     "typescript": "5.9.2",
     "url": "0.11.4",
     "webpack": "5.101.3",
