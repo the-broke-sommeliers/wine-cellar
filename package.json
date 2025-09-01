@@ -40,7 +40,7 @@
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-promise": "7.2.1",
     "husky": "9.1.7",
-    "lint-staged": "16.1.5",
+    "lint-staged": "16.1.6",
     "mini-css-extract-plugin": "2.9.4",
     "neostandard": "0.12.2",
     "path-browserify": "1.0.1",
