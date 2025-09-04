@@ -11,4 +11,4 @@ mkdocs-material==9.6.18
 pytest-cov==6.2.1
 pytest-django==4.11.1
 pytest-factoryboy==2.8.1
-pytest==8.4.1
+pytest==8.4.2
