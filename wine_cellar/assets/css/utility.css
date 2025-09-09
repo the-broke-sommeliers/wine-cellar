@@ -10,6 +10,10 @@
   margin: auto;
 }
 
+.d-flex {
+    display: flex;
+}
+
 .d-inline {
   display: inline;
 }
