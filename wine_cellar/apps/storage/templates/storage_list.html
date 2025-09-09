@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+{% block header %}
+    <h1 class="header__title">{% translate "Storages" %}</h1>
+{% endblock header %}
+{% block content %}
+    <div class="storage-list__container">
+        <div class="pure-g">
+            <div class="storage-list__menu pure-u-1 pure-u-md-1 text-align-center">
+                <a href="{% url 'storage-add' %}" class="pure-button button__neutral"><i class="fa-regular fa-plus"></i> <span>{% translate "Add Storage" %}</span></a>
+            </div>
+            <div class="pure-u-1 pure-u-md-1 text-align-center">
+                <table class="storage-list__table">
+                    <tr>
+                        <th>{% translate "Name" %}</th>
+                        <th>{% translate "Location" %}</th>
+                        <th>{% translate "Used Slots" %}</th>
+                        <th>{% translate "Total Slots" %}</th>
+                        <th></th>
+                    </tr>
+                    {% for item in storages %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'storage-detail' item.pk %}">{{ item.name }}</a>
+                            </td>
+                            <td>{{ item.location|default_if_none:"" }}</td>
+                            <td>{{ item.used_slots|default_if_none:"" }}</td>
+                            <td>{{ item.total_slots|default_if_none:"" }}</td>
+                            <td>
+                                <a class="pure-button" href="{% url 'storage-delete' item.pk %}"><i class="fa-regular fa-trash-can"></i></a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+                {% include "includes/pagination.html" %}
+            </div>
+        </div>
+    </div>
+{% endblock content %}

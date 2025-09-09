@@ -1,8 +1,7 @@
 from django.forms import model_to_dict
-from django.http import HttpResponseForbidden, HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
-from django.views.generic import DetailView, FormView, RedirectView, TemplateView
+from django.views.generic import DeleteView, DetailView, FormView, TemplateView
 from django_filters.views import FilterView
 
 from wine_cellar.apps.wine.filters import WineFilter
@@ -145,14 +144,12 @@ class WineUpdateView(FormView):
 
     def get_initial(self):
         initial = super().get_initial()
-        wine = get_object_or_404(Wine, pk=self.kwargs["pk"])
+        wine = get_object_or_404(Wine, pk=self.kwargs["pk"], user=self.request.user)
         initial.update(model_to_dict(wine))
         return initial
 
     def form_valid(self, form):
-        wine = get_object_or_404(Wine, pk=self.kwargs["pk"])
-        if not self.request.user == wine.user:
-            return HttpResponseForbidden()
+        wine = get_object_or_404(Wine, pk=self.kwargs["pk"], user=self.request.user)
         self.process_form_data(wine, self.request.user, form.cleaned_data)
         self.success_url = reverse_lazy("wine-detail", kwargs={"pk": wine.pk})
         return super().form_valid(form)
@@ -210,6 +207,10 @@ class WineDetailView(DetailView):
     template_name = "wine_detail.html"
     model = Wine
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(user=self.request.user)
+
 
 class WineListView(FilterView):
     model = Wine
@@ -239,26 +240,14 @@ class WineScannedView(TemplateView):
         return super().dispatch(request, *args, **kwargs)
 
 
-class WineChangeStockView(RedirectView):
-    permanent = False
-    query_string = True
-    pattern_name = "wine-detail"
+class WineDeleteView(DeleteView):
+    model = Wine
+    template_name = "wine_confirm_delete.html"
+    success_url = reverse_lazy("wine-list")
 
-    def get_redirect_url(self, *args, **kwargs):
-        # op = 0 decrease stock
-        # op = 1 increaste stock
-        pk = kwargs["pk"]
-        operation = kwargs.pop("op")
-        try:
-            wine = Wine.objects.filter(pk=pk).filter(user=self.request.user).first()
-        except Wine.DoesNotExist:
-            return HttpResponseNotFound("hello")
-        if operation == 1:
-            wine.stock += 1
-        else:
-            wine.stock -= 1
-        wine.save()
-        return super().get_redirect_url(*args, **kwargs)
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(user=self.request.user)
 
 
 class WineMapView(TemplateView):
