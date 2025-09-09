@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "widget_tweaks",
     "wine_cellar.apps.wine",
     "wine_cellar.apps.user",
+    "wine_cellar.apps.storage",
 ]
 
 MIDDLEWARE = [

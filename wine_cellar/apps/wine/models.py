@@ -210,6 +210,14 @@ class Wine(UserContentModel):
             return Category(self.category).label
 
     @property
+    def total_stock(self):
+        return self.storageitem_set.count()
+
+    @property
+    def get_stock(self):
+        return self.storageitem_set.all()
+
+    @property
     def get_type_image(self):
         match self.wine_type:
             case WineType.RED:

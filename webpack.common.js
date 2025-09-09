@@ -8,6 +8,7 @@ module.exports = {
       import: [
         './wine_cellar/assets/css/menu.css',
         './wine_cellar/assets/css/detail.css',
+        './wine_cellar/assets/css/storage.css',
         './wine_cellar/assets/css/utility.css',
         './wine_cellar/assets/css/card.css',
         './wine_cellar/assets/css/forms.css',
@@ -22,6 +23,9 @@ module.exports = {
     },
     tom_select: {
       import: ['./wine_cellar/assets/js/init_tom_select.ts'],
+    },
+    stock_add: {
+      import: ['./wine_cellar/assets/js/stock_add.ts'],
     },
     barcode_scanner: {
       import: ['./wine_cellar/react/react_bar_code.tsx'],

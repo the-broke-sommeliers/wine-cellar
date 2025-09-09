@@ -25,8 +25,34 @@
     }
 }
 
+.button__neutral {
+    color: black;
+    background-color: var(--gray);
+    text-decoration: none;
+    border-radius: 6px;
+
+    &:hover {
+        background-color: var(--gray);
+    }
+
+    &:focus {
+        outline: revert;
+        background-color: var(--darker-green);
+    }
+
+    &:active {
+        background-color: var(--darkest-green);
+    }
+}
+
 .ts-control:focus-within,
 .pure-control-group > input[type="number"]:focus,
 .pure-control-group > input[type="text"]:focus {
     border: 2px solid #3584E4 !important; /* Blue glow effect */
+}
+
+.wine__edit-delete-buttons {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 36px;
 }
