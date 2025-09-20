@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+{% block header %}
+    <h1 class="header__title">{{ storage.name }}</h1>
+{% endblock header %}
+{% block content %}
+    <div class="storage-detail__container">
+        <div class="pure-g">
+            <div class="pure-u-1 pure-u-md-1">
+                {% url 'storage-edit' storage.pk as edit_url %}
+                {% url 'storage-delete' storage.pk as delete_url %}
+                {% include "includes/edit_delete_buttons.html" with edit_url=edit_url delete_url=delete_url %}
+            </div>
+            <div class="pure-u-1 pure-u-md-1 text-align-center">
+                <span class="storage-detail__location">{% translate "Location:" %} {{ storage.location }}</span>
+                {% if storage.total_slots > 0 %}
+                    <span>{% translate "Bottles:" %} {{ storage.used_slots }}/{{ storage.total_slots }}</span>
+                {% else %}
+                    <span>{% translate "Bottles:" %} {{ storage.used_slots }}</span>
+                {% endif %}
+            </div>
+            <div class="pure-u-1 pure-u-md-1 text-align-center">
+                {% if object_list %}
+                    <table class="storage-list__table">
+                        <tr>
+                            <th>{% translate "Wine" %}</th>
+                            <th>{% translate "Row" %}</th>
+                            <th>{% translate "Cell" %}</th>
+                            <th></th>
+                        </tr>
+                        {% for item in object_list %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'wine-detail' item.wine.pk %}">{{ item.wine.name }}</a>
+                                </td>
+                                <td>{{ item.row|default_if_none:"" }}</td>
+                                <td>{{ item.column|default_if_none:"" }}</td>
+                                <td>
+                                    <a class="pure-button" href="{% url 'stock-delete' item.pk %}"><i class="fa-regular fa-trash-can"></i></a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                    {% include "includes/pagination.html" %}
+                {% else %}
+                    <p>{% translate "No wines here yet." %}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock content %}
