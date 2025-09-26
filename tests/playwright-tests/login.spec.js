@@ -1,3 +1,5 @@
+import { test, expect } from '@playwright/test';
+
 test('test', async ({ page }) => {
   await page.goto('http://localhost:8003/accounts/login/?next=/');
   await page.getByRole('textbox', { name: 'Username' }).click();
