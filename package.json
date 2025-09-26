@@ -5,7 +5,8 @@
     "prepare": "husky",
     "watch": "webpack --config webpack.dev.js --watch --mode development",
     "lint": "eslint wine_cellar/assets",
-    "lint-fix": "eslint --fix wine_cellar"
+    "lint-fix": "eslint --fix wine_cellar",
+    "test": "npx playwright test"
   },
   "dependencies": {
     "@babel/runtime": "^7.27.1",
@@ -16,6 +17,7 @@
     "barcode-detector": "3.0.5",
     "leaflet": "1.9.4",
     "leaflet.markercluster": "1.5.3",
+    "playright": "^0.0.22",
     "react": "19.1.1",
     "react-barcode-scanner": "4.0.0",
     "react-dom": "19.1.1",
@@ -30,6 +32,8 @@
     "@babel/plugin-transform-runtime": "7.28.3",
     "@babel/preset-env": "7.28.3",
     "@babel/preset-react": "7.27.1",
+    "@playwright/test": "^1.55.1",
+    "@types/node": "^24.5.2",
     "@types/react": "19.1.13",
     "@types/react-dom": "19.1.9",
     "autoprefixer": "10.4.21",

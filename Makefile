@@ -104,3 +104,8 @@ po:
 .PHONY: mo
 mo:
 	$(VIRTUAL_ENV)/bin/python manage.py compilemessages
+
+.PHONY: jstest
+jstest: 
+	npm run test -- --watchAll=false --coverage
+	
