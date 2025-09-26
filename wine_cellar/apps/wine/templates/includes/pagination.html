@@ -12,7 +12,7 @@
                     {% for i in page_obj.paginator.page_range %}
                         {% if page_obj.number == i %}
                             <li class="active">
-                                <span>{{ i }} <span class="sr-only">{% translate "(current)" %}</span></span>
+                                <span>{{ i }} <span class="visually-hidden">{% translate "(current)" %}</span></span>
                             </li>
                         {% else %}
                             <li>
