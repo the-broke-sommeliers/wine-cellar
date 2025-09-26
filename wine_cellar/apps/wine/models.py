@@ -163,10 +163,6 @@ class Wine(UserContentModel):
     vineyard = models.ManyToManyField(Vineyard)
     source = models.ManyToManyField(Source)
     price = models.DecimalField(max_digits=6, decimal_places=2, null=True)
-    stock = models.PositiveIntegerField(
-        default=0,
-        validators=[MinValueValidator(0)],
-    )
 
     def get_absolute_url(self):
         return reverse("wine-detail", kwargs={"pk": self.pk})

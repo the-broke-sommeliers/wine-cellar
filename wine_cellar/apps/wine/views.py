@@ -16,7 +16,10 @@ class HomePageView(TemplateView):
         context = super().get_context_data(**kwargs)
         wines = Wine.objects.filter(user=self.request.user).count()
         wines_in_stock = (
-            Wine.objects.filter(stock__gt=0).filter(user=self.request.user).count()
+            Wine.objects.filter(storageitem__isnull=False)
+            .filter(user=self.request.user)
+            .distinct()
+            .count()
         )
         countries = (
             Wine.objects.filter(user=self.request.user)
@@ -100,7 +103,6 @@ class WineCreateView(FormView):
         image = cleaned_data["image"]
         name = cleaned_data["name"]
         rating = cleaned_data["rating"]
-        stock = cleaned_data["stock"]
         vintage = cleaned_data["vintage"]
         wine_type = cleaned_data["wine_type"]
         drink_by = cleaned_data["drink_by"]
@@ -112,7 +114,6 @@ class WineCreateView(FormView):
             country=country,
             name=name,
             barcode=barcode,
-            stock=stock if stock else 0,
             user=user,
             vintage=vintage,
             drink_by=drink_by,
@@ -170,7 +171,6 @@ class WineUpdateView(FormView):
         image = cleaned_data["image"]
         name = cleaned_data["name"]
         rating = cleaned_data["rating"]
-        stock = cleaned_data["stock"]
         vintage = cleaned_data["vintage"]
         drink_by = cleaned_data["drink_by"]
         wine_type = cleaned_data["wine_type"]
@@ -183,7 +183,6 @@ class WineUpdateView(FormView):
         wine.name = name
         wine.barcode = barcode
         wine.rating = rating
-        wine.stock = stock if stock else 0
         wine.vintage = vintage
         wine.drink_by = drink_by
         wine.wine_type = wine_type
