@@ -21,7 +21,7 @@
                 {% with step=form.form_step.value|add:"0" %}
                     <fieldset id="create__fs_0" class="{% if step != 0 %}hidden{% endif %}">
                         <legend>
-                            <h2 class="form-subhead text-color-gray">{% translate "Details" %}</h2>
+                            <h2 class="form-subhead text--gray">{% translate "Details" %}</h2>
                         </legend>
                         {% include 'forms/form_field.html' with field=form.name %}
                         {% include 'forms/form_field.html' with field=form.wine_type %}
@@ -30,7 +30,7 @@
                     </fieldset>
                     <fieldset id="create__fs_1" class="{% if step != 1 %}hidden{% endif %}">
                         <legend>
-                            <h2 class="form-subhead text-color-gray">{% translate "Characteristics" %}</h2>
+                            <h2 class="form-subhead text--gray">{% translate "Characteristics" %}</h2>
                         </legend>
                         {% include 'forms/form_field.html' with field=form.grapes %}
                         {% include 'forms/form_field.html' with field=form.vintage %}
@@ -39,7 +39,7 @@
                     </fieldset>
                     <fieldset id="create__fs_2" class="{% if step != 2 %}hidden{% endif %}">
                         <legend>
-                            <h2 class="form-subhead text-color-gray">{% translate "Origin" %}</h2>
+                            <h2 class="form-subhead text--gray">{% translate "Origin" %}</h2>
                         </legend>
                         {% include 'forms/form_field.html' with field=form.vineyard %}
                         {% include 'forms/form_field.html' with field=form.source %}
@@ -48,7 +48,7 @@
                     </fieldset>
                     <fieldset id="create__fs_3" class="{% if step != 3 %}hidden{% endif %}">
                         <legend>
-                            <h2 class="form-subhead text-color-gray">{% translate "Personal Notes" %}</h2>
+                            <h2 class="form-subhead text--gray">{% translate "Personal Notes" %}</h2>
                         </legend>
                         {% include 'forms/form_field.html' with field=form.drink_by %}
                         {% include 'forms/form_field.html' with field=form.stock %}
@@ -58,7 +58,7 @@
                     </fieldset>
                     <fieldset id="create__fs_4" class="{% if step != 4 %}hidden{% endif %}">
                         <legend>
-                            <h2 class="form-subhead text-color-gray">{% translate "Image" %}</h2>
+                            <h2 class="form-subhead text--gray">{% translate "Image" %}</h2>
                         </legend>
                         {% include 'forms/form_field.html' with field=form.image %}
                     </fieldset>
