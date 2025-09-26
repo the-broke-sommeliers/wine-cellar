@@ -1,4 +1,5 @@
 from django.db import models
+
 from wine_cellar.apps.wine.models import UserContentModel, Wine
 
 
@@ -28,7 +29,7 @@ class Storage(UserContentModel):
 
     @property
     def get_wines(self):
-        return self.items.all().order_by('row', 'column')
+        return self.items.all().order_by("row", "column")
 
 
 class StorageItem(UserContentModel):

@@ -6,4 +6,4 @@ class StorageConfig(AppConfig):
     name = "wine_cellar.apps.storage"
 
     def ready(self):
-        import wine_cellar.apps.storage.signals
+        import wine_cellar.apps.storage.signals  # noqa: F401
