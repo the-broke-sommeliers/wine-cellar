@@ -8,6 +8,7 @@ from wine_cellar.apps.wine.models import Wine
 
 
 class WineFilter(django_filters.FilterSet):
+    name = django_filters.CharFilter(field_name="name", lookup_expr="icontains")
     stock = ChoiceFilter(
         method="filter_stock",
         label=_("Show only in stock"),
@@ -32,7 +33,7 @@ class WineFilter(django_filters.FilterSet):
 
     def filter_stock(self, queryset, name, value):
         if value == "1":
-            return queryset.filter(stock__gt=0)
+            return queryset.filter(storageitem__isnull=False).distinct()
         else:
             return queryset
 
