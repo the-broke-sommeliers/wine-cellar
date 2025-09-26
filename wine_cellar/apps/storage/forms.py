@@ -1,5 +1,4 @@
 from django import forms
-from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
 from wine_cellar.apps.storage.models import Storage
@@ -38,7 +37,7 @@ class StockAddForm(forms.Form):
         for user_field in user_fields:
             self.fields[user_field].queryset = self.fields[
                 user_field
-            ].queryset.model.objects.filter(Q(user=None) | Q(user=user))
+            ].queryset.model.objects.filter(Quser=user)
             self.fields[user_field].user = user
 
     storage = forms.ModelChoiceField(

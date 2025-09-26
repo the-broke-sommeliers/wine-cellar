@@ -18,6 +18,8 @@ def drink_by_reminder():
     )
     date = timezone.now().date() + timedelta(days=14)
     for user in users:
-        wines = Wine.objects.filter(user=user, drink_by=date, stock__gt=0)
+        wines = Wine.objects.filter(
+            user=user, drink_by=date, storageitem__isnull=False
+        ).distinct()
         if wines.count() > 0:
             send_drink_by_reminder(user, wines)

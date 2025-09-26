@@ -33,7 +33,9 @@ def test_homepage(client, user):
 
 @pytest.mark.django_db
 def test_homepage_stats(client, user, wine_factory):
-    wine_factory(user=user, stock=1, vintage=2020)
+    wine = wine_factory(user=user, vintage=2020)
+    storage = user.storage_set.first()
+    StorageItem.objects.create(wine=wine, storage=storage)
     wine_factory(user=user, country="DE", vintage=2023)
     wine_factory(user=user, country="DE", vintage=2024)
     client.force_login(user)
@@ -244,7 +246,6 @@ def test_wine_create_post_with_steps(client, user):
     # post form step 2
     data_step2 = {
         "source": "tom_new_optSupermarket",
-        "stock": 1,
     }
     initial = r.context_data["form"].data.copy()
     assert initial["form_step"] == 2
