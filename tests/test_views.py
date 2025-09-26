@@ -9,6 +9,7 @@ from pytest_django.asserts import (
     assertTemplateUsed,
 )
 
+from wine_cellar.apps.storage.models import StorageItem
 from wine_cellar.apps.wine.models import Size, Wine
 
 
@@ -656,8 +657,9 @@ def test_wine_scanned_non_existing(
 
 @pytest.mark.django_db
 def test_wine_filter_in_stock(client, user, wine_factory):
-    wine_in_stock = wine_factory(user=user, stock=1, vintage=2020)
-    wine_not_in_stock = wine_factory(user=user, stock=0, vintage=2021)
+    wine_in_stock = wine_factory(user=user, vintage=2020)
+    wine_not_in_stock = wine_factory(user=user, vintage=2021)
+    StorageItem.objects.create(storage=user.storage_set.first(), wine=wine_in_stock)
     client.force_login(user)
     r = client.get(reverse("wine-list"))
     assert r.status_code == HTTPStatus.OK
