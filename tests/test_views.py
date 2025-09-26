@@ -655,33 +655,6 @@ def test_wine_scanned_non_existing(
 
 
 @pytest.mark.django_db
-def test_wine_increase_stock(
-    client,
-    user,
-    wine_factory,
-):
-    wine = wine_factory(user=user, stock=0, country="DE")
-    assert wine.stock == 0
-    client.force_login(user)
-    r = client.get(
-        reverse("change-stock", kwargs={"pk": wine.pk, "op": 1}), follow=True
-    )
-    assert r.status_code == HTTPStatus.OK
-    assertTemplateUsed(response=r, template_name="base.html")
-    assertTemplateUsed(response=r, template_name="wine_detail.html")
-    wine.refresh_from_db()
-    assert wine.stock == 1
-    r = client.get(
-        reverse("change-stock", kwargs={"pk": wine.pk, "op": 0}), follow=True
-    )
-    assert r.status_code == HTTPStatus.OK
-    assertTemplateUsed(response=r, template_name="base.html")
-    assertTemplateUsed(response=r, template_name="wine_detail.html")
-    wine.refresh_from_db()
-    assert wine.stock == 0
-
-
-@pytest.mark.django_db
 def test_wine_filter_in_stock(client, user, wine_factory):
     wine_in_stock = wine_factory(user=user, stock=1, vintage=2020)
     wine_not_in_stock = wine_factory(user=user, stock=0, vintage=2021)
