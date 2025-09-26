@@ -29,11 +29,15 @@ html {
  }
 
 .header__title {
-  font-size: var(--font-lg);
+  font-size: var(--font-xl);
   margin: 50px 0 35px 0;
   font-weight: 300;
   color: var(--text-color-gray);
   text-align: center;
+}
+
+h2.header__title {
+  font-size: var(--font-lg);
 }
 
 .pagination {

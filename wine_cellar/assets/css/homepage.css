@@ -34,7 +34,7 @@
 }
 
 .stats__number {
-  font-size: var(--font-lg);
+  font-size: var(--font-xl);
   color: #333;
   margin: 0;
   line-height: initial;
