@@ -82,3 +82,23 @@ The easiest way to run Wine Cellar is by using docker as described below.
    ```sh
    docker compose -f docker-compose.prod.full.yml up
    ```
+
+
+#### Email Setup
+
+Wine Cellar can send notification emails, including reminders for when a wine should be drunk by ("drink by" reminders).
+
+To enable email notifications, configure the email backend and credentials in your `.env-prod` file:
+
+```
+DJANGO_EMAIL_HOST=smtp.example.com
+DJANGO_EMAIL_PORT=587
+DJANGO_EMAIL_HOST_USER=your@email.com
+DJANGO_EMAIL_HOST_PASSWORD=yourpassword
+DJANGO_EMAIL_USE_TLS=
+DJANGO_EMAIL_USE_SSL=
+DJANGO_DEFAULT_FROM_EMAIL=Wine Cellar <your@email.com>
+```
+
+!!! Note
+    USE_TLS and USE_SSL are mutual exclusive, only one can be True
