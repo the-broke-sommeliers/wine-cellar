@@ -19,6 +19,7 @@ barcode.
 - **Wine Ratings**: Rate wines to track preferences.
 - **Food Pairings**: Add recommended food pairings.
 - **Self-hosted**: Full control over your data.
+- **Drink By Reminder**: Email reminder to drink a bottle before it goes off.
 
 ## Documentations
 
