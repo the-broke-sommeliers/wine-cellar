@@ -53,6 +53,7 @@
                                     </li>
                                     <li class="pure-menu-item">
                                         <a href="{% url 'wine-map' %}" class="pure-menu-link">{% translate "Map" %}</a>
+                                    </li>
                                     <li class="pure-menu-item">
                                         <a href="{% url 'storage-list' %}" class="pure-menu-link">{% translate "Storage" %}</a>
                                     </li>
@@ -123,7 +124,7 @@
         </main>
         <footer class="footer">
             <p>
-                AGPL 3.0 | {% translate "Version" %} {% get_setting "VERSION" %} | <a href="https://github.com/the-broke-sommeliers/wine-cellar" target="_blank">Github <span class="sr-only">(opens in new tab)</span></a>
+                AGPL 3.0 | {% translate "Version" %} {% get_setting "VERSION" %} | <a href="https://github.com/the-broke-sommeliers/wine-cellar" target="_blank">Github <span class="visually-hidden">(opens in new tab)</span></a>
             </p>
         </footer>
     </body>
