@@ -34,6 +34,10 @@
   justify-content: center;
 }
 
+.j-between {
+  justify-content: space-between;
+}
+
 .text--gray {
   color: var(--text-color-gray);
 }

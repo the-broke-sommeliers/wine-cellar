@@ -9,8 +9,8 @@
     --dark-purple: #4d1445;
     --darker-purple: #2c0527;
     --darkest-purple: #23021f;
-    --gray: rgba(64, 128, 72, 0.21);
-    --red: #cc0000;
+    --gray-green: rgba(64, 128, 72, 0.21);
+    --red: #bb0000;
     --light: #f6f5ef;
     --text-color-gray: #525252;
     --darker-gray:#333333;
@@ -22,3 +22,12 @@
     --border-radius: 10px;
     --container-box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
+
+.pure-table {
+    border: none;
+
+    thead {
+        background-color: var(--gray-green);
+    }
+}
+
