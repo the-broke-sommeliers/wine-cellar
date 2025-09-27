@@ -40,35 +40,21 @@
   }
 }
 
-.wine-detail__stock {
-  h2 {
-  margin-bottom: 0px;
-  }
-  margin-bottom: 12px;
-}
-
 .wine-detail__menu { 
   margin-bottom: 32px;
 }
 
+/* .wine-detail__stock {
+  h2 {
+  margin-bottom: 0px;
+  }
+  margin-bottom: 12px;
+} */
+
+
 .wine-detail__stock-table {
   text-align: left;
-  margin: auto;
+  margin: 1rem auto;
   border-collapse: collapse;
-  min-width: 40%;
-  th:first-child {
-    min-width: 8px;
-
-  }
-  tr:nth-child(even){background-color: #f2f2f2;}
-
-  th {
-    background-color: var(--gray);
-  }
-  th, td {
-    padding: 4px 12px 4px 12px;
-  }
-  tr {
-    border: 1px solid #ddd;
-  }
+  min-width: 100%;
 }

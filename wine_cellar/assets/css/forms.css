@@ -8,8 +8,6 @@
   background-color: var(--light);
   box-shadow: var(--container-box-shadow);
 
-  /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
-
   .pure-form input[type='text'],
   .pure-form input[type='password'] {
     width: 100%;
@@ -91,7 +89,7 @@ p.form-hint {
 
 .form-errorlist {
   margin-top: 0;
-  color: #bb0000;
+  color: var(--red);
   font-weight: bold;
   padding-left: 1rem;
 }

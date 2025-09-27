@@ -27,12 +27,12 @@
 
 .button__neutral {
     color: black;
-    background-color: var(--gray);
+    background-color: var(--gray-green);
     text-decoration: none;
     border-radius: 6px;
 
     &:hover {
-        background-color: var(--gray);
+        background-color: var(--gray-green);
     }
 
     &:focus {
