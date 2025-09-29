@@ -3891,13 +3891,10 @@
     "type": "Feature",
     "geometry": {
       "type": "Point",
-      "coordinates": [
-        -16.53799441021647,
-        28.297665106525546
-      ]
+      "coordinates": [-3.6516251409956983, 40.365008336683836]
     },
     "properties": {
-      "COUNTRY": "Canarias",
+      "COUNTRY": "Spain",
       "ISO": "ES",
       "COUNTRYAFF": "Spain",
       "AFF_ISO": "ES"
