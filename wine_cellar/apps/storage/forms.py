@@ -37,7 +37,7 @@ class StockAddForm(forms.Form):
         for user_field in user_fields:
             self.fields[user_field].queryset = self.fields[
                 user_field
-            ].queryset.model.objects.filter(Quser=user)
+            ].queryset.model.objects.filter(user=user)
             self.fields[user_field].user = user
 
     storage = forms.ModelChoiceField(
