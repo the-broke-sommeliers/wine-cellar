@@ -1,11 +1,10 @@
 import random
 
 import factory
-from django.contrib.auth import get_user_model
-from django.contrib.auth.hashers import make_password
 from factory import post_generation
 from factory.django import DjangoModelFactory, ImageField
 
+from wine_cellar.apps.user.tests.factories import UserFactory
 from wine_cellar.apps.wine.models import (
     Classification,
     FoodPairing,
@@ -17,15 +16,6 @@ from wine_cellar.apps.wine.models import (
     WineImage,
     WineType,
 )
-
-
-class UserFactory(DjangoModelFactory):
-    class Meta:
-        model = get_user_model()
-
-    username = factory.Sequence(lambda n: "user%d" % n)
-    email = factory.Sequence(lambda n: "user%d@wine-cellar.net" % n)
-    password = make_password("password")
 
 
 class GrapeFactory(DjangoModelFactory):
