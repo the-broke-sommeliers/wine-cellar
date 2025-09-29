@@ -18,5 +18,8 @@
   },
   "pip_requirements": {
     "managerFilePatterns": ["/^requirements/.*\\.txt$/"]
+  },
+  {
+  "ignoreDeps": ["ghcr.io/the-broke-sommeliers/wine-cellar-web"]
   }
 }
