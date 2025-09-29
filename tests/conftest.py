@@ -5,13 +5,14 @@ import pytest
 from django.conf import settings
 from pytest_factoryboy import register
 
+from wine_cellar.apps.storage.tests.factories import StorageFactory
+from wine_cellar.apps.user.tests.factories import UserFactory
 from wine_cellar.apps.wine.tests.factories import (
     ClassificationFactory,
     FoodPairingFactory,
     GrapeFactory,
     SizeFactory,
     SourceFactory,
-    UserFactory,
     VineyardFactory,
     WineFactory,
     WineImageFactory,
@@ -26,6 +27,7 @@ register(FoodPairingFactory)
 register(ClassificationFactory)
 register(SizeFactory)
 register(SourceFactory)
+register(StorageFactory)
 
 
 @pytest.fixture
