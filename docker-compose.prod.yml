@@ -34,14 +34,14 @@ services:
   redis:
     image: redis:alpine
   celery:
-    image: ghcr.io/the-broke-sommeliers/wine-cellar-web:v0.0.11-rc2
+    image: ghcr.io/the-broke-sommeliers/wine-cellar-web:v0.0.10
     command: celery -A wine_cellar.conf worker -l info
     env_file:
       - ./.env.prod
     depends_on:
       - redis
   celery-beat:
-    image: ghcr.io/the-broke-sommeliers/wine-cellar-web:v0.0.11-rc2
+    image: ghcr.io/the-broke-sommeliers/wine-cellar-web:v0.0.10
     command: celery -A wine_cellar.conf beat -l info
     env_file:
       - ./.env.prod

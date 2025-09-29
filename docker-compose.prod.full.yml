@@ -11,6 +11,7 @@ services:
       - ./.env.prod
     depends_on:
       - db
+      - redis
   db:
     image: postgres:16
     volumes:
@@ -34,6 +35,22 @@ services:
       - caddy_config:/config
     depends_on:
       - web
+  redis:
+    image: redis:alpine
+  celery:
+    image: ghcr.io/the-broke-sommeliers/wine-cellar-web:v0.0.10
+    command: celery -A wine_cellar.conf worker -l info
+    env_file:
+      - ./.env.prod
+    depends_on:
+      - redis
+  celery-beat:
+    image: ghcr.io/the-broke-sommeliers/wine-cellar-web:v0.0.10
+    command: celery -A wine_cellar.conf beat -l info
+    env_file:
+      - ./.env.prod
+    depends_on:
+      - redis
 
 volumes:
   postgres_data:
