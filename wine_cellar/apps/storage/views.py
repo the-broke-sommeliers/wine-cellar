@@ -190,8 +190,10 @@ class StorageItemDeleteView(DeleteView):
     template_name = "storage_item_confirm_delete.html"
 
     def get_success_url(self):
-        storage = self.object.storage
-        return reverse_lazy("storage-detail", kwargs={"pk": storage.pk})
+        next = self.request.GET.get("next")
+        if next == "storage":
+            return reverse_lazy("storage-detail", kwargs={"pk": self.object.storage.pk})
+        return reverse_lazy("wine-detail", kwargs={"pk": self.object.wine.pk})
 
     def get_queryset(self):
         qs = super().get_queryset()
