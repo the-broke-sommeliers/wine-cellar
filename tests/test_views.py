@@ -37,7 +37,7 @@ def test_homepage_stats(client, user, wine_factory):
     storage = user.storage_set.first()
     StorageItem.objects.create(wine=wine, storage=storage)
     wine_factory(user=user, country="DE", vintage=2023)
-    wine_factory(user=user, country="DE", vintage=2024)
+    wine_factory(user=user, country="ES", vintage=2024)
     client.force_login(user)
     r = client.get(reverse("homepage"), follow=True)
     assert r.status_code == HTTPStatus.OK
