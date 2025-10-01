@@ -6,7 +6,7 @@ django-debug-toolbar==6.0.0
 djlint==1.36.4
 factory-boy==3.3.3
 flake8==7.3.0
-isort==6.0.1
+isort==6.1.0
 mkdocs-material==9.6.21
 pytest-cov==7.0.0
 pytest-django==4.11.1
