@@ -69,6 +69,7 @@ class WineFactory(DjangoModelFactory):
     wine_type = random.choice(WineType.choices)[0]
     vintage = random.randint(1900, 2024)
     abv = 12.0
+    country = "DE"
 
     @post_generation
     def grapes(obj, create, extracted, **kwargs):

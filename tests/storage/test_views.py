@@ -7,7 +7,7 @@ from pytest_django.asserts import (
     assertTemplateUsed,
 )
 
-from wine_cellar.apps.storage.models import Storage
+from wine_cellar.apps.storage.models import Storage, StorageItem
 
 
 @pytest.mark.django_db
@@ -66,7 +66,6 @@ def test_storage_create_post(client, user):
     }
 
     assert Storage.objects.count() == 1
-    r = client.get(reverse("storage-add"))
     r = client.post(reverse("storage-add"), data=data, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("storage-list"))
@@ -94,6 +93,32 @@ def test_storage_create_post_invalid(client, user):
     r = client.post(reverse("storage-add"), data=data, follow=True)
     assert r.status_code == HTTPStatus.OK
     assert r.context_data["form"].errors
+
+
+@pytest.mark.django_db
+def test_storage_update_post(client, user):
+    client.force_login(user)
+    storage = Storage.objects.first()
+    data = {
+        "name": storage.name,
+        "location": "Basement",
+        "rows": 1,
+        "columns": 10,
+    }
+    assert Storage.objects.count() == 1
+    r = client.post(
+        reverse("storage-edit", kwargs={"pk": storage.pk}), data=data, follow=True
+    )
+    assert r.status_code == HTTPStatus.OK
+    assertRedirects(
+        response=r, expected_url=reverse("storage-detail", kwargs={"pk": storage.pk})
+    )
+    assertTemplateUsed(response=r, template_name="base.html")
+    assertTemplateUsed(response=r, template_name="storage_detail.html")
+    storage.refresh_from_db()
+    assert storage.user == user
+    assert storage.rows == data["rows"]
+    assert storage.columns == data["columns"]
 
 
 @pytest.mark.django_db
@@ -129,3 +154,104 @@ def test_storage_can_delete_multiple(client, user, storage_factory):
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("storage-list"))
     assert Storage.objects.count() == 1
+
+
+@pytest.mark.django_db
+def test_unauthenticated_cant_add_stock(client, user, wine_factory):
+    wine = wine_factory(user=user)
+    r = client.post(reverse("stock-add", kwargs={"pk": wine.pk}), follow=True)
+    assert r.status_code == HTTPStatus.OK
+    assertRedirects(
+        response=r,
+        expected_url=reverse("login")
+        + "?next="
+        + reverse("stock-add", kwargs={"pk": wine.pk}),
+    )
+    assertTemplateUsed(response=r, template_name="base.html")
+    assertTemplateUsed(response=r, template_name="registration/login.html")
+
+
+@pytest.mark.django_db
+def test_user_can_add_stock(client, user, wine_factory):
+    client.force_login(user)
+    storage = Storage.objects.first()
+    wine = wine_factory(user=user)
+    data = {
+        "storage": storage.pk,
+    }
+    r = client.post(
+        reverse("stock-add", kwargs={"pk": wine.pk}), data=data, follow=True
+    )
+    assert r.status_code == HTTPStatus.OK
+    assertRedirects(
+        response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
+    )
+    assert storage.used_slots == 1
+    assert storage.items.first().wine == wine
+
+
+@pytest.mark.django_db
+def test_user_cant_add_stock_to_other_users_storage(
+    client, user, user_factory, wine_factory
+):
+    storage = Storage.objects.filter(user=user).first()
+    other_user = user_factory()
+    other_storage = Storage.objects.filter(user=other_user).first()
+    client.force_login(user)
+    wine = wine_factory(user=user)
+    other_wine = wine_factory(user=other_user)
+    data = {
+        "storage": other_storage.pk,
+    }
+    r = client.post(
+        reverse("stock-add", kwargs={"pk": wine.pk}), data=data, follow=True
+    )
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["form"].errors
+    assert other_storage.used_slots == 0
+    r = client.post(
+        reverse("stock-add", kwargs={"pk": other_wine.pk}), data=data, follow=True
+    )
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["form"].errors
+    assert other_storage.used_slots == 0
+    assert StorageItem.objects.count() == 0
+    data = {
+        "storage": storage.pk,
+    }
+    r = client.post(
+        reverse("stock-add", kwargs={"pk": other_wine.pk}), data=data, follow=True
+    )
+    assert r.status_code == HTTPStatus.NOT_FOUND
+    assert other_storage.used_slots == 0
+    assert StorageItem.objects.count() == 0
+
+
+@pytest.mark.django_db
+def test_user_can_delete_stock(client, user, wine_factory, storage_item_factory):
+    client.force_login(user)
+    storage = Storage.objects.first()
+    wine = wine_factory(user=user)
+    item = storage_item_factory(storage=storage, wine=wine, user=user)
+    assert StorageItem.objects.count() == 1
+    r = client.post(reverse("stock-delete", kwargs={"pk": item.pk}), follow=True)
+    assert r.status_code == HTTPStatus.OK
+    assertRedirects(
+        response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
+    )
+    assert StorageItem.objects.count() == 0
+
+
+@pytest.mark.django_db
+def test_user_cant_delete_other_users_stock(
+    client, user, user_factory, wine_factory, storage_item_factory
+):
+    client.force_login(user)
+    user2 = user_factory()
+    storage = Storage.objects.filter(user=user2).first()
+    wine = wine_factory(user=user2)
+    item = storage_item_factory(storage=storage, wine=wine, user=user2)
+    assert StorageItem.objects.count() == 1
+    r = client.post(reverse("stock-delete", kwargs={"pk": item.pk}), follow=True)
+    assert r.status_code == HTTPStatus.NOT_FOUND
+    assert StorageItem.objects.count() == 1
