@@ -27,7 +27,10 @@
                                     {% include "wine_filter_field.html" %}
                                 {% endfor %}
                             </fieldset>
-                            <a href="?" role="button" class="pure-button button__secondary" aria-label='{% translate "Clear all filters and reset the form" %}'>
+                            <a href="?"
+                               role="button"
+                               class="pure-button button__secondary"
+                               aria-label='{% translate "Clear all filters and reset the form" %}'>
                                 {% translate "Clear" %}
                             </a>
                             <button type="submit" class="pure-button button__primary">{% translate "Filter" %}</button>
@@ -49,9 +52,10 @@
                         {% include "wine_filter_field.html" %}
                     {% endfor %}
                 </fieldset>
-                <a href="?" role="button" class="pure-button button__secondary" aria-label='{% translate "Clear all filters and reset the form" %}'>
-                    {% translate "Clear" %}
-                </a>
+                <a href="?"
+                   role="button"
+                   class="pure-button button__secondary"
+                   aria-label='{% translate "Clear all filters and reset the form" %}'>{% translate "Clear" %}</a>
                 <button type="submit" class="pure-button button__primary">{% translate "Filter" %}</button>
             </form>
         </div>

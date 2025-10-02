@@ -32,13 +32,15 @@
                     </a>
                 </li>
                 <li class="stats__card">
-                    <a class="stats__link" href="{% url 'wine-list' %}?name=&wine_type=&category=&vintage=&order=vintage">
+                    <a class="stats__link"
+                       href="{% url 'wine-list' %}?name=&wine_type=&category=&vintage=&order=vintage">
                         <p class="stats__number">{{ oldest }}</p>
                         <h2 class="stats__label">{% translate "Oldest Wine" %}</h2>
                     </a>
                 </li>
                 <li class="stats__card">
-                    <a class="stats__link" href="{% url 'wine-list' %}?name=&wine_type=&category=&vintage=&order=-vintage">
+                    <a class="stats__link"
+                       href="{% url 'wine-list' %}?name=&wine_type=&category=&vintage=&order=-vintage">
                         <p class="stats__number">{{ youngest }}</p>
                         <h2 class="stats__label">{% translate "Youngest Wine" %}</h2>
                     </a>
