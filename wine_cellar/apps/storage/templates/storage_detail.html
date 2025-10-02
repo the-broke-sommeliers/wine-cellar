@@ -36,7 +36,8 @@
                                 <td>{{ item.row|default_if_none:"" }}</td>
                                 <td>{{ item.column|default_if_none:"" }}</td>
                                 <td>
-                                    <a class="pure-button" href="{% url 'stock-delete' item.pk %}?next=storage"><i class="fa-regular fa-trash-can"></i></a>
+                                    <a class="pure-button"
+                                       href="{% url 'stock-delete' item.pk %}?next=storage"><i class="fa-regular fa-trash-can"></i></a>
                                 </td>
                             </tr>
                         {% endfor %}

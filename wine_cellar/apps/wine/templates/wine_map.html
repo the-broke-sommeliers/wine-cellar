@@ -6,13 +6,10 @@
 {% block styles %}
     {{ block.super }}
     <link rel="stylesheet" href="{% static 'maps.css' %}" />
-{% endblock %}
-
+{% endblock styles %}
 {% block content %}
     <div class="pure-g">
-        <div class="pure-u-1-1 m-auto">
-            {% react_map wines %}
-        </div>
+        <div class="pure-u-1-1 m-auto">{% react_map wines %}</div>
     </div>
 {% endblock content %}
 {% block extra_js %}
