@@ -1,0 +1,562 @@
+[
+  {
+    "model": "wine.wine",
+    "pk": 1,
+    "fields": {
+      "created": "2025-10-11T14:42:05.922Z",
+      "modified": "2025-10-11T14:42:05.922Z",
+      "user": 1,
+      "name": "Loire Valley Sauvignon Blanc",
+      "barcode": "",
+      "wine_type": "WH",
+      "category": "DR",
+      "abv": 12.5,
+      "size": 4,
+      "vintage": 2023,
+      "drink_by": "2026-10-11",
+      "comment": "Bright and zesty with citrus and green apple notes.",
+      "rating": 4,
+      "country": "FR",
+      "price": 15.0,
+      "grapes": [
+        1
+      ],
+      "classification": [],
+      "food_pairings": [],
+      "vineyard": [],
+      "source": []
+    }
+  },
+  {
+    "model": "wine.wine",
+    "pk": 2,
+    "fields": {
+      "created": "2025-10-10T10:00:00.000Z",
+      "modified": "2025-10-10T10:00:00.000Z",
+      "user": 1,
+      "name": "Napa Valley Cabernet Sauvignon",
+      "barcode": "",
+      "wine_type": "RE",
+      "category": "DR",
+      "abv": 14.5,
+      "size": 4,
+      "vintage": 2020,
+      "drink_by": "2032-12-31",
+      "comment": "Full-bodied with blackcurrant, oak, and spice notes.",
+      "rating": 5,
+      "country": "US",
+      "price": 45.0,
+      "grapes": [
+        2
+      ],
+      "classification": [],
+      "food_pairings": [],
+      "vineyard": [],
+      "source": []
+    }
+  },
+  {
+    "model": "wine.wine",
+    "pk": 3,
+    "fields": {
+      "created": "2025-10-09T09:30:00.000Z",
+      "modified": "2025-10-09T09:30:00.000Z",
+      "user": 1,
+      "name": "Burgundy Pinot Noir",
+      "barcode": "",
+      "wine_type": "RE",
+      "category": "DR",
+      "abv": 13.0,
+      "size": 4,
+      "vintage": 2021,
+      "drink_by": "2029-06-01",
+      "comment": "Elegant and silky with cherry and earthy undertones.",
+      "rating": 5,
+      "country": "FR",
+      "price": 39.0,
+      "grapes": [
+        3
+      ],
+      "classification": [],
+      "food_pairings": [],
+      "vineyard": [],
+      "source": []
+    }
+  },
+  {
+    "model": "wine.wine",
+    "pk": 4,
+    "fields": {
+      "created": "2025-10-08T08:45:00.000Z",
+      "modified": "2025-10-08T08:45:00.000Z",
+      "user": 1,
+      "name": "Alsace Riesling Feinherb",
+      "barcode": "",
+      "wine_type": "WH",
+      "category": "FH",
+      "abv": 11.0,
+      "size": 4,
+      "vintage": 2022,
+      "drink_by": "2028-06-01",
+      "comment": "Delicate sweetness balanced with vibrant acidity.",
+      "rating": 4,
+      "country": "FR",
+      "price": 18.5,
+      "grapes": [
+        4
+      ],
+      "classification": [],
+      "food_pairings": [],
+      "vineyard": [],
+      "source": []
+    }
+  },
+  {
+    "model": "wine.wine",
+    "pk": 5,
+    "fields": {
+      "created": "2025-10-07T07:00:00.000Z",
+      "modified": "2025-10-07T07:00:00.000Z",
+      "user": 1,
+      "name": "Barossa Valley Shiraz",
+      "barcode": "",
+      "wine_type": "RE",
+      "category": "DR",
+      "abv": 15.0,
+      "size": 4,
+      "vintage": 2020,
+      "drink_by": "2035-01-01",
+      "comment": "Bold and peppery with dark fruit concentration.",
+      "rating": 5,
+      "country": "AU",
+      "price": 32.0,
+      "grapes": [
+        5
+      ],
+      "classification": [],
+      "food_pairings": [],
+      "vineyard": [],
+      "source": []
+    }
+  },
+  {
+    "model": "wine.wine",
+    "pk": 6,
+    "fields": {
+      "created": "2025-10-06T06:30:00.000Z",
+      "modified": "2025-10-06T06:30:00.000Z",
+      "user": 1,
+      "name": "Bordeaux Merlot",
+      "barcode": "",
+      "wine_type": "RE",
+      "category": "SD",
+      "abv": 13.5,
+      "size": 4,
+      "vintage": 2021,
+      "drink_by": "2030-01-01",
+      "comment": "Soft tannins with plum and black cherry notes.",
+      "rating": 4,
+      "country": "FR",
+      "price": 24.0,
+      "grapes": [
+        6
+      ],
+      "classification": [],
+      "food_pairings": [],
+      "vineyard": [],
+      "source": []
+    }
+  },
+  {
+    "model": "wine.wine",
+    "pk": 7,
+    "fields": {
+      "created": "2025-10-06T06:31:00.000Z",
+      "modified": "2025-10-06T06:31:00.000Z",
+      "user": 1,
+      "name": "Sonoma Chardonnay",
+      "barcode": "",
+      "wine_type": "WH",
+      "category": "DR",
+      "abv": 13.5,
+      "size": 4,
+      "vintage": 2022,
+      "drink_by": "2028-05-01",
+      "comment": "Creamy and round with notes of vanilla and pear.",
+      "rating": 4,
+      "country": "US",
+      "price": 21.0,
+      "grapes": [
+        7
+      ],
+      "classification": [],
+      "food_pairings": [],
+      "vineyard": [],
+      "source": []
+    }
+  },
+  {
+    "model": "wine.wine",
+    "pk": 8,
+    "fields": {
+      "created": "2025-10-05T06:32:00.000Z",
+      "modified": "2025-10-05T06:32:00.000Z",
+      "user": 1,
+      "name": "Mendoza Malbec",
+      "barcode": "",
+      "wine_type": "RE",
+      "category": "DR",
+      "abv": 14.0,
+      "size": 4,
+      "vintage": 2021,
+      "drink_by": "2032-01-01",
+      "comment": "Juicy and ripe with plum and chocolate flavors.",
+      "rating": 5,
+      "country": "AR",
+      "price": 22.5,
+      "grapes": [
+        8
+      ],
+      "classification": [],
+      "food_pairings": [],
+      "vineyard": [],
+      "source": []
+    }
+  },
+  {
+    "model": "wine.wine",
+    "pk": 9,
+    "fields": {
+      "created": "2025-10-04T06:33:00.000Z",
+      "modified": "2025-10-04T06:33:00.000Z",
+      "user": 1,
+      "name": "Rioja Tempranillo Crianza",
+      "barcode": "",
+      "wine_type": "RE",
+      "category": "DR",
+      "abv": 13.5,
+      "size": 4,
+      "vintage": 2019,
+      "drink_by": "2030-12-01",
+      "comment": "Classic Spanish red with red fruit and vanilla oak.",
+      "rating": 4,
+      "country": "ES",
+      "price": 19.5,
+      "grapes": [
+        9
+      ],
+      "classification": [],
+      "food_pairings": [],
+      "vineyard": [],
+      "source": []
+    }
+  },
+  {
+    "model": "wine.wine",
+    "pk": 10,
+    "fields": {
+      "created": "2025-10-03T06:34:00.000Z",
+      "modified": "2025-10-03T06:34:00.000Z",
+      "user": 1,
+      "name": "Piedmont Moscato d’Asti",
+      "barcode": "",
+      "wine_type": "DE",
+      "category": "MS",
+      "abv": 5.5,
+      "size": 4,
+      "vintage": 2024,
+      "drink_by": "2027-10-05",
+      "comment": "Lightly sparkling dessert wine with floral and peach aromas.",
+      "rating": 4,
+      "country": "IT",
+      "price": 17.0,
+      "grapes": [
+        10
+      ],
+      "classification": [],
+      "food_pairings": [],
+      "vineyard": [],
+      "source": []
+    }
+  },
+  {
+    "model": "wine.wine",
+    "pk": 11,
+    "fields": {
+      "created": "2025-10-03T08:00:00.000Z",
+      "modified": "2025-10-03T08:00:00.000Z",
+      "user": 1,
+      "name": "Champagne Brut",
+      "barcode": "",
+      "wine_type": "SP",
+      "category": "DR",
+      "abv": 12.0,
+      "size": 4,
+      "vintage": 2019,
+      "drink_by": "2030-12-31",
+      "comment": "Elegant sparkling wine with brioche and citrus aromas.",
+      "rating": 5,
+      "country": "FR",
+      "price": 55.0,
+      "grapes": [
+        7
+      ],
+      "classification": [],
+      "food_pairings": [],
+      "vineyard": [],
+      "source": []
+    }
+  },
+  {
+    "model": "wine.wine",
+    "pk": 12,
+    "fields": {
+      "created": "2025-10-02T08:00:00.000Z",
+      "modified": "2025-10-02T08:00:00.000Z",
+      "user": 1,
+      "name": "Vintage Port 20 Years",
+      "barcode": "",
+      "wine_type": "FO",
+      "category": "SW",
+      "abv": 20.0,
+      "size": 4,
+      "vintage": 2005,
+      "drink_by": "2045-01-01",
+      "comment": "Sweet fortified wine with dried fruit, fig, and spice.",
+      "rating": 5,
+      "country": "PT",
+      "price": 65.0,
+      "grapes": [
+        5
+      ],
+      "classification": [],
+      "food_pairings": [],
+      "vineyard": [],
+      "source": []
+    }
+  },
+  {
+    "model": "wine.wine",
+    "pk": 13,
+    "fields": {
+      "created": "2025-09-30T08:00:00.000Z",
+      "modified": "2025-09-30T08:00:00.000Z",
+      "user": 1,
+      "name": "Tokaji Aszú 5 Puttonyos",
+      "barcode": "",
+      "wine_type": "DE",
+      "category": "SW",
+      "abv": 10.0,
+      "size": 4,
+      "vintage": 2017,
+      "drink_by": "2035-01-01",
+      "comment": "Hungarian dessert wine with apricot and honey flavors.",
+      "rating": 5,
+      "country": "HU",
+      "price": 49.0,
+      "grapes": [
+        10
+      ],
+      "classification": [],
+      "food_pairings": [],
+      "vineyard": [],
+      "source": []
+    }
+  },
+  {
+    "model": "wine.wine",
+    "pk": 14,
+    "fields": {
+      "created": "2025-09-28T08:00:00.000Z",
+      "modified": "2025-09-28T08:00:00.000Z",
+      "user": 1,
+      "name": "Rosé d’Anjou",
+      "barcode": "",
+      "wine_type": "RO",
+      "category": "MS",
+      "abv": 10.5,
+      "size": 4,
+      "vintage": 2024,
+      "drink_by": "2027-12-01",
+      "comment": "Lively rosé with soft red fruit and light sweetness.",
+      "rating": 3,
+      "country": "FR",
+      "price": 10.5,
+      "grapes": [
+        3
+      ],
+      "classification": [],
+      "food_pairings": [],
+      "vineyard": [],
+      "source": []
+    }
+  },
+  {
+    "model": "wine.wine",
+    "pk": 15,
+    "fields": {
+      "created": "2025-09-25T08:00:00.000Z",
+      "modified": "2025-09-25T08:00:00.000Z",
+      "user": 1,
+      "name": "Chianti Classico",
+      "barcode": "",
+      "wine_type": "RE",
+      "category": "DR",
+      "abv": 13.0,
+      "size": 4,
+      "vintage": 2020,
+      "drink_by": "2030-01-01",
+      "comment": "Rustic and savory with cherry, herbs, and leather notes.",
+      "rating": 4,
+      "country": "IT",
+      "price": 22.0,
+      "grapes": [
+        9
+      ],
+      "classification": [],
+      "food_pairings": [],
+      "vineyard": [],
+      "source": []
+    }
+  },
+  {
+    "model": "wine.wine",
+    "pk": 16,
+    "fields": {
+      "created": "2025-09-20T08:00:00.000Z",
+      "modified": "2025-09-20T08:00:00.000Z",
+      "user": 1,
+      "name": "Sauternes Château Suduiraut",
+      "barcode": "",
+      "wine_type": "DE",
+      "category": "SW",
+      "abv": 13.5,
+      "size": 4,
+      "vintage": 2016,
+      "drink_by": "2035-12-31",
+      "comment": "Lusciously sweet with honey, apricot, and saffron notes.",
+      "rating": 5,
+      "country": "FR",
+      "price": 85.0,
+      "grapes": [
+        7
+      ],
+      "classification": [],
+      "food_pairings": [],
+      "vineyard": [],
+      "source": []
+    }
+  },
+  {
+    "model": "wine.wine",
+    "pk": 17,
+    "fields": {
+      "created": "2025-09-15T08:00:00.000Z",
+      "modified": "2025-09-15T08:00:00.000Z",
+      "user": 1,
+      "name": "Cava Brut Nature",
+      "barcode": "",
+      "wine_type": "SP",
+      "category": "DR",
+      "abv": 11.5,
+      "size": 4,
+      "vintage": 2022,
+      "drink_by": "2030-01-01",
+      "comment": "Crisp Spanish sparkling with green apple and almond.",
+      "rating": 4,
+      "country": "ES",
+      "price": 14.0,
+      "grapes": [
+        7
+      ],
+      "classification": [],
+      "food_pairings": [],
+      "vineyard": [],
+      "source": []
+    }
+  },
+  {
+    "model": "wine.wine",
+    "pk": 18,
+    "fields": {
+      "created": "2025-09-12T08:00:00.000Z",
+      "modified": "2025-09-12T08:00:00.000Z",
+      "user": 1,
+      "name": "Provence Rosé",
+      "barcode": "",
+      "wine_type": "RO",
+      "category": "SD",
+      "abv": 12.0,
+      "size": 4,
+      "vintage": 2023,
+      "drink_by": "2026-10-08",
+      "comment": "Fresh and fruity with notes of strawberry and herbs.",
+      "rating": 4,
+      "country": "FR",
+      "price": 13.0,
+      "grapes": [
+        3
+      ],
+      "classification": [],
+      "food_pairings": [],
+      "vineyard": [],
+      "source": []
+    }
+  },
+  {
+    "model": "wine.wine",
+    "pk": 19,
+    "fields": {
+      "created": "2025-09-10T08:00:00.000Z",
+      "modified": "2025-09-10T08:00:00.000Z",
+      "user": 1,
+      "name": "Madeira Bual 10 Years",
+      "barcode": "",
+      "wine_type": "FO",
+      "category": "SW",
+      "abv": 19.0,
+      "size": 4,
+      "vintage": 2015,
+      "drink_by": "2050-01-01",
+      "comment": "Fortified wine with caramel, nuts, and dried citrus peel.",
+      "rating": 5,
+      "country": "PT",
+      "price": 48.0,
+      "grapes": [
+        5
+      ],
+      "classification": [],
+      "food_pairings": [],
+      "vineyard": [],
+      "source": []
+    }
+  },
+  {
+    "model": "wine.wine",
+    "pk": 20,
+    "fields": {
+      "created": "2025-09-08T08:00:00.000Z",
+      "modified": "2025-09-08T08:00:00.000Z",
+      "user": 1,
+      "name": "New Zealand Sauvignon Blanc",
+      "barcode": "",
+      "wine_type": "WH",
+      "category": "DR",
+      "abv": 13.0,
+      "size": 4,
+      "vintage": 2024,
+      "drink_by": "2027-01-01",
+      "comment": "Tropical fruit, gooseberry, and grassy freshness.",
+      "rating": 5,
+      "country": "NZ",
+      "price": 16.5,
+      "grapes": [
+        1
+      ],
+      "classification": [],
+      "food_pairings": [],
+      "vineyard": [],
+      "source": []
+    }
+  }
+]
