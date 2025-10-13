@@ -44,17 +44,16 @@
   margin-bottom: 32px;
 }
 
-/* .wine-detail__stock {
-  h2 {
-  margin-bottom: 0px;
-  }
-  margin-bottom: 12px;
-} */
-
-
 .wine-detail__stock-table {
   text-align: left;
   margin: 1rem auto;
   border-collapse: collapse;
   min-width: 100%;
+}
+
+.stock__count {
+  margin-top: 0;
+  margin-bottom: 0;
+  color: var(--text-color-gray);
+  align-self: center;
 }
