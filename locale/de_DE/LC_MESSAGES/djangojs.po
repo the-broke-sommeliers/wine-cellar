@@ -3,6 +3,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -13,35 +14,32 @@ msgstr ""
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=ASCII\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: wine_cellar/static/barcode_scanner.js:31714
 msgid "Advanced"
-msgstr "Advanced"
+msgstr ""
 
 #: wine_cellar/static/barcode_scanner.js:31715
 msgid ""
 "Choose the type of barcode you want to scan, sometimes this can help if "
 "scanning doesn't work."
 msgstr ""
-"Choose the type of barcode you want to scan, sometimes this can help if "
-"scanning doesn't work."
 
 #: wine_cellar/static/barcode_scanner.js:31731
 msgid "All"
-msgstr "All"
+msgstr ""
 
 #: wine_cellar/static/maps.js:50159
 msgctxt "Singular"
 msgid "Country"
-msgstr "Country"
+msgstr ""
 
 #: wine_cellar/static/maps.js:50160
 msgid "Picture of a wine bottle."
-msgstr "Picture of a wine bottle."
+msgstr ""
 
 #: wine_cellar/static/maps.js:50161
 msgid "Vintage"
-msgstr "Vintage"
+msgstr ""
