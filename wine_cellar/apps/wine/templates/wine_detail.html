@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static i18n %}
+{% load static i18n l10n %}
 {% block header %}
     <h1 class="header__title">{{ wine.name }}</h1>
 {% endblock header %}
@@ -51,7 +51,7 @@
                     </tr>
                     <tr>
                         <th>{% translate "ABV" %}</th>
-                        <td>{{ wine.abv }}</td>
+                        <td>{{ wine.abv | localize }}</td>
                     </tr>
                     <tr>
                         <th>{% translate "Size" %}</th>

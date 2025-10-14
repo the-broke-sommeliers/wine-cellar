@@ -189,6 +189,7 @@ class WineBaseForm(TomSelectMixin, WineFormPostCleanMixin, forms.Form):
             " wine. This information is typically found on the label and indicates the"
             " strength of the wine."
         ),
+        localize=True,
     )
     vintage = forms.IntegerField(
         required=False,

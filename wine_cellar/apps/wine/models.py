@@ -1,12 +1,12 @@
 import pycountry
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.humanize.templatetags.humanize import intcomma
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import ImageField
 from django.templatetags.static import static
 from django.urls import reverse
+from django.utils.formats import number_format
 from django.utils.translation import gettext_lazy as _
 
 
@@ -48,7 +48,7 @@ class Size(UserContentModel):
         ]
 
     def __str__(self):
-        return str(self.name)
+        return str(number_format(self.name, use_l10n=True))
 
 
 class Grape(UserContentModel):
@@ -185,10 +185,11 @@ class Wine(UserContentModel):
 
     @property
     def get_price_with_currency(self):
-        return (
-            str(intcomma(self.price))
-            + settings.CURRENCY_SYMBOLS[self.user.user_settings.currency]
+        currency = settings.CURRENCY_SYMBOLS.get(
+            getattr(self.user.user_settings, "currency", "EUR"), "€"
         )
+        formatted_price = number_format(self.price, use_l10n=True)
+        return f"{formatted_price}{currency}"
 
     @property
     def get_food_pairings(self):
