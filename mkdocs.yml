@@ -5,6 +5,8 @@ nav:
   - Development:
     - Setup: setup.md
     - Testing: testing.md
+  - Wine: wine.md
+  - Storage: storage.md
 
 theme:
   name: material
