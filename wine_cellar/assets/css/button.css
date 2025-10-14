@@ -23,6 +23,15 @@
     &:hover {
         background-color: var(--darker-purple);
     }
+
+    &:focus {
+        outline: revert;
+        background-color: var(--darker-purple);
+    }
+
+    &:active {
+        background-color: var(--darkest-purple);
+    }
 }
 
 .button__neutral {
