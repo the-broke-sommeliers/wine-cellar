@@ -105,14 +105,14 @@ class FoodPairing(UserContentModel):
         return self.name
 
 
-class Classification(UserContentModel):
+class Attribute(UserContentModel):
     name = models.CharField(max_length=100)
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
                 fields=["name", "user"],
-                name="unique classification",
+                name="unique attributes",
             )
         ]
 
@@ -142,7 +142,7 @@ class Wine(UserContentModel):
     wine_type = models.CharField(max_length=2, choices=WineType)
     category = models.CharField(max_length=2, choices=Category, null=True)
     grapes = models.ManyToManyField(Grape)
-    classification = models.ManyToManyField(Classification)
+    attributes = models.ManyToManyField(Attribute)
     food_pairings = models.ManyToManyField(FoodPairing)
     abv = models.FloatField(null=True, blank=True)
     size = models.ForeignKey(Size, on_delete=models.SET_NULL, null=True)
@@ -180,10 +180,8 @@ class Wine(UserContentModel):
         return ", ".join([str(s) for s in self.source.all()])
 
     @property
-    def get_classifications(self):
-        return "\n".join(
-            [str(classification) for classification in self.classification.all()]
-        )
+    def get_attributes(self):
+        return "\n".join([str(attribute) for attribute in self.attributes.all()])
 
     @property
     def get_price_with_currency(self):

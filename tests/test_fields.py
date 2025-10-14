@@ -5,7 +5,7 @@ from wine_cellar.apps.wine.fields import OpenMultipleChoiceField
 from wine_cellar.apps.wine.models import Size
 
 
-class TestForm(forms.Form):
+class CustomTestForm(forms.Form):
     required_field = OpenMultipleChoiceField(
         queryset=Size.objects.all(), field_name="name", required=True
     )
@@ -14,53 +14,55 @@ class TestForm(forms.Form):
     )
 
 
-class TestFormSlicedQs(forms.Form):
+class CustomTestFormSlicedQs(forms.Form):
     required_field = OpenMultipleChoiceField(
         queryset=Size.objects.all()[:5], field_name="name", required=True
     )
 
 
-class TestFormType(forms.Form):
+class CustomTestFormType(forms.Form):
     required_field = OpenMultipleChoiceField(
         queryset=Size.objects.all(), field_name="name", required=True, field_class=float
     )
 
 
 def test_open_multiple_choice_required():
-    form = TestForm(data={"required_field": []})
+    form = CustomTestForm(data={"required_field": []})
     assert not form.is_valid()
 
 
 @pytest.mark.django_db
 def test_open_multiple_choice_required_present(size_factory):
     size = size_factory()
-    form = TestForm(data={"required_field": [size.pk]})
+    form = CustomTestForm(data={"required_field": [size.pk]})
     assert form.is_valid()
 
 
 @pytest.mark.django_db
 def test_open_multiple_choice_required_invalid(size_factory):
     size_factory()
-    form = TestFormSlicedQs(data={"required_field": ["a"]})
+    form = CustomTestFormSlicedQs(data={"required_field": ["a"]})
     assert not form.is_valid()
 
 
 @pytest.mark.django_db
 def test_open_multiple_choice_non_required_invalid(size_factory):
     size = size_factory()
-    form = TestForm(data={"required_field": [size.pk], "non_required_field": [""]})
+    form = CustomTestForm(
+        data={"required_field": [size.pk], "non_required_field": [""]}
+    )
     assert form.is_valid()
 
 
 @pytest.mark.django_db
 def test_open_multiple_choice_incompatible_field_class(size_factory):
     size_factory()
-    form = TestFormType(data={"required_field": ["tom_new_optaaa"]})
+    form = CustomTestFormType(data={"required_field": ["tom_new_optaaa"]})
     assert not form.is_valid()
 
 
 @pytest.mark.django_db
 def test_open_multiple_choice_compatible_field_class(size_factory):
     size_factory()
-    form = TestFormType(data={"required_field": ["tom_new_opt1"]})
+    form = CustomTestFormType(data={"required_field": ["tom_new_opt1"]})
     assert form.is_valid()

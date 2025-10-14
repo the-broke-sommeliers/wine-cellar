@@ -32,6 +32,7 @@
                         <legend>
                             <h2 class="form-subhead text--gray">{% translate "Characteristics" %}</h2>
                         </legend>
+                        {% include 'forms/form_field.html' with field=form.attributes %}
                         {% include 'forms/form_field.html' with field=form.grapes %}
                         {% include 'forms/form_field.html' with field=form.vintage %}
                         {% include 'forms/form_field.html' with field=form.abv %}

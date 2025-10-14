@@ -13,8 +13,8 @@ from django.utils.translation import gettext_lazy as _
 from wine_cellar.apps.user.views import get_user_settings
 from wine_cellar.apps.wine.fields import OpenMultipleChoiceField
 from wine_cellar.apps.wine.models import (
+    Attribute,
     Category,
-    Classification,
     FoodPairing,
     Grape,
     Size,
@@ -62,7 +62,7 @@ class WineBaseForm(TomSelectMixin, forms.Form):
         super().__init__(*args, **kwargs)
         user_fields = [
             "vineyard",
-            "classification",
+            "attributes",
             "grapes",
             "food_pairings",
             "source",
@@ -146,15 +146,13 @@ class WineBaseForm(TomSelectMixin, forms.Form):
             "select multiple options if applicable."
         ),
     )
-    classification = OpenMultipleChoiceField(
+    attributes = OpenMultipleChoiceField(
         required=False,
-        queryset=Classification.objects.none(),
+        queryset=Attribute.objects.none(),
         field_name="name",
         help_text=_(
-            "Select or add the classification or designation of the wine, such as "
-            "Vin de Table, Vin de Pays, or Appellation d'Origine Contrôlée ("
-            "AOC). This helps categorize the wine based on its regional or "
-            "quality classification."
+            "Add any attributes that apply to this wine, such as"
+            " natural, retsina or organic."
         ),
     )
     drink_by = DateField(
@@ -233,7 +231,7 @@ class WineForm(WineBaseForm):
         super().__init__(*args, **kwargs)
         self.initial["form_step"] = 0
         self.set_tom_config(name="grapes", create=True)
-        self.set_tom_config(name="classification", create=True)
+        self.set_tom_config(name="attributes", create=True)
         self.set_tom_config(name="food_pairings", create=True)
         self.set_tom_config(name="source", create=True)
         self.set_tom_config(name="vineyard", create=True)
@@ -251,12 +249,12 @@ class WineForm(WineBaseForm):
                     items=[g.pk for g in grapes],
                     clear=False,
                 )
-            classifications = self.cleaned_data.get("classification", [])
-            if classifications:
+            attributes = self.cleaned_data.get("attributes", [])
+            if attributes:
                 self.set_tom_config(
-                    name="classification",
+                    name="attributes",
                     create=True,
-                    items=[c.pk for c in classifications],
+                    items=[a.pk for a in attributes],
                     clear=False,
                 )
             food_pairings = self.cleaned_data.get("food_pairings", [])
@@ -310,7 +308,7 @@ class WineEditForm(WineBaseForm):
 
         category = [initial["category"]]
         grapes = [grape.pk for grape in initial["grapes"]]
-        classification = [c.pk for c in initial["classification"]]
+        attributes = [a.pk for a in initial["attributes"]]
         food_pairing = [f.pk for f in initial["food_pairings"]]
         source = [s.pk for s in initial["source"]]
         vineyard = [v.pk for v in initial["vineyard"]]
@@ -331,10 +329,10 @@ class WineEditForm(WineBaseForm):
                 ),
             }
         )
-        self.fields["classification"].widget.attrs.update(
+        self.fields["attributes"].widget.attrs.update(
             {
                 "data-tom_config": json.dumps(
-                    {"create": True, "items": classification, "maxItems": None}
+                    {"create": True, "items": attributes, "maxItems": None}
                 ),
             }
         )
@@ -400,6 +398,7 @@ class WineFilterForm(TomSelectMixin, forms.Form):
         self.set_tom_config(name="food_pairings", create=False)
         self.set_tom_config(name="source", create=False)
         self.set_tom_config(name="vineyard", create=False)
+        self.set_tom_config(name="attributes", create=False)
         self.set_tom_config(
             name="country", create=False, max_options=-1, placeholder=""
         )

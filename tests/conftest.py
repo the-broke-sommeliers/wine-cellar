@@ -8,7 +8,7 @@ from pytest_factoryboy import register
 from wine_cellar.apps.storage.tests.factories import StorageFactory, StorageItemFactory
 from wine_cellar.apps.user.tests.factories import UserFactory
 from wine_cellar.apps.wine.tests.factories import (
-    ClassificationFactory,
+    AttributeFactory,
     FoodPairingFactory,
     GrapeFactory,
     SizeFactory,
@@ -24,7 +24,7 @@ register(GrapeFactory)
 register(WineImageFactory)
 register(VineyardFactory)
 register(FoodPairingFactory)
-register(ClassificationFactory)
+register(AttributeFactory)
 register(SizeFactory)
 register(SourceFactory)
 register(StorageFactory)
