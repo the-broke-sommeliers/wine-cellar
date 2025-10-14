@@ -28,7 +28,7 @@ jobs:
         with:
           python-version: '3.14'
       - name: Setup Node
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: '22.x'
       - name: Setup Postgres
