@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from wine_cellar.apps.wine.models import (
+    Attribute,
     FoodPairing,
     Grape,
     Size,
@@ -42,5 +43,11 @@ class FoodPairingAdmin(admin.ModelAdmin):
 
 @admin.register(Source)
 class SourceAdmin(admin.ModelAdmin):
+    list_display = ["name", "user"]
+    fields = ["name", "user"]
+
+
+@admin.register(Attribute)
+class AttributeAdmin(admin.ModelAdmin):
     list_display = ["name", "user"]
     fields = ["name", "user"]
