@@ -36,6 +36,7 @@ html {
   text-align: center;
 }
 
+/* not strickly user in header element but here for convenience */
 h2.header__title {
   font-size: var(--font-lg);
 }
@@ -72,4 +73,3 @@ h2.header__title {
     margin-bottom: 0;
   }
 }
-
