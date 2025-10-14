@@ -43,11 +43,6 @@
     min-height: 40px;
   }
 
-  /* needed to ensure inner tomselect input does not default to new line */
-  .ts-control input:not([type='checkbox']) {
-    min-width: revert;
-  }
-
   label {
     margin-bottom: 0px;
     line-height: 0.75rem;
@@ -84,7 +79,15 @@ p.form-hint {
 }
 
 .ts-control {
-  height: 36px;
+  min-height: 36px;
+  flex-wrap: wrap;
+  align-items: flex-start; 
+}
+
+.ts-control input {
+  width: 0 !important ;
+  min-width: 1px;
+  flex: 1 0 auto;
 }
 
 .form-errorlist {
