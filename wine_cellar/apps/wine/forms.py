@@ -56,7 +56,71 @@ class TomSelectMixin:
         )
 
 
-class WineBaseForm(TomSelectMixin, forms.Form):
+class WineFormPostCleanMixin:
+    def _post_clean(self):
+        """Update tom-select config to prevent data loss in the form"""
+        if hasattr(self, "cleaned_data"):
+            grapes = self.cleaned_data.get("grapes", [])
+            if grapes:
+                self.set_tom_config(
+                    name="grapes",
+                    create=True,
+                    items=[g.pk for g in grapes],
+                    clear=False,
+                )
+            attributes = self.cleaned_data.get("attributes", [])
+            if attributes:
+                self.set_tom_config(
+                    name="attributes",
+                    create=True,
+                    items=[a.pk for a in attributes],
+                    clear=False,
+                )
+            food_pairings = self.cleaned_data.get("food_pairings", [])
+            if food_pairings:
+                self.set_tom_config(
+                    name="food_pairings",
+                    create=True,
+                    items=[f.pk for f in food_pairings],
+                    clear=False,
+                )
+            source = self.cleaned_data.get("source", [])
+            if source:
+                self.set_tom_config(
+                    name="source",
+                    create=True,
+                    items=[s.pk for s in source],
+                    clear=False,
+                )
+            vineyard = self.cleaned_data.get("vineyard", [])
+            if vineyard:
+                self.set_tom_config(
+                    name="vineyard",
+                    items=[v.pk for v in vineyard],
+                    create=True,
+                    clear=False,
+                )
+            country = self.cleaned_data.get("country")
+            if country:
+                self.set_tom_config(
+                    name="country",
+                    items=[country],
+                    max_items=1,
+                    max_options=-1,
+                    clear=False,
+                )
+            size = self.cleaned_data.get("size")
+            if size:
+                self.set_tom_config(
+                    name="size",
+                    items=[s.pk for s in size],
+                    max_items=1,
+                    max_options=-1,
+                    clear=False,
+                )
+
+
+class WineBaseForm(TomSelectMixin, WineFormPostCleanMixin, forms.Form):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop("user")
         super().__init__(*args, **kwargs)
@@ -238,68 +302,6 @@ class WineForm(WineBaseForm):
         self.set_tom_config(name="country", max_items=1, max_options=-1)
         self.set_tom_config(name="size", max_items=1, max_options=-1)
 
-    def _post_clean(self):
-        """Update tom-select config to prevent data loss in the form"""
-        if hasattr(self, "cleaned_data"):
-            grapes = self.cleaned_data.get("grapes", [])
-            if grapes:
-                self.set_tom_config(
-                    name="grapes",
-                    create=True,
-                    items=[g.pk for g in grapes],
-                    clear=False,
-                )
-            attributes = self.cleaned_data.get("attributes", [])
-            if attributes:
-                self.set_tom_config(
-                    name="attributes",
-                    create=True,
-                    items=[a.pk for a in attributes],
-                    clear=False,
-                )
-            food_pairings = self.cleaned_data.get("food_pairings", [])
-            if food_pairings:
-                self.set_tom_config(
-                    name="food_pairings",
-                    create=True,
-                    items=[f.pk for f in food_pairings],
-                    clear=False,
-                )
-            source = self.cleaned_data.get("source", [])
-            if source:
-                self.set_tom_config(
-                    name="source",
-                    create=True,
-                    items=[s.pk for s in source],
-                    clear=False,
-                )
-            vineyard = self.cleaned_data.get("vineyard", [])
-            if vineyard:
-                self.set_tom_config(
-                    name="vineyard",
-                    items=[v.pk for v in vineyard],
-                    create=True,
-                    clear=False,
-                )
-            country = self.cleaned_data.get("country")
-            if country:
-                self.set_tom_config(
-                    name="country",
-                    items=[country],
-                    max_items=1,
-                    max_options=-1,
-                    clear=False,
-                )
-            size = self.cleaned_data.get("size")
-            if size:
-                self.set_tom_config(
-                    name="size",
-                    items=[s.pk for s in size],
-                    max_items=1,
-                    max_options=-1,
-                    clear=False,
-                )
-
 
 class WineEditForm(WineBaseForm):
     def __init__(self, *args, **kwargs):
@@ -388,7 +390,7 @@ class WineEditForm(WineBaseForm):
         )
 
 
-class WineFilterForm(TomSelectMixin, forms.Form):
+class WineFilterForm(TomSelectMixin, WineFormPostCleanMixin, forms.Form):
     template_name = "wine_filter_field.html"
 
     def __init__(self, *args, **kwargs):
