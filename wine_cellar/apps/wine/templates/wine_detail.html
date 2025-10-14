@@ -81,10 +81,6 @@
                             <td>{{ wine.get_food_pairings | linebreaksbr }}</td>
                         </tr>
                     {% endif %}
-                    <tr>
-                        <th>{% translate "In Stock" %}</th>
-                        <td>{{ wine.stock }}</td>
-                    </tr>
                     {% if wine.price %}
                         <tr>
                             <th>{% translate "Price" %}</th>
