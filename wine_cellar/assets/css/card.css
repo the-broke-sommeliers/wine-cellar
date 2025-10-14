@@ -1,4 +1,6 @@
-.wine_card__container {
+.wine-card__list {
+  list-style: none;
+  padding: 0;
   display: flex;
   width: 100%;
   align-items: stretch;
@@ -8,46 +10,77 @@
   margin-block-start: 2rem;
 
   @media screen and (min-width: 48em) {
-    margin-block-start: 5rem;    
+    margin-block-start: 5rem;
   }
 }
 
-.wine_card {
+.wine-card {
+  display: flex;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+  position: relative;
   background-color: white;
+  padding: 25px 25px 15px 25px;
   border-radius: 10px;
   width: 100%;
   overflow: hidden;
-
+  transition: box-shadow .18s ease, transform .18s ease;
+  user-select: text; /* allow selecting text */
   box-shadow: var(--container-box-shadow);
+
   p {
     margin: 0;
   }
 
-  a {
-    text-decoration: inherit;
-    color: inherit;
-  }
-
-  @media screen and (min-width: 48em) {
+  @media screen and (min-width: 64em) {
     width: calc(50% - 10px); /* Half of container width minus the gap */
   }
 }
 
-.wine_card__content {
-  padding: 25px 25px 15px 25px;
+.wine-card__link {
+  text-decoration: none;
+  color: inherit;
 }
 
-.wine_card__title {
+.wine-card__link::after {
+content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/* Hover/focus states applied when link or card is interacted */
+.wine-card:hover,
+.wine-card:focus-within {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+/* Underline link on hover/focus for clarity */
+.wine-card__link:hover {
+  text-decoration: underline;
+}
+
+/* Keyboard focus ring */
+.wine-card__link:focus-visible {
+  outline: 3px solid rgba(0,125,255,0.6);
+  outline-offset: 1.5px;
+}
+
+.wine-card__detail_container {
+  margin-inline-start: 12px;
+  width: 50%;
+}
+
+.wine-card__title {
   margin-top: 0px;
   margin-bottom: 10px;
   overflow-wrap: anywhere;
 }
 
-.wine_card__detail_container {
-  margin-inline-start: 12px;
-}
-
-.wine_card__img {
+.wine-card__img {
   max-height: 200px;
   max-width: 100%;
   margin: auto;
@@ -56,7 +89,8 @@
   border-radius: var(--border-radius);
 }
 
-.wine_card__stock {
-  display: flex;
-  justify-content: flex-end;
+.wine-card__stock {
+  min-width: 100%;
+  align-content: end;
+  text-align: end;
 }
