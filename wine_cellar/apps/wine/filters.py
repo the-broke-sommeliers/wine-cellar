@@ -43,6 +43,7 @@ class WineFilter(django_filters.FilterSet):
         fields = [
             "name",
             "wine_type",
+            "attributes",
             "category",
             "vintage",
             "vineyard",
@@ -55,7 +56,13 @@ class WineFilter(django_filters.FilterSet):
 
     def __init__(self, data=None, queryset=None, *, request=None, prefix=None):
         super().__init__(data, queryset, request=request, prefix=prefix)
-        user_filters = ["vineyard", "grapes", "food_pairings", "source"]
+        user_filters = [
+            "vineyard",
+            "grapes",
+            "food_pairings",
+            "source",
+            "attributes",
+        ]
         for user_filter in user_filters:
             self.filters[user_filter].queryset = self.filters[
                 user_filter

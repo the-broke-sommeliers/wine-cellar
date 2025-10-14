@@ -13,3 +13,4 @@ media/
 .env.prod
 .env.prod.db
 *.mo
+autopo.ooo

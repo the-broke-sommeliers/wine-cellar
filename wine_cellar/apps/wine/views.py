@@ -105,6 +105,7 @@ class WineCreateView(FormView):
         rating = cleaned_data["rating"]
         vintage = cleaned_data["vintage"]
         wine_type = cleaned_data["wine_type"]
+        attributes = cleaned_data["attributes"]
         drink_by = cleaned_data["drink_by"]
 
         wine = Wine(
@@ -128,6 +129,7 @@ class WineCreateView(FormView):
         wine.grapes.set(grapes)
         wine.food_pairings.set(food_pairings)
         wine.source.set(source)
+        wine.attributes.set(attributes)
         if image:
             WineImage.objects.get_or_create(image=image, wine=wine, user=user)
 
@@ -174,6 +176,7 @@ class WineUpdateView(FormView):
         vintage = cleaned_data["vintage"]
         drink_by = cleaned_data["drink_by"]
         wine_type = cleaned_data["wine_type"]
+        attributes = cleaned_data["attributes"]
 
         wine.abv = abv
         wine.size = size
@@ -192,6 +195,7 @@ class WineUpdateView(FormView):
         wine.vineyard.set(vineyards)
         wine.grapes.set(grapes)
         wine.food_pairings.set(food_pairings)
+        wine.attributes.set(attributes)
         wine.source.set(source)
 
         if image:

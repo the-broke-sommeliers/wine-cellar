@@ -39,6 +39,12 @@
                         <th>{% translate "Type" %}</th>
                         <td>{{ wine.get_type }}</td>
                     </tr>
+                    {% if wine.get_attributes %}
+                        <tr>
+                            <th>{% translate "Attributes" %}</th>
+                            <td>{{ wine.get_attributes | linebreaksbr }}</td>
+                        </tr>
+                    {% endif %}
                     <tr>
                         <th>{% translate "Category" %}</th>
                         <td>{{ wine.get_category }}</td>
@@ -63,12 +69,6 @@
                         <th>{% translate "Grapes" %}</th>
                         <td>{{ wine.get_grapes | linebreaksbr }}</td>
                     </tr>
-                    {% if wine.get_classifications %}
-                        <tr>
-                            <th>{% translate "Classification" %}</th>
-                            <td>{{ wine.get_classification | linebreaksbr }}</td>
-                        </tr>
-                    {% endif %}
                     {% if wine.get_sources %}
                         <tr>
                             <th>{% translate "Sources" %}</th>

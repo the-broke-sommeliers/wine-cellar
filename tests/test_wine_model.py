@@ -24,8 +24,8 @@ def test_food_pairing_model(food_pairing):
 
 
 @pytest.mark.django_db
-def test_classification_model(classification):
-    assert classification.name == str(classification)
+def test_attribute_model(attribute):
+    assert attribute.name == str(attribute)
 
 
 @pytest.mark.django_db

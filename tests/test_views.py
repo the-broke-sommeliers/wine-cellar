@@ -521,7 +521,7 @@ def test_wine_create_post_all_valid_fields(
     grape_factory,
     food_pairing_factory,
     source_factory,
-    classification_factory,
+    attribute_factory,
     vineyard_factory,
 ):
     grape1 = grape_factory()
@@ -529,7 +529,7 @@ def test_wine_create_post_all_valid_fields(
     food_pairing = food_pairing_factory()
     source = source_factory()
     vineyard = vineyard_factory()
-    classification = classification_factory()
+    attribute = attribute_factory()
     size = Size.objects.get(name=0.75)
     client.force_login(user)
     data = {
@@ -543,7 +543,7 @@ def test_wine_create_post_all_valid_fields(
         "food_pairings": food_pairing.pk,
         "source": source.pk,
         "vineyard": vineyard.pk,
-        "classifications": classification.pk,
+        "attributes": attribute.pk,
         "country": "DE",
     }
     assert not Wine.objects.exists()
@@ -567,6 +567,7 @@ def test_wine_create_post_all_valid_fields(
     assert wine.vineyard.first() == vineyard
     assert wine.source.count() == 1
     assert wine.source.first() == source
+    assert wine.attributes.count() == 1
 
 
 @pytest.mark.django_db
@@ -577,7 +578,7 @@ def test_wine_update_valid_fields(
     grape_factory,
     food_pairing_factory,
     source_factory,
-    classification_factory,
+    attribute_factory,
     vineyard_factory,
 ):
     grape1 = grape_factory()
@@ -585,7 +586,7 @@ def test_wine_update_valid_fields(
     food_pairing = food_pairing_factory()
     source = source_factory()
     vineyard = vineyard_factory()
-    classification = classification_factory()
+    attribute = attribute_factory()
     size = Size.objects.get(name=0.75)
     client.force_login(user)
     data = {
@@ -599,7 +600,7 @@ def test_wine_update_valid_fields(
         "food_pairings": food_pairing.pk,
         "source": source.pk,
         "vineyard": vineyard.pk,
-        "classifications": classification.pk,
+        "attributes": attribute.pk,
         "country": "DE",
     }
     r = client.post(reverse("wine-edit", kwargs={"pk": wine.pk}), data, follow=True)
@@ -623,6 +624,7 @@ def test_wine_update_valid_fields(
     assert changed_wine.vineyard.first() == vineyard
     assert changed_wine.source.count() == 1
     assert changed_wine.source.first() == source
+    assert changed_wine.attributes.count() == 1
 
 
 @pytest.mark.django_db
