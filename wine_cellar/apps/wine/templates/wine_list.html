@@ -60,9 +60,9 @@
             </form>
         </div>
         <div class="pure-u-1 pure-u-sm-15-24 pure-u-md-17-24">
-            <div class="wine_card__container">
+            <ul class="wine-card__list">
                 {% for wine in wines %}
-                    <div class="wine_card">{% include 'wine_card.html' with wine=wine %}</div>
+                    {% include 'wine_card.html' with wine=wine %}
                 {% empty %}
                     <div class="pure-u-1 m-auto">
                         <p>
@@ -70,7 +70,7 @@
                         </p>
                     </div>
                 {% endfor %}
-            </div>
+                </ul>
             {% include "includes/pagination.html" %}
         </div>
     </div>
