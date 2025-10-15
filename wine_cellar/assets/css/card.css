@@ -82,7 +82,7 @@ content: '';
 
 .wine-card__img {
   max-height: 200px;
-  max-width: 100%;
+  max-width: 150px;
   margin: auto;
   display: block;
   object-fit: cover;

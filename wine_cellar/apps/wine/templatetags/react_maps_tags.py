@@ -15,7 +15,7 @@ def wine_to_json(wine: Wine):
         "country": wine.country,
         "country_name": wine.country_name,
         "country_icon": wine.country_icon,
-        "image": wine.image,
+        "image": wine.image_thumbnail,
         "vintage": wine.vintage,
         "url": wine.get_absolute_url(),
     }
