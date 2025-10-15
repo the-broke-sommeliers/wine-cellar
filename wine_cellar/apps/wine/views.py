@@ -1,4 +1,7 @@
+from django.contrib.auth.decorators import login_not_required
+from django.db import connections
 from django.forms import model_to_dict
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import DeleteView, DetailView, FormView, TemplateView
@@ -266,3 +269,10 @@ class WineMapView(TemplateView):
             }
         )
         return context
+
+
+@login_not_required
+def health_check(request):
+    db_ok = all(conn.cursor().execute("SELECT 1") for conn in connections.all())
+    status_code = 200 if db_ok else 503
+    return JsonResponse({"status": "ok" if db_ok else "unhealthy"}, status=status_code)

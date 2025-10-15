@@ -41,6 +41,7 @@ from wine_cellar.apps.wine.views import (
     WineScannedView,
     WineScanView,
     WineUpdateView,
+    health_check,
 )
 
 urlpatterns = [
@@ -63,6 +64,7 @@ urlpatterns = [
     path("wine/scan", WineScanView.as_view(), name="wine-scan"),
     path("wine/scan/<str:code>", WineScannedView.as_view(), name="wine-scan"),
     path("wines/map", WineMapView.as_view(), name="wine-map"),
+    path("health/", health_check, name="health_check"),
     path("", HomePageView.as_view(), name="homepage"),
     path("jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"),
 ]

@@ -8,6 +8,8 @@ handle @files {
 	}
 
 handle {
+	@health path /health
+    respond @health "Not Found" 404
 	reverse_proxy web:8000
 }
 }
