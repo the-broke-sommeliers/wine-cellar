@@ -5,6 +5,59 @@ All notable changes to this project will be documented in this file.
 Since version v0.0.1 the format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.0.11
+
+### Important 
+There was a mistake in the docker-compose file which could potentially have
+caused some issues with the django migrations in v0.0.10. It is recommended to
+backup the postgresql database before updating to this release. This can for
+example be done with:
+
+`docker-compose -f docker-compose.prod.yml exec db /usr/bin/pg_dump -U django django > postgres-backup-2025-10-15.sql`
+
+When running v.0.0.11 for the first time, check the logs and see if the
+migrations are applied without error.
+
+
+### Added
+- **add generic attributes to be able to add tags like natural, organic** 
+- **add a storage system to allow tracking bottles**
+- add sentry/bugsink as an error reporting system
+- add attribute model to admin 
+- add fixtures for grapes, wines and stock 
+- add focus style to secondary button 
+- add some initial ai generated docs for wine and storage 
+- utility: add styling for visually hidden 
+- more storage tests 
+
+## Changed
+- refactor wine card 
+- improve text styling 
+- Separate post_clean code into mixin 
+- Winecard text 
+- auto-format django templates 
+- refactor tests a bit and add some initial tests for the storage model 
+- replace favicon and cleanup assets 
+- update docs 
+
+### Fixed
+- Fix docker setup running migrate concurrently 
+- fix broken translate tag 
+- fix map center of spain 
+- fix renovate.json again 
+- fix some issues with numbers not shown in correct language format 
+- fix some issues with the new wine card 
+- fix typo in stock form queryset 
+- fix wine name search not finding partial matches 
+- wine_cards: fix stock no longer showing 
+- wine_detail: fix text align 
+- don't expose caddy port to the outside
+
+### Removed
+- **removed the docker-compose.prod.full.yml as it doesn't really provide
+anything useful**
+- remove old stock field 
+
 ## v0.0.10
 
 ### Added
