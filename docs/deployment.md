@@ -60,30 +60,6 @@ The easiest way to run Wine Cellar is by using docker as described below.
 
 ---
 
-#### Option 2: Standalone Deployment with Letsencrypt
-
-**Prerequisites:**
-
-- No conflicting web server on ports 80 and 443.
-- Domain name configured in `caddy/Caddyfile`.
-- Secure `.env` files.
-
-#### Steps:
-
-1. Copy and configure environment files:
-   ```sh
-   cp .env.prod.db-sample .env.prod.db
-   cp .env.prod-sample .env.prod
-   ```
-2. Edit `.env` files with secure credentials.
-3. Update `caddy/Caddyfile` by replacing `:80` with your
-   domain.
-4. Start the production container:
-   ```sh
-   docker compose -f docker-compose.prod.full.yml up
-   ```
-
-
 #### Email Setup
 
 Wine Cellar can send notification emails, including reminders for when a wine should be drunk by ("drink by" reminders).
