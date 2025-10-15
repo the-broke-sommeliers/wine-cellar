@@ -3,11 +3,12 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models import ImageField
 from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.formats import number_format
 from django.utils.translation import gettext_lazy as _
+
+from wine_cellar.apps.wine.utils import user_directory_path
 
 
 class UserContentModel(models.Model):
@@ -213,20 +214,20 @@ class Wine(UserContentModel):
         return self.storageitem_set.all()
 
     @property
-    def get_type_image(self):
-        match self.wine_type:
-            case WineType.RED:
-                return static("images/red_glass_no_ice_no_shadow.svg")
-            case WineType.WHITE:
-                return static("images/white_glass.svg")
-            case _:
-                return static("images/white_glass.svg")
-
-    @property
     def image(self):
         i = self.wineimage_set.first()
         if not i:
             return static("images/bottle.svg")
+        return i.image.url
+
+    @property
+    def image_thumbnail(self):
+        i = self.wineimage_set.first()
+        if not i:
+            return static("images/bottle.svg")
+        if i.thumbnail:
+            return i.thumbnail.url
+        # return normal image as fallback
         return i.image.url
 
     @property
@@ -254,12 +255,8 @@ class Wine(UserContentModel):
         ]
 
 
-def user_directory_path(instance, filename):
-    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-    return "user_{0}/{1}".format(instance.user.pk, filename)
-
-
 class WineImage(models.Model):
-    image = ImageField(upload_to=user_directory_path)
+    image = models.ImageField(upload_to=user_directory_path)
+    thumbnail = models.ImageField(upload_to=user_directory_path, blank=True, null=True)
     wine = models.ForeignKey(Wine, on_delete=models.CASCADE)
     user = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True)
