@@ -49,7 +49,7 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 
-SENTRY_DSN = os.getenv("SENTRY_DSN", "")
+SENTRY_DSN = os.environ.get("SENTRY_DSN", "")
 if SENTRY_DSN:
     sentry_sdk.init(
         dsn=SENTRY_DSN,
