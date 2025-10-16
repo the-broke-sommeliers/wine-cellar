@@ -1,7 +1,9 @@
 import os
 
+import sentry_sdk
 from celery.schedules import crontab
 
+from wine_cellar.__init__ import __version__
 from wine_cellar.conf.prod import *  # noqa: F403
 
 DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
@@ -46,3 +48,10 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": crontab(minute="30", hour="2"),
     },
 }
+
+SENTRY_DSN = os.getenv("SENTRY_DSN", "")
+if SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        release="wine-cellar@" + __version__,
+    )
