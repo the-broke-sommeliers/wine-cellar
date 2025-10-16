@@ -30,7 +30,7 @@ services:
     image: caddy:latest
     restart: unless-stopped
     ports:
-      - 8085:80
+      - 127.0.0.1:8085:80
     volumes:
       - ./caddy:/etc/caddy/
       - static_volume:/srv/static
