@@ -53,8 +53,8 @@ class StorageCreateView(FormView):
         location = cleaned_data["location"]
         description = cleaned_data["description"]
         name = cleaned_data["name"]
-        rows = cleaned_data["rows"]
-        columns = cleaned_data["columns"]
+        rows = cleaned_data["rows"] or 0
+        columns = cleaned_data["columns"] or 0
 
         Storage.objects.create(
             location=location,
