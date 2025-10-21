@@ -27,6 +27,7 @@ class WineType(models.TextChoices):
     SPARKLING = "SP", _("Sparkling")
     DESSERT = "DE", _("Dessert")
     FORTIFIED = "FO", _("Fortified")
+    ORANGE = "OR", _("Orange")
 
 
 class Category(models.TextChoices):
