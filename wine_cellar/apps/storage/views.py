@@ -141,26 +141,18 @@ class StorageItemAddView(FormView):
         free_cells_by_storage = {}
         for storage in user_storages:
             if storage.rows == 0:
-                free_cells_by_storage[storage.pk] = {
-                    "free_rows": None,
-                    "free_columns": None,
-                }
+                free_cells_by_storage[storage.pk] = {}
                 continue
             used_cells = set(storage.items.values_list("row", "column"))
             all_rows = range(1, storage.rows + 1)
             all_columns = range(1, storage.columns + 1)
-            free_cells = [
-                (r, c)
-                for r in all_rows
-                for c in all_columns
-                if (r, c) not in used_cells
-            ]
-            free_rows = sorted(set(r for r, _ in free_cells))
-            free_columns = sorted(set(c for _, c in free_cells))
-            free_cells_by_storage[storage.pk] = {
-                "free_rows": free_rows,
-                "free_columns": free_columns,
-            }
+            free_cells_by_storage[storage.pk] = {}
+            for row in all_rows:
+                free = []
+                for column in all_columns:
+                    if (row, column) not in used_cells:
+                        free.append(column)
+                free_cells_by_storage[storage.pk][str(row)] = free
         context["free_cells_by_storage"] = free_cells_by_storage
         return context
 
