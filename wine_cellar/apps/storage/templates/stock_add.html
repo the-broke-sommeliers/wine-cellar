@@ -21,15 +21,15 @@
                   novalidate>
                 {% csrf_token %}
                 {% include 'forms/form_field.html' with field=form.storage %}
+                {% include 'forms/form_field.html' with field=form.row %}
                 <ul id="storage__error-full"
                     class="form-errorlist hidden"
                     aria-live="assertive"
                     aria-atomic="true">
                     <li>
-                        <span>{% translate "This shelf is full. Please choose another one." %}</span>
+                        <span>{% translate "This row of the shelf is full. Please choose another one." %}</span>
                     </li>
                 </ul>
-                {% include 'forms/form_field.html' with field=form.row %}
                 {% include 'forms/form_field.html' with field=form.column %}
                 <div class="pure-controls">
                     <div class="pure-g">
