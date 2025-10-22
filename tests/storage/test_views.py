@@ -255,3 +255,86 @@ def test_user_cant_delete_other_users_stock(
     r = client.post(reverse("stock-delete", kwargs={"pk": item.pk}), follow=True)
     assert r.status_code == HTTPStatus.NOT_FOUND
     assert StorageItem.objects.count() == 1
+
+
+@pytest.mark.django_db
+def test_user_cant_add_to_full_slot(
+    client, user, storage_factory, storage_item_factory, wine_factory
+):
+    storage = storage_factory(user=user, rows=1, columns=1)
+    client.force_login(user)
+    wine = wine_factory(user=user)
+    storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
+    data = {
+        "storage": storage.pk,
+        "row": 1,
+        "column": 1,
+    }
+    r = client.post(
+        reverse("stock-add", kwargs={"pk": wine.pk}), data=data, follow=True
+    )
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["form"].errors
+
+
+@pytest.mark.django_db
+def test_user_can_add_to_specific_slot(client, user, storage_factory, wine_factory):
+    storage = storage_factory(user=user, rows=2, columns=2)
+    client.force_login(user)
+    wine = wine_factory(user=user)
+    data = {
+        "storage": storage.pk,
+        "row": 2,
+        "column": 1,
+    }
+    r = client.post(
+        reverse("stock-add", kwargs={"pk": wine.pk}), data=data, follow=True
+    )
+    assert r.status_code == HTTPStatus.OK
+    assertRedirects(
+        response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
+    )
+    item = storage.items.first()
+    assert item.wine == wine
+    assert item.row == 2
+    assert item.column == 1
+
+
+@pytest.mark.django_db
+def test_user_cant_add_to_invalid_slot(client, user, storage_factory, wine_factory):
+    storage = storage_factory(user=user, rows=2, columns=2)
+    client.force_login(user)
+    wine = wine_factory(user=user)
+    data = {
+        "storage": storage.pk,
+        "row": 3,
+        "column": 1,
+    }
+    r = client.post(
+        reverse("stock-add", kwargs={"pk": wine.pk}), data=data, follow=True
+    )
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["form"].errors
+
+
+@pytest.mark.django_db
+def test_form_context_has_empty_slots(
+    client, user, storage_factory, storage_item_factory, wine_factory
+):
+    storage = storage_factory(user=user, rows=2, columns=2)
+    client.force_login(user)
+    wine = wine_factory(user=user)
+    r = client.get(reverse("stock-add", kwargs={"pk": wine.pk}))
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["free_cells_by_storage"][storage.pk] == {
+        1: [1, 2],
+        2: [1, 2],
+    }
+    storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
+    storage_item_factory(storage=storage, wine=wine, row=2, column=2, user=user)
+    r = client.get(reverse("stock-add", kwargs={"pk": wine.pk}))
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["free_cells_by_storage"][storage.pk] == {
+        1: [2],
+        2: [1],
+    }

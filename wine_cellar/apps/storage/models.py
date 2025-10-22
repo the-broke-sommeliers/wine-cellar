@@ -27,6 +27,9 @@ class Storage(UserContentModel):
     def is_full(self):
         return self.used_slots >= self.total_slots
 
+    def is_slot_occupied(self, row, column):
+        return self.items.filter(row=row, column=column).exists()
+
     @property
     def get_wines(self):
         return self.items.all().order_by("row", "column")
