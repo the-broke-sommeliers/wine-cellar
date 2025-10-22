@@ -208,11 +208,11 @@ class Wine(UserContentModel):
 
     @property
     def total_stock(self):
-        return self.storageitem_set.count()
+        return self.storageitem_set.filter(deleted=False).count()
 
     @property
     def get_stock(self):
-        return self.storageitem_set.all()
+        return self.storageitem_set.filter(deleted=False)
 
     @property
     def image(self):

@@ -233,13 +233,16 @@ def test_user_can_delete_stock(client, user, wine_factory, storage_item_factory)
     storage = Storage.objects.first()
     wine = wine_factory(user=user)
     item = storage_item_factory(storage=storage, wine=wine, user=user)
+    assert item.deleted is False
     assert StorageItem.objects.count() == 1
     r = client.post(reverse("stock-delete", kwargs={"pk": item.pk}), follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(
         response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
     )
-    assert StorageItem.objects.count() == 0
+    assert StorageItem.objects.count() == 1
+    item.refresh_from_db()
+    assert item.deleted is True
 
 
 @pytest.mark.django_db
@@ -251,10 +254,13 @@ def test_user_cant_delete_other_users_stock(
     storage = Storage.objects.filter(user=user2).first()
     wine = wine_factory(user=user2)
     item = storage_item_factory(storage=storage, wine=wine, user=user2)
+    assert item.deleted is False
     assert StorageItem.objects.count() == 1
     r = client.post(reverse("stock-delete", kwargs={"pk": item.pk}), follow=True)
     assert r.status_code == HTTPStatus.NOT_FOUND
     assert StorageItem.objects.count() == 1
+    item.refresh_from_db()
+    assert item.deleted is False
 
 
 @pytest.mark.django_db

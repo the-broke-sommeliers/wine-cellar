@@ -1,5 +1,5 @@
 from django.forms import model_to_dict
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DeleteView, DetailView, FormView, ListView
@@ -143,7 +143,9 @@ class StorageItemAddView(FormView):
             if storage.rows == 0:
                 free_cells_by_storage[storage.pk] = {}
                 continue
-            used_cells = set(storage.items.values_list("row", "column"))
+            used_cells = set(
+                storage.items.filter(deleted=False).values_list("row", "column")
+            )
             all_rows = range(1, storage.rows + 1)
             all_columns = range(1, storage.columns + 1)
             free_cells_by_storage[storage.pk] = {}
@@ -189,4 +191,21 @@ class StorageItemDeleteView(DeleteView):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        return qs.filter(user=self.request.user)
+        return qs.filter(user=self.request.user, deleted=False)
+
+    def form_valid(self, form):
+        self.object = self.get_object()
+        self.object.deleted = True
+        self.object.save(update_fields=["deleted"])
+        return redirect(self.get_success_url())
+
+
+class StorageItemHistoryView(ListView):
+    model = StorageItem
+    template_name = "storage_item_history.html"
+    context_object_name = "storage_items"
+    paginate_by = 10
+
+    def get_queryset(self):
+        qs = super().get_queryset().order_by("-created")
+        return qs.filter(user=self.request.user, deleted=True)
