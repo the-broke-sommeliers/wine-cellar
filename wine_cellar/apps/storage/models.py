@@ -32,7 +32,7 @@ class Storage(UserContentModel):
 
     @property
     def get_wines(self):
-        return self.items.all().order_by("row", "column")
+        return self.items.filter(deleted=False).order_by("row", "column")
 
 
 class StorageItem(UserContentModel):
@@ -40,3 +40,4 @@ class StorageItem(UserContentModel):
     wine = models.ForeignKey(Wine, on_delete=models.CASCADE)
     row = models.PositiveIntegerField(null=True, blank=True)
     column = models.PositiveIntegerField(null=True, blank=True)
+    deleted = models.BooleanField(default=False)
