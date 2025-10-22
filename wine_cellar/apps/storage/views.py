@@ -152,7 +152,7 @@ class StorageItemAddView(FormView):
                 for column in all_columns:
                     if (row, column) not in used_cells:
                         free.append(column)
-                free_cells_by_storage[storage.pk][str(row)] = free
+                free_cells_by_storage[storage.pk][row] = free
         context["free_cells_by_storage"] = free_cells_by_storage
         return context
 
