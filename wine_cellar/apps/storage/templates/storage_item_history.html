@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+{% block header %}
+    <h1 class="header__title">{% translate "Stock History" %}</h1>
+{% endblock header %}
+{% block content %}
+    <div class="storage-list__container">
+        <div class="pure-g">
+            <div class="pure-u-1 pure-u-md-1 text-align-center">
+                {% if storage_items %}
+                    <table class="storage-list__table">
+                        <tr>
+                            <th>{% translate "Wine" %}</th>
+                            <th>{% translate "Location" %}</th>
+                            <th>{% translate "Row" %}</th>
+                            <th>{% translate "Cell" %}</th>
+                            <th>{% translate "Removed" %}</th>
+                            <th></th>
+                        </tr>
+                        {% for item in storage_items %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'wine-detail' item.wine.pk %}">{{ item.wine.name }}</a>
+                                </td>
+                                <td>{{ item.storage.name }}</td>
+                                <td>{{ item.row|default_if_none:"" }}</td>
+                                <td>{{ item.column|default_if_none:"" }}</td>
+                                <td>{{ item.modified | date }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                    {% include "includes/pagination.html" %}
+                {% else %}
+                    <p>{% translate "No wines here yet." %}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock content %}
