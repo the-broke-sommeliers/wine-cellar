@@ -24,3 +24,7 @@ barcode.
 ## Documentations
 
 Find the full documentation [here](https://the-broke-sommeliers.github.io/wine-cellar/)
+
+## Development
+
+This projects uses [Conventinal Commits](https://www.conventionalcommits.org/en/v1.0.0/) for all commit messages.
