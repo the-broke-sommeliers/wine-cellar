@@ -12,3 +12,4 @@ pytest-cov==7.0.0
 pytest-django==4.11.1
 pytest-factoryboy==2.8.1
 pytest==8.4.2
+commitizen==4.9.1

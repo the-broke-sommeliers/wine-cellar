@@ -4,6 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "wine_cellar"
+version = "0.0.12"
 authors = [
     {name = "Julian Dehm", email = "julian@dehm.dev"},
     {name = "Phillippa Morland"},
@@ -35,3 +36,12 @@ python_files = ["test_*.py", "*_test.py"]
 [tool.coverage.run]
 omit = ["wine_cellar/conf/*","**/tests/*", "**/migrations/*"]
 
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+tag_format = "$version"
+version_scheme = "semver2"
+version_provider = "pep621"
+update_changelog_on_bump = true
+major_version_zero = true
+changelog_incremental = true

@@ -1,0 +1,1 @@
+venv/bin/cz check --allow-abort --commit-msg-file $1
