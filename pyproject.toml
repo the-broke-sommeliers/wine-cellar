@@ -40,8 +40,13 @@ omit = ["wine_cellar/conf/*","**/tests/*", "**/migrations/*"]
 [tool.commitizen]
 name = "cz_conventional_commits"
 tag_format = "$version"
+legacy_tag_formats = ["v$version"]
 version_scheme = "semver2"
 version_provider = "pep621"
+version_files = [
+    "wine_cellar/__init__.py:__version__",
+    "pyproject.toml:version",
+]
 update_changelog_on_bump = true
 major_version_zero = true
 changelog_incremental = true
