@@ -1,9 +1,20 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
-
-Since version v0.0.1 the format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## 0.1.0-rc.0 (2025-11-04)
+
+### Feat
+
+- **storage**: add a stock history page which lists removed stock items
+- **wine**: add orange wine to model with migration
+
+### Fix
+
+- **storage**: add more validation and tests for the stock add view
+- **storage**: fix broken stock adding
+- **map**: change boolean value for the popup close button fixes #467
 
 ## v0.0.12
 
