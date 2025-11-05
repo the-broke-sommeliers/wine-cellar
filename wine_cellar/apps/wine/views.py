@@ -19,7 +19,7 @@ class HomePageView(TemplateView):
         context = super().get_context_data(**kwargs)
         wines = Wine.objects.filter(user=self.request.user).count()
         wines_in_stock = (
-            Wine.objects.filter(storageitem__isnull=False)
+            Wine.objects.filter(storageitem__isnull=False, storageitem__deleted=False)
             .filter(user=self.request.user)
             .distinct()
             .count()
