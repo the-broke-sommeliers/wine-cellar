@@ -9,7 +9,6 @@ from pytest_django.asserts import (
     assertTemplateUsed,
 )
 
-from wine_cellar.apps.storage.models import StorageItem
 from wine_cellar.apps.wine.models import Size, Wine
 
 
@@ -664,16 +663,27 @@ def test_wine_scanned_non_existing(
 
 
 @pytest.mark.django_db
-def test_wine_filter_in_stock(client, user, wine_factory):
+def test_wine_filter_in_stock(client, user, wine_factory, storage_item_factory):
+    storage = user.storage_set.first()
     wine_in_stock = wine_factory(user=user, vintage=2020)
+    wine_was_in_stock = wine_factory(user=user, vintage=2019)
     wine_not_in_stock = wine_factory(user=user, vintage=2021)
-    StorageItem.objects.create(storage=user.storage_set.first(), wine=wine_in_stock)
+    storage_item_factory(storage=storage, wine=wine_in_stock)
+    storage_item_factory(
+        storage=storage,
+        wine=wine_was_in_stock,
+        deleted=True,
+    )
     client.force_login(user)
     r = client.get(reverse("wine-list"))
     assert r.status_code == HTTPStatus.OK
     assertTemplateUsed(response=r, template_name="base.html")
     assertTemplateUsed(response=r, template_name="wine_list.html")
-    assert set(r.context_data["wines"]) == {wine_in_stock, wine_not_in_stock}
+    assert set(r.context_data["wines"]) == {
+        wine_in_stock,
+        wine_not_in_stock,
+        wine_was_in_stock,
+    }
     r = client.get(reverse("wine-list") + "?stock=1")
     assert r.status_code == HTTPStatus.OK
     assertTemplateUsed(response=r, template_name="base.html")
