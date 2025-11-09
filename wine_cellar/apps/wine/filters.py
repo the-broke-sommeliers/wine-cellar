@@ -33,7 +33,9 @@ class WineFilter(django_filters.FilterSet):
 
     def filter_stock(self, queryset, name, value):
         if value == "1":
-            return queryset.filter(storageitem__isnull=False).distinct()
+            return queryset.filter(
+                storageitem__isnull=False, storageitem__deleted=False
+            ).distinct()
         else:
             return queryset
 
