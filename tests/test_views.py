@@ -12,12 +12,13 @@ from pytest_django.asserts import (
 from wine_cellar.apps.wine.models import Size, Wine
 
 
+@pytest.mark.django_db
 def test_homepage_unauthenticated(client):
     r = client.get(reverse("homepage"), follow=True)
     assert r.status_code == HTTPStatus.OK
-    assertRedirects(response=r, expected_url=reverse("login") + "?next=/")
+    assertRedirects(response=r, expected_url=reverse("account_login") + "?next=/")
     assertTemplateUsed(response=r, template_name="base.html")
-    assertTemplateUsed(response=r, template_name="registration/login.html")
+    assertTemplateUsed(response=r, template_name="account/login.html")
 
 
 @pytest.mark.django_db
@@ -27,7 +28,7 @@ def test_homepage(client, user):
     assert r.status_code == HTTPStatus.OK
     assertTemplateUsed(response=r, template_name="base.html")
     assertTemplateUsed(response=r, template_name="homepage.html")
-    assertTemplateNotUsed(response=r, template_name="registration/login.html")
+    assertTemplateNotUsed(response=r, template_name="account/login.html")
 
 
 @pytest.mark.django_db
@@ -60,10 +61,11 @@ def test_wine_create_unauthenticated(client, user):
     r = client.get(reverse("wine-add"), follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(
-        response=r, expected_url=reverse("login") + "?next=" + reverse("wine-add")
+        response=r,
+        expected_url=reverse("account_login") + "?next=" + reverse("wine-add"),
     )
     assertTemplateUsed(response=r, template_name="base.html")
-    assertTemplateUsed(response=r, template_name="registration/login.html")
+    assertTemplateUsed(response=r, template_name="account/login.html")
 
 
 @pytest.mark.django_db
@@ -109,10 +111,11 @@ def test_wine_create_post_unauthenticated(client):
     r = client.post(reverse("wine-add"), follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(
-        response=r, expected_url=reverse("login") + "?next=" + reverse("wine-add")
+        response=r,
+        expected_url=reverse("account_login") + "?next=" + reverse("wine-add"),
     )
     assertTemplateUsed(response=r, template_name="base.html")
-    assertTemplateUsed(response=r, template_name="registration/login.html")
+    assertTemplateUsed(response=r, template_name="account/login.html")
     assert not Wine.objects.exists()
 
 

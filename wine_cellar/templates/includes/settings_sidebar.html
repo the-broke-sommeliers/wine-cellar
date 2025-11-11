@@ -1,0 +1,33 @@
+{% load i18n %}
+
+<div class="pure-u-1 pure-u-lg-1-4">
+        <div class="pure-menu pure-menu-vertical settings-sidebar">
+            <ul class="pure-menu-list">
+
+                <li class="pure-menu-item{% if request.resolver_match.url_name == 'user-settings' %} pure-menu-selected{% endif %}">
+                    <a href="{% url 'user-settings' %}" class="pure-menu-link">
+                        {% translate "General Settings" %}
+                    </a>
+                </li>
+
+                <li class="pure-menu-item{% if request.resolver_match.url_name == 'account_email' %} pure-menu-selected{% endif %}">
+                    <a href="{% url 'account_email' %}" class="pure-menu-link">
+                        {% translate "Email Addresses" %}
+                    </a>
+                </li>
+
+                <li class="pure-menu-item{% if request.resolver_match.url_name == 'account_change_password' %} pure-menu-selected{% endif %}">
+                    <a href="{% url 'account_change_password' %}" class="pure-menu-link">
+                        {% translate "Change Password" %}
+                    </a>
+                </li>
+
+                <li class="pure-menu-item{% if request.resolver_match.url_name == 'socialaccount_connections' %} pure-menu-selected{% endif %}">
+                    <a href="{% url 'socialaccount_connections' %}" class="pure-menu-link">
+                        {% translate "Social Accounts" %}
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+

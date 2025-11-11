@@ -46,6 +46,10 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_celery_beat",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.openid_connect",
     "widget_tweaks",
     "wine_cellar.apps.wine",
     "wine_cellar.apps.user",
@@ -63,6 +67,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.LoginRequiredMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = "wine_cellar.conf.urls"
@@ -97,6 +102,11 @@ DATABASES = {
         },
     }
 }
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
 
 
 # Password validation
@@ -169,3 +179,6 @@ MAP_BASEURL = "https://tiles.openfreemap.org/styles/liberty"
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 SITE_URL = "http://127.0.0.1:8003"
+ACCOUNT_ADAPTER = (
+    "wine_cellar.apps.user.signup_adapter.ConfigurableSignupAccountAdapter"
+)

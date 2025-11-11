@@ -104,3 +104,29 @@
         display: none;
     }
 }
+
+.settings-sidebar {
+    margin-top: 2rem;
+    background-color: revert;
+
+    .pure-menu-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .pure-menu-item {
+        padding-right: 24px;
+    }
+
+    .pure-menu-link:hover,
+    .pure-menu-link:focus {
+        background-color: var(--gray-green);
+    }
+
+    .pure-menu-link {
+        font-size: var(--font-md);
+        font-weight: 300;
+        color: var(--text-color-gray);
+    }
+}

@@ -15,10 +15,11 @@ def test_storage_create_page_unauthenticated(client, user):
     r = client.get(reverse("storage-add"), follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(
-        response=r, expected_url=reverse("login") + "?next=" + reverse("storage-add")
+        response=r,
+        expected_url=reverse("account_login") + "?next=" + reverse("storage-add"),
     )
     assertTemplateUsed(response=r, template_name="base.html")
-    assertTemplateUsed(response=r, template_name="registration/login.html")
+    assertTemplateUsed(response=r, template_name="account/login.html")
 
 
 @pytest.mark.django_db
@@ -48,10 +49,11 @@ def test_storage_create_post_unauthenticated(client, user):
     r = client.post(reverse("storage-add"), follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(
-        response=r, expected_url=reverse("login") + "?next=" + reverse("storage-add")
+        response=r,
+        expected_url=reverse("account_login") + "?next=" + reverse("storage-add"),
     )
     assertTemplateUsed(response=r, template_name="base.html")
-    assertTemplateUsed(response=r, template_name="registration/login.html")
+    assertTemplateUsed(response=r, template_name="account/login.html")
     assert Storage.objects.count() == 1
 
 
@@ -163,12 +165,12 @@ def test_unauthenticated_cant_add_stock(client, user, wine_factory):
     assert r.status_code == HTTPStatus.OK
     assertRedirects(
         response=r,
-        expected_url=reverse("login")
+        expected_url=reverse("account_login")
         + "?next="
         + reverse("stock-add", kwargs={"pk": wine.pk}),
     )
     assertTemplateUsed(response=r, template_name="base.html")
-    assertTemplateUsed(response=r, template_name="registration/login.html")
+    assertTemplateUsed(response=r, template_name="account/login.html")
 
 
 @pytest.mark.django_db
