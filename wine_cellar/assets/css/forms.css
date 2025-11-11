@@ -5,15 +5,19 @@
 .login-container {
   margin: 0 auto;
   padding: 20px;
-  background-color: var(--light);
-  box-shadow: var(--container-box-shadow);
 
-  .pure-form input[type='text'],
-  .pure-form input[type='password'] {
+}
+
+.pure-form input:not([type="radio"]) {
+    display: block;
+}
+.pure-form input[type='text'],
+.pure-form input[type='email'],
+.pure-form input[type='password'] {
     width: 100%;
     margin-bottom: 10px;
+    max-width: 400px;
   }
-}
 
 .login__error-list {
   ul {
@@ -68,10 +72,15 @@
   margin-bottom: 1rem;
 }
 
+div.form-hint,
 p.form-hint {
   font-style: italic;
   color: var(--text-color-gray);
   margin: 0.25rem 0;
+  ul {
+    padding: 0;
+    list-style: none;
+  }
 }
 
 .ts-wrapper {

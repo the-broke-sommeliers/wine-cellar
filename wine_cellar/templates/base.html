@@ -61,14 +61,14 @@
                                         <a href="{% url 'user-settings' %}" class="pure-menu-link">{% translate "Settings" %}</a>
                                     </li>
                                     <li class="pure-menu-item">
-                                        <form action="{% url 'logout' %}" method="post">
+                                        <form action="{% url 'account_logout' %}" method="post">
                                             {% csrf_token %}
                                             <button class="pure-menu-link button" type="submit">{% translate "Logout" %}</button>
                                         </form>
                                     </li>
                                 {% else %}
                                     <li class="pure-menu-item">
-                                        <a href="{% url 'login' %}" class="pure-menu-link">{% translate "Login" %}</a>
+                                        <a href="{% url 'account_login' %}" class="pure-menu-link">{% translate "Login" %}</a>
                                     </li>
                                 {% endif %}
                             </ul>
@@ -99,14 +99,14 @@
                                         <a href="{% url 'user-settings' %}" class="pure-menu-link">{% translate "Settings" %}</a>
                                     </li>
                                     <li class="pure-menu-item">
-                                        <form action="{% url 'logout' %}" method="post">
+                                        <form action="{% url 'account_logout' %}" method="post">
                                             {% csrf_token %}
                                             <button class="pure-menu-link button" type="submit">{% translate "Logout" %}</button>
                                         </form>
                                     </li>
                                 {% else %}
                                     <li class="pure-menu-item">
-                                        <a href="{% url 'login' %}" class="pure-menu-link">{% translate "Login" %}</a>
+                                        <a href="{% url 'account_login' %}" class="pure-menu-link">{% translate "Login" %}</a>
                                     </li>
                                 {% endif %}
                             </ul>
@@ -119,8 +119,10 @@
             {% block header %}
                 <h1 class="brand-title">Django Wine Cellar</h1>
             {% endblock header %}
-            {% block content %}
-            {% endblock content %}
+	    {% block allauth_wrapper %}
+		    {% block content %}
+		    {% endblock content %}
+	    {% endblock allauth_wrapper %}
         </main>
         <footer class="footer">
             <p>

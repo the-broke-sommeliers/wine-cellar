@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 import pytest
+from django.test import override_settings
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects, assertTemplateUsed
 
@@ -37,3 +38,20 @@ def test_user_settings_page(client, user):
     assert user_settings.language == "en-gb"
     assert user_settings.currency == "EUR"
     assert not user_settings.notifications
+
+
+@pytest.mark.django_db
+def test_user_signup_disabled(client, user):
+    r = client.get(reverse("account_signup"))
+    assert r.status_code == HTTPStatus.OK
+    assertTemplateUsed(response=r, template_name="base.html")
+    assertTemplateUsed(response=r, template_name="account/signup_closed.html")
+
+
+@override_settings(ENABLE_SIGNUPS=True)
+@pytest.mark.django_db
+def test_user_signup_enabled(client, user):
+    r = client.get(reverse("account_signup"))
+    assert r.status_code == HTTPStatus.OK
+    assertTemplateUsed(response=r, template_name="base.html")
+    assertTemplateUsed(response=r, template_name="account/signup.html")

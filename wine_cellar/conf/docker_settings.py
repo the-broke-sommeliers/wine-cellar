@@ -27,6 +27,8 @@ STATIC_ROOT = "staticfiles"
 
 SITE_URL = os.environ.get("DJANGO_SITE_URL")
 
+ENABLE_SIGNUPS = os.environ.get("DJANGO_ENABLE_SIGNUPS", False)
+
 EMAIL_HOST = os.environ.get("DJANGO_EMAIL_HOST")
 EMAIL_PORT = os.environ.get("DJANGO_EMAIL_PORT")
 EMAIL_HOST_USER = os.environ.get("DJANGO_EMAIL_USER")
