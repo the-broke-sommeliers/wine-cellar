@@ -31,7 +31,7 @@
     "@babel/preset-env": "7.28.5",
     "@babel/preset-react": "7.28.5",
     "@types/react": "19.2.3",
-    "@types/react-dom": "19.2.2",
+    "@types/react-dom": "19.2.3",
     "autoprefixer": "10.4.22",
     "babel-loader": "10.0.0",
     "copy-webpack-plugin": "13.0.1",
