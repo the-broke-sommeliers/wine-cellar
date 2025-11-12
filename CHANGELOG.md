@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.1.0 (2025-11-12)
+
+### Fix
+
+- **filters**: don't show wines with only deleted stock items
+- **deps**: update dependency barcode-detector to v3.0.7
+- **stats**: don't count removed bottles
+
 ## 0.1.0-rc.0 (2025-11-04)
 
 ### Feat
