@@ -2,5 +2,5 @@
 
 psycopg[c]==3.2.12
 gunicorn==23.0.0
-redis==7.0.1
+redis==7.1.0
 sentry-sdk==2.45.0
