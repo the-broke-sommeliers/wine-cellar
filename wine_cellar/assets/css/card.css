@@ -71,7 +71,13 @@ content: '';
 
 .wine-card__detail_container {
   margin-inline-start: 12px;
-  width: 50%;
+  flex: 1;
+  min-width: 120px;
+
+  @media (max-width: 353px) {
+    margin-top: 24px;
+  }
+
 }
 
 .wine-card__title {
