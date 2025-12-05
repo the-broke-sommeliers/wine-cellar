@@ -1,6 +1,7 @@
 import TomSelect from 'tom-select'
+import { TomSettings } from 'tom-select/dist/esm/types/settings.js';
+import { RecursivePartial, TomCreateCallback} from 'tom-select/dist/esm/types/core.js';
 
-import { RecursivePartial, TomCreateCallback, TomSettings } from 'tom-select/dist/types/types'
 
 function initTomSelect (): void {
   document.querySelectorAll('select').forEach((el) => {

@@ -3,6 +3,7 @@
 {% block extra_js %}
     {{ block.super }}
     <script src="{% static 'tom_select.js' %}" type="module" defer></script>
+    <script src="{% static 'image_preview.js' %}" type="module" defer></script>
 {% endblock extra_js %}
 {% block title %}
     Create/Edit Wine
@@ -61,7 +62,10 @@
                         <legend>
                             <h2 class="form-subhead text--gray">{% translate "Image" %}</h2>
                         </legend>
-                        {% include 'forms/form_field.html' with field=form.image %}
+                        {% include 'forms/form_field.html' with field=form.image_front %}
+                        {% include 'forms/form_field.html' with field=form.image_back %}
+                        {% include 'forms/form_field.html' with field=form.image_front_label %}
+                        {% include 'forms/form_field.html' with field=form.image_back_label %}
                     </fieldset>
                     {{ form.form_step }}
                     <div class="pure-controls">

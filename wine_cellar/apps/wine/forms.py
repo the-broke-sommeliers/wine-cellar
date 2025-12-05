@@ -17,11 +17,21 @@ from wine_cellar.apps.wine.models import (
     Category,
     FoodPairing,
     Grape,
+    ImageType,
     Size,
     Source,
     Vineyard,
+    WineImage,
     WineType,
 )
+from wine_cellar.apps.wine.widgets import NoFilenameClearableFileInput
+
+image_fields_map = {
+    "image_front": ImageType.FRONT,
+    "image_back": ImageType.BACK,
+    "image_front_label": ImageType.LABEL_FRONT,
+    "image_back_label": ImageType.LABEL_BACK,
+}
 
 
 class TomSelectMixin:
@@ -141,6 +151,26 @@ class WineBaseForm(TomSelectMixin, WineFormPostCleanMixin, forms.Form):
         self.fields["price"].help_text = _(
             "Enter the price of the bottle in %(currency)s."
         ) % {"currency": settings.CURRENCY_SYMBOLS[user_settings.currency]}
+
+        for field_name, image_type_code in image_fields_map.items():
+            field = self.fields.get(field_name)
+            if not field:
+                continue
+            if getattr(self, "initial", None):
+                wine_id = self.initial.get("id")
+                if wine_id:
+                    image_obj = (
+                        WineImage.objects.filter(
+                            wine=wine_id, image_type=image_type_code
+                        )
+                        .order_by("-id")
+                        .first()
+                    )
+                    if image_obj:
+                        self.initial[field_name] = image_obj.thumbnail
+                        self.fields[field_name].widget.attrs[
+                            "data-existing-url"
+                        ] = image_obj.thumbnail.url
 
     class Meta:
         abstract = True
@@ -273,16 +303,29 @@ class WineBaseForm(TomSelectMixin, WineFormPostCleanMixin, forms.Form):
         validators=[MinValueValidator(0), MaxValueValidator(10)],
         help_text=_("Rate this wine on a scale from 0 to 10."),
     )
-    image = ImageField(
+    image_front = ImageField(
+        widget=NoFilenameClearableFileInput,
         required=False,
-        help_text=_(
-            "Upload a photo of the wine bottle or label. Adding an image helps visually"
-            " identify the wine in your collection."
-        ),
+        help_text=_("Upload a photo of the front of the wine bottle."),
     )
-
+    image_back = ImageField(
+        widget=NoFilenameClearableFileInput,
+        required=False,
+        help_text=_("Upload a photo of the back of the wine bottle."),
+    )
+    image_front_label = ImageField(
+        widget=NoFilenameClearableFileInput,
+        required=False,
+        help_text=_("Upload a photo of the front of the bottle label."),
+    )
+    image_back_label = ImageField(
+        widget=NoFilenameClearableFileInput,
+        required=False,
+        help_text=_("Upload a photo of the back of the bottle label."),
+    )
     form_step = forms.IntegerField(
         widget=forms.HiddenInput(),
+        label="",
         required=False,
         validators=[
             validators.MinValueValidator(0),

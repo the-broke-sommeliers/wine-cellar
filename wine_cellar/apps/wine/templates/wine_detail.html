@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 {% load static i18n l10n %}
+{% block extra_js %}
+    {{ block.super }}
+    <script src="{% static 'wine_carousel.js' %}" type="module" defer></script>
+{% endblock extra_js %}
 {% block header %}
     <h1 class="header__title">{{ wine.name }}</h1>
 {% endblock header %}
@@ -12,12 +16,35 @@
                 {% include "includes/edit_delete_buttons.html" with edit_url=edit_url delete_url=delete_url %}
             </div>
             <div class="pure-u-1 pure-u-md-1-2">
-                {% if wine.image %}
-                    <div class="image wine-detail__image">
-                        <img src="{{ wine.image_thumbnail }}"
-                             height="225"
-                             width="auto"
-                             alt="{% translate 'Picture of a wine bottle' %}">
+                {% if wine.image_thumbnail %}
+                    <div class="wine-detail__image-wrapper">
+                        <div class="image wine-detail__image"
+                             id="wine-image-wrapper"
+                             data-images='[{% for img in wine.image_thumbnails %}"{{ img }}"{% if not forloop.last %},{% endif %}{% endfor %}]'>
+                            <img id="wine-image"
+                                 src="{{ wine.image_thumbnail }}"
+                                 height="225"
+                                 width="auto"
+                                 alt="{% translate 'Picture of a wine bottle' %}">
+                        </div>
+                        {% if wine.image_thumbnails %}
+                            <div class="image-controls"
+                                 role="group"
+                                 aria-label="{% translate "Image carousel controls" %}">
+                                <button type="button"
+                                        class="wine-prev"
+                                        aria-label="{% translate "Previous image" %}"
+                                        title="{% translate "Previous image" %}">
+                                    <i class="fa-solid fa-left-long" aria-hidden="true"></i>
+                                </button>
+                                <button type="button"
+                                        class="wine-next"
+                                        aria-label="{% translate "Next image" %}"
+                                        title="{% translate "Next image" %}">
+                                    <i class="fa-solid fa-right-long" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        {% endif %}
                     </div>
                 {% else %}
                     <div>{% translate "No image" %}</div>

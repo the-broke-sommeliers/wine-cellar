@@ -3,6 +3,7 @@
 {% block extra_js %}
     {{ block.super }}
     <script src="{% static 'tom_select.js' %}" type="module" defer></script>
+    <script src="{% static 'image_preview.js' %}" type="module" defer></script>
 {% endblock extra_js %}
 {% block title %}
     Create/Edit Wine
@@ -20,9 +21,7 @@
                 {% csrf_token %}
                 <fieldset>
                     {% for field in form %}
-                        {% if field.name != "form_step" %}
-                            {% include 'forms/form_field.html' %}
-                        {% endif %}
+                        {% include 'forms/form_field.html' %}
                     {% endfor %}
                     <div class="pure-controls">
                         <button type="submit" class="pure-button button__primary">{% translate "Save" %}</button>

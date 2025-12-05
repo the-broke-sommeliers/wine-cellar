@@ -8,7 +8,7 @@ from django.views.generic import DeleteView, DetailView, FormView, TemplateView
 from django_filters.views import FilterView
 
 from wine_cellar.apps.wine.filters import WineFilter
-from wine_cellar.apps.wine.forms import WineEditForm, WineForm
+from wine_cellar.apps.wine.forms import WineEditForm, WineForm, image_fields_map
 from wine_cellar.apps.wine.models import Wine, WineImage
 
 
@@ -103,7 +103,6 @@ class WineCreateView(FormView):
         price = cleaned_data["price"]
         vineyards = cleaned_data["vineyard"]
         grapes = cleaned_data["grapes"]
-        image = cleaned_data["image"]
         name = cleaned_data["name"]
         rating = cleaned_data["rating"]
         vintage = cleaned_data["vintage"]
@@ -133,8 +132,13 @@ class WineCreateView(FormView):
         wine.food_pairings.set(food_pairings)
         wine.source.set(source)
         wine.attributes.set(attributes)
-        if image:
-            WineImage.objects.get_or_create(image=image, wine=wine, user=user)
+
+        for form_field, image_type in image_fields_map.items():
+            image = cleaned_data.get(form_field)
+            if image:
+                WineImage.objects.get_or_create(
+                    image=image, wine=wine, user=user, image_type=image_type
+                )
 
 
 class WineUpdateView(FormView):
@@ -173,7 +177,6 @@ class WineUpdateView(FormView):
         price = cleaned_data["price"]
         vineyards = cleaned_data["vineyard"]
         grapes = cleaned_data["grapes"]
-        image = cleaned_data["image"]
         name = cleaned_data["name"]
         rating = cleaned_data["rating"]
         vintage = cleaned_data["vintage"]
@@ -201,12 +204,19 @@ class WineUpdateView(FormView):
         wine.attributes.set(attributes)
         wine.source.set(source)
 
-        if image:
-            existing_image = WineImage.objects.filter(wine=wine, user=user)
-            if existing_image.exists():
-                existing_image.first().image.delete()
-                existing_image.delete()
-            WineImage.objects.get_or_create(image=image, wine=wine, user=user)
+        for form_field, image_type in image_fields_map.items():
+            image = cleaned_data.get(form_field)
+            existing_image = WineImage.objects.filter(
+                wine=wine, user=user, image_type=image_type
+            )
+            if image is False or not hasattr(image, "instance"):
+                if existing_image.exists():
+                    existing_image.first().image.delete()
+                    existing_image.delete()
+            if image and not hasattr(image, "instance"):
+                WineImage.objects.get_or_create(
+                    image=image, wine=wine, user=user, image_type=image_type
+                )
 
 
 class WineDetailView(DetailView):
