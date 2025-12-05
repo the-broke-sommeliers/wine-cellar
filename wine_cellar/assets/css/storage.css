@@ -3,14 +3,17 @@
   margin: auto;
   border-collapse: collapse;
   th:first-child {
-  min-width: 8px;
+    min-width: 8px;
   }
-  tr:nth-child(even){background-color: #f2f2f2;}
+  tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
 
   th {
     background-color: var(--gray-green);
   }
-  th, td {
+  th,
+  td {
     padding: 4px 12px 4px 12px;
   }
   tr {
@@ -18,7 +21,7 @@
   }
 }
 
-.storage-list__menu { 
+.storage-list__menu {
   margin-bottom: 32px;
 }
 
