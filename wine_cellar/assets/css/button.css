@@ -1,67 +1,67 @@
 .button__primary {
-    background-color: var(--dark-green);
-    color: var(--light);
+  background-color: var(--dark-green);
+  color: var(--light);
 
-    &:hover {
-        background-color: var(--darker-green);
-    }
+  &:hover {
+    background-color: var(--darker-green);
+  }
 
-    &:focus {
-        outline: revert;
-        background-color: var(--darker-green);
-    }
+  &:focus {
+    outline: revert;
+    background-color: var(--darker-green);
+  }
 
-    &:active {
-        background-color: var(--darkest-green);
-    }
+  &:active {
+    background-color: var(--darkest-green);
+  }
 }
 
 .button__secondary {
-    background-color: var(--dark-purple);
-    color: var(--light);
+  background-color: var(--dark-purple);
+  color: var(--light);
 
-    &:hover {
-        background-color: var(--darker-purple);
-    }
+  &:hover {
+    background-color: var(--darker-purple);
+  }
 
-    &:focus {
-        outline: revert;
-        background-color: var(--darker-purple);
-    }
+  &:focus {
+    outline: revert;
+    background-color: var(--darker-purple);
+  }
 
-    &:active {
-        background-color: var(--darkest-purple);
-    }
+  &:active {
+    background-color: var(--darkest-purple);
+  }
 }
 
 .button__neutral {
-    color: black;
+  color: black;
+  background-color: var(--gray-green);
+  text-decoration: none;
+  border-radius: 6px;
+
+  &:hover {
     background-color: var(--gray-green);
-    text-decoration: none;
-    border-radius: 6px;
+  }
 
-    &:hover {
-        background-color: var(--gray-green);
-    }
+  &:focus {
+    outline: revert;
+    background-color: var(--darker-green);
+  }
 
-    &:focus {
-        outline: revert;
-        background-color: var(--darker-green);
-    }
-
-    &:active {
-        background-color: var(--darkest-green);
-    }
+  &:active {
+    background-color: var(--darkest-green);
+  }
 }
 
 .ts-control:focus-within,
-.pure-control-group > input[type="number"]:focus,
-.pure-control-group > input[type="text"]:focus {
-    border: 2px solid #3584E4 !important; /* Blue glow effect */
+.pure-control-group > input[type='number']:focus,
+.pure-control-group > input[type='text']:focus {
+  border: 2px solid #3584e4 !important; /* Blue glow effect */
 }
 
 .wine__edit-delete-buttons {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 36px;
+  display: flex;
+  gap: 6px;
+  margin-bottom: 36px;
 }

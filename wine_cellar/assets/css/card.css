@@ -24,7 +24,9 @@
   border-radius: 10px;
   width: 100%;
   overflow: hidden;
-  transition: box-shadow .18s ease, transform .18s ease;
+  transition:
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
   user-select: text; /* allow selecting text */
   box-shadow: var(--container-box-shadow);
 
@@ -43,7 +45,7 @@
 }
 
 .wine-card__link::after {
-content: '';
+  content: '';
   position: absolute;
   left: 0;
   top: 0;
@@ -55,7 +57,7 @@ content: '';
 .wine-card:hover,
 .wine-card:focus-within {
   transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 }
 
 /* Underline link on hover/focus for clarity */
@@ -65,7 +67,7 @@ content: '';
 
 /* Keyboard focus ring */
 .wine-card__link:focus-visible {
-  outline: 3px solid rgba(0,125,255,0.6);
+  outline: 3px solid rgba(0, 125, 255, 0.6);
   outline-offset: 1.5px;
 }
 

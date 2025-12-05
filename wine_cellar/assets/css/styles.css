@@ -3,35 +3,37 @@
 @import url('forms.css');
 
 :root {
-    --darkest-green: #07330d;
-    --darker-green: #2e5f34;
-    --dark-green: #408048;
-    --dark-purple: #4d1445;
-    --darker-purple: #2c0527;
-    --darkest-purple: #23021f;
-    --gray-green: rgba(64, 128, 72, 0.21);
-    --red: #bb0000;
-    --light: #f6f5ef;
-    --text-color-gray: #525252;
-    --darker-gray:#333333;
-    --font-xs: 0.8rem;
-    --font-sm: 1rem;
-    --font-md: 1.25rem;
-    --font-lg: 1.75rem;
-    --font-xl: 2rem;
-    --border-radius: 10px;
-    --container-box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  --darkest-green: #07330d;
+  --darker-green: #2e5f34;
+  --dark-green: #408048;
+  --dark-purple: #4d1445;
+  --darker-purple: #2c0527;
+  --darkest-purple: #23021f;
+  --gray-green: rgba(64, 128, 72, 0.21);
+  --red: #bb0000;
+  --light: #f6f5ef;
+  --text-color-gray: #525252;
+  --darker-gray: #333333;
+  --font-xs: 0.8rem;
+  --font-sm: 1rem;
+  --font-md: 1.25rem;
+  --font-lg: 1.75rem;
+  --font-xl: 2rem;
+  --border-radius: 10px;
+  --container-box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
 
 .pure-table {
-    border: none;
+  border: none;
 
-    thead {
-        background-color: var(--gray-green);
-    }
+  thead {
+    background-color: var(--gray-green);
+  }
 }
 
-h1, h2, h3 {
-    font-weight: 300;
-    line-height: 1.2em;
+h1,
+h2,
+h3 {
+  font-weight: 300;
+  line-height: 1.2em;
 }

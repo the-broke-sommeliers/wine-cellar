@@ -26,7 +26,7 @@ html {
   max-width: 1140px;
   padding: 0 2rem 4rem 2rem;
   margin: 0 auto;
- }
+}
 
 .header__title {
   font-size: var(--font-xl);

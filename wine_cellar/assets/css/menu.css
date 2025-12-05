@@ -1,11 +1,11 @@
 .pure-menu,
 .pure-menu-heading {
-    background-color: var(--dark-green);
+  background-color: var(--dark-green);
 }
 
 .pure-menu-link {
-    color: white;
-    padding: 1em 0.7em;
+  color: white;
+  padding: 1em 0.7em;
 }
 
 .pure-menu a:hover,
@@ -14,119 +14,119 @@
 .pure-menu .button:hover,
 .pure-menu .button:focus,
 .pure-menu .button:focus-visible {
-    background: var(--darker-green);
+  background: var(--darker-green);
 }
 
 /* remove styling for logout */
 .pure-menu .button {
-    background: none;
-    border: none;
+  background: none;
+  border: none;
 }
 
 .menu__container {
-    max-width: 1140px;
-    margin: 0 auto;
+  max-width: 1140px;
+  margin: 0 auto;
 }
 
 /* responsive styling for large and small menus */
 .menu__md {
-    display: none;
+  display: none;
 }
 
 .menu__sm {
-    padding-bottom: 50px;
+  padding-bottom: 50px;
 }
 
 .menu__sm .pure-menu {
-    margin-left: -200px;
-    width: 200px;
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    z-index: 1000; /* so the menu or its navicon stays above all content */
-    background-color: var(--dark-green);
-    overflow-y: auto;
+  margin-left: -200px;
+  width: 200px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 1000; /* so the menu or its navicon stays above all content */
+  background-color: var(--dark-green);
+  overflow-y: auto;
 }
 
 .menu__sm .menu-link {
-    position: fixed;
-    display: block;
-    top: 10px;
-    left: 0;
-    background: var(--dark-green);
-    font-size: 40px;
-    z-index: 10;
-    padding: 0.1em 0.4em;
+  position: fixed;
+  display: block;
+  top: 10px;
+  left: 0;
+  background: var(--dark-green);
+  font-size: 40px;
+  z-index: 10;
+  padding: 0.1em 0.4em;
 
-    span:before {
-        content: '\2261';
-        color: var(--light);
-    }
+  span:before {
+    content: '\2261';
+    color: var(--light);
+  }
 }
 
 .menu__sm .pure-menu-heading {
-    text-align: center;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 5;
+  text-align: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 5;
 }
 
 .menu-toggle {
-    position: absolute;
-    top: 0;
-    left: 0;
-    opacity: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
 }
 
 .menu-toggle:checked ~ .menu-link {
-    background: var(--dark-green);
-    position: fixed;
-    width: fit-content;
-    left: 140px;
-    z-index: 1001;
-    span:before {
-        content: '\00d7';
-    }
+  background: var(--dark-green);
+  position: fixed;
+  width: fit-content;
+  left: 140px;
+  z-index: 1001;
+  span:before {
+    content: '\00d7';
+  }
 }
 
 .menu-toggle:checked ~ .pure-menu {
-    margin-left: 0;
+  margin-left: 0;
 }
 
 @media screen and (min-width: 35.5em) {
-    .menu__md {
-        display: block;
-    }
-    .menu__sm {
-        display: none;
-    }
+  .menu__md {
+    display: block;
+  }
+  .menu__sm {
+    display: none;
+  }
 }
 
 .settings-sidebar {
-    margin-top: 2rem;
-    background-color: revert;
+  margin-top: 2rem;
+  background-color: revert;
 
-    .pure-menu-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
+  .pure-menu-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
 
-    .pure-menu-item {
-        padding-right: 24px;
-    }
+  .pure-menu-item {
+    padding-right: 24px;
+  }
 
-    .pure-menu-link:hover,
-    .pure-menu-link:focus {
-        background-color: var(--gray-green);
-    }
+  .pure-menu-link:hover,
+  .pure-menu-link:focus {
+    background-color: var(--gray-green);
+  }
 
-    .pure-menu-link {
-        font-size: var(--font-md);
-        font-weight: 300;
-        color: var(--text-color-gray);
-    }
+  .pure-menu-link {
+    font-size: var(--font-md);
+    font-weight: 300;
+    color: var(--text-color-gray);
+  }
 }
