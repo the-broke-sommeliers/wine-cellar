@@ -119,14 +119,15 @@
             {% block header %}
                 <h1 class="brand-title">Django Wine Cellar</h1>
             {% endblock header %}
-	    {% block allauth_wrapper %}
-		    {% block content %}
-		    {% endblock content %}
-	    {% endblock allauth_wrapper %}
+            {% block allauth_wrapper %}
+                {% block content %}
+                {% endblock content %}
+            {% endblock allauth_wrapper %}
         </main>
         <footer class="footer">
             <p>
-                AGPL 3.0 | {% translate "Version" %} {% get_setting "VERSION" %} | <a href="https://github.com/the-broke-sommeliers/wine-cellar" target="_blank">Github <span class="visually-hidden">(opens in new tab)</span></a>
+                AGPL 3.0 | {% translate "Version" %} {% get_setting "VERSION" %} | <a href="https://github.com/the-broke-sommeliers/wine-cellar"
+    target="_blank">Github <span class="visually-hidden">(opens in new tab)</span></a>
             </p>
         </footer>
     </body>

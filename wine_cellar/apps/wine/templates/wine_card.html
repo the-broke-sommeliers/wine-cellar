@@ -1,11 +1,11 @@
 {% load static i18n %}
 <li class="wine-card">
     <img src="{{ wine.image_thumbnail }}"
-        class="wine-card__img"
-        height="200"
-        width="auto"
-        loading="lazy"
-        alt="Image of a glass of {{ wine.get_type }} wine">
+         class="wine-card__img"
+         height="200"
+         width="auto"
+         loading="lazy"
+         alt="Image of a glass of {{ wine.get_type }} wine">
     <div class="wine-card__detail_container">
         <h2 class="wine-card__title">
             <a class="wine-card__link" href="{% url 'wine-detail' wine.pk %}">{{ wine.name }}</a>
