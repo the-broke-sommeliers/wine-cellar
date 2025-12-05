@@ -1,57 +1,42 @@
 {% load i18n allauth %}
-
 <div class="form-container">
-
     {% if attrs.errors %}
         <ul class="form-errorlist" aria-live="assertive" aria-atomic="true">
-            {% for error in attrs.errors %}
-                <li>{{ error|escape }}</li>
-            {% endfor %}
+            {% for error in attrs.errors %}<li>{{ error|escape }}</li>{% endfor %}
         </ul>
     {% endif %}
-
-        <label for="{{ attrs.id }}">
-            {% slot label %}{% endslot %}
-            {% if not attrs.required %}
-    {% if attrs.type != "checkbox" and attrs.type != "radio" %}
+    <label for="{{ attrs.id }}">
+        {% slot label %}{% endslot %}
+        {% if not attrs.required %}
+            {% if attrs.type != "checkbox" and attrs.type != "radio" %}
                 <p class="d-inline"
                    role="presentation"
-                   title="{% translate "This field is optional" %}">
-                    {% translate "(Optional)" %}
-                </p>
+                   title="{% translate "This field is optional" %}">{% translate "(Optional)" %}</p>
             {% endif %}
-{% endif %}
-        </label>
-
-        {% if attrs.help_text %}
-            <div class="form-hint">{% slot help_text %}{% endslot %}</div>
         {% endif %}
-
-        {% if attrs.type == "textarea" %}
-            <textarea
-                {% if attrs.required %}required{% endif %}
-                {% if attrs.rows %}rows="{{ attrs.rows }}"{% endif %}
-                {% if attrs.disabled %}disabled{% endif %}
-                {% if attrs.readonly %}readonly{% endif %}
-                {% if attrs.checked %}checked{% endif %}
-                {% if attrs.name %}name="{{ attrs.name }}"{% endif %}
-                {% if attrs.id %}id="{{ attrs.id }}"{% endif %}
-                aria-invalid="{% if attrs.errors %}true{% else %}false{% endif %}"
-            >{% if attrs.value is not None %}{{ attrs.value }}{% endif %}</textarea>
-
-        {% else %}
-            <input
-                {% if attrs.required %}required{% endif %}
-                {% if attrs.disabled %}disabled{% endif %}
-                {% if attrs.readonly %}readonly{% endif %}
-                {% if attrs.checked %}checked{% endif %}
-                {% if attrs.name %}name="{{ attrs.name }}"{% endif %}
-                {% if attrs.id %}id="{{ attrs.id }}"{% endif %}
-                {% if attrs.autocomplete %}autocomplete="{{ attrs.autocomplete }}"{% endif %}
-                {% if attrs.value is not None %}value="{{ attrs.value }}"{% endif %}
-                aria-invalid="{% if attrs.errors %}true{% else %}false{% endif %}"
-                type="{{ attrs.type }}"
-            >
-        {% endif %}
-
+    </label>
+    {% if attrs.help_text %}
+        <div class="form-hint">{% slot help_text %}{% endslot %}</div>
+    {% endif %}
+    {% if attrs.type == "textarea" %}
+        <textarea {% if attrs.required %}required{% endif %}
+                  {% if attrs.rows %}rows="{{ attrs.rows }}"{% endif %}
+                  {% if attrs.disabled %}disabled{% endif %}
+                  {% if attrs.readonly %}readonly{% endif %}
+                  {% if attrs.checked %}checked{% endif %}
+                  {% if attrs.name %}name="{{ attrs.name }}"{% endif %}
+                  {% if attrs.id %}id="{{ attrs.id }}"{% endif %}
+                  aria-invalid="{% if attrs.errors %}true{% else %}false{% endif %}">{% if attrs.value is not None %}{{ attrs.value }}{% endif %}</textarea>
+    {% else %}
+        <input {% if attrs.required %}required{% endif %}
+               {% if attrs.disabled %}disabled{% endif %}
+               {% if attrs.readonly %}readonly{% endif %}
+               {% if attrs.checked %}checked{% endif %}
+               {% if attrs.name %}name="{{ attrs.name }}"{% endif %}
+               {% if attrs.id %}id="{{ attrs.id }}"{% endif %}
+               {% if attrs.autocomplete %}autocomplete="{{ attrs.autocomplete }}"{% endif %}
+               {% if attrs.value is not None %}value="{{ attrs.value }}"{% endif %}
+               aria-invalid="{% if attrs.errors %}true{% else %}false{% endif %}"
+               type="{{ attrs.type }}">
+    {% endif %}
 </div>
