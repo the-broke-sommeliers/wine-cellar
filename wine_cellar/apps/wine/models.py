@@ -38,6 +38,13 @@ class Category(models.TextChoices):
     FEINHERB = "FH", _("Feinherb")
 
 
+class ImageType(models.TextChoices):
+    FRONT = "FR", _("Front")
+    BACK = "BA", _("Back")
+    LABEL_FRONT = "LF", _("Label Front")
+    LABEL_BACK = "LB", _("Label Back")
+
+
 class Size(UserContentModel):
     name = models.FloatField(verbose_name=_("Size"))
 
@@ -223,13 +230,33 @@ class Wine(UserContentModel):
 
     @property
     def image_thumbnail(self):
-        i = self.wineimage_set.first()
+        i = self.wineimage_set.filter(image_type=ImageType.FRONT)
         if not i:
             return static("images/bottle.svg")
-        if i.thumbnail:
-            return i.thumbnail.url
+        front = i.first()
+        if front.thumbnail:
+            return front.thumbnail.url
         # return normal image as fallback
-        return i.image.url
+        return front.image.url
+
+    @property
+    def image_thumbnails(self):
+        images = {img.image_type: img for img in self.wineimage_set.all()}
+        order = [
+            ImageType.FRONT,
+            ImageType.BACK,
+            ImageType.LABEL_FRONT,
+            ImageType.LABEL_BACK,
+        ]
+        result = []
+        for image_type in order:
+            image = images.get(image_type)
+            if image:
+                src = image.thumbnail.url if image.thumbnail else image.image.url
+                result.append(src)
+        if not result:
+            return [static("images/bottle.svg")]
+        return result
 
     @property
     def country_name(self):
@@ -261,3 +288,6 @@ class WineImage(models.Model):
     thumbnail = models.ImageField(upload_to=user_directory_path, blank=True, null=True)
     wine = models.ForeignKey(Wine, on_delete=models.CASCADE)
     user = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True)
+    image_type = models.CharField(
+        max_length=3, choices=ImageType, default=ImageType.FRONT
+    )

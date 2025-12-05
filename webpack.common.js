@@ -38,6 +38,12 @@ module.exports = {
         './wine_cellar/assets/css/map.css',
         './wine_cellar/react/maps/react_maps.tsx'
       ]
+    },
+    wine_carousel: {
+      import: ['./wine_cellar/assets/js/wine_carousel.ts'],
+    },
+    image_preview: {
+      import: ['./wine_cellar/assets/js/image_preview.ts'],
     }
   },
   output: {
