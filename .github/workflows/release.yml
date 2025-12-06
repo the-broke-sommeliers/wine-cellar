@@ -1,0 +1,56 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Type of release'
+        required: true
+        default: 'normal'
+        type: choice
+        options:
+          - normal
+          - rc
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install Commitizen
+        run: pip install commitizen
+
+      - name: Bump version with Commitizen
+        id: bump
+        run: |
+          if [ "${{ github.event.inputs.release_type }}" == "rc" ]; then
+            echo "Creating RC release..."
+            cz bump --yes --pre-release rc
+          else
+            echo "Creating normal release..."
+            cz bump --yes
+          fi
+          echo "new_version=$(cz version)" >> $GITHUB_OUTPUT
+
+      - name: Push version bump commit + tag
+        run: |
+          git push
+          git push --tags
+
+      - name: Show new version
+        run: echo "Released version: ${{ steps.bump.outputs.new_version }}"
+
