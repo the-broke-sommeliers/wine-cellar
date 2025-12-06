@@ -25,7 +25,7 @@ RUN pip install --upgrade pip
 COPY . .
 
 # install python dependencies
-RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requirements/prod.txt
+RUN pip wheel --no-cache-dir  --wheel-dir /usr/src/app/wheels -r requirements/prod.txt
 # install js dependencies
 RUN npm install
 # build js
