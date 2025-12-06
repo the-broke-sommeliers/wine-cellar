@@ -1,0 +1,58 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Type of release'
+        required: true
+        default: 'normal'
+        type: choice
+        options:
+          - normal
+          - rc
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          fetch-tags: true
+          token: ${{ secrets.PAT }}
+      - name: Configure git user
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Install Commitizen
+        run: pip install commitizen
+      - name: Bump version with Commitizen
+        id: bump
+        run: |
+          if [ "${{ github.event.inputs.release_type }}" == "rc" ]; then
+            echo "Creating RC release..."
+            cz bump --yes -pr rc
+          else
+            echo "Creating normal release..."
+            cz bump --yes
+          fi
+          VERSION=$(cz version)
+          echo "NEW_VERSION=$VERSION" >> $GITHUB_OUTPUT
+      - name: Push version bump commit + tag
+        run: |
+          git push
+          git push --tags
+      - name: Show new version
+        env:
+          NEW_VERSION: ${{ steps.bump.outputs.NEW_VERSION }}
+        run: echo "The new version is $NEW_VERSION"
