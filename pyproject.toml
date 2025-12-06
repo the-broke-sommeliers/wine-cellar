@@ -38,7 +38,7 @@ omit = ["wine_cellar/conf/*","**/tests/*", "**/migrations/*"]
 
 
 [tool.commitizen]
-name = "cz_conventional_commits"
+name = "cz_customize"
 tag_format = "$version"
 legacy_tag_formats = ["v$version"]
 version_scheme = "semver2"
@@ -50,3 +50,7 @@ version_files = [
 update_changelog_on_bump = true
 major_version_zero = true
 changelog_incremental = true
+changelog_merge_prerelease = true
+
+[tool.commitizen.customize]
+commit_parser = '^((?P<change_type>feat|fix|refactor|perf|BREAKING CHANGE)(?:\((?P<scope>[^()\r\n]*)\)|\()?(?P<breaking>!)?|\w+!):\s(?P<subject>[^\n]*)(?P<body>(?:\n(?!Refs:|:\s#)[^\n]*)*)(?:\n(?P<footer>(?:Refs:[\s\S]*)?))?$'
