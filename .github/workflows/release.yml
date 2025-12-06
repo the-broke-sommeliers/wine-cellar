@@ -34,7 +34,7 @@ jobs:
         run: |
           if [ "${{ github.event.inputs.release_type }}" == "rc" ]; then
             echo "Creating RC release..."
-            cz bump --yes --pre-release rc
+            cz bump --yes -pr rc
           else
             echo "Creating normal release..."
             cz bump --yes
