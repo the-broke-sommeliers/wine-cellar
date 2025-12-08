@@ -39,6 +39,12 @@ jobs:
       - name: Bump version with Commitizen
         id: bump
         run: |
+          set -e
+          if [ "${{ github.event.inputs.release_type }}" == "rc" ]; then
+            NEXT_VERSION=$(cz bump --get-next -pr rc)
+          else
+            NEXT_VERSION=$(cz bump --get-next)
+          fi
           if [ "${{ github.event.inputs.release_type }}" == "rc" ]; then
             echo "Creating RC release..."
             cz bump --yes -pr rc
@@ -46,8 +52,12 @@ jobs:
             echo "Creating normal release..."
             cz bump --yes
           fi
-          VERSION=$(cz version)
-          echo "NEW_VERSION=$VERSION" >> $GITHUB_OUTPUT
+          cz changelog
+          git add CHANGELOG.md
+          git commit --amend --no-edit
+          git tag -d "$NEXT_VERSION"
+          git tag "$NEXT_VERSION"
+          echo "NEW_VERSION=$NEXT_VERSION" >> $GITHUB_OUTPUT
       - name: Push version bump commit + tag
         run: |
           git push
