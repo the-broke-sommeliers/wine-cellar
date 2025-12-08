@@ -1,28 +1,33 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 {% for entry in tree %}
 
 ## {{ entry.version }}{% if entry.date %} ({{ entry.date }}){% endif %}
 
-{% for change_key, changes in entry.changes.items() %}
 
+{% for change_key, changes in entry.changes.items() %}
 {% if change_key %}
 ### {{ change_key }}
 {% endif %}
 
 {% for change in changes %}
 {% if change.scope %}
-- **{{ change.scope }}**: {{ change.message }}
-{% if change.body %}
-{{ change.body }}
+- **{{ change.scope }}**: {{ change.subject }}
+{%- if change.body %}
+    {{ change.body | replace('\n', '', 1) | replace('\n', '\n    ') }}
 {% endif %}
-{% elif change.message %}
-- {{ change.message }}
+
+{% else %}
+- {{ change.subject }}
 {% if change.body %}
-{{ change.body }}
+    {{ change.body | replace('\n', '', 1) | replace('\n', '\n    ') }}
 {% endif %}
-{{ body }}
+
 {% endif %}
 {% endfor %}
+
 {% endfor %}
 {% endfor %}
 
-test
