@@ -254,8 +254,6 @@ class Wine(UserContentModel):
             if image:
                 src = image.thumbnail.url if image.thumbnail else image.image.url
                 result.append(src)
-        if not result:
-            return [static("images/bottle.svg")]
         return result
 
     @property

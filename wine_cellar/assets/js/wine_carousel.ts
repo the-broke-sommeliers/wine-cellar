@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const wrapper = document.getElementById("wine-image-wrapper");
+    const wrapper = document.querySelector(".wine-detail__image-wrapper") as HTMLElement;
     if (!wrapper) return;
 
     const images = JSON.parse(wrapper.dataset.images || '');
