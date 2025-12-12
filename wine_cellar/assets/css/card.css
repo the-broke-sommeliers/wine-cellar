@@ -88,6 +88,11 @@
   overflow-wrap: anywhere;
 }
 
+.wine-card__image-wrapper {
+  width: 150px;
+  height: 200px ;
+}
+
 .wine-card__img {
   max-height: 200px;
   max-width: 150px;
