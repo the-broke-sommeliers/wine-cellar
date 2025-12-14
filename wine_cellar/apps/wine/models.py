@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import pycountry
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -8,6 +10,7 @@ from django.urls import reverse
 from django.utils.formats import number_format
 from django.utils.translation import gettext_lazy as _
 
+from wine_cellar.apps.user.views import get_user_settings
 from wine_cellar.apps.wine.utils import user_directory_path
 
 
@@ -194,10 +197,27 @@ class Wine(UserContentModel):
 
     @property
     def get_price_with_currency(self):
+        user_settings = get_user_settings(self.user)
         currency = settings.CURRENCY_SYMBOLS.get(
-            getattr(self.user.user_settings, "currency", "EUR"), "€"
+            getattr(user_settings, "currency", "EUR"), "€"
         )
         formatted_price = number_format(self.price, use_l10n=True)
+        return f"{formatted_price}{currency}"
+
+    @property
+    def get_average_price_with_currency(self):
+        user_settings = get_user_settings(self.user)
+        currency = settings.CURRENCY_SYMBOLS.get(
+            getattr(user_settings, "currency", "EUR"), "€"
+        )
+        avg_price = self.storageitem_set.aggregate(avg_price=models.Avg("price"))[
+            "avg_price"
+        ]
+
+        if avg_price is None:
+            return None
+        avg_price = avg_price.quantize(Decimal("0.00"))
+        formatted_price = number_format(avg_price, use_l10n=True)
         return f"{formatted_price}{currency}"
 
     @property

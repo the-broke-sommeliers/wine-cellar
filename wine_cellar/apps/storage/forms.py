@@ -1,7 +1,9 @@
 from django import forms
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
 from wine_cellar.apps.storage.models import Storage
+from wine_cellar.apps.user.views import get_user_settings
 
 
 class StorageForm(forms.Form):
@@ -39,6 +41,10 @@ class StockAddForm(forms.Form):
                 user_field
             ].queryset.model.objects.filter(user=self.user)
             self.fields[user_field].user = self.user
+        user_settings = get_user_settings(self.user)
+        self.fields["price"].help_text = _(
+            "Enter the price of the bottle in %(currency)s."
+        ) % {"currency": settings.CURRENCY_SYMBOLS[user_settings.currency]}
 
     storage = forms.ModelChoiceField(
         queryset=Storage.objects.none(),
@@ -55,6 +61,12 @@ class StockAddForm(forms.Form):
         min_value=0,
         help_text=_("Enter the number of columns in the storage."),
         widget=forms.Select(),
+    )
+    price = forms.DecimalField(
+        required=False,
+        max_digits=6,
+        decimal_places=2,
+        localize=True,
     )
 
     def clean_row(self):

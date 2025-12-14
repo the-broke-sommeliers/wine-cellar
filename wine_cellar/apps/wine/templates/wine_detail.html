@@ -103,10 +103,10 @@
                             <td>{{ wine.get_food_pairings | linebreaksbr }}</td>
                         </tr>
                     {% endif %}
-                    {% if wine.price %}
+                    {% if wine.price is not None or wine.get_average_price_with_currency %}
                         <tr>
                             <th>{% translate "Price" %}</th>
-                            <td>{{ wine.get_price_with_currency }}</td>
+                            <td>{{ wine.get_price_with_currency }}{% if wine.get_average_price_with_currency %} ({% translate "Average" %}: {{ wine.get_average_price_with_currency }}){% endif %}</td>
                         </tr>
                     {% endif %}
                     {% if wine.comment %}

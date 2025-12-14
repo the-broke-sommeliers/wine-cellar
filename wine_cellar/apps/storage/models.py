@@ -41,3 +41,4 @@ class StorageItem(UserContentModel):
     row = models.PositiveIntegerField(null=True, blank=True)
     column = models.PositiveIntegerField(null=True, blank=True)
     deleted = models.BooleanField(default=False)
+    price = models.DecimalField(max_digits=6, decimal_places=2, null=True)
