@@ -31,9 +31,10 @@ class StorageForm(forms.Form):
     )
 
 
-class StockAddForm(forms.Form):
+class StockForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user")
+        self.storage_item = kwargs.pop("storage_item", None)
         super().__init__(*args, **kwargs)
         user_fields = ["storage"]
         for user_field in user_fields:
@@ -117,7 +118,12 @@ class StockAddForm(forms.Form):
                         ),
                         code="row_column_required",
                     )
-                if storage.is_slot_occupied(row, column):
+                if storage.is_slot_occupied(row, column) and not (
+                    self.storage_item
+                    and self.storage_item.row == row
+                    and self.storage_item.column == column
+                    and self.storage_item.storage == storage
+                ):
                     raise forms.ValidationError(
                         _(
                             "The selected slot (row: %(row)s, column: %(column)s)"

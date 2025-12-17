@@ -376,3 +376,106 @@ def test_used_slot_is_free_after_delete(
     assert item.row == 1
     assert item.column == 1
     assert item.deleted is False
+
+
+@pytest.mark.django_db
+def test_user_can_edit_existing_item_new_slot(
+    client, user, storage_factory, wine_factory, storage_item_factory
+):
+    storage = storage_factory(user=user, rows=2, columns=2)
+    client.force_login(user)
+    wine = wine_factory(user=user)
+    item = storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
+    data = {
+        "storage": storage.pk,
+        "row": 2,
+        "column": 1,
+    }
+    r = client.post(
+        reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
+    )
+    assert r.status_code == HTTPStatus.OK
+    assertRedirects(
+        response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
+    )
+    assert storage.used_slots == 1
+    assert storage.items.first().wine == wine
+    item = storage.items.first()
+    assert item.wine == wine
+    assert item.row == 2
+    assert item.column == 1
+
+
+@pytest.mark.django_db
+def test_user_can_edit_existing_item_new_price(
+    client, user, storage_factory, wine_factory, storage_item_factory
+):
+    storage = storage_factory(user=user, rows=2, columns=2)
+    client.force_login(user)
+    wine = wine_factory(user=user)
+    item = storage_item_factory(
+        storage=storage, wine=wine, row=1, column=1, user=user, price=10.0
+    )
+    data = {
+        "storage": storage.pk,
+        "row": 1,
+        "column": 1,
+        "price": 15.0,
+    }
+    r = client.post(
+        reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
+    )
+    assert r.status_code == HTTPStatus.OK
+    assertRedirects(
+        response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
+    )
+    assert storage.used_slots == 1
+    assert storage.items.first().wine == wine
+    item = storage.items.first()
+    assert item.wine == wine
+    assert item.row == 1
+    assert item.column == 1
+    assert item.price == 15.0
+
+
+@pytest.mark.django_db
+def test_user_cant_edit_to_occupied_slot(
+    client, user, storage_factory, wine_factory, storage_item_factory
+):
+    storage = storage_factory(user=user, rows=2, columns=2)
+    client.force_login(user)
+    wine = wine_factory(user=user)
+    item = storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
+    storage_item_factory(
+        storage=storage, wine=wine_factory(user=user), row=2, column=1, user=user
+    )
+    data = {
+        "storage": storage.pk,
+        "row": 2,
+        "column": 1,
+    }
+    r = client.post(
+        reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
+    )
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["form"].errors
+
+
+@pytest.mark.django_db
+def test_user_cant_edit_to_other_users_storage(
+    client, user, user_factory, storage_factory, wine_factory, storage_item_factory
+):
+    other_user = user_factory()
+    other_storage = Storage.objects.filter(user=other_user).first()
+    storage = storage_factory(user=user, rows=2, columns=2)
+    client.force_login(user)
+    wine = wine_factory(user=user)
+    item = storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
+    data = {
+        "storage": other_storage.pk,
+    }
+    r = client.post(
+        reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
+    )
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["form"].errors

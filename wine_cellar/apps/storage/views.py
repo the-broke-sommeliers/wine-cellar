@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import DeleteView, DetailView, FormView, ListView
 from django.views.generic.list import MultipleObjectMixin
 
-from wine_cellar.apps.storage.forms import StockAddForm, StorageForm
+from wine_cellar.apps.storage.forms import StockForm, StorageForm
 from wine_cellar.apps.storage.models import Storage, StorageItem
 from wine_cellar.apps.wine.models import Wine
 
@@ -127,7 +127,7 @@ class StorageDeleteView(DeleteView):
 
 class StorageItemAddView(FormView):
     template_name = "stock_add.html"
-    form_class = StockAddForm
+    form_class = StockForm
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -179,6 +179,76 @@ class StorageItemAddView(FormView):
             user=user,
             price=price,
         )
+
+
+class StorageItemUpdateView(FormView):
+    template_name = "stock_add.html"
+    form_class = StockForm
+
+    def get_initial(self):
+        initial = super().get_initial()
+        self.storage_item = get_object_or_404(
+            StorageItem, pk=self.kwargs["pk"], user=self.request.user
+        )
+        initial.update(model_to_dict(self.storage_item))
+        return initial
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        if "user" not in kwargs:
+            kwargs["user"] = self.request.user
+        if "storage_item" not in kwargs:
+            kwargs["storage_item"] = self.storage_item
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        user_storages = Storage.objects.filter(user=self.request.user)
+        free_cells_by_storage = {}
+
+        for storage in user_storages:
+            if storage.rows == 0:
+                free_cells_by_storage[storage.pk] = {}
+                continue
+
+            used_cells = set(
+                storage.items.filter(deleted=False)
+                .exclude(pk=self.kwargs["pk"])
+                .values_list("row", "column")
+            )
+
+            free_cells_by_storage[storage.pk] = {}
+            for row in range(1, storage.rows + 1):
+                free_cells_by_storage[storage.pk][row] = [
+                    col
+                    for col in range(1, storage.columns + 1)
+                    if (row, col) not in used_cells
+                ]
+
+        context["free_cells_by_storage"] = free_cells_by_storage
+        return context
+
+    def form_valid(self, form):
+        self.process_form_data(
+            self.storage_item,
+            self.request.user,
+            form.cleaned_data,
+        )
+        self.success_url = reverse_lazy(
+            "wine-detail",
+            kwargs={"pk": self.storage_item.wine.pk},
+        )
+        return super().form_valid(form)
+
+    @staticmethod
+    def process_form_data(storage_item, user, cleaned_data):
+        storage_item.storage = cleaned_data["storage"]
+        storage_item.row = cleaned_data["row"]
+        storage_item.column = cleaned_data["column"]
+        storage_item.price = cleaned_data.get("price")
+        storage_item.user = user
+        storage_item.save()
 
 
 class StorageItemDeleteView(DeleteView):
