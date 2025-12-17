@@ -16,6 +16,13 @@
                     </a>
                 </li>
                 <li class="stats__card">
+                    <a class="stats__link"
+                       href="{% url 'wine-list' %}?name=&wine_type=&category=&vintage=&order=-effective_price">
+                        <p class="stats__number">{{ total_value }}</p>
+                        <h2 class="stats__label">{% translate "Total Value in Stock" %}</h2>
+                    </a>
+                </li>
+                <li class="stats__card">
                     <a class="stats__link" href="{% url 'wine-list' %}">
                         <p class="stats__number">{{ wines }}</p>
                         <h2 class="stats__label">

@@ -1,12 +1,20 @@
+from decimal import Decimal
+
+from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
 from django.db import connections
+from django.db.models import Avg, Q, Sum
+from django.db.models.functions import Coalesce
 from django.forms import model_to_dict
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
+from django.utils.formats import number_format
 from django.views.generic import DeleteView, DetailView, FormView, TemplateView
 from django_filters.views import FilterView
 
+from wine_cellar.apps.storage.models import StorageItem
+from wine_cellar.apps.user.views import get_user_settings
 from wine_cellar.apps.wine.filters import WineFilter
 from wine_cellar.apps.wine.forms import WineEditForm, WineForm, image_fields_map
 from wine_cellar.apps.wine.models import Wine, WineImage
@@ -47,6 +55,17 @@ class HomePageView(TemplateView):
             )
         except Wine.DoesNotExist:
             pass
+        total_value = StorageItem.objects.aggregate(
+            total=Sum("price", filter=Q(deleted=False, wine__user=self.request.user))
+        )["total"] or Decimal("0")
+        total_value = total_value.quantize(Decimal("0"))
+        user_settings = get_user_settings(self.request.user)
+        currency = settings.CURRENCY_SYMBOLS.get(
+            getattr(user_settings, "currency", "EUR"), "€"
+        )
+
+        formatted_price = number_format(total_value, use_l10n=True)
+        total_value = f"{formatted_price}{currency}"
 
         context.update(
             {
@@ -55,6 +74,7 @@ class HomePageView(TemplateView):
                 "countries": countries,
                 "oldest": oldest,
                 "youngest": youngest,
+                "total_value": total_value,
             }
         )
         return context
@@ -237,6 +257,12 @@ class WineListView(FilterView):
 
     def get_queryset(self):
         qs = super().get_queryset().order_by("-created")
+        qs = qs.annotate(
+            effective_price=Coalesce(
+                Avg("storageitem__price"),
+                "price",
+            )
+        )
         return qs.filter(user=self.request.user)
 
 

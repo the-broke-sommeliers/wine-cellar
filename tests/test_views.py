@@ -37,11 +37,11 @@ def test_homepage_stats(client, user, wine_factory, storage_item_factory):
     storage = user.storage_set.first()
     wine_2 = wine_factory(user=user, country="DE", vintage=2023)
     wine_factory(user=user, country="ES", vintage=2024)
-    storage_item_factory(wine=wine, storage=storage)
-    storage_item_factory(wine=wine, storage=storage)
-    storage_item_factory(wine=wine, storage=storage, deleted=True)
-    storage_item_factory(wine=wine_2, storage=storage, deleted=True)
-    storage_item_factory(wine=wine_2, storage=storage)
+    storage_item_factory(wine=wine, storage=storage, price=10.50)
+    storage_item_factory(wine=wine, storage=storage, price=5.25)
+    storage_item_factory(wine=wine, storage=storage, price=8.99, deleted=True)
+    storage_item_factory(wine=wine_2, storage=storage, price=4.99, deleted=True)
+    storage_item_factory(wine=wine_2, storage=storage, price=12.00)
     client.force_login(user)
     r = client.get(reverse("homepage"), follow=True)
     assert r.status_code == HTTPStatus.OK
@@ -54,6 +54,7 @@ def test_homepage_stats(client, user, wine_factory, storage_item_factory):
     assert r.context_data["wines_in_stock"] == 2
     assert r.context_data["wines"] == 3
     assert r.context_data["countries"] == 2
+    assert r.context_data["total_value"] == "28€"
 
 
 @pytest.mark.django_db
@@ -692,3 +693,48 @@ def test_wine_filter_in_stock(client, user, wine_factory, storage_item_factory):
     assertTemplateUsed(response=r, template_name="base.html")
     assertTemplateUsed(response=r, template_name="wine_list.html")
     assert list(r.context_data["wines"]) == [wine_in_stock]
+
+
+@pytest.mark.django_db
+def test_wine_filter_price(client, user, wine_factory, storage_item_factory):
+    storage = user.storage_set.first()
+    wine_in_stock_cheap = wine_factory(user=user, vintage=2020)
+    wine_in_stock_expensive = wine_factory(user=user, vintage=2020)
+    wine_in_stock_middle = wine_factory(user=user, vintage=2020)
+    wine_was_in_stock = wine_factory(user=user, vintage=2019)
+    wine_no_price = wine_factory(user=user, vintage=2019)
+    wine_not_in_stock = wine_factory(user=user, vintage=2021, price=7.00)
+    storage_item_factory(storage=storage, wine=wine_in_stock_cheap, price=5.00)
+    storage_item_factory(storage=storage, wine=wine_in_stock_middle, price=15.00)
+    storage_item_factory(storage=storage, wine=wine_in_stock_expensive, price=50.00)
+    storage_item_factory(
+        storage=storage,
+        wine=wine_was_in_stock,
+        price=10.00,
+        deleted=True,
+    )
+    client.force_login(user)
+    r = client.get(reverse("wine-list") + "?order=-effective_price", follow=True)
+    assert r.status_code == HTTPStatus.OK
+    assertTemplateUsed(response=r, template_name="base.html")
+    assertTemplateUsed(response=r, template_name="wine_list.html")
+    assert list(r.context_data["wines"]) == [
+        wine_in_stock_expensive,
+        wine_in_stock_middle,
+        wine_was_in_stock,
+        wine_not_in_stock,
+        wine_in_stock_cheap,
+        wine_no_price,
+    ]
+    r = client.get(reverse("wine-list") + "?order=effective_price", follow=True)
+    assert r.status_code == HTTPStatus.OK
+    assertTemplateUsed(response=r, template_name="base.html")
+    assertTemplateUsed(response=r, template_name="wine_list.html")
+    assert list(r.context_data["wines"]) == [
+        wine_no_price,
+        wine_in_stock_cheap,
+        wine_not_in_stock,
+        wine_was_in_stock,
+        wine_in_stock_middle,
+        wine_in_stock_expensive,
+    ]

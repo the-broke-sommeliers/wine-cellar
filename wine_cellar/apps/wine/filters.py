@@ -25,6 +25,8 @@ class WineFilter(django_filters.FilterSet):
             ("-vintage", _("Youngest First")),
             ("vintage", _("Oldest First")),
             ("drink_by", _("Drink By")),
+            ("-effective_price", _("Highest Price (Avg)")),
+            ("effective_price", _("Lowest Price (Avg)")),
         ),
         label=_("Sorting"),
         empty_label=None,
