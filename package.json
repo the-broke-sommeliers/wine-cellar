@@ -16,9 +16,9 @@
     "barcode-detector": "3.0.8",
     "leaflet": "1.9.4",
     "leaflet.markercluster": "1.5.3",
-    "react": "19.2.1",
+    "react": "19.2.3",
     "react-barcode-scanner": "4.0.0",
-    "react-dom": "19.2.1",
+    "react-dom": "19.2.3",
     "react-leaflet": "5.0.0",
     "tom-select": "2.4.3"
   },
