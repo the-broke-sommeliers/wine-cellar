@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.3.0-rc.0 (2025-12-20)
+
+### feat
+
+- **wine**: add sorting by average price and total value statistic    
+    - the wine list can now be sorted by the average price of a wine
+    - the homepage shows the total value of all bottles in stock
+
+- **stock**: add option to add the bottle price to a stock item    
+    - show average price across all bottles of a wine in wine detail view
+
+
+### fix
+
+- **deps**: update react monorepo to v19.2.3
+
+
 ## 0.2.0 (2025-12-13)
 
 ### feat
