@@ -20,6 +20,11 @@
                   class="pure-form pure-form-stacked wine-form"
                   novalidate>
                 {% csrf_token %}
+                {% if form.non_field_errors %}
+                    <ul class="form-errorlist" aria-live="assertive" aria-atomic="true">
+                        {% for error in form.non_field_errors %}<li>{{ error|escape }}</li>{% endfor %}
+                    </ul>
+                {% endif %}
                 {% include 'forms/form_field.html' with field=form.storage %}
                 {% include 'forms/form_field.html' with field=form.row %}
                 <ul id="storage__error-full"

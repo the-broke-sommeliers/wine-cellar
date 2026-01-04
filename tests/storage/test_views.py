@@ -346,3 +346,33 @@ def test_form_context_has_empty_slots(
         1: [2],
         2: [1],
     }
+
+
+@pytest.mark.django_db
+def test_used_slot_is_free_after_delete(
+    client, user, storage_factory, storage_item_factory, wine_factory
+):
+    wine = wine_factory(user=user)
+    wine_new = wine_factory(user=user)
+    storage = storage_factory(user=user, rows=2, columns=2)
+    storage_item_factory(
+        storage=storage, wine=wine, row=1, column=1, user=user, deleted=True
+    )
+    client.force_login(user)
+    data = {
+        "storage": storage.pk,
+        "row": 1,
+        "column": 1,
+    }
+    r = client.post(
+        reverse("stock-add", kwargs={"pk": wine_new.pk}), data=data, follow=True
+    )
+    assert r.status_code == HTTPStatus.OK
+    assertRedirects(
+        response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine_new.pk})
+    )
+    item = storage.items.filter(deleted=False).first()
+    assert item.wine == wine_new
+    assert item.row == 1
+    assert item.column == 1
+    assert item.deleted is False
