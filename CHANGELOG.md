@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.3.0-rc.0 (2025-12-20)
+## 0.3.0-rc.1 (2026-01-04)
 
 ### feat
 
@@ -17,6 +17,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### fix
 
+- **stock**: make adding a bottle to a previously occupied slot work.
 - **deps**: update react monorepo to v19.2.3
 
 
