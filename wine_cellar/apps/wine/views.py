@@ -56,7 +56,10 @@ class HomePageView(TemplateView):
         except Wine.DoesNotExist:
             pass
         total_value = StorageItem.objects.aggregate(
-            total=Sum("price", filter=Q(deleted=False, wine__user=self.request.user))
+            total=Sum(
+                Coalesce("price", "wine__price"),
+                filter=Q(deleted=False, wine__user=self.request.user),
+            )
         )["total"] or Decimal("0")
         total_value = total_value.quantize(Decimal("0"))
         user_settings = get_user_settings(self.request.user)
