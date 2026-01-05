@@ -239,7 +239,9 @@ class Wine(UserContentModel):
 
     @property
     def get_stock(self):
-        return self.storageitem_set.filter(deleted=False)
+        return self.storageitem_set.filter(deleted=False).order_by(
+            "storage", "row", "column"
+        )
 
     @property
     def image(self):
