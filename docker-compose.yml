@@ -1,13 +1,26 @@
+name: wine-cellar-dev
+
 services:
   web:
     build: .
     command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/usr/src/app
     ports:
       - 127.0.0.1:8000:8000
     env_file:
       - ./.env.dev
+    environment:
+      - CONTAINER_ROLE=web
     depends_on:
       - db
+      - redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
   db:
     image: postgres:16
     volumes:
@@ -16,6 +29,28 @@ services:
       - POSTGRES_USER=django_dev_user
       - POSTGRES_PASSWORD=django_dev_password
       - POSTGRES_DB=django_dev
+  redis:
+    image: redis:alpine
+  celery:
+    build: .
+    command: celery -A wine_cellar.conf worker -l info
+    env_file:
+      - ./.env.dev
+    depends_on:
+      web:
+        condition: service_healthy
+      redis:
+        condition: service_started
+  celery-beat:
+    build: .
+    command: celery -A wine_cellar.conf beat -l info
+    env_file:
+      - ./.env.dev
+    depends_on:
+      web:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
 volumes:
   postgres_data:
