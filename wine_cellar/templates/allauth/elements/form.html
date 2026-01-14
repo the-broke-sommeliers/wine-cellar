@@ -2,6 +2,9 @@
 <form class="{% block class %}pure-form{% endblock class %}"
       method="{{ attrs.method }}"
       {% if attrs.action %}action="{{ attrs.action }}"{% endif %}>
+      <ul class="form-errorlist" aria-live="assertive" aria-atomic="true">
+          {% for error in attrs.form.non_field_errors %}<li>{{ error|escape }}</li>{% endfor %}
+      </ul>
     {% slot body %}
 {% endslot %}
 {% slot actions %}

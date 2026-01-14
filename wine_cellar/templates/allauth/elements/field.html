@@ -1,10 +1,5 @@
 {% load i18n allauth %}
 <div class="form-container">
-    {% if attrs.errors %}
-        <ul class="form-errorlist" aria-live="assertive" aria-atomic="true">
-            {% for error in attrs.errors %}<li>{{ error|escape }}</li>{% endfor %}
-        </ul>
-    {% endif %}
     <label for="{{ attrs.id }}">
         {% slot label %}{% endslot %}
         {% if not attrs.required %}
@@ -18,6 +13,12 @@
     {% if attrs.help_text %}
         <div class="form-hint">{% slot help_text %}{% endslot %}</div>
     {% endif %}
+    {% if attrs.errors %}
+        <ul class="form-errorlist" aria-live="assertive" aria-atomic="true">
+            {% for error in attrs.errors %}<li>{{ error|escape }}</li>{% endfor %}
+        </ul>
+    {% endif %}
+
     {% if attrs.type == "textarea" %}
         <textarea {% if attrs.required %}required{% endif %}
                   {% if attrs.rows %}rows="{{ attrs.rows }}"{% endif %}
