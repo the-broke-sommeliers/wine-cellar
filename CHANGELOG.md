@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.4.0-rc.0 (2026-01-15)
+
+### feat
+
+- **stats**: if a stock item has no price, use the price of the wine
+
+### fix
+
+- **docker**: fix DJANGO_ENABLE_SIGNUPS variable not working as intended    
+    When `DJANGO_ENABLE_SIGNUPS` is set to "False" it still allowed signups.
+    If you didn't want to allow signups please check if any users registered
+    in the django-admin under `/admin`.
+
+- **templates**: fix allauth templates not showing errors
+- **docker dev**: fix hot reload not working, add missing services for full dev setup
+- **docker-dev**: don't flush database on start
+- **deps**: update dependency react-barcode-scanner to v4.0.1
+- **wine details**: order stock items by storage, row, column
+
+### refactor
+
+- **templates**: remove redundant login template
+
+
 ## 0.3.0 (2026-01-04)
 
 ### feat
