@@ -83,6 +83,10 @@
   }
 }
 
+.wine-detail__container .wine-detail__map {
+  margin-top: 20px;
+}
+
 .wine-detail__menu {
   margin-bottom: 32px;
 }

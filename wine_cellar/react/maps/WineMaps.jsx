@@ -2,6 +2,7 @@ import React from 'react'
 import BaseMap from './Map'
 import MarkerClusterLayer from './MarkerClusterLayer'
 import GeoJsonMarker from './GeoJsonMarker'
+import { ZoomToMarkers } from './ZoomToMarkers'
 import { ItemPopup } from './ItemPopup'
 import * as countries from './country.json'
 
@@ -39,11 +40,13 @@ export const Map = React.forwardRef(function Map({ id, title, ...props }, ref) {
  * @returns {JSX.Element} - The rendered map component with markers.
  */
 export const MapWithMarkers = ({ wines, withoutPopup, children, ...props }) => {
+  const latLngs = []
   const markers = wines.map((wine, index) => {
-    const feature = Object.assign({}, countries[wine.country])
+    const feature = { ...(wine.location ?? countries[wine.country]) };
     if (!feature) {
         return null
     }
+    latLngs.push([feature.geometry.coordinates[1], feature.geometry.coordinates[0]])
     feature.properties = Object.assign(wine, feature.properties)
     return (
       <GeoJsonMarker key={index} feature={feature}>
@@ -53,6 +56,7 @@ export const MapWithMarkers = ({ wines, withoutPopup, children, ...props }) => {
   })
   return (
     <Map {...props}>
+      <ZoomToMarkers points={latLngs} />
       {markers.length > 1 ? (
         <MarkerClusterLayer>{markers}</MarkerClusterLayer>
       ) : (

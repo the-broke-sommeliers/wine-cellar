@@ -1,3 +1,4 @@
+import json
 import shutil
 from pathlib import Path
 
@@ -36,3 +37,10 @@ def clear_image_folder():
     yield
     path = settings.BASE_DIR / Path("test_media")
     shutil.rmtree(path)
+
+
+@pytest.fixture
+def geojson_point():
+    return json.dumps(
+        {"type": "Feature", "geometry": {"type": "Point", "coordinates": [90.0, 45.0]}}
+    )

@@ -24,7 +24,10 @@ from wine_cellar.apps.wine.models import (
     WineImage,
     WineType,
 )
-from wine_cellar.apps.wine.widgets import NoFilenameClearableFileInput
+from wine_cellar.apps.wine.widgets import (
+    MapChoosePointWidget,
+    NoFilenameClearableFileInput,
+)
 
 image_fields_map = {
     "image_front": ImageType.FRONT,
@@ -131,6 +134,9 @@ class WineFormPostCleanMixin:
 
 
 class WineBaseForm(TomSelectMixin, WineFormPostCleanMixin, forms.Form):
+    class Meta:
+        abstract = True
+
     def __init__(self, *args, **kwargs):
         user = kwargs.pop("user")
         super().__init__(*args, **kwargs)
@@ -172,9 +178,6 @@ class WineBaseForm(TomSelectMixin, WineFormPostCleanMixin, forms.Form):
                             "data-existing-url"
                         ] = image_obj.thumbnail.url
 
-    class Meta:
-        abstract = True
-
     name = forms.CharField(
         max_length=100,
         help_text=_("Enter the name of the wine as indicated on the label."),
@@ -199,6 +202,16 @@ class WineBaseForm(TomSelectMixin, WineFormPostCleanMixin, forms.Form):
         help_text=_(
             "Select the country the wine was produced in as indicated on the label."
         ),
+    )
+    location = forms.JSONField(
+        required=False,
+        max_length=500,
+        help_text=_(
+            "Select the location (region, vineyard, site) the wine is from."
+            " Click inside the map to set a marker. The "
+            "marker can be dragged when pressed."
+        ),
+        widget=MapChoosePointWidget(polygon=None),
     )
     size = OpenMultipleChoiceField(
         queryset=Size.objects.none(),
