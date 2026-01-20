@@ -1,10 +1,32 @@
 import django_filters
-from django.db.models import Q
+from django.db.models import F, Q
+from django.db.models.expressions import OrderBy
 from django.utils.translation import gettext_lazy as _
 from django_filters import ChoiceFilter, OrderingFilter
 
 from wine_cellar.apps.wine.forms import WineFilterForm
 from wine_cellar.apps.wine.models import Wine
+
+
+class NullsLastOrderingFilter(OrderingFilter):
+    def filter(self, qs, value):
+        if not value:
+            return qs
+
+        ordering = []
+        for param in value:
+            descending = param.startswith("-")
+            field_name = param.lstrip("-")
+
+            ordering.append(
+                OrderBy(
+                    F(field_name),
+                    descending=descending,
+                    nulls_last=True,
+                )
+            )
+
+        return qs.order_by(*ordering)
 
 
 class WineFilter(django_filters.FilterSet):
@@ -16,7 +38,7 @@ class WineFilter(django_filters.FilterSet):
         empty_label=None,
         null_label=None,
     )
-    order = OrderingFilter(
+    order = NullsLastOrderingFilter(
         choices=(
             ("-created", _("Recently Added")),
             ("created", _("Least Recently Added")),
