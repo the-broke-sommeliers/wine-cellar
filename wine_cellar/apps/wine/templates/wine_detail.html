@@ -1,9 +1,14 @@
 {% extends 'base.html' %}
-{% load static i18n l10n %}
+{% load static i18n l10n react_maps_tags %}
 {% block extra_js %}
     {{ block.super }}
     <script src="{% static 'wine_carousel.js' %}" type="module" defer></script>
+    <script src="{% static 'maps.js' %}"></script>
 {% endblock extra_js %}
+{% block styles %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'maps.css' %}" />
+{% endblock styles %}
 {% block header %}
     <h1 class="header__title">{{ wine.name }}</h1>
 {% endblock header %}
@@ -127,6 +132,9 @@
                     </tr>
                 </table>
             </div>
+            {% if wine.location %}
+            <div class="pure-u-1 pure-u-md-2-3 m-auto wine-detail__map">{% react_detail_map wine %}</div>
+            {% endif %}
             <div class="pure-u-1 pure-u-md-1 text-align-center">
                 <h2 class="header__title">{% translate "Stock" %}</h2>
             </div>

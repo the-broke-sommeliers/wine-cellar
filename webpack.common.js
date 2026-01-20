@@ -39,6 +39,14 @@ module.exports = {
         './wine_cellar/react/maps/react_maps.tsx'
       ]
     },
+    react_choose_point: {
+      import: [
+        'leaflet/dist/leaflet.css',
+        'maplibre-gl/dist/maplibre-gl.css',
+        './wine_cellar/assets/css/map.css',
+        './wine_cellar/react/maps/react_choose_point.jsx'
+      ],
+    },
     wine_carousel: {
       import: ['./wine_cellar/assets/js/wine_carousel.ts'],
     },

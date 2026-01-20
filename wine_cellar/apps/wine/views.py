@@ -132,6 +132,7 @@ class WineCreateView(FormView):
         wine_type = cleaned_data["wine_type"]
         attributes = cleaned_data["attributes"]
         drink_by = cleaned_data["drink_by"]
+        location = cleaned_data["location"]
 
         wine = Wine(
             abv=abv,
@@ -147,6 +148,7 @@ class WineCreateView(FormView):
             comment=comment,
             rating=rating,
             price=price,
+            location=location,
         )
         wine.save()
 
@@ -206,6 +208,7 @@ class WineUpdateView(FormView):
         drink_by = cleaned_data["drink_by"]
         wine_type = cleaned_data["wine_type"]
         attributes = cleaned_data["attributes"]
+        location = cleaned_data["location"]
 
         wine.abv = abv
         wine.size = size
@@ -219,6 +222,7 @@ class WineUpdateView(FormView):
         wine.drink_by = drink_by
         wine.wine_type = wine_type
         wine.price = price
+        wine.location = location
         wine.save()
 
         wine.vineyard.set(vineyards)

@@ -4,7 +4,12 @@
     {{ block.super }}
     <script src="{% static 'tom_select.js' %}" type="module" defer></script>
     <script src="{% static 'image_preview.js' %}" type="module" defer></script>
+    {{ form.media.js }}
 {% endblock extra_js %}
+{% block styles %}
+    {{ block.super }}
+    {{ form.media.css }}
+{% endblock styles %}
 {% block title %}
     Create/Edit Wine
 {% endblock title %}
@@ -44,6 +49,7 @@
                             <h2 class="form-subhead text--gray">{% translate "Origin" %}</h2>
                         </legend>
                         {% include 'forms/form_field.html' with field=form.vineyard %}
+                        {% include 'forms/form_field.html' with field=form.location %}
                         {% include 'forms/form_field.html' with field=form.source %}
                         {% include 'forms/form_field.html' with field=form.price %}
                         {% include 'forms/form_field.html' with field=form.barcode %}

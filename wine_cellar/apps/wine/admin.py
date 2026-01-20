@@ -14,7 +14,7 @@ from wine_cellar.apps.wine.models import (
 @admin.register(Wine)
 class WineAdmin(admin.ModelAdmin):
     list_display = ["name", "barcode", "user"]
-    fields = ["name", "barcode", "user"]
+    fields = ["name", "barcode", "user", "location"]
 
 
 @admin.register(Size)

@@ -172,6 +172,7 @@ class Wine(UserContentModel):
         max_length=3,
         choices={country.alpha_2: country.name for country in pycountry.countries},
     )
+    location = models.JSONField(max_length=500, null=True, blank=True)
     vineyard = models.ManyToManyField(Vineyard)
     source = models.ManyToManyField(Source)
     price = models.DecimalField(max_digits=6, decimal_places=2, null=True)

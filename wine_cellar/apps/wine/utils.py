@@ -1,7 +1,13 @@
+from __future__ import annotations
+
 import os
+from typing import TYPE_CHECKING
 
 from django.conf import settings
 from PIL import ExifTags, Image
+
+if TYPE_CHECKING:
+    from wine_cellar.apps.wine.models import Wine
 
 
 def user_directory_path(instance, filename):
@@ -45,3 +51,42 @@ def make_thumbnail(instance, height=225):
 
     img.save(thumb_full_path, format=img.format, quality=100)
     return name
+
+
+def wine_to_json(wine: Wine) -> dict:
+    if not wine:
+        return None
+    feature = {
+        "name": wine.name,
+        "country": wine.country,
+        "country_name": wine.country_name,
+        "country_icon": wine.country_icon,
+        "image": wine.image_thumbnail,
+        "vintage": wine.vintage,
+        "location": wine.location,
+        "url": wine.get_absolute_url(),
+    }
+    return feature
+
+
+def get_map_attributes(
+    wines: list[Wine] = None, point: str = None, height: str = ""
+) -> dict:
+    map_settings = {
+        "attribution": '<a href="https://openfreemap.org" target="_blank">'
+        + 'OpenFreeMap</a> <a href="https://www.openmaptiles.org/" '
+        + 'target="_blank">© OpenMapTiles</a> Data from '
+        + '<a href="https://www.openstreetmap.org/copyright" '
+        + 'target="_blank">OpenStreetMap</a>',
+        "baseUrl": settings.MAP_BASEURL,
+    }
+    if point:
+        map_settings["point"] = point
+    if height:
+        map_settings["style"] = {"height": height}
+
+    attributes = {"map": map_settings}
+    if wines is not None:
+        wines = [wine_to_json(w) for w in wines]
+        attributes["wines"] = wines
+    return attributes
