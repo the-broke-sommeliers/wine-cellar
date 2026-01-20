@@ -3,7 +3,7 @@ from decimal import Decimal
 from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
 from django.db import connections
-from django.db.models import Avg, Q, Sum
+from django.db.models import Avg, F, Q, Sum
 from django.db.models.functions import Coalesce
 from django.forms import model_to_dict
 from django.http import JsonResponse
@@ -267,7 +267,7 @@ class WineListView(FilterView):
         qs = qs.annotate(
             effective_price=Coalesce(
                 Avg("storageitem__price"),
-                "price",
+                F("price"),
             )
         )
         return qs.filter(user=self.request.user)

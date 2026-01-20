@@ -732,10 +732,10 @@ def test_wine_filter_price(client, user, wine_factory, storage_item_factory):
     assertTemplateUsed(response=r, template_name="base.html")
     assertTemplateUsed(response=r, template_name="wine_list.html")
     assert list(r.context_data["wines"]) == [
-        wine_no_price,
         wine_in_stock_cheap,
         wine_not_in_stock,
         wine_was_in_stock,
         wine_in_stock_middle,
         wine_in_stock_expensive,
+        wine_no_price,
     ]
