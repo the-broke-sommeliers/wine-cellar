@@ -92,13 +92,12 @@ function updateStorageCells() {
     function updateRows() {
         const storageId = storageSelect.value
         const rows = freeCells[storageId]
-        const unlimited_shelf = Object.keys(rows).length === 0
-        if (!unlimited_shelf) {
+        const unlimitedShelf = Object.keys(rows).length === 0
+        if (!unlimitedShelf) {
             const rowKeys = Object.keys(rows).map(Number)
-            const hasRows = Array.isArray(rowKeys) && rowKeys.length > 0
-                populateSelect(rowSelect, rowKeys)
-                populateSelect(columnSelect, [])
-                toggleFields(false, false)
+            populateSelect(rowSelect, rowKeys)
+            populateSelect(columnSelect, [])
+            toggleFields(false, false)
         } else {
             populateSelect(rowSelect, [])
             populateSelect(columnSelect, [])
