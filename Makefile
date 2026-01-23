@@ -37,6 +37,12 @@ fixtures:
 	$(VIRTUAL_ENV)/bin/python3 manage.py loaddata fixtures/wines.json
 	$(VIRTUAL_ENV)/bin/python3 manage.py loaddata fixtures/stock.json
 
+.PHONY: docker-fixtures
+docker-fixtures:
+	docker compose exec web python3 manage.py loaddata fixtures/grapes.json
+	docker compose exec web python3 manage.py loaddata fixtures/wines.json
+	docker compose exec web python3 manage.py loaddata fixtures/stock.json
+
 .PHONY: pytest
 pytest:
 	$(VIRTUAL_ENV)/bin/py.test --reuse-db
