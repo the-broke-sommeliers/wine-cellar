@@ -3,7 +3,8 @@ name: wine-cellar-dev
 services:
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    command: >
+      sh -c "npm run watch & exec python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/usr/src/app
     ports:
