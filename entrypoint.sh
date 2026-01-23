@@ -11,6 +11,9 @@ then
     echo "PostgreSQL started"
 fi
 
+if [ "$CONTAINER_ROLE" = "web" ]
+then
+
 python manage.py migrate
 
 cat <<EOF | python manage.py shell
@@ -21,5 +24,6 @@ User = get_user_model()  # get the currently active user model,
 User.objects.filter(username='$ADMIN_USER').exists() or \
     User.objects.create_superuser('$ADMIN_USER', '$ADMIN_USER_EMAIL', '$ADMIN_USER_PASSWORD')
 EOF
+fi
 
 exec "$@"
