@@ -23,6 +23,10 @@ The easiest way to run Wine Cellar is by using docker as described below.
    ```sh
    docker compose up
    ```
+4. (optional): populate database with some sample data:
+   ```sh
+   make docker-fixtures
+   ```
 
 ---
 
