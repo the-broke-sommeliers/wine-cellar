@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.5.0-rc.0 (2026-01-24)
+
+### feat
+
+- **wine**: add location field to wine    
+    The location field allows to set a marker for the origin of the wine
+    (e.g. region, vineyard, site) on the map. This location will then be
+    used on the global map instead of just showing the marker on the
+    country.
+
+- **docker-dev**: add make command to add sample data for development    
+    You can run `make docker-fixtures` after starting the containers to
+    populate the db with some sample data for development.
+
+
+### fix
+
+- **docker-dev**: hot reload of js/css not working
+- **filter**: when sorting by price show wines without price last
+- **docker-dev**: only run migrations in web container
+- **deps**: update babel monorepo to v7.28.6
+
+
 ## 0.4.0 (2026-01-15)
 
 ### feat
