@@ -97,15 +97,15 @@ class WineCreateView(FormView):
         return kwargs
 
     def form_valid(self, form):
-        form_step = form.cleaned_data.get("form_step", 4)
+        form_step = form.cleaned_data.get("form_step", 5)
 
         # assume form_step is last step if not send
         if form_step is None:
-            form_step = 4
-        if form_step == 4 or "save_finish" in self.request.POST:
+            form_step = 5
+        if form_step == 5 or "save_finish" in self.request.POST:
             self.process_form_data(self.request.user, form.cleaned_data)
             return super().form_valid(form)
-        elif form_step < 4:
+        elif form_step < 5:
             # FIXME: hacky workaround to increase form_step field
             form.data = form.data.copy()
             form.data["form_step"] = form.cleaned_data["form_step"] + 1
@@ -121,6 +121,8 @@ class WineCreateView(FormView):
         barcode = cleaned_data["barcode"]
         comment = cleaned_data["comment"]
         country = cleaned_data["country"]
+        region = cleaned_data["region"]
+        appellation = cleaned_data["appellation"]
         food_pairings = cleaned_data["food_pairings"]
         source = cleaned_data["source"]
         price = cleaned_data["price"]
@@ -139,6 +141,8 @@ class WineCreateView(FormView):
             size=size,
             category=category,
             country=country,
+            region=region[0] if region else None,
+            appellation=appellation[0] if appellation else None,
             name=name,
             barcode=barcode,
             user=user,
@@ -197,6 +201,8 @@ class WineUpdateView(FormView):
         barcode = cleaned_data["barcode"]
         comment = cleaned_data["comment"]
         country = cleaned_data["country"]
+        region = cleaned_data["region"]
+        appellation = cleaned_data["appellation"]
         food_pairings = cleaned_data["food_pairings"]
         source = cleaned_data["source"]
         price = cleaned_data["price"]
@@ -215,6 +221,8 @@ class WineUpdateView(FormView):
         wine.category = category
         wine.comment = comment
         wine.country = country
+        wine.region = region[0] if region else None
+        wine.appellation = appellation[0] if appellation else None
         wine.name = name
         wine.barcode = barcode
         wine.rating = rating

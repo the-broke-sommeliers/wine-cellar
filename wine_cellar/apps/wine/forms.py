@@ -13,11 +13,13 @@ from django.utils.translation import gettext_lazy as _
 from wine_cellar.apps.user.views import get_user_settings
 from wine_cellar.apps.wine.fields import OpenMultipleChoiceField
 from wine_cellar.apps.wine.models import (
+    Appellation,
     Attribute,
     Category,
     FoodPairing,
     Grape,
     ImageType,
+    Region,
     Size,
     Source,
     Vineyard,
@@ -122,6 +124,26 @@ class WineFormPostCleanMixin:
                     max_options=-1,
                     clear=False,
                 )
+            region = self.cleaned_data.get("region")
+            if region:
+                self.set_tom_config(
+                    name="region",
+                    items=[r.pk for r in region],
+                    max_items=1,
+                    max_options=-1,
+                    create=True,
+                    clear=False,
+                )
+            appellation = self.cleaned_data.get("appellation")
+            if appellation:
+                self.set_tom_config(
+                    name="appellation",
+                    items=[a.pk for a in appellation],
+                    max_items=1,
+                    max_options=-1,
+                    create=True,
+                    clear=False,
+                )
             size = self.cleaned_data.get("size")
             if size:
                 self.set_tom_config(
@@ -147,6 +169,8 @@ class WineBaseForm(TomSelectMixin, WineFormPostCleanMixin, forms.Form):
             "food_pairings",
             "source",
             "size",
+            "region",
+            "appellation",
         ]
         for user_field in user_fields:
             self.fields[user_field].queryset = self.fields[
@@ -202,6 +226,18 @@ class WineBaseForm(TomSelectMixin, WineFormPostCleanMixin, forms.Form):
         help_text=_(
             "Select the country the wine was produced in as indicated on the label."
         ),
+    )
+    region = OpenMultipleChoiceField(
+        required=False,
+        field_name="name",
+        queryset=Region.objects.none(),
+        help_text=_("Enter the name of the region the wine is from."),
+    )
+    appellation = OpenMultipleChoiceField(
+        required=False,
+        field_name="name",
+        queryset=Appellation.objects.none(),
+        help_text=_("Enter the name of the appellation of the wine."),
     )
     location = forms.JSONField(
         required=False,
@@ -342,7 +378,7 @@ class WineBaseForm(TomSelectMixin, WineFormPostCleanMixin, forms.Form):
         required=False,
         validators=[
             validators.MinValueValidator(0),
-            validators.MaxValueValidator(4),
+            validators.MaxValueValidator(5),
         ],
     )
 
@@ -358,6 +394,10 @@ class WineForm(WineBaseForm):
         self.set_tom_config(name="vineyard", create=True)
         self.set_tom_config(name="country", max_items=1, max_options=-1)
         self.set_tom_config(name="size", max_items=1, max_options=-1)
+        self.set_tom_config(name="region", max_items=1, max_options=-1, create=True)
+        self.set_tom_config(
+            name="appellation", max_items=1, max_options=-1, create=True
+        )
 
 
 class WineEditForm(WineBaseForm):
@@ -373,6 +413,14 @@ class WineEditForm(WineBaseForm):
         vineyard = [v.pk for v in initial["vineyard"]]
         country = initial["country"]
         size = initial["size"]
+        initial_region = initial.get("region", [])
+        if initial_region is None:
+            initial_region = []
+        region = [r.pk for r in initial_region]
+        initial_appellation = initial.get("appellation", [])
+        if initial_appellation is None:
+            initial_appellation = []
+        appellation = [a.pk for a in initial_appellation]
 
         self.fields["category"].widget.attrs.update(
             {
@@ -427,6 +475,30 @@ class WineEditForm(WineBaseForm):
                     {
                         "create": False,
                         "items": country,
+                        "maxItems": 1,
+                        "maxOptions": None,
+                    }
+                ),
+            }
+        )
+        self.fields["region"].widget.attrs.update(
+            {
+                "data-tom_config": json.dumps(
+                    {
+                        "create": True,
+                        "items": region,
+                        "maxItems": 1,
+                        "maxOptions": None,
+                    }
+                ),
+            }
+        )
+        self.fields["appellation"].widget.attrs.update(
+            {
+                "data-tom_config": json.dumps(
+                    {
+                        "create": True,
+                        "items": appellation,
                         "maxItems": 1,
                         "maxOptions": None,
                     }

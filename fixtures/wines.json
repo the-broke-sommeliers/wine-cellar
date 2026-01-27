@@ -17,6 +17,8 @@
       "comment": "Bright and zesty with citrus and green apple notes.",
       "rating": 4,
       "country": "FR",
+      "region": 1,
+      "appellation": 1,
       "price": 15.0,
       "grapes": [
         1
@@ -45,6 +47,8 @@
       "comment": "Full-bodied with blackcurrant, oak, and spice notes.",
       "rating": 5,
       "country": "US",
+      "region": 2,
+      "appellation": 1,
       "price": 45.0,
       "grapes": [
         2
@@ -73,6 +77,8 @@
       "comment": "Elegant and silky with cherry and earthy undertones.",
       "rating": 5,
       "country": "FR",
+      "region": 2,
+      "appellation": 2,
       "price": 39.0,
       "grapes": [
         3
@@ -101,6 +107,8 @@
       "comment": "Delicate sweetness balanced with vibrant acidity.",
       "rating": 4,
       "country": "FR",
+      "region": 3,
+      "appellation": 3,
       "price": 18.5,
       "grapes": [
         4
@@ -493,6 +501,8 @@
       "comment": "Fresh and fruity with notes of strawberry and herbs.",
       "rating": 4,
       "country": "FR",
+      "region": 6,
+      "appellation": 11,
       "price": 13.0,
       "grapes": [
         3

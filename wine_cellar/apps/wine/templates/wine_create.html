@@ -49,12 +49,19 @@
                             <h2 class="form-subhead text--gray">{% translate "Origin" %}</h2>
                         </legend>
                         {% include 'forms/form_field.html' with field=form.vineyard %}
+                        {% include 'forms/form_field.html' with field=form.region %}
+                        {% include 'forms/form_field.html' with field=form.appellation %}
                         {% include 'forms/form_field.html' with field=form.location %}
+                    </fieldset>
+                    <fieldset id="create__fs_3" class="{% if step != 3 %}hidden{% endif %}">
+                        <legend>
+                            <h2 class="form-subhead text--gray">{% translate "Purchase" %}</h2>
+                        </legend>
                         {% include 'forms/form_field.html' with field=form.source %}
                         {% include 'forms/form_field.html' with field=form.price %}
                         {% include 'forms/form_field.html' with field=form.barcode %}
                     </fieldset>
-                    <fieldset id="create__fs_3" class="{% if step != 3 %}hidden{% endif %}">
+                    <fieldset id="create__fs_4" class="{% if step != 4 %}hidden{% endif %}">
                         <legend>
                             <h2 class="form-subhead text--gray">{% translate "Personal Notes" %}</h2>
                         </legend>
@@ -64,7 +71,7 @@
                         {% include 'forms/form_field.html' with field=form.rating %}
                         {% include 'forms/form_field.html' with field=form.comment %}
                     </fieldset>
-                    <fieldset id="create__fs_4" class="{% if step != 4 %}hidden{% endif %}">
+                    <fieldset id="create__fs_5" class="{% if step != 5 %}hidden{% endif %}">
                         <legend>
                             <h2 class="form-subhead text--gray">{% translate "Image" %}</h2>
                         </legend>

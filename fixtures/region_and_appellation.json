@@ -1,0 +1,283 @@
+[
+  {
+    "model": "wine.region",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "California"
+    }
+  },
+  {
+    "model": "wine.region",
+    "pk": 2,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Burgundy"
+    }
+  },
+  {
+    "model": "wine.region",
+    "pk": 3,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Alsace"
+    }
+  },
+  {
+    "model": "wine.region",
+    "pk": 4,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "South Australia"
+    }
+  },
+  {
+    "model": "wine.region",
+    "pk": 5,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Bordeaux"
+    }
+  },
+  {
+    "model": "wine.region",
+    "pk": 6,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "La Rioja"
+    }
+  },
+  {
+    "model": "wine.region",
+    "pk": 7,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Piedmont"
+    }
+  },
+  {
+    "model": "wine.region",
+    "pk": 8,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Tokaj"
+    }
+  },
+  {
+    "model": "wine.region",
+    "pk": 9,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Tuscany"
+    }
+  },
+  {
+    "model": "wine.region",
+    "pk": 10,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Catalonia"
+    }
+  },
+  {
+    "model": "wine.region",
+    "pk": 11,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Provence"
+    }
+  },
+  {
+    "model": "wine.region",
+    "pk": 12,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Douro"
+    }
+  },
+  {
+    "model": "wine.region",
+    "pk": 13,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Madeira"
+    }
+  },
+  {
+    "model": "wine.region",
+    "pk": 14,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Champagne"
+    }
+  },
+
+  {
+    "model": "wine.appellation",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Napa Valley"
+    }
+  },
+  {
+    "model": "wine.appellation",
+    "pk": 2,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Bourgogne"
+    }
+  },
+  {
+    "model": "wine.appellation",
+    "pk": 3,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Alsace AOC"
+    }
+  },
+  {
+    "model": "wine.appellation",
+    "pk": 4,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Barossa Valley"
+    }
+  },
+  {
+    "model": "wine.appellation",
+    "pk": 5,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Bordeaux AOC"
+    }
+  },
+  {
+    "model": "wine.appellation",
+    "pk": 6,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Rioja DOCa"
+    }
+  },
+  {
+    "model": "wine.appellation",
+    "pk": 7,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Moscato d’Asti DOCG"
+    }
+  },
+  {
+    "model": "wine.appellation",
+    "pk": 8,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Tokaji Aszú"
+    }
+  },
+  {
+    "model": "wine.appellation",
+    "pk": 9,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Chianti Classico DOCG"
+    }
+  },
+  {
+    "model": "wine.appellation",
+    "pk": 10,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Cava DO"
+    }
+  },
+  {
+    "model": "wine.appellation",
+    "pk": 11,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Côtes de Provence AOC"
+    }
+  },
+  {
+    "model": "wine.appellation",
+    "pk": 12,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Porto DOC"
+    }
+  },
+  {
+    "model": "wine.appellation",
+    "pk": 13,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Madeira DOC"
+    }
+  },
+  {
+    "model": "wine.appellation",
+    "pk": 14,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Champagne AOC"
+    }
+  }
+]

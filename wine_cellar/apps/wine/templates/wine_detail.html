@@ -56,6 +56,14 @@
                         <th>{% translate "Country" context "Singular" %}</th>
                         <td>{{ wine.country_icon }} {{ wine.country_name }}</td>
                     </tr>
+                    <tr>
+                        <th>{% translate "Region" %}</th>
+                        <td>{{ wine.region }}</td>
+                    </tr>
+                    <tr>
+                        <th>{% translate "Appellation" %}</th>
+                        <td>{{ wine.appellation }}</td>
+                    </tr>
                     {% if wine.get_vineyards %}
                         <tr>
                             <th>{% translate "Vineyard" %}</th>
@@ -111,7 +119,12 @@
                     {% if wine.price is not None or wine.get_average_price_with_currency %}
                         <tr>
                             <th>{% translate "Price" %}</th>
-                            <td>{{ wine.get_price_with_currency }}{% if wine.get_average_price_with_currency %} ({% translate "Average" %}: {{ wine.get_average_price_with_currency }}){% endif %}</td>
+                            <td>
+                                {{ wine.get_price_with_currency }}
+                                {% if wine.get_average_price_with_currency %}
+                                    ({% translate "Average" %}: {{ wine.get_average_price_with_currency }})
+                                {% endif %}
+                            </td>
                         </tr>
                     {% endif %}
                     {% if wine.comment %}
@@ -133,7 +146,7 @@
                 </table>
             </div>
             {% if wine.location %}
-            <div class="pure-u-1 pure-u-md-2-3 m-auto wine-detail__map">{% react_detail_map wine %}</div>
+                <div class="pure-u-1 pure-u-md-2-3 m-auto wine-detail__map">{% react_detail_map wine %}</div>
             {% endif %}
             <div class="pure-u-1 pure-u-md-1 text-align-center">
                 <h2 class="header__title">{% translate "Stock" %}</h2>
