@@ -80,6 +80,36 @@ class Grape(UserContentModel):
         return ""
 
 
+class Region(UserContentModel):
+    name = models.CharField(max_length=100, verbose_name=_("Region"))
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name", "user"],
+                name="unique region",
+            )
+        ]
+
+    def __str__(self):
+        return self.name
+
+
+class Appellation(UserContentModel):
+    name = models.CharField(max_length=100, verbose_name=_("Appellation"))
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name", "user"],
+                name="unique appellation",
+            )
+        ]
+
+    def __str__(self):
+        return self.name
+
+
 class Vineyard(UserContentModel):
     name = models.CharField(max_length=100)
     website = models.CharField(max_length=100, null=True)
@@ -172,6 +202,8 @@ class Wine(UserContentModel):
         max_length=3,
         choices={country.alpha_2: country.name for country in pycountry.countries},
     )
+    region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True)
+    appellation = models.ForeignKey(Appellation, on_delete=models.SET_NULL, null=True)
     location = models.JSONField(max_length=500, null=True, blank=True)
     vineyard = models.ManyToManyField(Vineyard)
     source = models.ManyToManyField(Source)

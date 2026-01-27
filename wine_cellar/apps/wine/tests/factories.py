@@ -6,9 +6,11 @@ from factory.django import DjangoModelFactory, ImageField
 
 from wine_cellar.apps.user.tests.factories import UserFactory
 from wine_cellar.apps.wine.models import (
+    Appellation,
     Attribute,
     FoodPairing,
     Grape,
+    Region,
     Size,
     Source,
     Vineyard,
@@ -21,6 +23,20 @@ from wine_cellar.apps.wine.models import (
 class GrapeFactory(DjangoModelFactory):
     class Meta:
         model = Grape
+
+    name = factory.Faker("name")
+
+
+class RegionFactory(DjangoModelFactory):
+    class Meta:
+        model = Region
+
+    name = factory.Faker("name")
+
+
+class AppellationFactory(DjangoModelFactory):
+    class Meta:
+        model = Appellation
 
     name = factory.Faker("name")
 

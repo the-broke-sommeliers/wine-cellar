@@ -133,7 +133,7 @@ def test_wine_create_post_with_barcode(client, user):
         "size": size.pk,
         "vintage": 2002,
         "country": "DE",
-        "form_step": 4,
+        "form_step": 5,
     }
     assert not Wine.objects.exists()
     r = client.get(reverse("wine-add", kwargs={"code": 12345}))
@@ -169,7 +169,7 @@ def test_wine_create_post_with_drink_by(client, user):
         "vintage": 2002,
         "drink_by": "2003-02-25",
         "country": "DE",
-        "form_step": 4,
+        "form_step": 5,
     }
     assert not Wine.objects.exists()
     r = client.get(reverse("wine-add", kwargs={"code": 12345}))
@@ -206,7 +206,7 @@ def test_wine_create_post_with_invalid_drink_by(client, user):
         "vintage": 2002,
         "drink_by": "02-02-2000",
         "country": "DE",
-        "form_step": 4,
+        "form_step": 5,
     }
     assert not Wine.objects.exists()
     r = client.get(reverse("wine-add", kwargs={"code": 12345}))
@@ -220,7 +220,9 @@ def test_wine_create_post_with_invalid_drink_by(client, user):
 
 
 @pytest.mark.django_db
-def test_wine_create_post_with_steps(client, user):
+def test_wine_create_post_with_steps(client, user, region_factory, appellation_factory):
+    region = region_factory(name="Rheinhessen")
+    appellation = appellation_factory(name="Nierstein")
     client.force_login(user)
     size = Size.objects.get(name=0.75)
     data_step0 = {
@@ -254,7 +256,8 @@ def test_wine_create_post_with_steps(client, user):
 
     # post form step 2
     data_step2 = {
-        "source": "tom_new_optSupermarket",
+        "region": region.pk,
+        "appellation": appellation.pk,
     }
     initial = r.context_data["form"].data.copy()
     assert initial["form_step"] == 2
@@ -265,8 +268,7 @@ def test_wine_create_post_with_steps(client, user):
 
     # post form step 3
     data_step3 = {
-        "rating": 5,
-        "comment": "Good wine",
+        "source": "tom_new_optSupermarket",
     }
     initial = r.context_data["form"].data.copy()
     assert initial["form_step"] == 3
@@ -276,8 +278,20 @@ def test_wine_create_post_with_steps(client, user):
     assert not Wine.objects.exists()
 
     # post form step 4
+    data_step4 = {
+        "rating": 5,
+        "comment": "Good wine",
+    }
     initial = r.context_data["form"].data.copy()
     assert initial["form_step"] == 4
+    initial.update(data_step4)
+    r = client.post(reverse("wine-add"), data=initial, follow=True)
+    assert r.status_code == HTTPStatus.OK
+    assert not Wine.objects.exists()
+
+    # post form step 5
+    initial = r.context_data["form"].data.copy()
+    assert initial["form_step"] == 5
     r = client.post(reverse("wine-add"), data=initial, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
@@ -290,10 +304,14 @@ def test_wine_create_post_with_steps(client, user):
     data.update(data_step1)
     data.update(data_step2)
     data.update(data_step3)
+    data.update(data_step4)
     assert wine.name == data["name"]
     assert wine.wine_type == data["wine_type"]
     assert wine.abv == data["abv"]
     assert wine.size == size
+    assert wine.country == data["country"]
+    assert wine.region == region
+    assert wine.appellation == appellation
     assert wine.vintage == data["vintage"]
     assert wine.comment == data["comment"]
     assert wine.rating == data["rating"]
@@ -311,7 +329,7 @@ def test_wine_create_post_invalid_step(client, user):
         "size": size.pk,
         "vintage": 2002,
         "country": "DE",
-        "form_step": 5,
+        "form_step": 6,
     }
     assert not Wine.objects.exists()
     r = client.post(reverse("wine-add"), data, follow=True)
