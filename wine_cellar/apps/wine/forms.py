@@ -269,6 +269,14 @@ class WineBaseForm(TomSelectMixin, WineFormPostCleanMixin, forms.Form):
             " strength of the wine."
         ),
         localize=True,
+        # Force number input on mobile devices
+        widget=forms.NumberInput(
+            attrs={
+                "step": "0.1",
+                "inputmode": "decimal",
+                "pattern": r"\d+(\.\d+)?",
+            }
+        ),
     )
     vintage = forms.IntegerField(
         required=False,
@@ -332,6 +340,14 @@ class WineBaseForm(TomSelectMixin, WineFormPostCleanMixin, forms.Form):
         max_digits=6,
         decimal_places=2,
         localize=True,
+        # Force number input on mobile devices
+        widget=forms.NumberInput(
+            attrs={
+                "step": "0.01",
+                "inputmode": "decimal",
+                "pattern": r"\d+(\.\d+)?",
+            }
+        ),
     )
     barcode = forms.CharField(
         max_length=100,
