@@ -17,8 +17,7 @@ RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y curl libpq-dev git build-essential
 RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - && \
-    apt-get install -y nodejs \
-
+    apt-get install -y nodejs
 
 RUN pip install --upgrade pip
 COPY . .
