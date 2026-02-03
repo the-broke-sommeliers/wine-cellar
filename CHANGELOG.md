@@ -3,10 +3,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.5.0-rc.0 (2026-01-24)
+## 0.5.0-rc.1 (2026-02-03)
 
 ### feat
 
+- **wine**: add field for region and appellation
 - **wine**: add location field to wine    
     The location field allows to set a marker for the origin of the wine
     (e.g. region, vineyard, site) on the map. This location will then be
@@ -20,10 +21,21 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### fix
 
+- **deps**: update react monorepo
+- **map**: fix incorrect call to get_map_attributes
+- **storage**: don't include deleted bottles in used slots count
+- **form**: use NumberInput widget for abv and price    
+    This will show the number input on mobile instead of the full keyboard
+
 - **docker-dev**: hot reload of js/css not working
 - **filter**: when sorting by price show wines without price last
 - **docker-dev**: only run migrations in web container
 - **deps**: update babel monorepo to v7.28.6
+
+### refactor
+
+- format map_choose_point_widget.html
+
 
 
 ## 0.4.0 (2026-01-15)
