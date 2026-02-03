@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.5.0-rc.1 (2026-02-03)
+## 0.5.0-rc.2 (2026-02-03)
 
 ### feat
 
@@ -21,6 +21,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### fix
 
+- **docker**: fix broken Dockerfile for prod after node update
 - **deps**: update react monorepo
 - **map**: fix incorrect call to get_map_attributes
 - **storage**: don't include deleted bottles in used slots count
