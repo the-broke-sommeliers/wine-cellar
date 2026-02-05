@@ -50,6 +50,12 @@ Copyright &copy; 2026 Julian Dehm
 #   { "Get started" = "index.md" },
 #   { "Markdown in 5min" = "markdown.md" },
 # ]
+nav = [
+    "README.md",
+    { "Setup" = ["setup/deployment.md"] },
+    { "Usage" = ["usage/wine.md", "usage/storage.md"]},
+    { "Development" = ["development/setup.md", "development/testing.md"]}
+]
 
 # With the "extra_css" option you can add your own CSS styling to customize
 # your Zensical project according to your needs. You can add any number of

@@ -1,10 +1,13 @@
-# Get started
+# Getting started
 
 **Wine Cellar** is a self-hosted wine management app built with Django, designed for wine enthusiasts to track wines, store tasting notes, rate wines, and manage inventory. Whether you're a casual drinker or a connoisseur, this app helps organize your collection.
 
-<img src="https://github.com/user-attachments/assets/315280b8-9f87-45fd-ab88-507d88aef362" height="150" alt="Landing page showing different statistics about your wines">
-<img src="https://github.com/user-attachments/assets/645855e4-3c22-4253-9d59-9fd76f7f4c05" height="150" alt="Wine list view showing all wines in the database">
-<img src="https://github.com/user-attachments/assets/dec2345b-e276-43bf-aac9-e667f3a535b3" height="150" alt="wine detail view showing a picture of a wine and it's attributes">
+<img src="https://github.com/user-attachments/assets/f6230c75-e538-4128-83c3-bdaf54ef1107" height="150" alt="Screenshot of the landing page showing different statistics about your wines">
+<img src="https://github.com/user-attachments/assets/f7c899dc-0540-432a-951c-2146136c67f9" height="150" alt="Screenshot of the wine list view showing all wines in the database">
+<img src="https://github.com/user-attachments/assets/4edd4a02-fe52-405a-9552-1af6788d4e06" height="150" alt="Screenshot of the wine detail view showing a picture of a wine and it's attributes">
+<img src="https://github.com/user-attachments/assets/ccc049d0-f534-4536-844b-73d7eace3dd0" height="150" alt="Screenshot of the wine map view showing markers on the world map">
+<img src="https://github.com/user-attachments/assets/cfa0e3f1-3207-4256-b049-dbf220fc9b03" height="150" alt="Screenshot of the wine barcode scanner page">
+<img src="https://github.com/user-attachments/assets/268c1bc8-8d15-4036-a9ed-00b41c977cc8" height="150" alt="Screenshot of the wine shelf list page">
 
 ## Features
 
