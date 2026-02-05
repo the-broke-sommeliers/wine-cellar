@@ -1,4 +1,4 @@
-name: ci
+name: Deploy Documentation
 on:
   push:
     branches:
