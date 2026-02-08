@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.5.0-rc.2 (2026-02-03)
+## 0.5.0-rc.3 (2026-02-08)
 
 ### feat
 
@@ -21,6 +21,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### fix
 
+- **wine form**: fix error in handling region and appellation
+- **wine form**: fix image step no longer accessible
+- **deps**: update dependency @turf/turf to v7.3.3
 - **docker**: fix broken Dockerfile for prod after node update
 - **deps**: update react monorepo
 - **map**: fix incorrect call to get_map_attributes
@@ -35,6 +38,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### refactor
 
+- **ci**: add better name for docs workflow
 - format map_choose_point_widget.html
 
 
