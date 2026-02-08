@@ -429,15 +429,8 @@ class WineEditForm(WineBaseForm):
         vineyard = [v.pk for v in initial["vineyard"]]
         country = initial["country"]
         size = initial["size"]
-        initial_region = initial.get("region", [])
-        if initial_region is None:
-            initial_region = []
-        region = [r.pk for r in initial_region]
-        initial_appellation = initial.get("appellation", [])
-        if initial_appellation is None:
-            initial_appellation = []
-        appellation = [a.pk for a in initial_appellation]
-
+        region = initial.get("region", None)
+        appellation = initial.get("appellation", None)
         self.fields["category"].widget.attrs.update(
             {
                 "data-tom_config": json.dumps(
