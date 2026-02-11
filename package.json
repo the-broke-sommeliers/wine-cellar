@@ -31,7 +31,7 @@
     "@babel/plugin-transform-runtime": "7.29.0",
     "@babel/preset-env": "7.29.0",
     "@babel/preset-react": "7.28.5",
-    "@types/react": "19.2.10",
+    "@types/react": "19.2.11",
     "@types/react-dom": "19.2.3",
     "autoprefixer": "10.4.24",
     "babel-loader": "10.0.0",
