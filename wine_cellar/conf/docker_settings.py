@@ -1,7 +1,6 @@
 import os
 
 import sentry_sdk
-from celery.schedules import crontab
 
 from wine_cellar.__init__ import __version__
 from wine_cellar.conf.prod import *  # noqa: F403
@@ -43,13 +42,6 @@ if EMAIL_HOST:
 
 CELERY_BROKER_URL = "redis://redis:6379"
 CELERY_RESULT_BACKEND = "redis://redis:6379"
-
-CELERY_BEAT_SCHEDULE = {
-    "drink_by_reminder": {
-        "task": "drink_by_reminder",
-        "schedule": crontab(minute="30", hour="2"),
-    },
-}
 
 SENTRY_DSN = os.environ.get("SENTRY_DSN", "")
 if SENTRY_DSN:
