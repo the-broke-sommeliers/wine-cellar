@@ -2,7 +2,7 @@
 {% blocktranslate %}
 Hello {{ user }},
 
-this is a reminder that the following wine(s) in your cellar should be drunk soon:
+this is a reminder that the following wines in your cellar should be drunk soon:
 {% endblocktranslate %}
 {% for wine in wines %}
 {{ wine.total_stock}}x {{ wine.name }}: {% translate "drink by" %} {{ wine.drink_by }}
