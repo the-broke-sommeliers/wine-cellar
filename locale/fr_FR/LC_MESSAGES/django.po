@@ -50,21 +50,9 @@ msgstr "Entrer le prix de la bouteille en %(currency)s."
 msgid "The selected storage has no rows."
 msgstr ""
 
-#: wine_cellar/apps/storage/forms.py:82
-#, fuzzy
-#| msgid "Enter the number of rows in the storage."
-msgid "The selected row exceeds the number of rows in the storage."
-msgstr "Entrer le nombre de rangées dans le stockage."
-
 #: wine_cellar/apps/storage/forms.py:93
 msgid "The selected storage has no columns."
 msgstr ""
-
-#: wine_cellar/apps/storage/forms.py:98
-#, fuzzy
-#| msgid "Enter the number of columns in the storage."
-msgid "The selected column exceeds the number of columns in the storage."
-msgstr "Entrer le nombre de colonnes dans le stockage."
 
 #: wine_cellar/apps/storage/forms.py:115
 msgid "Both row and column must be specified for the selected storage."
@@ -81,12 +69,6 @@ msgstr ""
 #: wine_cellar/apps/storage/templates/stock_add.html:12
 msgid "Add Bottle"
 msgstr "Ajouter une bouteille"
-
-#: wine_cellar/apps/storage/templates/stock_add.html:35
-#, fuzzy
-#| msgid "This shelf is full. Please choose another one."
-msgid "This row of the shelf is full. Please choose another one."
-msgstr "Cette étagère est remplie. Veuillez en choisir une autre."
 
 #: wine_cellar/apps/storage/templates/stock_add.html:46
 #: wine_cellar/apps/storage/templates/storage_create.html:29
@@ -196,12 +178,6 @@ msgstr ""
 #: wine_cellar/apps/storage/templates/storage_list.html:4
 msgid "Storages"
 msgstr "Stockage"
-
-#: wine_cellar/apps/storage/templates/storage_list.html:11
-#, fuzzy
-#| msgid "Show only in stock"
-msgid "Show Stock History"
-msgstr "Afficher uniquement les vins en stock"
 
 #: wine_cellar/apps/storage/templates/storage_list.html:16
 msgid "Name"
@@ -320,18 +296,6 @@ msgstr "Sélectionner le niveau de sucre du vin."
 msgid "Select the country the wine was produced in as indicated on the label."
 msgstr ""
 "Sélectionner le pays de production du vin tel qu'indiqué sur l'étiquette."
-
-#: wine_cellar/apps/wine/forms.py:234
-#, fuzzy
-#| msgid "Enter the name of the storage."
-msgid "Enter the name of the region the wine is from."
-msgstr "Entrer le nom du stockage"
-
-#: wine_cellar/apps/wine/forms.py:240
-#, fuzzy
-#| msgid "Enter the names of the vineyards which produced the wine."
-msgid "Enter the name of the appellation of the wine."
-msgstr "Entrer les noms du vignoble qui a produit ce vin."
 
 #: wine_cellar/apps/wine/forms.py:246
 msgid ""
@@ -536,13 +500,6 @@ msgstr[0] "Vin en stock"
 msgstr[1] "Vin en stock"
 msgstr[2] "Vins en stock"
 
-#: wine_cellar/apps/wine/templates/homepage.html:22
-#, fuzzy
-#| msgid "Wine in Stock"
-#| msgid_plural "Wines in Stock"
-msgid "Total Value in Stock"
-msgstr "Vin en stock"
-
 #: wine_cellar/apps/wine/templates/homepage.html:29
 msgid "Recorded Wine"
 msgid_plural "Recorded Wines"
@@ -660,20 +617,6 @@ msgstr "Image d'une bouteille de vin"
 #: wine_cellar/apps/wine/templates/wine_detail.html:37
 msgid "Image carousel controls"
 msgstr ""
-
-#: wine_cellar/apps/wine/templates/wine_detail.html:40
-#: wine_cellar/apps/wine/templates/wine_detail.html:41
-#, fuzzy
-#| msgid "No image"
-msgid "Previous image"
-msgstr "Aucune image"
-
-#: wine_cellar/apps/wine/templates/wine_detail.html:44
-#: wine_cellar/apps/wine/templates/wine_detail.html:45
-#, fuzzy
-#| msgid "No image"
-msgid "Next image"
-msgstr "Aucune image"
 
 #: wine_cellar/apps/wine/templates/wine_detail.html:50
 msgid "No image"
@@ -866,12 +809,6 @@ msgstr "Connection"
 #: wine_cellar/templates/base.html:129
 msgid "Version"
 msgstr "Version"
-
-#: wine_cellar/templates/includes/settings_sidebar.html:6
-#, fuzzy
-#| msgid "Settings"
-msgid "General Settings"
-msgstr "Réglages"
 
 #: wine_cellar/templates/includes/settings_sidebar.html:9
 msgid "Email Addresses"

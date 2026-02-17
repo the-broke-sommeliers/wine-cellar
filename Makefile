@@ -109,6 +109,7 @@ lint-py:
 po:
 	$(VIRTUAL_ENV)/bin/python manage.py makemessages --all --no-obsolete -d django --extension html,email,py --ignore 'venv/*' --ignore 'build/*' --ignore "wine_cellar/static/**"
 	$(VIRTUAL_ENV)/bin/python manage.py makemessages --all --no-obsolete -d djangojs --extension js,jsx,ts,tsx --ignore 'venv/*' --ignore 'node_modules/*' --ignore 'build/*' --ignore "wine_cellar/static/**"
+	find locale -name "*.po" -exec msgattrib --no-fuzzy {} -o {} \;
 	msgen locale/en_GB/LC_MESSAGES/django.po -o locale/en_GB/LC_MESSAGES/django.po
 	msgen locale/en_GB/LC_MESSAGES/djangojs.po -o locale/en_GB/LC_MESSAGES/djangojs.po
 
