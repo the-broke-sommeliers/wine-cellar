@@ -142,6 +142,7 @@ LOCALE_PATHS = [ROOT_DIR / "locale"]
 
 LANGUAGES = [
     ("de-DE", _("German")),
+    ("fr-FR", _("French")),
     ("en-gb", _("British English")),
 ]
 
