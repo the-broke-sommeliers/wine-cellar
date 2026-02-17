@@ -9,9 +9,9 @@
   },
   "dependencies": {
     "@babel/runtime": "7.28.6",
-    "@fortawesome/fontawesome-free": "7.1.0",
-    "@fortawesome/fontawesome-svg-core": "7.1.0",
-    "@fortawesome/free-solid-svg-icons": "7.1.0",
+    "@fortawesome/fontawesome-free": "7.2.0",
+    "@fortawesome/fontawesome-svg-core": "7.2.0",
+    "@fortawesome/free-solid-svg-icons": "7.2.0",
     "@maplibre/maplibre-gl-leaflet": "0.1.3",
     "@turf/turf": "7.3.4",
     "barcode-detector": "3.0.8",
