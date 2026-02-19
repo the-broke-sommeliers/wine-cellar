@@ -3,9 +3,24 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.5.0-rc.3 (2026-02-08)
+## 0.5.0 (2026-02-19)
+
+### BREAKING CHANGE
+
+- django-celery beat has been removed. If you setup custom celery beat schedules via the
+    django admin they will no longer work.
+
 
 ### feat
+
+- **language**: enable french    
+    thanks @philmassart
+
+- **lang**: add french translation    
+    django.po file
+
+- **lang**: add french translation    
+    djangojs.po file
 
 - **wine**: add field for region and appellation
 - **wine**: add location field to wine    
@@ -21,6 +36,14 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### fix
 
+- **deps**: update dependency tom-select to v2.5.1
+- **deps**: update font awesome to v7.2.0
+- **translations**: auto remove fuzzy translations
+- **translations**: ignore static files dir and add extensions for js translations
+- **deps**: update dependency @turf/turf to v7.3.4
+- **deps**: update dependency tom-select to v2.4.6
+- **deps**: update dependency tom-select to v2.4.5
+- **deps**: update dependency tom-select to v2.4.4
 - **wine form**: fix error in handling region and appellation
 - **wine form**: fix image step no longer accessible
 - **deps**: update dependency @turf/turf to v7.3.3
@@ -37,6 +60,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **deps**: update babel monorepo to v7.28.6
 
 ### refactor
+
+- **celery**: remove django-celery-beat as it's not really maintained and overkill.    
+    BREAKING CHANGE: django-celery beat has been removed. If you setup custom celery beat schedules via the
+    django admin they will no longer work.
 
 - **ci**: add better name for docs workflow
 - format map_choose_point_widget.html
