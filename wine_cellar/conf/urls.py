@@ -35,6 +35,7 @@ from wine_cellar.apps.storage.views import (
 from wine_cellar.apps.user.views import UserSettingsView
 from wine_cellar.apps.wine.views import (
     HomePageView,
+    WineChooseActionView,
     WineCreateView,
     WineDeleteView,
     WineDetailView,
@@ -43,6 +44,7 @@ from wine_cellar.apps.wine.views import (
     WineScannedView,
     WineScanView,
     WineUpdateView,
+    WineUploadAIView,
     health_check,
 )
 
@@ -58,8 +60,15 @@ urlpatterns = [
     path("stock/add/<int:pk>", StorageItemAddView.as_view(), name="stock-add"),
     path("stock/edit/<int:pk>", StorageItemUpdateView.as_view(), name="stock-edit"),
     path("stock/delete/<int:pk>", StorageItemDeleteView.as_view(), name="stock-delete"),
+    path("wine/add/choose", WineChooseActionView.as_view(), name="wine-add-choose"),
     path("wine/add/", WineCreateView.as_view(), name="wine-add"),
     path("wine/add/<str:code>", WineCreateView.as_view(), name="wine-add"),
+    path(
+        "wine/add/from_ai/<str:ai_initial>",
+        WineCreateView.as_view(),
+        name="wine-add-initial",
+    ),
+    path("wine/ai/", WineUploadAIView.as_view(), name="wine-ai-upload"),
     path("wine/<int:pk>", WineDetailView.as_view(), name="wine-detail"),
     path("wine/edit/<int:pk>", WineUpdateView.as_view(), name="wine-edit"),
     path("wine/delete/<int:pk>", WineDeleteView.as_view(), name="wine-delete"),

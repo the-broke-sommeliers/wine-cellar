@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+{% block header %}
+    <h1 class="header__title">{% translate "Add new Wine" %}</h1>
+{% endblock header %}
+{% block content %}
+    <div class="wine-scan__container">
+        <div class="pure-g">
+            <div class="pure-u-1 pure-u-md-1-1 text-align-center">
+                <p>{% translate "Choose how to add a wine" %}</p>
+                <div class="wine__stock-buttons">
+                    <a href="{% url 'wine-add' %}" class="pure-button button__primary">{% translate "Add new wine manually" %}</a>
+                    <a href="{% url 'wine-ai-upload' %}" class="pure-button button__primary" {% if not ai_enabled %}disabled{% endif %}>{% translate "Add by uploading an image (AI)" %}</a>
+                </div>
+            {% if not ai_enabled %}
+                <p>
+            {% blocktranslate trimmed %}
+                To use ai-based wine creation a valid ai model and api key need to be configured.
+                See <a href="https://the-broke-sommeliers.github.io/wine-cellar/setup/deployment/#ai-setup">the docs</a> for more information.
+            {% endblocktranslate %}
+                </p>
+        {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock content %}

@@ -3,6 +3,7 @@ from django.conf import settings
 
 from wine_cellar.apps.wine.utils import (
     get_map_attributes,
+    lat_long_to_geojson,
     wine_to_json,
 )
 
@@ -23,7 +24,6 @@ def test_wine_to_json_none(wine_factory, geojson_point):
     assert wine_to_json(wine) == expected
 
 
-@pytest.mark.django_db
 def test_get_map_attributes(wine_factory):
     expected = {
         "map": {
@@ -66,7 +66,6 @@ def test_get_map_attributes_with_wine(wine_factory, geojson_point):
     assert get_map_attributes([wine]) == expected
 
 
-@pytest.mark.django_db
 def test_get_map_attributes_with_point_height(geojson_point):
     expected = {
         "map": {
@@ -81,3 +80,9 @@ def test_get_map_attributes_with_point_height(geojson_point):
         },
     }
     assert get_map_attributes(point=geojson_point, height="50vh") == expected
+
+
+def test_latlong_to_point(geojson_point_dict):
+    long = geojson_point_dict["geometry"]["coordinates"][0]
+    lat = geojson_point_dict["geometry"]["coordinates"][1]
+    assert lat_long_to_geojson(str(lat) + "," + str(long)) == geojson_point_dict

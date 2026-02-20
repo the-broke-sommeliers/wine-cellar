@@ -48,3 +48,11 @@ def geojson_point():
     return json.dumps(
         {"type": "Feature", "geometry": {"type": "Point", "coordinates": [90.0, 45.0]}}
     )
+
+
+@pytest.fixture
+def geojson_point_dict():
+    return {
+        "type": "Feature",
+        "geometry": {"type": "Point", "coordinates": [90.0, 45.0]},
+    }

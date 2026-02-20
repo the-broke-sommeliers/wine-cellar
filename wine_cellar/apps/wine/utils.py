@@ -90,3 +90,14 @@ def get_map_attributes(
         wines = [wine_to_json(w) for w in wines]
         attributes["wines"] = wines
     return attributes
+
+
+def lat_long_to_geojson(lat_long: str) -> dict:
+    lat_str, long_str = lat_long.split(",")
+    lat = float(lat_str.strip())
+    long = float(long_str.strip())
+
+    return {
+        "type": "Feature",
+        "geometry": {"type": "Point", "coordinates": [long, lat]},
+    }
