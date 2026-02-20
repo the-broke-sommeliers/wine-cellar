@@ -16,3 +16,4 @@ media/
 autopo.ooo
 .vscode/
 site/
+wine_cellar/conf/local.py

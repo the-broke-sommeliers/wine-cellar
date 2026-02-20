@@ -102,6 +102,26 @@ DJANGO_DEFAULT_FROM_EMAIL=Wine Cellar <your@email.com>
 ???+ Info
     USE_TLS and USE_SSL are mutual exclusive, only one may be set to True.
 
+#### AI Setup
+
+Wine Cellar supports AI-powered wine label scanning to automatically extract wine details from photos to make adding new wines
+a bit easier.
+
+To enable this feature, configure the following in your `.env-prod` file:
+```
+AI_MODEL=gemini/gemini-2.5-flash
+AI_API_KEY=your-api-key
+```
+
+???+ Tip
+    [Google Gemini](https://aistudio.google.com) offers a free tier with no credit card required.
+    The free quota (~50 requests/day) is sufficient for personal use.
+    Simply create an API key at [Google AI Studio](https://aistudio.google.com) and use `gemini/gemini-2.5-flash` as the model.
+
+???+ Info
+    Other providers such as OpenAI (`gpt-4o`) and Anthropic (`anthropic/claude-3-5-sonnet-20241022`) are also supported.
+    See [LiteLLM's documentation](https://docs.litellm.ai/docs/providers) for a full list of supported models and providers.
+
 #### Sample NGINX config
 
 Below is a sample nginx config using Letsencrypt for your reverse proxy. 

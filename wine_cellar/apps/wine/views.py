@@ -1,3 +1,5 @@
+import base64
+import json
 from decimal import Decimal
 
 from django.conf import settings
@@ -10,14 +12,25 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.formats import number_format
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import DeleteView, DetailView, FormView, TemplateView
 from django_filters.views import FilterView
+from litellm import completion
 
 from wine_cellar.apps.storage.models import StorageItem
 from wine_cellar.apps.user.views import get_user_settings
+from wine_cellar.apps.wine.fields import OpenChoiceModelFormViewMixin
 from wine_cellar.apps.wine.filters import WineFilter
-from wine_cellar.apps.wine.forms import WineEditForm, WineForm, image_fields_map
-from wine_cellar.apps.wine.models import Wine, WineImage
+from wine_cellar.apps.wine.forms import (
+    WineForm,
+    WineUploadAIForm,
+    image_fields_map,
+)
+from wine_cellar.apps.wine.models import (
+    Wine,
+    WineImage,
+)
+from wine_cellar.apps.wine.serializers import WineAiSerializer
 
 
 class HomePageView(TemplateView):
@@ -83,175 +96,125 @@ class HomePageView(TemplateView):
         return context
 
 
-class WineCreateView(FormView):
-    template_name = "wine_create.html"
+class WineChooseActionView(TemplateView):
+    template_name = "wine_choose_action.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        ai_enabled = False
+        if hasattr(settings, "AI_MODEL") and hasattr(settings, "AI_API_KEY"):
+            if settings.AI_MODEL and settings.AI_API_KEY:
+                ai_enabled = True
+        context.update({"ai_enabled": ai_enabled})
+        return context
+
+
+class WineBaseView(OpenChoiceModelFormViewMixin, FormView):
     form_class = WineForm
-    success_url = reverse_lazy("wine-list")
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        if "user" not in kwargs:
-            kwargs["user"] = self.request.user
-        if "code" in self.kwargs:
-            kwargs["initial"].update({"barcode": self.kwargs["code"]})
+        kwargs.setdefault("user", self.request.user)
         return kwargs
+
+    def get_wine_instance(self):
+        raise NotImplementedError
+
+    def update_wine_from_cleaned_data(self, form, wine=None):
+        cleaned_data = form.cleaned_data
+        user = self.request.user
+
+        self.create_new_objects(form)
+
+        wine_fields = [
+            "abv",
+            "category",
+            "barcode",
+            "comment",
+            "country",
+            "name",
+            "rating",
+            "vintage",
+            "drink_by",
+            "wine_type",
+            "price",
+            "location",
+        ]
+        for field in wine_fields:
+            setattr(wine, field, cleaned_data[field])
+        wine.size = cleaned_data["size"][0]
+        wine.region = cleaned_data["region"][0] if cleaned_data["region"] else None
+        wine.appellation = (
+            cleaned_data["appellation"][0] if cleaned_data["appellation"] else None
+        )
+        wine.user = user
+        wine.save()
+
+        for field in ["vineyard", "grapes", "food_pairings", "attributes", "source"]:
+            getattr(wine, field).set(cleaned_data[field])
+
+        for form_field, image_type in image_fields_map.items():
+            image = cleaned_data.get(form_field)
+            existing = WineImage.objects.filter(
+                wine=wine, user=user, image_type=image_type
+            )
+            if image is False or (image and not hasattr(image, "instance")):
+                if existing.exists():
+                    existing.first().image.delete()
+                    existing.delete()
+            elif image and not hasattr(image, "instance"):
+                WineImage.objects.get_or_create(
+                    image=image, wine=wine, user=user, image_type=image_type
+                )
+        return wine
+
+
+class WineCreateView(WineBaseView):
+    template_name = "wine_create.html"
+    success_url = reverse_lazy("wine-list")
+
+    def get_initial(self):
+        initial = super().get_initial()
+        if code := self.kwargs.get("code"):
+            initial["barcode"] = code
+        if b64 := self.kwargs.get("ai_initial"):
+            initial.update(WineAiSerializer().deserialize_ai_payload(b64))
+        return initial
+
+    def get_wine_instance(self):
+        return Wine()
 
     def form_valid(self, form):
         form_step = form.cleaned_data.get("form_step", 5)
 
-        # assume form_step is last step if not send
         if form_step is None:
             form_step = 5
         if form_step == 5 or "save_finish" in self.request.POST:
-            self.process_form_data(self.request.user, form.cleaned_data)
+            self.update_wine_from_cleaned_data(form=form, wine=self.get_wine_instance())
             return super().form_valid(form)
         elif form_step < 5:
             # FIXME: hacky workaround to increase form_step field
             form.data = form.data.copy()
             form.data["form_step"] = form.cleaned_data["form_step"] + 1
             return super().form_invalid(form)
-
         return super().form_invalid(form)
 
-    @staticmethod
-    def process_form_data(user, cleaned_data):
-        abv = cleaned_data["abv"]
-        size = cleaned_data["size"][0]
-        category = cleaned_data["category"]
-        barcode = cleaned_data["barcode"]
-        comment = cleaned_data["comment"]
-        country = cleaned_data["country"]
-        region = cleaned_data["region"]
-        appellation = cleaned_data["appellation"]
-        food_pairings = cleaned_data["food_pairings"]
-        source = cleaned_data["source"]
-        price = cleaned_data["price"]
-        vineyards = cleaned_data["vineyard"]
-        grapes = cleaned_data["grapes"]
-        name = cleaned_data["name"]
-        rating = cleaned_data["rating"]
-        vintage = cleaned_data["vintage"]
-        wine_type = cleaned_data["wine_type"]
-        attributes = cleaned_data["attributes"]
-        drink_by = cleaned_data["drink_by"]
-        location = cleaned_data["location"]
 
-        wine = Wine(
-            abv=abv,
-            size=size,
-            category=category,
-            country=country,
-            region=region[0] if region else None,
-            appellation=appellation[0] if appellation else None,
-            name=name,
-            barcode=barcode,
-            user=user,
-            vintage=vintage,
-            drink_by=drink_by,
-            wine_type=wine_type,
-            comment=comment,
-            rating=rating,
-            price=price,
-            location=location,
-        )
-        wine.save()
-
-        wine.vineyard.set(vineyards),
-        wine.grapes.set(grapes)
-        wine.food_pairings.set(food_pairings)
-        wine.source.set(source)
-        wine.attributes.set(attributes)
-
-        for form_field, image_type in image_fields_map.items():
-            image = cleaned_data.get(form_field)
-            if image:
-                WineImage.objects.get_or_create(
-                    image=image, wine=wine, user=user, image_type=image_type
-                )
-
-
-class WineUpdateView(FormView):
+class WineUpdateView(WineBaseView):
     template_name = "wine_edit.html"
-    form_class = WineEditForm
-    success_url = reverse_lazy("wine-list")
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        if "user" not in kwargs:
-            kwargs["user"] = self.request.user
-        return kwargs
 
     def get_initial(self):
-        initial = super().get_initial()
         wine = get_object_or_404(Wine, pk=self.kwargs["pk"], user=self.request.user)
-        initial.update(model_to_dict(wine))
-        return initial
+        return {**super().get_initial(), **model_to_dict(wine)}
+
+    def get_wine_instance(self):
+        return get_object_or_404(Wine, pk=self.kwargs["pk"], user=self.request.user)
 
     def form_valid(self, form):
-        wine = get_object_or_404(Wine, pk=self.kwargs["pk"], user=self.request.user)
-        self.process_form_data(wine, self.request.user, form.cleaned_data)
+        wine = self.get_wine_instance()
+        self.update_wine_from_cleaned_data(form=form, wine=wine)
         self.success_url = reverse_lazy("wine-detail", kwargs={"pk": wine.pk})
         return super().form_valid(form)
-
-    @staticmethod
-    def process_form_data(wine, user, cleaned_data):
-        abv = cleaned_data["abv"]
-        size = cleaned_data["size"][0]
-        category = cleaned_data["category"]
-        barcode = cleaned_data["barcode"]
-        comment = cleaned_data["comment"]
-        country = cleaned_data["country"]
-        region = cleaned_data["region"]
-        appellation = cleaned_data["appellation"]
-        food_pairings = cleaned_data["food_pairings"]
-        source = cleaned_data["source"]
-        price = cleaned_data["price"]
-        vineyards = cleaned_data["vineyard"]
-        grapes = cleaned_data["grapes"]
-        name = cleaned_data["name"]
-        rating = cleaned_data["rating"]
-        vintage = cleaned_data["vintage"]
-        drink_by = cleaned_data["drink_by"]
-        wine_type = cleaned_data["wine_type"]
-        attributes = cleaned_data["attributes"]
-        location = cleaned_data["location"]
-
-        wine.abv = abv
-        wine.size = size
-        wine.category = category
-        wine.comment = comment
-        wine.country = country
-        wine.region = region[0] if region else None
-        wine.appellation = appellation[0] if appellation else None
-        wine.name = name
-        wine.barcode = barcode
-        wine.rating = rating
-        wine.vintage = vintage
-        wine.drink_by = drink_by
-        wine.wine_type = wine_type
-        wine.price = price
-        wine.location = location
-        wine.save()
-
-        wine.vineyard.set(vineyards)
-        wine.grapes.set(grapes)
-        wine.food_pairings.set(food_pairings)
-        wine.attributes.set(attributes)
-        wine.source.set(source)
-
-        for form_field, image_type in image_fields_map.items():
-            image = cleaned_data.get(form_field)
-            existing_image = WineImage.objects.filter(
-                wine=wine, user=user, image_type=image_type
-            )
-            if image is False or not hasattr(image, "instance"):
-                if existing_image.exists():
-                    existing_image.first().image.delete()
-                    existing_image.delete()
-            if image and not hasattr(image, "instance"):
-                WineImage.objects.get_or_create(
-                    image=image, wine=wine, user=user, image_type=image_type
-                )
 
 
 class WineDetailView(DetailView):
@@ -320,6 +283,82 @@ class WineMapView(TemplateView):
             }
         )
         return context
+
+
+class WineUploadAIView(FormView):
+    template_name = "wine_upload_ai.html"
+    form_class = WineUploadAIForm
+    success_url = reverse_lazy("wine-list")
+
+    MODEL_INSTRUCTIONS = """
+    Return JSON with fields:
+    name: wine name
+    country: ISO2 code
+    type: white, red, rose, sparkling, orange, dessert, fortified
+    size: float, bottle size in liters, e.g. 0.75, if no value guess
+    grapes: list of grapes
+    vintage: year
+    abs: float, alcohol %
+    sweetness: dry, semi-dry, medium sweet, sweet, feinherb
+    vineyard: list of vineyard names
+    region: region
+    appellation: appellation
+    location: lat,long; if unknown use region or omit
+    """
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        ai_enabled = False
+        if hasattr(settings, "AI_MODEL") and hasattr(settings, "AI_API_KEY"):
+            if settings.AI_MODEL and settings.AI_API_KEY:
+                ai_enabled = True
+        context.update({"ai_enabled": ai_enabled})
+        return context
+
+    def form_valid(self, form):
+        front_img = form.cleaned_data.get("front")
+        back_img = form.cleaned_data.get("back")
+
+        content = [{"type": "text", "text": self.MODEL_INSTRUCTIONS}]
+        if front_img:
+            front_b64 = base64.b64encode(front_img.read()).decode()
+            front_url = (
+                f"data:{front_img.content_type or 'image/jpeg'};base64,{front_b64}"
+            )
+            content.append({"type": "image_url", "image_url": {"url": front_url}})
+
+        if back_img:
+            back_b64 = base64.b64encode(back_img.read()).decode()
+            back_url = f"data:{back_img.content_type or 'image/jpeg'};base64,{back_b64}"
+            content.append({"type": "image_url", "image_url": {"url": back_url}})
+
+        response = completion(
+            model=settings.AI_MODEL,
+            messages=[{"role": "user", "content": content}],
+            api_key=settings.AI_API_KEY,
+        )
+        ai_text = response.choices[0].message.content.strip()
+
+        try:
+            if ai_text.startswith("```"):
+                ai_text = ai_text.split("```")[1]
+                if ai_text.startswith("json"):
+                    ai_text = ai_text[4:]
+
+            ai_json = json.loads(ai_text)
+        except json.JSONDecodeError:
+            form.add_error(
+                None,
+                _(
+                    "Failed to process AI response."
+                    + "Please check the uploaded images and try again."
+                ),
+            )
+            return self.form_invalid(form)
+
+        b64_initial = WineAiSerializer().serialize_ai_payload(ai_json)
+        create_url = reverse("wine-add-initial", kwargs={"ai_initial": b64_initial})
+        return redirect(create_url)
 
 
 @login_not_required

@@ -39,14 +39,14 @@ def test_open_multiple_choice_required_present(size_factory):
 
 
 @pytest.mark.django_db
-def test_open_multiple_choice_required_invalid(size_factory):
+def test_open_multiple_choice_required_empty(size_factory):
     size_factory()
-    form = CustomTestFormSlicedQs(data={"required_field": ["a"]})
+    form = CustomTestFormSlicedQs(data={"required_field": [""]})
     assert not form.is_valid()
 
 
 @pytest.mark.django_db
-def test_open_multiple_choice_non_required_invalid(size_factory):
+def test_open_multiple_choice_non_required_empty(size_factory):
     size = size_factory()
     form = CustomTestForm(
         data={"required_field": [size.pk], "non_required_field": [""]}

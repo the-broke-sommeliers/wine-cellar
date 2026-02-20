@@ -49,3 +49,6 @@ if SENTRY_DSN:
         dsn=SENTRY_DSN,
         release="wine-cellar@" + __version__,
     )
+
+AI_MODEL = os.environ.get("AI_MODEL", "")
+AI_API_KEY = os.environ.get("AI_API_KEY", "")
