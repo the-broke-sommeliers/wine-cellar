@@ -14,6 +14,7 @@ fi
 if [ "$CONTAINER_ROLE" = "web" ]
 then
 
+chown -R $(id -u):$(id -g) /home/app/web/staticfiles || true
 python manage.py migrate
 python manage.py collectstatic --no-input --clear
 python manage.py compilemessages
