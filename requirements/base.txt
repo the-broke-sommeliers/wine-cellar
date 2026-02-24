@@ -4,6 +4,6 @@ django-allauth[socialaccount]==65.14.3
 django-filter==25.2
 django-widget-tweaks==1.5.1
 pillow==12.1.1
-pycountry==24.6.1
+pycountry==26.2.16
 requests==2.32.5
 whitenoise[brotli]==6.11.0
