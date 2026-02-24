@@ -46,6 +46,7 @@ version_provider = "pep621"
 version_files = [
     "wine_cellar/__init__.py:__version__",
     "pyproject.toml:version",
+    "docs/version.txt",
 ]
 update_changelog_on_bump = false
 major_version_zero = true

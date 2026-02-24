@@ -22,7 +22,8 @@ The easiest way to run Wine Cellar is by using docker as described below.
    ```
 2. Checkout the latest release
    ```sh
-   git checkout 0.5.0
+   git checkout 
+   --8<-- "docs/version.txt"
    ```
 3. Copy and configure environment files:
    ```sh
