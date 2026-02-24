@@ -7,9 +7,9 @@ djlint==1.36.4
 factory-boy==3.3.3
 flake8==7.3.0
 isort==7.0.0
-mkdocs-material==9.7.1
 pytest-cov==7.0.0
 pytest-django==4.12.0
 pytest-factoryboy==2.8.1
 pytest==9.0.2
 commitizen==4.13.7
+zensical==0.0.23
