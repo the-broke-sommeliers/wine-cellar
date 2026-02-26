@@ -16,53 +16,73 @@ The easiest way to run Wine Cellar is by using docker as described below.
 
 #### Steps
 
-1. Clone the repository
+##### 1. Clone the repository
    ```sh
    git clone https://github.com/the-broke-sommeliers/wine-cellar.git
    ```
-2. Checkout the latest release
+##### 2. Checkout the latest release
    ```sh
    git checkout 0.5.0
    ```
-3. Copy and configure environment files:
+##### 3. Copy and configure environment files:
    ```sh
    cp .env.prod.db-sample .env.prod.db
    cp .env.prod-sample .env.prod
    ```
-4. Edit both `.env` files with secure credentials and your desired settings.
-5. Start the production container:
-   ```sh
-   docker compose -f docker-compose.prod.yml up
-   ```
-6. Configure your reverse proxy to forward traffic to `http://127.0.0.1:8085`.
+##### 4. Edit both `.env` files with secure credentials and your desired settings.
+##### 5. Start the production container:
+=== "Docker"
+    ```sh
+    docker compose -f docker-compose.prod.yml up -d
+    ```
+=== "Podman"
+    ```sh
+    podman-compose -f docker-compose.prod.yml up -d
+    ```
+##### 6. Configure your reverse proxy to forward traffic to `http://127.0.0.1:8085`.
 
 
 #### Update
 
 To update to a newer version do the following steps:
 
-1. Stop the containers
-   ```sh
-   docker compose -f docker-compose.prod.yml down
-   ```
-2. Fetch latest release
+##### 1. Stop the containers
+=== "Docker"
+    ```sh
+    docker compose -f docker-compose.prod.yml down
+    ```
+=== "Podman"
+    ```sh
+    podman-compose -f docker-compose.prod.yml down
+    ```
+##### 2. Fetch latest release
    ```sh
    git fetch
    ```
-3. Checkout the latest release
+##### 3. Checkout the latest release
    ```sh
    git checkout <latest version>
    ```
-4. Check if env files had changes  
+##### 4. Check if env files had changes  
    Compare your `.env.prod` and `env.prod.db` against the sample files to check if there's been any changes. If so, copy them over.
-5. Pull new image
-   ```sh
-   docker compose -f docker-compose.prod.yml pull
-   ```
-6. Start the containers:
-   ```sh
-   docker compose -f docker-compose.prod.yml up
-   ```
+##### 5. Pull new image
+=== "Docker"
+    ```sh
+    docker compose -f docker-compose.prod.yml pull
+    ```
+=== "Podman"
+    ```sh
+    podman-compose -f docker-compose.prod.yml pull
+    ```
+##### 6. Start the containers:
+=== "Docker"
+    ```sh
+    docker compose -f docker-compose.prod.yml up -d
+    ```
+=== "Podman"
+    ```sh
+    podman-compose -f docker-compose.prod.yml up -d
+    ```
 
 #### Email Setup
 
