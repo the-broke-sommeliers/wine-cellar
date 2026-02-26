@@ -52,7 +52,7 @@ Copyright &copy; 2026 Julian Dehm
 # ]
 nav = [
     "README.md",
-    { "Setup" = ["setup/deployment.md"] },
+    { "Setup" = ["setup/deployment.md", "setup/backups.md"] },
     { "Usage" = ["usage/wine.md", "usage/storage.md"]},
     { "Development" = ["development/setup.md", "development/testing.md"]}
 ]
