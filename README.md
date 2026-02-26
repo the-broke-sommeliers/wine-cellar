@@ -31,3 +31,10 @@ Find the full documentation [here](https://the-broke-sommeliers.github.io/wine-c
 ## Development
 
 This projects uses [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) for all commit messages.
+
+## Translation
+The project is translated on transifex. If you want to help translating you should be able to find it here and request access: https://app.transifex.com/the-broke-sommeliers/wine-cellar/. If not please open an issue.
+
+Currently translated languages are:
+- German
+- French
