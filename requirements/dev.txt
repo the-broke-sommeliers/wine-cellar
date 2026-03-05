@@ -12,4 +12,4 @@ pytest-django==4.12.0
 pytest-factoryboy==2.8.1
 pytest==9.0.2
 commitizen==4.13.9
-zensical==0.0.23
+zensical==0.0.24
