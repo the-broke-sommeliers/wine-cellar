@@ -1,6 +1,6 @@
 -r base.txt
 
 psycopg[c]==3.3.3
-gunicorn==24.1.1
+gunicorn==25.1.0
 redis==7.2.1
 sentry-sdk==2.53.0
