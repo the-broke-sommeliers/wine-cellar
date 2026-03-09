@@ -74,9 +74,12 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
-    import debug_toolbar
-
+    try:
+        import debug_toolbar  # noqa: F401
+    except ImportError:
+        pass
+    else:
+        urlpatterns += [
+            path("__debug__/", include(debug_toolbar.urls)),
+        ]
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += [
-        path("__debug__/", include(debug_toolbar.urls)),
-    ]
