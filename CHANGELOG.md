@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.6.0-rc.0 (2026-03-09)
+
+### feat
+
+- **stock**: add edit view for items in stock
+
+### fix
+
+- only import debug toolbar if installed
+
+- **deps**: update dependency barcode-detector to v3.1.0
+- **deps**: update dependency tom-select to v2.5.2
+
+
 ## 0.5.0 (2026-02-19)
 
 ### BREAKING CHANGE
