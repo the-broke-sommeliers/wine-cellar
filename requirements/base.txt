@@ -1,6 +1,6 @@
 Django==5.2.12
 celery==5.6.2
-django-allauth[socialaccount]==65.14.3
+django-allauth[socialaccount]==65.15.0
 django-filter==25.2
 django-widget-tweaks==1.5.1
 pillow==12.1.1
