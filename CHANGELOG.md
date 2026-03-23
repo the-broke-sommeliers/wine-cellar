@@ -3,14 +3,23 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.6.0-rc.0 (2026-03-09)
+## 0.6.0-rc.1 (2026-03-23)
 
 ### feat
+
+- **wine**: add option to use ai to extract data from wine label    
+    You can now use ai to extract data about a new wine by uploading
+    a picture of the front and/or back label. This should make adding
+    a new wine much easier. To use this feature you need an api key
+    for an api compatible with litellm. Currently gogole also offers
+    free api keys with a limited quota for e.g. gemini-2.5-flash.
 
 - **stock**: add edit view for items in stock
 
 ### fix
 
+- **deps**: update dependency barcode-detector to v3.1.1
+- **docker**: fix permission issue with selinux
 - only import debug toolbar if installed
 
 - **deps**: update dependency barcode-detector to v3.1.0
