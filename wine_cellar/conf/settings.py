@@ -182,3 +182,7 @@ SITE_URL = "http://127.0.0.1:8003"
 ACCOUNT_ADAPTER = (
     "wine_cellar.apps.user.signup_adapter.ConfigurableSignupAccountAdapter"
 )
+
+ENABLE_SIGNUPS = False
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_EMAIL_REQUIRED = True
