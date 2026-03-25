@@ -153,8 +153,8 @@ server {
     client_body_buffer_size 50M;
   }
 
-  ssl_certificate /etc/letsencrypt/live/<your full domain>/fullchain.pem; # managed by Certbot
-  ssl_certificate_key /etc/letsencrypt/live/<your full domain>/privkey.pem; # managed by Certbot
+  ssl_certificate /etc/letsencrypt/live/<your full domain>/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/<your full domain>/privkey.pem;
   ssl_session_timeout 1d;
   ssl_session_cache shared:MozSSL:10m;  # about 40000 sessions
   ssl_session_tickets off;
@@ -165,13 +165,6 @@ server {
 
   # HSTS (ngx_http_headers_module is required) (63072000 seconds)
   add_header Strict-Transport-Security "max-age=63072000" always;
-
-  # OCSP stapling
-  ssl_stapling on;
-  ssl_stapling_verify on;
-
-  # verify chain of trust of OCSP response using Root CA and Intermediate certs
-  ssl_trusted_certificate /etc/letsencrypt/live/wine.dehm.dev/chain.pem;
 
   # replace with the IP address of your resolver
   resolver 9.9.9.9 [2620:fe::fe] valid=300s;
