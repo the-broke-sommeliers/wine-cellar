@@ -170,3 +170,5 @@ server {
   resolver 9.9.9.9 [2620:fe::fe] valid=300s;
 }
 ```
+### SSO
+see [SSO](sso.md)
