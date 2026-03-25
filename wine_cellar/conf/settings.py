@@ -184,5 +184,5 @@ ACCOUNT_ADAPTER = (
 )
 
 ENABLE_SIGNUPS = False
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"
-ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "optional"
+ACCOUNT_SIGNUP_FIELDS = ["email", "username*", "password1*", "password2*"]

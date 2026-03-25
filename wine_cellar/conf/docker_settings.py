@@ -27,6 +27,13 @@ STATIC_ROOT = "staticfiles"
 SITE_URL = os.environ.get("DJANGO_SITE_URL")
 
 ENABLE_SIGNUPS = os.environ.get("DJANGO_ENABLE_SIGNUPS", "False") == "True"
+ACCOUNT_EMAIL_VERIFICATION = "mandatory" if ENABLE_SIGNUPS else "optional"
+ACCOUNT_SIGNUP_FIELDS = (
+    ["email*", "username*", "password1*", "password2*"]
+    if ENABLE_SIGNUPS
+    else ["email", "username*", "password1*", "password2*"]
+)
+
 
 EMAIL_HOST = os.environ.get("DJANGO_EMAIL_HOST")
 EMAIL_PORT = os.environ.get("DJANGO_EMAIL_PORT")
