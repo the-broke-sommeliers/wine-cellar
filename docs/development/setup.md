@@ -36,7 +36,6 @@ Ensure your system has:
 
 - [Python 3.x](https://www.python.org/downloads/)
 - [Node.js](https://nodejs.org/) (v24.x or higher recommended)
-- [npm](https://www.npmjs.com/get-npm) (comes with Node.js)
 
 ### Getting Started
 
@@ -53,31 +52,17 @@ cd wine-cellar
 make install
 ```
 
-#### 3. Run the Development Server
-
-```sh
-make server
-```
-
-Access the app at `http://127.0.0.1:8003/`.
-
-#### 4. Watch for Changes
-
-```sh
-make watch
-```
-
-#### 5. Load Sample Data (Optional)
+#### 3. Load Sample Data (Optional)
 
 ```sh
 make fixtures
 ```
 This will create an admin user with login `admin:password`.
 
-#### 6. Create an Admin User (Optional)
+#### 4. Run the Development Server
 
 ```sh
-source venv/bin/activate
-python manage.py createsuperuser
+make watch
 ```
-If you haven't run step 5.
+
+Access the app at `http://127.0.0.1:8003/`.
