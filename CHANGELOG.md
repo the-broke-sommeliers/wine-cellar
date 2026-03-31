@@ -3,7 +3,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.6.0-rc.1 (2026-03-23)
+## 0.6.0-rc.2 (2026-03-31)
+
+### BREAKING CHANGE
+
+- Move the caddyfile into docker-compose.prod.yml to
+    avoid the file dependency. If you've made modifications to the Caddyfile, apply
+    them to the config in `docker-compose.prod.yml` instead.
+
 
 ### feat
 
@@ -18,12 +25,31 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### fix
 
+- image upload not working as intended
+    
+    Uploading images should now work again. Additionally,
+    thumbnails will now be properly cleaned up on image
+    deletion/replacement.
+
+- only enforce email validation when signup is enabled
+
+- **registration**: require email verification on signup
+- **deps**: update babel monorepo to v7.29.2
 - **deps**: update dependency barcode-detector to v3.1.1
 - **docker**: fix permission issue with selinux
 - only import debug toolbar if installed
 
 - **deps**: update dependency barcode-detector to v3.1.0
 - **deps**: update dependency tom-select to v2.5.2
+
+### refactor
+
+- move Caddyfile into docker compose to avoid file dependency
+    
+    BREAKING CHANGE: Move the caddyfile into docker-compose.prod.yml to
+    avoid the file dependency. If you've made modifications to the Caddyfile, apply
+    them to the config in `docker-compose.prod.yml` instead.
+
 
 
 ## 0.5.0 (2026-02-19)
