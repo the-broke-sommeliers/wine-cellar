@@ -27,8 +27,10 @@ from wine_cellar.apps.wine.forms import (
     image_fields_map,
 )
 from wine_cellar.apps.wine.models import (
+    Category,
     Wine,
     WineImage,
+    WineType,
 )
 from wine_cellar.apps.wine.serializers import WineAiSerializer
 
@@ -292,16 +294,19 @@ class WineUploadAIView(FormView):
     form_class = WineUploadAIForm
     success_url = reverse_lazy("wine-list")
 
-    MODEL_INSTRUCTIONS = """
+    wine_types = ", ".join([choice.label.lower() for choice in WineType])
+    sweetness_categories = ", ".join([choice.label.lower() for choice in Category])
+
+    MODEL_INSTRUCTIONS = f"""
     Return JSON with fields:
     name: wine name
     country: ISO2 code
-    type: white, red, rose, sparkling, orange, dessert, fortified
+    type: {wine_types}
     size: float, bottle size in liters, e.g. 0.75, if no value guess
     grapes: list of grapes
     vintage: year
     abs: float, alcohol %
-    sweetness: dry, semi-dry, medium sweet, sweet, feinherb
+    sweetness: {sweetness_categories}
     vineyard: list of vineyard names
     region: region
     appellation: appellation

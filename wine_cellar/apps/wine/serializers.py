@@ -10,6 +10,7 @@ from wine_cellar.apps.wine.models import (
     Region,
     Size,
     Vineyard,
+    WineType,
 )
 from wine_cellar.apps.wine.utils import lat_long_to_geojson
 
@@ -93,11 +94,17 @@ class WineAiSerializer:
             if country:
                 initial["country"] = country.alpha_2
 
-        if ai_json.get("type") in Category.values:
-            initial["wine_type"] = ai_json["type"]
+        ai_type = (ai_json.get("type") or "").strip().lower()
+        for val, label in WineType.choices:
+            if label.lower() == ai_type:
+                initial["wine_type"] = val
+                break
 
-        if ai_json.get("sweetness") in Category.values:
-            initial["category"] = ai_json["sweetness"]
+        ai_sweetness = (ai_json.get("sweetness") or "").strip().lower()
+        for value, label in Category.choices:
+            if label.lower() == ai_sweetness:
+                initial["category"] = value
+                break
 
         for field, cfg in self.FIELD_CONFIG.items():
             value = ai_json.get(field)
