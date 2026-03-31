@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.6.0-rc.2 (2026-03-31)
+## 0.6.0-rc.3 (2026-03-31)
 
 ### BREAKING CHANGE
 
@@ -24,6 +24,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **stock**: add edit view for items in stock
 
 ### fix
+
+- **ai**: dynamically construct values for wine type and category    
+    - make ai value parsing a bit more robust
 
 - image upload not working as intended
     
