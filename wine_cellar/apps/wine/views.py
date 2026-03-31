@@ -160,9 +160,11 @@ class WineBaseView(OpenChoiceModelFormViewMixin, FormView):
             )
             if image is False or (image and not hasattr(image, "instance")):
                 if existing.exists():
-                    existing.first().image.delete()
+                    image = existing.first()
+                    image.image.delete()
+                    image.thumbnail.delete()
                     existing.delete()
-            elif image and not hasattr(image, "instance"):
+            if image and not hasattr(image, "instance"):
                 WineImage.objects.get_or_create(
                     image=image, wine=wine, user=user, image_type=image_type
                 )
