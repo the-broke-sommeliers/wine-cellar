@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.6.0-rc.3 (2026-03-31)
+## 0.6.0-rc.4 (2026-04-05)
 
 ### BREAKING CHANGE
 
@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### feat
 
+- **security**: add content security policy
 - **wine**: add option to use ai to extract data from wine label    
     You can now use ai to extract data about a new wine by uploading
     a picture of the front and/or back label. This should make adding
@@ -46,6 +47,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **deps**: update dependency tom-select to v2.5.2
 
 ### refactor
+
+- **forms**: improve view structure for adding a new wine    
+    - fix some small ui quirks
 
 - move Caddyfile into docker compose to avoid file dependency
     
