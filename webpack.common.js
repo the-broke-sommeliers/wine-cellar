@@ -10,6 +10,7 @@ module.exports = {
         './node_modules/@fortawesome/fontawesome-free/css/fontawesome.css',
         './node_modules/@fortawesome/fontawesome-free/css/solid.css',
         './node_modules/purecss/build/pure.css',
+        './node_modules/purecss/build/grids-responsive.css',
         './wine_cellar/assets/css/menu.css',
         './wine_cellar/assets/css/detail.css',
         './wine_cellar/assets/css/storage.css',
