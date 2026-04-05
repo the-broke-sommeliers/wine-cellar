@@ -5,7 +5,6 @@ function initImagePreview() {
       .closest('.form-container')
       ?.querySelector('.image-preview') as HTMLImageElement | null
     const hasInitial = preview?.src !== ''
-    console.log(hasInitial)
     const wrapper = preview?.parentElement
     const clearCheckbox = input
       .closest('.form-container')
