@@ -287,10 +287,11 @@ p.form-hint {
   content: '\f2ea';
 }
 
-.wine__stock-buttons {
+.wine__add-buttons {
   margin-top: 20px;
-
-  @media screen and (max-width: 48em) {
-    text-align: center;
-  }
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
 }
