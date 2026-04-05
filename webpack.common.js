@@ -6,6 +6,10 @@ module.exports = {
   entry: {
     base: {
       import: [
+        './node_modules/tom-select/dist/css/tom-select.css',
+        './node_modules/@fortawesome/fontawesome-free/css/fontawesome.css',
+        './node_modules/@fortawesome/fontawesome-free/css/solid.css',
+        './node_modules/purecss/build/pure.css',
         './wine_cellar/assets/css/menu.css',
         './wine_cellar/assets/css/detail.css',
         './wine_cellar/assets/css/storage.css',
@@ -16,9 +20,6 @@ module.exports = {
         './wine_cellar/assets/css/page-layout.css',
         './wine_cellar/assets/css/homepage.css',
         './wine_cellar/assets/css/button.css',
-        './node_modules/tom-select/dist/css/tom-select.css',
-        './node_modules/@fortawesome/fontawesome-free/css/fontawesome.css',
-        './node_modules/@fortawesome/fontawesome-free/css/solid.css',
       ],
     },
     tom_select: {
