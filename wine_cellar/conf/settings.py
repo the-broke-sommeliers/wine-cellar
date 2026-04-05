@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 
+from django.utils.csp import CSP
 from django.utils.translation import gettext_lazy as _
 
 from wine_cellar import __version__
@@ -59,6 +60,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.csp.ContentSecurityPolicyMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -186,3 +188,10 @@ ACCOUNT_ADAPTER = (
 ENABLE_SIGNUPS = False
 ACCOUNT_EMAIL_VERIFICATION = "optional"
 ACCOUNT_SIGNUP_FIELDS = ["email", "username*", "password1*", "password2*"]
+
+SECURE_CSP = {
+    "default-src": [CSP.SELF],
+    "frame-ancestors": [CSP.SELF],
+    "form-action": [CSP.SELF],
+    "base-uri": [CSP.NONE],
+}
