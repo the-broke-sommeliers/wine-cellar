@@ -103,11 +103,12 @@ class WineChooseActionView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        ai_enabled = False
-        if hasattr(settings, "AI_MODEL") and hasattr(settings, "AI_API_KEY"):
-            if settings.AI_MODEL and settings.AI_API_KEY:
-                ai_enabled = True
+        ai_enabled = all(
+            [getattr(settings, "AI_MODEL", None), getattr(settings, "AI_API_KEY", None)]
+        )
         context.update({"ai_enabled": ai_enabled})
+        if barcode := self.request.GET.get("barcode"):
+            context.update({"barcode": barcode})
         return context
 
 
@@ -179,9 +180,9 @@ class WineCreateView(WineBaseView):
 
     def get_initial(self):
         initial = super().get_initial()
-        if code := self.kwargs.get("code"):
-            initial["barcode"] = code
-        if b64 := self.kwargs.get("ai_initial"):
+        if barcode := self.request.GET.get("barcode"):
+            initial["barcode"] = barcode
+        if b64 := self.request.GET.get("ai_initial"):
             initial.update(WineAiSerializer().deserialize_ai_payload(b64))
         return initial
 
@@ -249,15 +250,17 @@ class WineListView(FilterView):
 
 
 class WineScanView(TemplateView):
-    template_name = "scan_wine.html"
+    template_name = "wine_scan.html"
 
 
 class WineScannedView(TemplateView):
-    template_name = "scanned_wine.html"
+    template_name = "wine_scanned.html"
 
     def dispatch(self, request, *args, **kwargs):
-        code = self.kwargs["code"]
-        wine = Wine.objects.filter(barcode=code).filter(user=self.request.user).first()
+        barcode = self.kwargs["barcode"]
+        wine = (
+            Wine.objects.filter(barcode=barcode).filter(user=self.request.user).first()
+        )
         if wine:
             return redirect(reverse("wine-detail", kwargs={"pk": wine.pk}))
 
@@ -349,8 +352,8 @@ class WineUploadAIView(FormView):
         try:
             if ai_text.startswith("```"):
                 ai_text = ai_text.split("```")[1]
-                if ai_text.startswith("json"):
-                    ai_text = ai_text[4:]
+            if ai_text.startswith("json"):
+                ai_text = ai_text[4:]
 
             ai_json = json.loads(ai_text)
         except json.JSONDecodeError:
@@ -364,7 +367,9 @@ class WineUploadAIView(FormView):
             return self.form_invalid(form)
 
         b64_initial = WineAiSerializer().serialize_ai_payload(ai_json)
-        create_url = reverse("wine-add-initial", kwargs={"ai_initial": b64_initial})
+        create_url = reverse("wine-add") + f"?ai_initial={b64_initial}"
+        if barcode := self.request.GET.get("barcode"):
+            create_url += f"&barcode={barcode}"
         return redirect(create_url)
 
 

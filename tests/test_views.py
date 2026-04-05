@@ -136,12 +136,10 @@ def test_wine_create_post_with_barcode(client, user):
         "form_step": 5,
     }
     assert not Wine.objects.exists()
-    r = client.get(reverse("wine-add", kwargs={"code": 12345}))
+    r = client.get(reverse("wine-add") + "?barcode=12345")
     initial = r.context_data["form"].initial.copy()
     initial.update(data)
-    r = client.post(
-        reverse("wine-add", kwargs={"code": 12345}), data=initial, follow=True
-    )
+    r = client.post(reverse("wine-add"), data=initial, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
     assertTemplateUsed(response=r, template_name="base.html")
@@ -172,12 +170,10 @@ def test_wine_create_post_with_drink_by(client, user):
         "form_step": 5,
     }
     assert not Wine.objects.exists()
-    r = client.get(reverse("wine-add", kwargs={"code": 12345}))
+    r = client.get(reverse("wine-add") + "?barcode=12345")
     initial = r.context_data["form"].initial.copy()
     initial.update(data)
-    r = client.post(
-        reverse("wine-add", kwargs={"code": 12345}), data=initial, follow=True
-    )
+    r = client.post(reverse("wine-add"), data=initial, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
     assertTemplateUsed(response=r, template_name="base.html")
@@ -209,12 +205,10 @@ def test_wine_create_post_with_invalid_drink_by(client, user):
         "form_step": 5,
     }
     assert not Wine.objects.exists()
-    r = client.get(reverse("wine-add", kwargs={"code": 12345}))
+    r = client.get(reverse("wine-add") + "?barcode=12345")
     initial = r.context_data["form"].initial.copy()
     initial.update(data)
-    r = client.post(
-        reverse("wine-add", kwargs={"code": 12345}), data=initial, follow=True
-    )
+    r = client.post(reverse("wine-add"), data=initial, follow=True)
     assert r.status_code == HTTPStatus.OK
     assert r.context_data["form"].errors
 
@@ -662,7 +656,7 @@ def test_wine_scanned_existing(
 ):
     wine = wine_factory(user=user, country="DE", barcode="12345")
     client.force_login(user)
-    r = client.get(reverse("wine-scan", kwargs={"code": wine.barcode}), follow=True)
+    r = client.get(reverse("wine-scan", kwargs={"barcode": wine.barcode}), follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(
         response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
@@ -679,10 +673,10 @@ def test_wine_scanned_non_existing(
 ):
     wine_factory(user=user, country="DE", barcode="12345")
     client.force_login(user)
-    r = client.get(reverse("wine-scan", kwargs={"code": "00000"}), follow=True)
+    r = client.get(reverse("wine-scan", kwargs={"barcode": "00000"}), follow=True)
     assert r.status_code == HTTPStatus.OK
     assertTemplateUsed(response=r, template_name="base.html")
-    assertTemplateUsed(response=r, template_name="scanned_wine.html")
+    assertTemplateUsed(response=r, template_name="wine_scanned.html")
 
 
 @pytest.mark.django_db
