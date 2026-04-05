@@ -17,6 +17,7 @@
     "barcode-detector": "3.1.1",
     "leaflet": "1.9.4",
     "leaflet.markercluster": "1.5.3",
+    "purecss": "3.0.0",
     "react": "19.2.4",
     "react-barcode-scanner": "4.0.1",
     "react-dom": "19.2.4",
