@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.6.0-rc.5 (2026-04-05)
+## 0.6.0-rc.6 (2026-04-05)
 
 ### BREAKING CHANGE
 
@@ -25,6 +25,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **stock**: add edit view for items in stock
 
 ### fix
+
+- adjust csp for maps and image previews
 
 - include purecss locally
 
