@@ -1,4 +1,4 @@
-Django==6.0.3
+Django==6.0.4
 celery==5.6.3
 django-allauth[socialaccount]==65.15.0
 django-filter==25.2
