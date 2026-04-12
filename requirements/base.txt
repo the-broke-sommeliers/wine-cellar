@@ -3,7 +3,7 @@ celery==5.6.3
 django-allauth[socialaccount]==65.15.1
 django-filter==25.2
 django-widget-tweaks==1.5.1
-litellm==1.83.2
+litellm==1.83.3
 pillow==12.2.0
 pycountry==26.2.16
 requests==2.33.1
