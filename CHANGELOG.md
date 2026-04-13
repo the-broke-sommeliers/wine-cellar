@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.6.0-rc.6 (2026-04-05)
+## 0.6.0-rc.7 (2026-04-13)
 
 ### BREAKING CHANGE
 
@@ -13,6 +13,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 
 ### feat
+
+- add option to scan barcode within add/edit form
 
 - **security**: add content security policy
 - **wine**: add option to use ai to extract data from wine label    
@@ -26,6 +28,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### fix
 
+- **csp**: add missing csp for barcode scanner
+- **deps**: update dependency barcode-detector to v3.1.2
 - adjust csp for maps and image previews
 
 - include purecss locally
