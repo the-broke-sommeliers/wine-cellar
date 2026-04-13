@@ -194,7 +194,8 @@ SECURE_CSP = {
     "frame-ancestors": [CSP.SELF],
     "form-action": [CSP.SELF],
     "base-uri": [CSP.NONE],
-    "connect-src": ["https://tiles.openfreemap.org/"],
+    "connect-src": [CSP.SELF, "https://tiles.openfreemap.org/"],
     "worker-src": [CSP.SELF, "blob:"],
     "img-src": [CSP.SELF, "data:"],
+    "script-src": [CSP.SELF, CSP.WASM_UNSAFE_EVAL],
 }
