@@ -4,6 +4,7 @@
     {{ block.super }}
     <script src="{% static 'tom_select.js' %}" type="module" defer></script>
     <script src="{% static 'image_preview.js' %}" type="module" defer></script>
+    <script src="{% static 'barcode_scanner.js' %}" type="module" defer></script>
     {{ form.media.js }}
 {% endblock extra_js %}
 {% block styles %}
@@ -60,6 +61,9 @@
                         {% include 'forms/form_field.html' with field=form.source %}
                         {% include 'forms/form_field.html' with field=form.price %}
                         {% include 'forms/form_field.html' with field=form.barcode %}
+                        <div id="scanner"
+                             data-zxing_wasm_url="{% static 'zxing_reader.wasm' %}"
+                             data-target-input="id_barcode"></div>
                     </fieldset>
                     <fieldset id="create__fs_4" class="{% if step != 4 %}hidden{% endif %}">
                         <legend>
