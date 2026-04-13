@@ -371,7 +371,10 @@ class WineForm(TomSelectMixin, WineFormPostCleanMixin, forms.Form):
     barcode = forms.CharField(
         max_length=100,
         required=False,
-        help_text=_("Enter the barcode number of the wine as indicated on the label."),
+        help_text=_(
+            "Enter the barcode number of the wine as indicated"
+            " on the label or scan using the button below."
+        ),
     )
     comment = forms.CharField(
         max_length=250,
