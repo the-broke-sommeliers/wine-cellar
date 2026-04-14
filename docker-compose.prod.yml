@@ -32,13 +32,11 @@ services:
     ports:
       - 127.0.0.1:8085:80
     volumes:
+      - ./caddy:/etc/caddy/
       - static_volume:/srv/static
       - media_volume:/srv/media
       - caddy_data:/data
       - caddy_config:/config
-    configs:
-      - source: caddyfile
-        target: /etc/caddy/Caddyfile
     depends_on:
       - web
   redis:
@@ -63,24 +61,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
-
-configs:
-  caddyfile:
-    content: |
-      :80 {
-        @files {
-          path /static/* /media/*
-        }
-        handle @files {
-          file_server
-        }
-        handle {
-          @health path /health
-          respond @health "Not Found" 404
-          reverse_proxy web:8000
-        }
-      }
-
 volumes:
   postgres_data:
   static_volume:
