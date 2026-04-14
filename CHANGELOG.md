@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.6.1 (2026-04-14)
+
+### fix
+
+- Revert "refactor: move Caddyfile into docker compose to avoid file dependency"
+    
+    revert the below commit as it won't work with podman.
+    
+    This reverts commit a188e18d27b0e71afde671837617986ce06f799c.
+
+
+
 ## 0.6.0 (2026-04-14)
 
 ### BREAKING CHANGE
