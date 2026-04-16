@@ -18,9 +18,9 @@
     "leaflet": "1.9.4",
     "leaflet.markercluster": "1.5.3",
     "purecss": "3.0.0",
-    "react": "19.2.4",
+    "react": "19.2.5",
     "react-barcode-scanner": "4.0.1",
-    "react-dom": "19.2.4",
+    "react-dom": "19.2.5",
     "react-leaflet": "5.0.0",
     "tom-select": "2.5.2"
   },
