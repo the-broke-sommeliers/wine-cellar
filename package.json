@@ -56,7 +56,7 @@
     "ts-loader": "9.5.7",
     "typescript": "5.9.3",
     "url": "0.11.4",
-    "webpack": "5.106.0",
+    "webpack": "5.106.1",
     "webpack-cli": "7.0.2",
     "webpack-merge": "6.0.1"
   }
