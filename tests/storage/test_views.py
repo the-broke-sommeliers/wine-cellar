@@ -98,6 +98,18 @@ def test_storage_create_post_invalid(client, user):
 
 
 @pytest.mark.django_db
+def test_storage_cant_edit_other_users(client, user, user_factory, storage_factory):
+    other_user = user_factory()
+    storage_other_user = storage_factory(user=other_user)
+    client.force_login(user)
+    assert Storage.objects.count() == 3
+    r = client.post(
+        reverse("storage-edit", kwargs={"pk": storage_other_user.pk}), follow=True
+    )
+    assert r.status_code == HTTPStatus.NOT_FOUND
+
+
+@pytest.mark.django_db
 def test_storage_update_post(client, user):
     client.force_login(user)
     storage = Storage.objects.first()
