@@ -73,7 +73,9 @@ class StorageUpdateView(FormView):
 
     def get_initial(self):
         initial = super().get_initial()
-        storage = get_object_or_404(Storage, pk=self.kwargs["pk"])
+        storage = get_object_or_404(
+            Storage, pk=self.kwargs["pk"], user=self.request.user
+        )
         initial.update(model_to_dict(storage))
         return initial
 
