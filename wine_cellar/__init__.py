@@ -1,4 +1,4 @@
 from .conf.celery import celery_app
 
 __all__ = ("celery_app",)
-__version__ = "0.6.1"
+__version__ = "0.6.2"
