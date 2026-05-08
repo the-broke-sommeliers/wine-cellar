@@ -30,7 +30,7 @@
     "@babel/eslint-plugin": "7.27.1",
     "@babel/plugin-transform-modules-commonjs": "7.28.6",
     "@babel/plugin-transform-runtime": "7.29.0",
-    "@babel/preset-env": "7.29.2",
+    "@babel/preset-env": "7.29.3",
     "@babel/preset-react": "7.28.5",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
