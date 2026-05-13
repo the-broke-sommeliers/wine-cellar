@@ -12,6 +12,11 @@
       "matchDepTypes": ["dependencies", "devDependencies"],
       "matchUpdateTypes": ["minor", "patch"],
       "automerge": true
+    },
+    {
+      "description": "Lock Python to 3.13 line for Docker and GitHub Actions",
+      "matchPackageNames": ["python", "docker.io/library/python"],
+      "allowedVersions": "< 3.14.0"
     }
   ],
   "digest": {
