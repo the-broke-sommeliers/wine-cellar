@@ -13,7 +13,7 @@ function init() {
       <React.StrictMode>
         <ChoosePointMap
           BaseMap={Map}
-          input={container.nextElementSibling}
+          input={container.nextElementSibling as HTMLInputElement}
           {...props.map}
           style={{ height: '50vh' }}
         />

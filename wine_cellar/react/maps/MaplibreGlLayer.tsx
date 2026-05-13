@@ -2,19 +2,26 @@ import L from 'leaflet'
 import '@maplibre/maplibre-gl-leaflet'
 import {
   createElementObject,
-  createTileLayerComponent, updateGridLayer
+  createTileLayerComponent,
+  updateGridLayer,
+  LeafletContextInterface
 } from '@react-leaflet/core'
 
-const createMaplibreGlLayer = (props, context) => {
+interface MaplibreGlLayerProps {
+  attribution?: string
+  baseUrl: string
+}
+
+const createMaplibreGlLayer = (props: MaplibreGlLayerProps, context: LeafletContextInterface) => {
   const instance = L.maplibreGL({
-    attribution: props.attribution,
     style: props.baseUrl,
-  })
+    ...(props.attribution && { attribution: props.attribution })
+  } as any)
 
   return createElementObject(instance, context)
 }
 
-const updateMaplibreGlLayer = (instance, props, prevProps) => {
+const updateMaplibreGlLayer = (instance: any, props: MaplibreGlLayerProps, prevProps: MaplibreGlLayerProps) => {
   updateGridLayer(instance, props, prevProps)
 
   const { baseUrl, attribution } = props

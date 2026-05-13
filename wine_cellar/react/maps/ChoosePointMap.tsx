@@ -2,7 +2,19 @@ import React, { useRef } from 'react'
 import AddMarkerControl from './AddMarkerControl'
 import Map from './Map'
 
-const ChoosePointMap = ({ BaseMap = Map, apiUrl, input, ...mapProps }) => {
+interface ChoosePointMapProps {
+  BaseMap?: typeof Map
+  apiUrl?: string
+  input: HTMLInputElement
+  point?: string
+  polygon?: GeoJSON.FeatureCollection | GeoJSON.Feature
+  attribution?: string
+  baseUrl: string
+  style?: React.CSSProperties
+  id?: string
+}
+
+const ChoosePointMap = ({ BaseMap = Map, apiUrl, input, ...mapProps }: ChoosePointMapProps) => {
   const mapRef = useRef(null)
   const controlRef = useRef(null)
 

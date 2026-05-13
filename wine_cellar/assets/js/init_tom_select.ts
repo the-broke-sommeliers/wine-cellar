@@ -43,11 +43,11 @@ function initTomSelect(): void {
       let optionObj: TomOption | undefined
       if (isInteger) {
         optionObj = Object.values(ts.options).find(
-          (opt: any) => opt.value === value || opt.text === strValue
+          (opt: TomOption) => opt.value === value || opt.text === strValue
         )
       } else {
         optionObj = Object.values(ts.options).find(
-          (opt: any) => opt.text === strValue
+          (opt: TomOption) => opt.text === strValue
         )
       }
 

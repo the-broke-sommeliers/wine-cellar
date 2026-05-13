@@ -46,7 +46,7 @@ module.exports = {
         'leaflet/dist/leaflet.css',
         'maplibre-gl/dist/maplibre-gl.css',
         './wine_cellar/assets/css/map.css',
-        './wine_cellar/react/maps/react_choose_point.jsx'
+        './wine_cellar/react/maps/react_choose_point.tsx'
       ],
     },
     wine_carousel: {
@@ -65,20 +65,6 @@ module.exports = {
   },
   module: {
     rules: [
-      {
-        test: /\.jsx?$/,
-        exclude: /node_modules\/.*/, // exclude most dependencies
-        loader: 'babel-loader',
-        options: {
-          presets: ['@babel/preset-env', '@babel/preset-react'].map(
-            require.resolve
-          ),
-          plugins: [
-            '@babel/plugin-transform-runtime',
-            '@babel/plugin-transform-modules-commonjs',
-          ],
-        },
-      },
       {
         test: /\.tsx?$/,
         use: 'ts-loader',
