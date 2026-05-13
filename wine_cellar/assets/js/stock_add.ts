@@ -38,15 +38,11 @@ function updateStorageCells() {
         rowSelect.disabled = disable
         columnSelect.disabled = disable
         if (disable) {
-            // @ts-ignore
-            rowSelect.tomselect.disable()
-            // @ts-ignore
-            columnSelect.tomselect.disable()
+            rowSelect.tomselect?.disable()
+            columnSelect.tomselect?.disable()
         } else {
-            // @ts-ignore
-            rowSelect.tomselect.enable()
-            // @ts-ignore
-            columnSelect.tomselect.enable()
+            rowSelect.tomselect?.enable()
+            columnSelect.tomselect?.enable()
         }
         submitButton.disabled = !submit
     }
@@ -59,16 +55,12 @@ function updateStorageCells() {
             opt.textContent = String(val)
             select.appendChild(opt)
         })
-        // @ts-ignore
-        select.tomselect.clear(true)
-        // @ts-ignore
-        select.tomselect.clearOptions()
+        select.tomselect?.clear(true)
+        select.tomselect?.clearOptions()
         options.forEach(function (val) {
-            // @ts-ignore
-            select.tomselect.addOption({ value: val, text: val })
+            select.tomselect?.addOption({ value: val, text: val })
         })
-        // @ts-ignore
-        select.tomselect.refreshOptions(false)
+        select.tomselect?.refreshOptions(false)
     }
 
     function updateSubmit() {

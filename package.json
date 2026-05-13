@@ -8,7 +8,6 @@
     "lint-fix": "eslint --fix wine_cellar"
   },
   "dependencies": {
-    "@babel/runtime": "7.29.2",
     "@fortawesome/fontawesome-free": "7.2.0",
     "@fortawesome/fontawesome-svg-core": "7.2.0",
     "@fortawesome/free-solid-svg-icons": "7.2.0",
@@ -25,20 +24,13 @@
     "tom-select": "2.6.0"
   },
   "devDependencies": {
-    "@babel/core": "7.29.0",
-    "@babel/plugin-transform-modules-commonjs": "7.28.6",
-    "@babel/plugin-transform-runtime": "7.29.0",
-    "@babel/preset-env": "7.29.5",
-    "@babel/preset-react": "7.28.5",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "autoprefixer": "10.5.0",
-    "babel-loader": "10.1.1",
     "copy-webpack-plugin": "14.0.0",
     "css-loader": "7.1.4",
     "eslint": "9.39.4",
     "eslint-config-prettier": "10.1.8",
-    "eslint-plugin-promise": "7.3.0",
     "husky": "9.1.7",
     "lint-staged": "16.4.0",
     "mini-css-extract-plugin": "2.10.2",

@@ -2,16 +2,19 @@ import L from 'leaflet'
 import 'leaflet.markercluster'
 import {
   createElementObject,
-  createLayerComponent, extendContext, updateGridLayer
+  createLayerComponent,
+  extendContext,
+  updateGridLayer,
+  LeafletContextInterface
 } from '@react-leaflet/core'
 
-const createMarkerClusterLayer = (props, context) => {
-  const instance = L.markerClusterGroup({ showCoverageOnHover: false })
+const createMarkerClusterLayer = (props: Record<string, unknown>, context: LeafletContextInterface) => {
+  const instance = (L as any).markerClusterGroup({ showCoverageOnHover: false })
 
   return createElementObject(instance, extendContext(context, { layerContainer: instance }))
 }
 
-const updateMarkerClusterLayer = (instance, props, prevProps) => {
+const updateMarkerClusterLayer = (instance: any, props: Record<string, unknown>, prevProps: Record<string, unknown>) => {
   updateGridLayer(instance, props, prevProps)
 }
 

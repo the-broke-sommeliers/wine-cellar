@@ -8,6 +8,19 @@ const translations = {
   vintage: django.gettext('Vintage'),
 }
 
+interface ItemPopupProps {
+  feature: GeoJSON.Feature & {
+    properties: {
+      image: string
+      url: string
+      name: string
+      country_icon: string
+      country_name: string
+      vintage?: string
+    }
+  }
+}
+
 /**
  * Renders a popup for an item feature on a map.
  *
@@ -15,7 +28,7 @@ const translations = {
  * @param {Object} props.feature - The geojson feature.
  * @returns {JSX.Element} The JSX element representing the popup.
  */
-export const ItemPopup = ({ feature }) => {
+export const ItemPopup = ({ feature }: ItemPopupProps) => {
   return (
     <MapPopup feature={feature}>
       <div className="popup-image">

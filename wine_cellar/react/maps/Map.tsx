@@ -1,8 +1,17 @@
-import React, { useImperativeHandle } from 'react'
-import { MapContainer, useMap } from 'react-leaflet'
+import React, { useImperativeHandle, ReactNode } from 'react'
+import { MapContainer, MapContainerProps, useMap } from 'react-leaflet'
 import MaplibreGlLayer from './MaplibreGlLayer'
+import L from 'leaflet'
 
-const Map = React.forwardRef(function Map(
+interface MapProps extends Omit<MapContainerProps, 'children'> {
+  attribution?: string
+  baseUrl: string
+  polygon?: GeoJSON.FeatureCollection | GeoJSON.Feature
+  omtToken?: string
+  children?: ReactNode
+}
+
+const Map = React.forwardRef<L.Map, MapProps>(function Map(
   { attribution, baseUrl, polygon, omtToken, children, ...rest },
   ref
 ) {
