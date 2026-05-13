@@ -1,7 +1,7 @@
 services:
   web:
     image: ghcr.io/the-broke-sommeliers/wine-cellar-web:latest
-    command: gunicorn wine_cellar.conf.wsgi:application --bind 0.0.0.0:8000
+    command: gunicorn wine_cellar.conf.wsgi:application --bind 0.0.0.0:8000 --worker-class gthread --threads 4 --workers 2
     volumes:
       - static_volume:/home/app/web/staticfiles
       - media_volume:/home/app/web/mediafiles
