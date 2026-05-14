@@ -15,6 +15,7 @@ if [ "$CONTAINER_ROLE" = "web" ]
 then
 
 python manage.py migrate
+python manage.py compilemessages
 
 cat <<EOF | python manage.py shell
 from django.contrib.auth import get_user_model
