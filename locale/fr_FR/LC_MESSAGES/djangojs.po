@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-17 17:25+0100\n"
+"POT-Creation-Date: 2026-05-15 14:17+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,32 +19,32 @@ msgstr ""
 "X-Language: fr_FR\n"
 "X-Source-Language: C\n"
 
-#: wine_cellar/assets/js/image_preview.ts:40
+#: wine_cellar/assets/js/image_preview.ts:39
 msgid "Clear Image"
 msgstr ""
 
-#: wine_cellar/assets/js/image_preview.ts:41
+#: wine_cellar/assets/js/image_preview.ts:40
 msgid "Restore image"
 msgstr ""
 
-#: wine_cellar/react/maps/ItemPopup.jsx:6
+#: wine_cellar/react/maps/ItemPopup.tsx:5
 msgctxt "Singular"
 msgid "Country"
 msgstr "Pays"
 
-#: wine_cellar/react/maps/ItemPopup.jsx:7
+#: wine_cellar/react/maps/ItemPopup.tsx:6
 msgid "Picture of a wine bottle."
 msgstr "Image d'une bouteille de vin."
 
-#: wine_cellar/react/maps/ItemPopup.jsx:8
+#: wine_cellar/react/maps/ItemPopup.tsx:7
 msgid "Vintage"
 msgstr "Millésime"
 
-#: wine_cellar/react/react_bar_code.tsx:10
+#: wine_cellar/react/react_bar_code.tsx:8
 msgid "Advanced"
 msgstr "Avancé"
 
-#: wine_cellar/react/react_bar_code.tsx:12
+#: wine_cellar/react/react_bar_code.tsx:10
 msgid ""
 "Choose the type of barcode you want to scan, sometimes this can help if "
 "scanning doesn't work."
@@ -52,6 +52,14 @@ msgstr ""
 "Choisissez le type de code-barre que vous voulez scanner, cela peut parfois "
 "aider si le scan ne fonctionne pas."
 
-#: wine_cellar/react/react_bar_code.tsx:36
+#: wine_cellar/react/react_bar_code.tsx:12
+msgid "Scan Barcode"
+msgstr ""
+
+#: wine_cellar/react/react_bar_code.tsx:13
+msgid "Close Scanner"
+msgstr ""
+
+#: wine_cellar/react/react_bar_code.tsx:55
 msgid "All"
 msgstr "Tout"
