@@ -360,8 +360,8 @@ class WineUploadAIView(FormView):
             form.add_error(
                 None,
                 _(
-                    "Failed to process AI response."
-                    + "Please check the uploaded images and try again."
+                    "Failed to process AI response. "
+                    "Please check the uploaded images and try again."
                 ),
             )
             return self.form_invalid(form)

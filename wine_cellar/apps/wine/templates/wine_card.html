@@ -6,7 +6,7 @@
              height="200"
              width="auto"
              loading="lazy"
-             alt="Image of a glass of {{ wine.get_type }} wine">
+             alt="{% blocktranslate with type=wine.get_type %}Image of a glass of {{ type }} wine{% endblocktranslate %}">
     </div>
     <div class="wine-card__detail_container">
         <h2 class="wine-card__title">
@@ -14,19 +14,19 @@
         </h2>
         {% if wine.get_grapes %}
             <div class="pure-u-1-1">
-                <span class="text--gray">Grape</span>
+                <span class="text--gray">{% translate "Grapes" %}</span>
                 <p>{{ wine.get_grapes | truncatechars:31 | title }}</p>
             </div>
         {% endif %}
         {% if wine.vintage %}
             <div class="pure-u-1-1">
-                <span class="text--gray">Vintage</span>
+                <span class="text--gray">{% translate "Vintage" %}</span>
                 <p>{{ wine.vintage }}</p>
             </div>
         {% endif %}
         {% if wine.drink_by %}
             <div class="pure-u-1-1">
-                <span class="text--gray">Drink By</span>
+                <span class="text--gray">{% translate "Drink By" %}</span>
                 <p>{{ wine.drink_by }}</p>
             </div>
         {% endif %}
