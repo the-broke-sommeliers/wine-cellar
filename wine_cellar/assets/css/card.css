@@ -45,7 +45,7 @@
 }
 
 .wine-card__link::after {
-  content: '';
+  content: "";
   position: absolute;
   left: 0;
   top: 0;
@@ -79,7 +79,6 @@
   @media (max-width: 353px) {
     margin-top: 24px;
   }
-
 }
 
 .wine-card__title {
@@ -90,7 +89,7 @@
 
 .wine-card__image-wrapper {
   width: 150px;
-  height: 200px ;
+  height: 200px;
 }
 
 .wine-card__img {

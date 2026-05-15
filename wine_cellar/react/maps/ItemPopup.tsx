@@ -1,4 +1,3 @@
-import React from 'react'
 import django from 'django'
 import { MapPopup } from './MapPopup'
 

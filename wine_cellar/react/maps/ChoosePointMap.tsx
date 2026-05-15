@@ -1,4 +1,5 @@
-import React, { useRef } from 'react'
+import type React from 'react'
+import { useRef } from 'react'
 import AddMarkerControl from './AddMarkerControl'
 import Map from './Map'
 
@@ -14,7 +15,12 @@ interface ChoosePointMapProps {
   id?: string
 }
 
-const ChoosePointMap = ({ BaseMap = Map, apiUrl, input, ...mapProps }: ChoosePointMapProps) => {
+const ChoosePointMap = ({
+  BaseMap = Map,
+  apiUrl,
+  input,
+  ...mapProps
+}: ChoosePointMapProps) => {
   const mapRef = useRef(null)
   const controlRef = useRef(null)
 

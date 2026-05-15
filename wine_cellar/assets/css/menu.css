@@ -60,7 +60,7 @@
   padding: 0.1em 0.4em;
 
   span:before {
-    content: '\2261';
+    content: "\2261";
     color: var(--light);
   }
 }
@@ -88,7 +88,7 @@
   left: 140px;
   z-index: 1001;
   span:before {
-    content: '\00d7';
+    content: "\00d7";
   }
 }
 

@@ -1,10 +1,10 @@
-import L from 'leaflet'
 import {
   createElementObject,
   createLayerComponent,
   extendContext,
-  LeafletContextInterface
+  type LeafletContextInterface,
 } from '@react-leaflet/core'
+import L from 'leaflet'
 
 export const makeIcon = (iconUrl?: string) =>
   L.icon({
@@ -13,7 +13,7 @@ export const makeIcon = (iconUrl?: string) =>
     iconAnchor: [15, 36],
     shadowSize: [40, 54],
     shadowAnchor: [20, 54],
-    popupAnchor: [0, -10]
+    popupAnchor: [0, -10],
   })
 
 interface GeoJsonMarkerProps extends L.MarkerOptions {
@@ -25,16 +25,26 @@ interface GeoJsonMarkerProps extends L.MarkerOptions {
  * Creates a Leaflet marker from a GeoJSON. This is needed to
  * be able to add any Tooltip or Popup to the Markers using JSX.
  */
-const createGeoJsonMarker = ({ feature, ...props }: GeoJsonMarkerProps, context: LeafletContextInterface) => {
+const createGeoJsonMarker = (
+  { feature, ...props }: GeoJsonMarkerProps,
+  context: LeafletContextInterface
+) => {
   const coords = [...feature.geometry.coordinates].reverse() as [number, number]
   const icon = props.icon || makeIcon(feature.properties?.category_icon)
   const propsWithIcon = { ...props, icon }
   const instance = L.marker(coords, propsWithIcon)
 
-  return createElementObject(instance, extendContext(context, { overlayContainer: instance }))
+  return createElementObject(
+    instance,
+    extendContext(context, { overlayContainer: instance })
+  )
 }
 
-const updateGeoJsonMarker = (instance: L.Marker, { feature, ...props }: GeoJsonMarkerProps, prevProps: GeoJsonMarkerProps) => {
+const updateGeoJsonMarker = (
+  instance: L.Marker,
+  { feature, ...props }: GeoJsonMarkerProps,
+  prevProps: GeoJsonMarkerProps
+) => {
   const coords = [...feature.geometry.coordinates].reverse() as [number, number]
   if (props.icon !== prevProps.icon) {
     const icon = props.icon || makeIcon(feature.properties?.category_icon)
@@ -43,5 +53,8 @@ const updateGeoJsonMarker = (instance: L.Marker, { feature, ...props }: GeoJsonM
   instance.setLatLng(coords)
 }
 
-const GeoJsonMarker = createLayerComponent(createGeoJsonMarker, updateGeoJsonMarker)
+const GeoJsonMarker = createLayerComponent(
+  createGeoJsonMarker,
+  updateGeoJsonMarker
+)
 export default GeoJsonMarker

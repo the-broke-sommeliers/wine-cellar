@@ -4,8 +4,9 @@
     "build": "webpack --config webpack.dev.js --mode development",
     "prepare": "husky",
     "watch": "webpack --config webpack.dev.js --watch --mode development",
-    "lint": "eslint wine_cellar/assets",
-    "lint-fix": "eslint --fix wine_cellar"
+    "lint": "biome check wine_cellar/assets wine_cellar/react",
+    "lint-fix": "biome check --write wine_cellar/assets wine_cellar/react",
+    "format": "biome format --write wine_cellar/assets wine_cellar/react"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "7.2.0",
@@ -24,21 +25,18 @@
     "tom-select": "2.6.0"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.4.15",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "autoprefixer": "10.5.0",
     "copy-webpack-plugin": "14.0.0",
     "css-loader": "7.1.4",
-    "eslint": "9.39.4",
-    "eslint-config-prettier": "10.1.8",
     "husky": "9.1.7",
     "lint-staged": "17.0.2",
     "mini-css-extract-plugin": "2.10.2",
-    "neostandard": "0.13.0",
     "path-browserify": "1.0.1",
     "postcss": "8.5.14",
     "postcss-loader": "8.2.1",
-    "prettier": "3.8.3",
     "sass": "1.99.0",
     "sass-loader": "16.0.7",
     "stylelint": "17.11.0",

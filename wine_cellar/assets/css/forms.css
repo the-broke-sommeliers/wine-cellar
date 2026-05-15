@@ -1,4 +1,4 @@
-.pure-form input[aria-invalid='true'] {
+.pure-form input[aria-invalid="true"] {
   border-color: var(--red);
 }
 
@@ -7,12 +7,12 @@
   padding: 20px;
 }
 
-.pure-form input:not([type='radio']) {
+.pure-form input:not([type="radio"]) {
   display: block;
 }
-.pure-form input[type='text'],
-.pure-form input[type='email'],
-.pure-form input[type='password'] {
+.pure-form input[type="text"],
+.pure-form input[type="email"],
+.pure-form input[type="password"] {
   width: 100%;
   margin-bottom: 10px;
   max-width: 400px;
@@ -30,7 +30,7 @@
 }
 
 .wine-form {
-  input:not([type='checkbox']),
+  input:not([type="checkbox"]),
   select,
   textarea,
   .ts-wrapper {
@@ -85,7 +85,7 @@ p.form-hint {
 }
 
 .ts-control input {
-  width: 0 !important ;
+  width: 0;
   min-width: 1px;
   flex: 1 0 auto;
 }
@@ -99,7 +99,7 @@ p.form-hint {
 
 .filter-form--lg,
 .filter-form {
-  input:not([type='checkbox']),
+  input:not([type="checkbox"]),
   select,
   .ts-wrapper .ts-control {
     width: calc(100% - 20px);
@@ -122,14 +122,14 @@ p.form-hint {
   }
 
   summary::before {
-    content: '  +';
+    content: "  +";
     font-size: 27px;
     font-weight: 400;
     vertical-align: text-bottom;
   }
 
   details[open] summary:before {
-    content: '  –';
+    content: "  –";
     font-size: 27px;
     font-weight: 400;
     vertical-align: unset;
@@ -277,9 +277,9 @@ p.form-hint {
 }
 
 .image-clear-checkbox::before {
-  font-family: 'Font Awesome 6 Free';
+  font-family: "Font Awesome 6 Free", sans-serif;
   font-weight: 900;
-  content: '\f1f8';
+  content: "\f1f8";
   font-size: 16px;
   color: #333;
   position: absolute;
@@ -290,7 +290,7 @@ p.form-hint {
 }
 
 .image-clear-checkbox:checked::before {
-  content: '\f2ea';
+  content: "\f2ea";
 }
 
 .wine__add-buttons {

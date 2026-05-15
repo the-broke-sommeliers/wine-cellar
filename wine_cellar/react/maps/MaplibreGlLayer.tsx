@@ -3,8 +3,8 @@ import '@maplibre/maplibre-gl-leaflet'
 import {
   createElementObject,
   createTileLayerComponent,
+  type LeafletContextInterface,
   updateGridLayer,
-  LeafletContextInterface
 } from '@react-leaflet/core'
 
 interface MaplibreGlLayerProps {
@@ -12,16 +12,23 @@ interface MaplibreGlLayerProps {
   baseUrl: string
 }
 
-const createMaplibreGlLayer = (props: MaplibreGlLayerProps, context: LeafletContextInterface) => {
+const createMaplibreGlLayer = (
+  props: MaplibreGlLayerProps,
+  context: LeafletContextInterface
+) => {
   const instance = L.maplibreGL({
     style: props.baseUrl,
-    ...(props.attribution && { attribution: props.attribution })
+    ...(props.attribution && { attribution: props.attribution }),
   } as any)
 
   return createElementObject(instance, context)
 }
 
-const updateMaplibreGlLayer = (instance: any, props: MaplibreGlLayerProps, prevProps: MaplibreGlLayerProps) => {
+const updateMaplibreGlLayer = (
+  instance: any,
+  props: MaplibreGlLayerProps,
+  prevProps: MaplibreGlLayerProps
+) => {
   updateGridLayer(instance, props, prevProps)
 
   const { baseUrl, attribution } = props
@@ -34,5 +41,8 @@ const updateMaplibreGlLayer = (instance: any, props: MaplibreGlLayerProps, prevP
   }
 }
 
-const MaplibreGlLayer = createTileLayerComponent(createMaplibreGlLayer, updateMaplibreGlLayer)
+const MaplibreGlLayer = createTileLayerComponent(
+  createMaplibreGlLayer,
+  updateMaplibreGlLayer
+)
 export default MaplibreGlLayer

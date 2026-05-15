@@ -10,7 +10,7 @@
   border: 0;
   padding: 0;
   margin: 0;
-  position: absolute !important;
+  position: absolute;
   height: 1px;
   width: 1px;
   overflow: hidden;
