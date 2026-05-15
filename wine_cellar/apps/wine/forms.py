@@ -231,7 +231,7 @@ class WineForm(TomSelectMixin, WineFormPostCleanMixin, forms.Form):
         help_text=_("Select the type of wine from the dropdown."),
     )
     category = forms.CharField(
-        label="Sweetness",
+        label=_("Sweetness"),
         required=False,
         max_length=2,
         widget=forms.Select(choices=Category),
@@ -271,7 +271,7 @@ class WineForm(TomSelectMixin, WineFormPostCleanMixin, forms.Form):
     size = OpenMultipleChoiceField(
         queryset=Size.objects.none(),
         field_name="name",
-        label="Size",
+        label=_("Size"),
         help_text=_(
             "Please enter the volume of bottle or box ect. in liters, e.g. 0.75."
         ),
@@ -342,7 +342,7 @@ class WineForm(TomSelectMixin, WineFormPostCleanMixin, forms.Form):
         ),
     )
     vineyard = OpenMultipleChoiceField(
-        label="Vineyard",
+        label=_("Vineyard"),
         required=False,
         queryset=Vineyard.objects.none(),
         field_name="name",

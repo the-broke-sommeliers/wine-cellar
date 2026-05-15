@@ -115,8 +115,8 @@ class StorageDeleteView(DeleteView):
             form.add_error(
                 None,
                 _(
-                    "You must have at least one storage."
-                    + " Cannot delete the last storage."
+                    "You must have at least one storage. "
+                    "Cannot delete the last storage."
                 ),
             )
             return self.form_invalid(form)

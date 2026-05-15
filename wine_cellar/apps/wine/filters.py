@@ -30,7 +30,9 @@ class NullsLastOrderingFilter(OrderingFilter):
 
 
 class WineFilter(django_filters.FilterSet):
-    name = django_filters.CharFilter(field_name="name", lookup_expr="icontains")
+    name = django_filters.CharFilter(
+        label=_("Name contains"), field_name="name", lookup_expr="icontains"
+    )
     stock = ChoiceFilter(
         method="filter_stock",
         label=_("Show only in stock"),
@@ -79,6 +81,18 @@ class WineFilter(django_filters.FilterSet):
             "country",
             "stock",
         ]
+        labels = {
+            "name": _("Name Contains"),
+            "wine_type": _("Wine Type"),
+            "attributes": _("Attributes"),
+            "category": _("Category"),
+            "vintage": _("Vintage"),
+            "vineyard": _("Vineyard"),
+            "grapes": _("Grapes"),
+            "food_pairings": _("Food Pairings"),
+            "source": _("Source"),
+            "country": _("Country"),
+        }
 
     def __init__(self, data=None, queryset=None, *, request=None, prefix=None):
         super().__init__(data, queryset, request=request, prefix=prefix)
@@ -93,3 +107,7 @@ class WineFilter(django_filters.FilterSet):
             self.filters[user_filter].queryset = self.filters[
                 user_filter
             ].queryset.filter(Q(user=None) | Q(user=request.user))
+
+        for key, fil in self.filters.items():
+            if key in self.Meta.labels:
+                fil.label = self.Meta.labels[key]

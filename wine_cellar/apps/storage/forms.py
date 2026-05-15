@@ -9,24 +9,29 @@ from wine_cellar.apps.user.views import get_user_settings
 class StorageForm(forms.Form):
     name = forms.CharField(
         max_length=100,
+        label=_("Storage Name"),
         help_text=_("Enter the name of the storage."),
     )
     description = forms.CharField(
         required=False,
+        label=_("Storage Description"),
         help_text=_("Enter a description of the storage."),
     )
     location = forms.CharField(
         max_length=100,
+        label=_("Location"),
         help_text=_("Enter the location of the storage."),
     )
     rows = forms.IntegerField(
         min_value=0,
         required=False,
+        label=_("Number of Rows"),
         help_text=_("Enter the number of rows in the storage."),
     )
     columns = forms.IntegerField(
         min_value=0,
         required=False,
+        label=_("Number of Columns"),
         help_text=_("Enter the number of columns in the storage."),
     )
 
