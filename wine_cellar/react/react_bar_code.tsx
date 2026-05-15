@@ -1,10 +1,8 @@
-import React, { useState } from 'react'
-import { createRoot } from 'react-dom/client'
-import { BarcodeScanner, DetectedBarcode } from 'react-barcode-scanner'
-// @ts-ignore
-import django from 'django'
-
 import { BarcodeDetector, prepareZXingModule } from 'barcode-detector/ponyfill'
+import django from 'django'
+import { useState } from 'react'
+import { BarcodeScanner, type DetectedBarcode } from 'react-barcode-scanner'
+import { createRoot } from 'react-dom/client'
 
 const translated = {
   advanced: django.gettext('Advanced'),
@@ -12,7 +10,7 @@ const translated = {
     "Choose the type of barcode you want to scan, sometimes this can help if scanning doesn't work."
   ),
   scan_barcode: django.gettext('Scan Barcode'),
-  close_barcode: django.gettext('Close Scanner')
+  close_barcode: django.gettext('Close Scanner'),
 }
 
 const Scanner = ({ targetInputId }: { targetInputId?: string }) => {
@@ -27,11 +25,11 @@ const Scanner = ({ targetInputId }: { targetInputId?: string }) => {
       if (targetInputId) {
         const input = document.getElementById(targetInputId) as HTMLInputElement
         if (input) {
-          input.value = code;
+          input.value = code
           setIsOpen(false)
         }
       } else {
-        window.location.href = '/wine/scan/' + code
+        window.location.href = `/wine/scan/${code}`
       }
     }
   }
@@ -94,7 +92,7 @@ const initScanner = () => {
     // Override the locateFile function
     prepareZXingModule({
       overrides: {
-        // @ts-ignore
+        // @ts-expect-error
         locateFile: (path, prefix) => {
           if (path.endsWith('.wasm')) {
             return container.dataset.zxing_wasm_url
@@ -103,7 +101,7 @@ const initScanner = () => {
         },
       },
     })
-    // @ts-ignore
+    // @ts-expect-error
     globalThis.BarcodeDetector ??= BarcodeDetector
     root.render(<Scanner targetInputId={targetInputId} />)
   }

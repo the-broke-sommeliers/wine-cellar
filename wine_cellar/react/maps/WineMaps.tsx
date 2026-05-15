@@ -1,11 +1,11 @@
-import React, { ReactNode } from 'react'
+import type L from 'leaflet'
+import React, { type ReactNode } from 'react'
+import * as countries from './country.json'
+import GeoJsonMarker from './GeoJsonMarker'
+import { ItemPopup } from './ItemPopup'
 import BaseMap from './Map'
 import MarkerClusterLayer from './MarkerClusterLayer'
-import GeoJsonMarker from './GeoJsonMarker'
 import { ZoomToMarkers } from './ZoomToMarkers'
-import { ItemPopup } from './ItemPopup'
-import * as countries from './country.json'
-import L from 'leaflet'
 
 interface MapProps {
   id: string
@@ -23,7 +23,10 @@ interface MapProps {
  * @returns {React.Element} - The rendered Map component.
  * @throws {Error} - If id is not defined.
  */
-export const Map = React.forwardRef<L.Map, MapProps>(function Map({ id, title, ...props }, ref) {
+export const Map = React.forwardRef<L.Map, MapProps>(function Map(
+  { id, title, ...props },
+  ref
+) {
   if (!id) {
     throw new Error('id must be defined when using Map')
   }
@@ -31,9 +34,9 @@ export const Map = React.forwardRef<L.Map, MapProps>(function Map({ id, title, .
   return (
     <div id={id}>
       {title && <h2 className="title">{title}</h2>}
-        <div>
-          <BaseMap {...props} ref={ref} />
-        </div>
+      <div>
+        <BaseMap {...props} ref={ref} />
+      </div>
     </div>
   )
 })
@@ -65,18 +68,31 @@ interface MapWithMarkersProps extends Omit<MapProps, 'children'> {
  * @param {ReactNode} children - Any additional controls etc. to be added to the map
  * @returns {JSX.Element} - The rendered map component with markers.
  */
-export const MapWithMarkers = ({ wines, withoutPopup, children, ...props }: MapWithMarkersProps) => {
+export const MapWithMarkers = ({
+  wines,
+  withoutPopup,
+  children,
+  ...props
+}: MapWithMarkersProps) => {
   const latLngs: [number, number][] = []
   const markers = wines.map((wine, index) => {
-    const feature = { ...(wine.location ?? (countries as any)[wine.country || '']) };
-    if (!feature || !feature.geometry) {
-        return null
+    const feature = {
+      ...(wine.location ?? (countries as any)[wine.country || '']),
     }
-    latLngs.push([feature.geometry.coordinates[1], feature.geometry.coordinates[0]])
+    if (!feature?.geometry) {
+      return null
+    }
+    latLngs.push([
+      feature.geometry.coordinates[1],
+      feature.geometry.coordinates[0],
+    ])
     feature.properties = Object.assign(wine, feature.properties)
     return (
-      <GeoJsonMarker key={index} feature={feature as GeoJSON.Feature<GeoJSON.Point>}>
-          {!withoutPopup && <ItemPopup feature={feature as any} />}
+      <GeoJsonMarker
+        key={index}
+        feature={feature as GeoJSON.Feature<GeoJSON.Point>}
+      >
+        {!withoutPopup && <ItemPopup feature={feature as any} />}
       </GeoJsonMarker>
     )
   })

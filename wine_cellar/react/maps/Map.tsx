@@ -1,7 +1,7 @@
-import React, { useImperativeHandle, ReactNode } from 'react'
-import { MapContainer, MapContainerProps, useMap } from 'react-leaflet'
+import type L from 'leaflet'
+import React, { type ReactNode, useImperativeHandle } from 'react'
+import { MapContainer, type MapContainerProps, useMap } from 'react-leaflet'
 import MaplibreGlLayer from './MaplibreGlLayer'
-import L from 'leaflet'
 
 interface MapProps extends Omit<MapContainerProps, 'children'> {
   attribution?: string
@@ -18,16 +18,12 @@ const Map = React.forwardRef<L.Map, MapProps>(function Map(
   const MapLayers = () => {
     const map = useMap()
     useImperativeHandle(ref, () => map)
-    return (
-      <>
-        <MaplibreGlLayer attribution={attribution} baseUrl={baseUrl} />
-      </>
-    )
+    return <MaplibreGlLayer attribution={attribution} baseUrl={baseUrl} />
   }
 
   return (
     <MapContainer
-      style={{ minHeight: "60vh" }}
+      style={{ minHeight: '60vh' }}
       zoom={2}
       maxZoom={18}
       {...rest}

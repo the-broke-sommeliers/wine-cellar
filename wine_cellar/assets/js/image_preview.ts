@@ -10,9 +10,9 @@ function initImagePreview() {
       .closest('.form-container')
       ?.querySelector('.image-clear-checkbox') as HTMLInputElement | null
 
-    input.addEventListener('change', (e: Event) => {
+    input.addEventListener('change', (_e: Event) => {
       const file = input.files?.[0]
-      if (!file || !file.type.startsWith('image/')) {
+      if (!file?.type.startsWith('image/')) {
         if (wrapper && !wrapper.className.includes('hidden')) {
           wrapper.classList.add('hidden')
         }
@@ -22,11 +22,11 @@ function initImagePreview() {
       const reader = new FileReader()
       reader.onload = () => {
         if (preview && reader.result) {
-          if (wrapper && wrapper.className.includes('hidden')) {
+          if (wrapper?.className.includes('hidden')) {
             wrapper.classList.remove('hidden')
           }
           preview.src = reader.result as string
-          if (clearCheckbox && clearCheckbox.checked) {
+          if (clearCheckbox?.checked) {
             clearCheckbox.checked = false
           }
         }

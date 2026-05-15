@@ -1,13 +1,18 @@
 import TomSelect from 'tom-select'
-import { TomSettings } from 'tom-select/dist/esm/types/settings.js';
-import { RecursivePartial, TomCreateCallback, TomOption } from 'tom-select/dist/esm/types/core.js';
-
+import type {
+  RecursivePartial,
+  TomCreateCallback,
+  TomOption,
+} from 'tom-select/dist/esm/types/core.js'
+import type { TomSettings } from 'tom-select/dist/esm/types/settings.js'
 
 function initTomSelect(): void {
   document.querySelectorAll('select').forEach((el) => {
     const rawConfig: string | undefined = el.dataset.tom_config
-    const clear: boolean = Boolean(JSON.parse(el.dataset.clear ?? "false"))
-    const clearOpts: boolean = Boolean(JSON.parse(el.dataset.clearOpts ?? "false"))
+    const clear: boolean = Boolean(JSON.parse(el.dataset.clear ?? 'false'))
+    const clearOpts: boolean = Boolean(
+      JSON.parse(el.dataset.clearOpts ?? 'false')
+    )
     let config: RecursivePartial<TomSettings> = {
       create: false,
       closeAfterSelect: true,
@@ -18,8 +23,8 @@ function initTomSelect(): void {
     if (rawConfig) {
       config = JSON.parse(rawConfig)
       if (config.create) {
-        config.create = function (input: string, create: TomCreateCallback): boolean {
-          create({ value: 'tom_new_opt' + input, text: input })
+        config.create = (input: string, create: TomCreateCallback): boolean => {
+          create({ value: `tom_new_opt${input}`, text: input })
           return true
         }
       }
@@ -32,7 +37,9 @@ function initTomSelect(): void {
       ts.clearOptions()
     }
 
-    if (!config.create) return
+    if (!config.create) {
+      return
+    }
 
     const itemsArray = Array.isArray(config.items) ? config.items : []
 
