@@ -14,9 +14,13 @@ export function checkPointInsidePolygon(
   let isInPolygon = false
 
   polygons.eachLayer((layer: L.Layer) => {
-    const polygonGeoJSON = (layer as any).toGeoJSON()
-    if (booleanPointInPolygon(pointGeoJSON, polygonGeoJSON as any)) {
-      isInPolygon = true
+    if ('toGeoJSON' in layer && typeof layer.toGeoJSON === 'function') {
+      const polygonGeoJSON = layer.toGeoJSON() as GeoJSON.Feature<
+        GeoJSON.Polygon | GeoJSON.MultiPolygon
+      >
+      if (booleanPointInPolygon(pointGeoJSON, polygonGeoJSON)) {
+        isInPolygon = true
+      }
     }
   })
 
@@ -25,7 +29,7 @@ export function checkPointInsidePolygon(
 
 const markerProps = { icon: makeIcon(), draggable: true }
 
-interface AddMarkerControlProps {
+interface AddMarkerControlProps extends L.ControlOptions {
   input: HTMLInputElement
   point?: string
   markerConstraints?: GeoJSON.FeatureCollection | GeoJSON.Feature
@@ -76,11 +80,13 @@ export class AddMarkerControlClass extends L.Control {
       this.oldCoords = latlng
       if (this.marker) {
         this.marker.setLatLng(latlng)
-      } else {
-        this.marker = L.marker(latlng, markerProps).addTo(this.map!)
+      } else if (this.map) {
+        this.marker = L.marker(latlng, markerProps).addTo(this.map)
         this.marker.on('dragend', this.onDragend.bind(this))
       }
-      this.input.value = JSON.stringify(this.marker.toGeoJSON())
+      if (this.marker) {
+        this.input.value = JSON.stringify(this.marker.toGeoJSON())
+      }
     }
 
     return isInsideConstraints
@@ -92,15 +98,15 @@ export class AddMarkerControlClass extends L.Control {
       targetPosition,
       this.markerConstraints
     )
-    if (!isInsideConstraints) {
-      ;(e.target as L.Marker).setLatLng(this.oldCoords!)
+    if (!isInsideConstraints && this.oldCoords) {
+      ;(e.target as L.Marker).setLatLng(this.oldCoords)
     } else {
       this.updateMarker(targetPosition)
     }
     this.onDragEndHandler?.(isInsideConstraints)
   }
 
-  addTo(map: L.Map) {
+  override addTo(map: L.Map) {
     this.map = map
     this.boundClickHandler = (e: L.LeafletMouseEvent) =>
       this.updateMarker(e.latlng)
@@ -113,7 +119,7 @@ export class AddMarkerControlClass extends L.Control {
     return this
   }
 
-  onRemove(map: L.Map) {
+  override onRemove(map: L.Map) {
     if (this.boundClickHandler) {
       map.off('click', this.boundClickHandler)
     }
@@ -124,7 +130,11 @@ export class AddMarkerControlClass extends L.Control {
     }
   }
 }
-const createControl = (props: any) => new AddMarkerControlClass(props)
+const createControl = (props: AddMarkerControlProps) =>
+  new AddMarkerControlClass(props)
 
-const AddMarkerControl = createControlComponent(createControl)
+const AddMarkerControl = createControlComponent<
+  AddMarkerControlClass,
+  AddMarkerControlProps
+>(createControl)
 export default AddMarkerControl

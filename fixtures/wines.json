@@ -20,9 +20,7 @@
       "region": 1,
       "appellation": 1,
       "price": 15.0,
-      "grapes": [
-        1
-      ],
+      "grapes": [1],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -50,9 +48,7 @@
       "region": 2,
       "appellation": 1,
       "price": 45.0,
-      "grapes": [
-        2
-      ],
+      "grapes": [2],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -80,9 +76,7 @@
       "region": 2,
       "appellation": 2,
       "price": 39.0,
-      "grapes": [
-        3
-      ],
+      "grapes": [3],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -110,9 +104,7 @@
       "region": 3,
       "appellation": 3,
       "price": 18.5,
-      "grapes": [
-        4
-      ],
+      "grapes": [4],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -138,9 +130,7 @@
       "rating": 5,
       "country": "AU",
       "price": 32.0,
-      "grapes": [
-        5
-      ],
+      "grapes": [5],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -166,9 +156,7 @@
       "rating": 4,
       "country": "FR",
       "price": 24.0,
-      "grapes": [
-        6
-      ],
+      "grapes": [6],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -194,9 +182,7 @@
       "rating": 4,
       "country": "US",
       "price": 21.0,
-      "grapes": [
-        7
-      ],
+      "grapes": [7],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -222,9 +208,7 @@
       "rating": 5,
       "country": "AR",
       "price": 22.5,
-      "grapes": [
-        8
-      ],
+      "grapes": [8],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -250,9 +234,7 @@
       "rating": 4,
       "country": "ES",
       "price": 19.5,
-      "grapes": [
-        9
-      ],
+      "grapes": [9],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -278,9 +260,7 @@
       "rating": 4,
       "country": "IT",
       "price": 17.0,
-      "grapes": [
-        10
-      ],
+      "grapes": [10],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -306,9 +286,7 @@
       "rating": 5,
       "country": "FR",
       "price": 55.0,
-      "grapes": [
-        7
-      ],
+      "grapes": [7],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -334,9 +312,7 @@
       "rating": 5,
       "country": "PT",
       "price": 65.0,
-      "grapes": [
-        5
-      ],
+      "grapes": [5],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -362,9 +338,7 @@
       "rating": 5,
       "country": "HU",
       "price": 49.0,
-      "grapes": [
-        10
-      ],
+      "grapes": [10],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -390,9 +364,7 @@
       "rating": 3,
       "country": "FR",
       "price": 10.5,
-      "grapes": [
-        3
-      ],
+      "grapes": [3],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -418,9 +390,7 @@
       "rating": 4,
       "country": "IT",
       "price": 22.0,
-      "grapes": [
-        9
-      ],
+      "grapes": [9],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -446,9 +416,7 @@
       "rating": 5,
       "country": "FR",
       "price": 85.0,
-      "grapes": [
-        7
-      ],
+      "grapes": [7],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -474,9 +442,7 @@
       "rating": 4,
       "country": "ES",
       "price": 14.0,
-      "grapes": [
-        7
-      ],
+      "grapes": [7],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -504,9 +470,7 @@
       "region": 6,
       "appellation": 11,
       "price": 13.0,
-      "grapes": [
-        3
-      ],
+      "grapes": [3],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -532,9 +496,7 @@
       "rating": 5,
       "country": "PT",
       "price": 48.0,
-      "grapes": [
-        5
-      ],
+      "grapes": [5],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -560,9 +522,7 @@
       "rating": 5,
       "country": "NZ",
       "price": 16.5,
-      "grapes": [
-        1
-      ],
+      "grapes": [1],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],

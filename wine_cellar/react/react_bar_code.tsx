@@ -19,8 +19,9 @@ const Scanner = ({ targetInputId }: { targetInputId?: string }) => {
   const defaultFormats = ['ean_13', 'ean_8', 'upc_a', 'code_39', 'itf']
 
   const handleCapture = (barcodes: DetectedBarcode[]) => {
-    if (barcodes.length > 0) {
-      const code = barcodes[0].rawValue
+    const firstBarcode = barcodes[0]
+    if (firstBarcode) {
+      const code = firstBarcode.rawValue
 
       if (targetInputId) {
         const input = document.getElementById(targetInputId) as HTMLInputElement

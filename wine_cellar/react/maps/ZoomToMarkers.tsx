@@ -14,8 +14,9 @@ export const ZoomToMarkers: React.FC<ZoomToMarkersProps> = ({ points }) => {
       return
     }
 
-    if (points.length === 1) {
-      map.setView(points[0], 8)
+    const firstPoint = points[0]
+    if (points.length === 1 && firstPoint) {
+      map.setView(firstPoint, 8)
     } else {
       map.fitBounds(L.latLngBounds(points), {
         padding: [40, 40],
