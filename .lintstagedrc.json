@@ -1,12 +1,7 @@
 {
-   "*.{js,jsx,ts,tsx}": [
-     "biome check --write --no-errors-on-unmatched --files-ignore-unknown=true"
-   ],
-   "*.html": [
-     "make lint-html"
-   ],
-   "*.py": [
-     "make lint-py"
-   ]
+  "*.{js,jsx,ts,tsx}": [
+    "biome check --write --no-errors-on-unmatched --files-ignore-unknown=true"
+  ],
+  "*.html": ["make lint-html"],
+  "*.py": ["make lint-py"]
 }
-

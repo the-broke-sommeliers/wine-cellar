@@ -38,15 +38,15 @@ module.exports = {
         'maplibre-gl/dist/maplibre-gl.css',
         'leaflet.markercluster/dist/MarkerCluster.css',
         './wine_cellar/assets/css/map.css',
-        './wine_cellar/react/maps/react_maps.tsx'
-      ]
+        './wine_cellar/react/maps/react_maps.tsx',
+      ],
     },
     react_choose_point: {
       import: [
         'leaflet/dist/leaflet.css',
         'maplibre-gl/dist/maplibre-gl.css',
         './wine_cellar/assets/css/map.css',
-        './wine_cellar/react/maps/react_choose_point.tsx'
+        './wine_cellar/react/maps/react_choose_point.tsx',
       ],
     },
     wine_carousel: {
@@ -54,7 +54,7 @@ module.exports = {
     },
     image_preview: {
       import: ['./wine_cellar/assets/js/image_preview.ts'],
-    }
+    },
   },
   output: {
     path: path.resolve('./wine_cellar/static/'),
