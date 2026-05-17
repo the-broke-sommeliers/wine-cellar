@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.7.0-rc.0 (2026-05-17)
+
+### feat
+
+- make wine images clickable and open in new tab
+
+
+### fix
+
+- add more missing translations
+
+- **deps**: update react monorepo to v19.2.6
+- **deps**: update dependency barcode-detector to v3.1.3
+
+
 ## 0.6.2 (2026-04-28)
 
 ### fix
