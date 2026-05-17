@@ -25,11 +25,17 @@
                     <div class="wine-detail__image-wrapper"
                          data-images='[{% for img in wine.image_thumbnails %}"{{ img }}"{% if not forloop.last %},{% endif %}{% endfor %}]'>
                         <div class="image wine-detail__image" id="wine-image-wrapper">
-                            <img id="wine-image"
-                                 src="{{ wine.image_thumbnail }}"
-                                 height="225"
-                                 width="auto"
-                                 alt="{% translate 'Picture of a wine bottle' %}">
+                            <a href="{{ wine.image }}"
+                               target="_blank"
+                               class="image-fullscreen-anchor"
+                               rel="noopener noreferrer"
+                               aria-label="Open full-size image in a new tab">
+                                <img id="wine-image"
+                                     src="{{ wine.image_thumbnail }}"
+                                     height="225"
+                                     width="auto"
+                                     alt="{% translate 'Picture of a wine bottle' %}">
+                            </a>
                         </div>
                         {% if wine.image_thumbnails|length > 1 %}
                             <div class="image-controls"
@@ -38,6 +44,7 @@
                                 <button type="button"
                                         class="wine-prev"
                                         aria-label="{% translate "Previous image" %}"
+                                        disabled
                                         title="{% translate "Previous image" %}">«</button>
                                 <button type="button"
                                         class="wine-next"
@@ -180,8 +187,7 @@
                                     <td>{{ item.row|default_if_none:"" }}</td>
                                     <td>{{ item.column|default_if_none:"" }}</td>
                                     <td>
-                                    <a class="pure-button"
-                                       href="{% url 'stock-edit' item.pk %}"><i class="fa-regular fa-pen-to-square"></i></a>
+                                        <a class="pure-button" href="{% url 'stock-edit' item.pk %}"><i class="fa-regular fa-pen-to-square"></i></a>
                                         <a class=" pure-button" href="{% url 'stock-delete' item.pk %}"><i class="fa-regular fa-trash-can"></i></a>
                                     </td>
                                 </tr>

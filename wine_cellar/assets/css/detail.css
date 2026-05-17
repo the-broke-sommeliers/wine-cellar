@@ -35,7 +35,7 @@
     cursor: pointer;
   }
 
-  .image-controls button:hover {
+  .image-controls button:not(:disabled):hover {
     outline: 3px solid rgba(21, 156, 228, 0.35);
     outline-offset: 2px;
   }
