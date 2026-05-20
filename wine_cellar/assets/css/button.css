@@ -1,6 +1,7 @@
 .button__primary {
   background-color: var(--dark-green);
   color: var(--light);
+  border-radius: 6px;
 
   &:hover {
     background-color: var(--darker-green);
@@ -19,6 +20,7 @@
 .button__secondary {
   background-color: var(--dark-purple);
   color: var(--light);
+  border-radius: 6px;
 
   &:hover {
     background-color: var(--darker-purple);
@@ -57,11 +59,11 @@
 .ts-control:focus-within,
 .pure-control-group > input[type="number"]:focus,
 .pure-control-group > input[type="text"]:focus {
-  border: 2px solid #3584e4; /* Blue glow effect */
+  border: 2px solid var(--dark-green);
 }
 
 .wine__edit-delete-buttons {
   display: flex;
-  gap: 6px;
+  gap: 12px;
   margin-bottom: 36px;
 }
