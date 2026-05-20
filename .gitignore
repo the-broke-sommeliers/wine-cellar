@@ -18,3 +18,5 @@ autopo.ooo
 site/
 wine_cellar/conf/local.py
 .tx/
+.playwright-mcp/
+CLAUDE.md
