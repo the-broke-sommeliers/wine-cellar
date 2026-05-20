@@ -169,7 +169,14 @@
         </div>
 
         {% if wine.location %}
-            <div class="wine-detail__map m-auto">{% react_detail_map wine %}</div>
+            <div class="wine-detail__section">
+                <div class="wine-detail__summary">
+                    <div class="wine-detail__card-header">
+                        <h3>{% translate "Origin" %}</h3>
+                    </div>
+                    <div class="wine-detail__map">{% react_detail_map wine %}</div>
+                </div>
+            </div>
         {% endif %}
 
         <div class="wine-detail__section">

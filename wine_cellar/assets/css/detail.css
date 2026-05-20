@@ -166,8 +166,25 @@
   margin-top: 2rem;
 }
 
-.wine-detail__container .wine-detail__map {
-  margin-block: 2rem;
+.wine-detail__map {
+  height: 360px;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f0f0f0;
+}
+
+.wine-detail__map #wine_map,
+.wine-detail__map #wine_map > div,
+.wine-detail__map #wine_map > div > div {
+  height: 100%;
+  width: 100%;
+}
+
+.wine-detail__map .leaflet-container {
+  height: 100%;
+  width: 100%;
+  border-radius: 8px;
 }
 
 .wine-detail__stock-summary {
