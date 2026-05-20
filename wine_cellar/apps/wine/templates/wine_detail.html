@@ -14,189 +14,205 @@
 {% endblock header %}
 {% block content %}
     <div class="wine-detail__container">
-        <div class="pure-g">
-            <div class="pure-u-1 pure-u-md-1">
-                {% url 'wine-edit' wine.pk as edit_url %}
-                {% url 'wine-delete' wine.pk as delete_url %}
-                {% include "includes/edit_delete_buttons.html" with edit_url=edit_url delete_url=delete_url %}
-            </div>
-            <div class="pure-u-1 pure-u-md-1-2">
-                {% if wine.image_thumbnail %}
-                    <div class="wine-detail__image-wrapper"
-                         data-images='[{% for img in wine.image_thumbnails %}"{{ img }}"{% if not forloop.last %},{% endif %}{% endfor %}]'>
-                        <div class="image wine-detail__image" id="wine-image-wrapper">
-                            <a href="{{ wine.image }}"
-                               target="_blank"
-                               class="image-fullscreen-anchor"
-                               rel="noopener noreferrer"
-                               aria-label="Open full-size image in a new tab">
-                                <img id="wine-image"
-                                     src="{{ wine.image_thumbnail }}"
-                                     height="225"
-                                     width="auto"
-                                     alt="{% translate 'Picture of a wine bottle' %}">
-                            </a>
-                        </div>
-                        {% if wine.image_thumbnails|length > 1 %}
-                            <div class="image-controls"
-                                 role="group"
-                                 aria-label="{% translate "Image carousel controls" %}">
-                                <button type="button"
-                                        class="wine-prev"
-                                        aria-label="{% translate "Previous image" %}"
-                                        disabled
-                                        title="{% translate "Previous image" %}">«</button>
-                                <button type="button"
-                                        class="wine-next"
-                                        aria-label="{% translate "Next image" %}"
-                                        title="{% translate "Next image" %}">»</button>
-                            </div>
-                        {% endif %}
+        <div class="wine-detail__hero">
+            {% if wine.image_thumbnail %}
+                <div class="wine-detail__image-wrapper"
+                     data-images='[{% for img in wine.image_thumbnails %}"{{ img }}"{% if not forloop.last %},{% endif %}{% endfor %}]'>
+                    <div class="image wine-detail__image" id="wine-image-wrapper">
+                        <a href="{{ wine.image }}"
+                           target="_blank"
+                           class="image-fullscreen-anchor"
+                           rel="noopener noreferrer"
+                           aria-label="Open full-size image in a new tab">
+                            <img id="wine-image"
+                                 src="{{ wine.image_thumbnail }}"
+                                 height="264"
+                                 width="auto"
+                                 alt="{% translate 'Picture of a wine bottle' %}">
+                        </a>
                     </div>
-                {% else %}
-                    <div>{% translate "No image" %}</div>
-                {% endif %}
-            </div>
-            <div class="pure-u-1 pure-u-md-1-2">
-                <table class="wine-detail__table">
-                    <tr>
-                        <th>{% translate "Country" context "Singular" %}</th>
-                        <td>{{ wine.country_icon }} {{ wine.country_name }}</td>
-                    </tr>
-                    <tr>
-                        <th>{% translate "Region" %}</th>
-                        <td>{{ wine.region }}</td>
-                    </tr>
-                    <tr>
-                        <th>{% translate "Appellation" %}</th>
-                        <td>{{ wine.appellation }}</td>
-                    </tr>
+                    {% if wine.image_thumbnails|length > 1 %}
+                        <div class="image-controls"
+                             role="group"
+                             aria-label="{% translate "Image carousel controls" %}">
+                            <button type="button"
+                                    class="wine-prev"
+                                    aria-label="{% translate "Previous image" %}"
+                                    disabled
+                                    title="{% translate "Previous image" %}">«</button>
+                            <button type="button"
+                                    class="wine-next"
+                                    aria-label="{% translate "Next image" %}"
+                                    title="{% translate "Next image" %}">»</button>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            <div class="wine-detail__summary">
+                <div class="wine-detail__card-header">
+                    <h3>{% translate "Details" %}</h3>
+                    {% url 'wine-edit' wine.pk as edit_url %}
+                    {% url 'wine-delete' wine.pk as delete_url %}
+                    {% include "includes/edit_delete_buttons.html" with edit_url=edit_url delete_url=delete_url %}
+                </div>
+
+                <div class="wine-detail__highlights">
+                    {% if wine.vintage %}
+                        <div class="wine-detail__highlight">
+                            <span class="wine-detail__highlight-value">{{ wine.vintage }}</span>
+                            <span class="wine-detail__highlight-label">{% translate "Vintage" %}</span>
+                        </div>
+                    {% endif %}
+                    <div class="wine-detail__highlight">
+                        <span class="wine-detail__highlight-value">{{ wine.get_type }}</span>
+                        <span class="wine-detail__highlight-label">{% translate "Type" %}</span>
+                    </div>
+                    {% if wine.rating %}
+                        <div class="wine-detail__highlight">
+                            <span class="wine-detail__highlight-value">{{ wine.rating }}/10</span>
+                            <span class="wine-detail__highlight-label">{% translate "Rating" %}</span>
+                        </div>
+                    {% endif %}
+                    {% if wine.get_price_with_currency %}
+                        <div class="wine-detail__highlight">
+                            <span class="wine-detail__highlight-value">{{ wine.get_price_with_currency }}</span>
+                            <span class="wine-detail__highlight-label">{% translate "Price" %}</span>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="wine-detail__fields">
+                    <div class="wine-detail__field">
+                        <span class="wine-detail__field-label">{% translate "Country" context "Singular" %}</span>
+                        <span class="wine-detail__field-value">{{ wine.country_icon }} {{ wine.country_name }}</span>
+                    </div>
+                    {% if wine.region %}
+                        <div class="wine-detail__field">
+                            <span class="wine-detail__field-label">{% translate "Region" %}</span>
+                            <span class="wine-detail__field-value">{{ wine.region }}</span>
+                        </div>
+                    {% endif %}
+                    {% if wine.appellation %}
+                        <div class="wine-detail__field">
+                            <span class="wine-detail__field-label">{% translate "Appellation" %}</span>
+                            <span class="wine-detail__field-value">{{ wine.appellation }}</span>
+                        </div>
+                    {% endif %}
                     {% if wine.get_vineyards %}
-                        <tr>
-                            <th>{% translate "Vineyard" %}</th>
-                            <td>{{ wine.get_vineyards | linebreaksbr }}</td>
-                        </tr>
+                        <div class="wine-detail__field">
+                            <span class="wine-detail__field-label">{% translate "Vineyard" %}</span>
+                            <span class="wine-detail__field-value">{{ wine.get_vineyards | linebreaksbr }}</span>
+                        </div>
                     {% endif %}
-                    <tr>
-                        <th>{% translate "Type" %}</th>
-                        <td>{{ wine.get_type }}</td>
-                    </tr>
+                    {% if wine.get_grapes %}
+                        <div class="wine-detail__field">
+                            <span class="wine-detail__field-label">{% translate "Grapes" %}</span>
+                            <span class="wine-detail__field-value">{{ wine.get_grapes | linebreaksbr }}</span>
+                        </div>
+                    {% endif %}
+                    <div class="wine-detail__field">
+                        <span class="wine-detail__field-label">{% translate "Category" %}</span>
+                        <span class="wine-detail__field-value">{{ wine.get_category }}</span>
+                    </div>
+                    {% if wine.abv %}
+                        <div class="wine-detail__field">
+                            <span class="wine-detail__field-label">{% translate "ABV" %}</span>
+                            <span class="wine-detail__field-value">{{ wine.abv | localize }}</span>
+                        </div>
+                    {% endif %}
+                    {% if wine.size %}
+                        <div class="wine-detail__field">
+                            <span class="wine-detail__field-label">{% translate "Size" %}</span>
+                            <span class="wine-detail__field-value">{{ wine.size }}</span>
+                        </div>
+                    {% endif %}
+                    {% if wine.drink_by %}
+                        <div class="wine-detail__field">
+                            <span class="wine-detail__field-label">{% translate "Drink By" %}</span>
+                            <span class="wine-detail__field-value">{{ wine.drink_by }}</span>
+                        </div>
+                    {% endif %}
                     {% if wine.get_attributes %}
-                        <tr>
-                            <th>{% translate "Attributes" %}</th>
-                            <td>{{ wine.get_attributes | linebreaksbr }}</td>
-                        </tr>
+                        <div class="wine-detail__field">
+                            <span class="wine-detail__field-label">{% translate "Attributes" %}</span>
+                            <span class="wine-detail__field-value">{{ wine.get_attributes | linebreaksbr }}</span>
+                        </div>
                     {% endif %}
-                    <tr>
-                        <th>{% translate "Category" %}</th>
-                        <td>{{ wine.get_category }}</td>
-                    </tr>
-                    <tr>
-                        <th>{% translate "ABV" %}</th>
-                        <td>{{ wine.abv | localize }}</td>
-                    </tr>
-                    <tr>
-                        <th>{% translate "Size" %}</th>
-                        <td>{{ wine.size }}</td>
-                    </tr>
-                    <tr>
-                        <th>{% translate "Vintage" %}</th>
-                        <td>{{ wine.vintage }}</td>
-                    </tr>
-                    <tr>
-                        <th>{% translate "Drink By" %}</th>
-                        <td>{{ wine.drink_by }}</td>
-                    </tr>
-                    <tr>
-                        <th>{% translate "Grapes" %}</th>
-                        <td>{{ wine.get_grapes | linebreaksbr }}</td>
-                    </tr>
                     {% if wine.get_sources %}
-                        <tr>
-                            <th>{% translate "Sources" %}</th>
-                            <td>{{ wine.get_sources | linebreaksbr }}</td>
-                        </tr>
+                        <div class="wine-detail__field">
+                            <span class="wine-detail__field-label">{% translate "Sources" %}</span>
+                            <span class="wine-detail__field-value">{{ wine.get_sources | linebreaksbr }}</span>
+                        </div>
                     {% endif %}
                     {% if wine.get_food_pairings %}
-                        <tr>
-                            <th>{% translate "Food Pairings" %}</th>
-                            <td>{{ wine.get_food_pairings | linebreaksbr }}</td>
-                        </tr>
+                        <div class="wine-detail__field">
+                            <span class="wine-detail__field-label">{% translate "Food Pairings" %}</span>
+                            <span class="wine-detail__field-value">{{ wine.get_food_pairings | linebreaksbr }}</span>
+                        </div>
                     {% endif %}
-                    {% if wine.price is not None or wine.get_average_price_with_currency %}
-                        <tr>
-                            <th>{% translate "Price" %}</th>
-                            <td>
-                                {{ wine.get_price_with_currency }}
-                                {% if wine.get_average_price_with_currency %}
-                                    ({% translate "Average" %}: {{ wine.get_average_price_with_currency }})
-                                {% endif %}
-                            </td>
-                        </tr>
-                    {% endif %}
-                    {% if wine.comment %}
-                        <tr>
-                            <th>{% translate "Comment" %}</th>
-                            <td>{{ wine.comment }}</td>
-                        </tr>
-                    {% endif %}
-                    <tr>
-                        <th>{% translate "Rating" %}</th>
-                        <td>
-                            {% if wine.rating %}
-                                {{ wine.rating }} / 10
-                            {% else %}
-                                {% translate "No rating yet" %}
-                            {% endif %}
-                        </td>
-                    </tr>
-                </table>
-            </div>
-            {% if wine.location %}
-                <div class="pure-u-1 pure-u-md-2-3 m-auto wine-detail__map">{% react_detail_map wine %}</div>
-            {% endif %}
-            <div class="pure-u-1 pure-u-md-1 text-align-center">
-                <h2 class="header__title">{% translate "Stock" %}</h2>
-            </div>
-            <div class="pure-u-1 pure-u-md-3-8 m-auto">
-                <div class="d-flex j-between mb-12">
-                    <p class="stock__count">
-                        {% blocktranslate count counter=wine.total_stock %}
-                    {{ counter }} bottle
-                    {% plural %}
-                    {{ counter }} bottles
-                    {% endblocktranslate %}
-                    </p>
-                    <a href="{% url 'stock-add' wine.pk %}"
-                       class="pure-button button__neutral"><i class="fa-regular fa-plus"></i> <span>{% translate "Add bottle" %}</span></a>
-                </div>
-                <div class="pure-u-1 pure-u-md-1">
-                    {% if wine.get_stock %}
-                        <table class="pure-table pure-table-horizontal pure-table-striped wine-detail__stock-table">
-                            <thead>
-                                <tr>
-                                    <th>{% translate "Location" %}</th>
-                                    <th>{% translate "Row" %}</th>
-                                    <th>{% translate "Cell" %}</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            {% for item in wine.get_stock %}
-                                <tr>
-                                    <td>{{ item.storage }}</td>
-                                    <td>{{ item.row|default_if_none:"" }}</td>
-                                    <td>{{ item.column|default_if_none:"" }}</td>
-                                    <td>
-                                        <a class="pure-button" href="{% url 'stock-edit' item.pk %}"><i class="fa-regular fa-pen-to-square"></i></a>
-                                        <a class=" pure-button" href="{% url 'stock-delete' item.pk %}"><i class="fa-regular fa-trash-can"></i></a>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </table>
-                    {% else %}
-                        <p>{% translate "No bottles in stock." %}</p>
+                    {% if wine.get_average_price_with_currency %}
+                        <div class="wine-detail__field">
+                            <span class="wine-detail__field-label">{% translate "Average Price" %}</span>
+                            <span class="wine-detail__field-value">{{ wine.get_average_price_with_currency }}</span>
+                        </div>
                     {% endif %}
                 </div>
+
+                {% if wine.comment %}
+                    <div class="wine-detail__section">
+                        <span class="wine-detail__field-label">{% translate "Comment" %}</span>
+                        <p class="wine-detail__field-value">{{ wine.comment }}</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if wine.location %}
+            <div class="wine-detail__map m-auto">{% react_detail_map wine %}</div>
+        {% endif %}
+
+        <div class="wine-detail__section">
+            <div class="wine-detail__summary">
+                <div class="wine-detail__card-header">
+                    <h3>{% translate "Stock" %}</h3>
+                    <div class="wine-detail__stock-summary">
+                        <span class="stock__count">
+                            {% blocktranslate count counter=wine.total_stock %}
+                                {{ counter }} bottle
+                            {% plural %}
+                                {{ counter }} bottles
+                            {% endblocktranslate %}
+                        </span>
+                        <a href="{% url 'stock-add' wine.pk %}"
+                           class="pure-button button__primary"><i class="fa-regular fa-plus"></i> <span>{% translate "Add" %}</span></a>
+                    </div>
+                </div>
+                {% if wine.get_stock %}
+                    <table class="wine-detail__stock-table">
+                        <thead>
+                            <tr>
+                                <th>{% translate "Location" %}</th>
+                                <th>{% translate "Row" %}</th>
+                                <th>{% translate "Cell" %}</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        {% for item in wine.get_stock %}
+                            <tr>
+                                <td>{{ item.storage }}</td>
+                                <td>{{ item.row|default_if_none:"—" }}</td>
+                                <td>{{ item.column|default_if_none:"—" }}</td>
+                                <td class="wine-detail__stock-actions">
+                                    <a href="{% url 'stock-edit' item.pk %}" title="{% translate "Edit" %}"><i class="fa-regular fa-pen-to-square"></i></a>
+                                    <a href="{% url 'stock-delete' item.pk %}" title="{% translate "Remove" %}"><i class="fa-regular fa-trash-can"></i></a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                {% else %}
+                    <p class="text--gray">{% translate "No bottles in stock." %}</p>
+                {% endif %}
             </div>
         </div>
     </div>

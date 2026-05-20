@@ -64,6 +64,5 @@
 
 .wine__edit-delete-buttons {
   display: flex;
-  gap: 12px;
-  margin-bottom: 36px;
+  gap: 6px;
 }
