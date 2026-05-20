@@ -212,6 +212,42 @@
   }
 }
 
+.wine-detail__stock-drag {
+  width: 24px;
+  color: #ccc;
+  cursor: grab;
+  text-align: center;
+  user-select: none;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.wine-detail__stock-table tr[draggable="true"] {
+  transition: opacity 0.15s;
+}
+
+.wine-detail__stock-table tr.dragging {
+  opacity: 0.4;
+}
+
+.wine-detail__stock-table tr.drag-over {
+  outline: 2px dashed var(--dark-green);
+  outline-offset: -2px;
+}
+
+.wine-detail__stock-empty td {
+  color: #bbb;
+  font-style: italic;
+}
+
+.wine-detail__stock-empty.drag-over {
+  background: rgba(64, 128, 72, 0.08);
+  outline: 2px dashed var(--dark-green);
+  outline-offset: -2px;
+}
+
 .wine-detail__stock-actions {
   text-align: right;
   white-space: nowrap;
