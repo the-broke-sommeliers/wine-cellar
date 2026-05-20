@@ -1,7 +1,10 @@
+from django.db import models, transaction
 from django.forms import model_to_dict
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
+from django.views import View
 from django.views.generic import DeleteView, DetailView, FormView, ListView
 from django.views.generic.list import MultipleObjectMixin
 
@@ -28,9 +31,39 @@ class StorageDetailView(DetailView, MultipleObjectMixin):
 
     def get_context_data(self, **kwargs):
         object = self.get_object()
-        object_list = object.get_wines
+        items = list(object.get_wines)
+
+        # Build a combined list of items and empty slots, sorted by grid position
+        rows = []
+        for item in items:
+            rows.append(item)
+
+        if object.rows > 0 and object.columns > 0:
+            used = set(
+                object.items.filter(deleted=False, row__isnull=False).values_list(
+                    "row", "column"
+                )
+            )
+            for r in range(1, object.rows + 1):
+                for c in range(1, object.columns + 1):
+                    if (r, c) not in used:
+                        rows.append(
+                            {
+                                "is_empty": True,
+                                "row": r,
+                                "column": c,
+                            }
+                        )
+
+        def sort_key(x):
+            r = x["row"] if isinstance(x, dict) else x.row
+            c = x["column"] if isinstance(x, dict) else x.column
+            return (r or 0, c or 0)
+
+        rows.sort(key=sort_key)
+
         context = super(StorageDetailView, self).get_context_data(
-            object_list=object_list, **kwargs
+            object_list=rows, **kwargs
         )
         return context
 
@@ -283,3 +316,151 @@ class StorageItemHistoryView(ListView):
     def get_queryset(self):
         qs = super().get_queryset().order_by("-created")
         return qs.filter(user=self.request.user, deleted=True)
+
+
+def _adjacent(r1, c1, r2, c2, max_cols):
+    """True if (r2, c2) is immediately before or after (r1, c1) in row-major order."""
+    return _next_cell(r1, c1, max_cols) == (r2, c2) or _next_cell(r2, c2, max_cols) == (
+        r1,
+        c1,
+    )
+
+
+def _next_cell(row, col, max_cols):
+    """Return the next cell in row-major order."""
+    if col < max_cols:
+        return (row, col + 1)
+    return (row + 1, 1)
+
+
+def _is_before(r1, c1, r2, c2):
+    """True if (r1, c1) comes before (r2, c2)."""
+    return r1 < r2 or (r1 == r2 and c1 < c2)
+
+
+def _move_gap(storage, old_row, old_col, new_row, new_col):
+    """Shift items between old and new toward the gap at old."""
+    if _is_before(old_row, old_col, new_row, new_col):
+        # old is before new: shift items backward toward old
+        _shift_toward(storage, old_row, old_col, new_row, new_col, forward=False)
+    else:
+        # old is after new: shift items forward toward old
+        _shift_toward(storage, new_row, new_col, old_row, old_col, forward=True)
+
+
+def _shift_toward(storage, start_row, start_col, end_row, end_col, *, forward):
+    """Shift items in [start, end] range toward one end."""
+    max_cols = storage.columns
+    if start_row == end_row:
+        range_filter = models.Q(
+            row=start_row, column__gte=start_col, column__lte=end_col
+        )
+    else:
+        range_filter = (
+            models.Q(row=start_row, column__gte=start_col)
+            | models.Q(row__gt=start_row, row__lt=end_row)
+            | models.Q(row=end_row, column__lte=end_col)
+        )
+    items = (
+        StorageItem.objects.filter(
+            storage=storage,
+            deleted=False,
+            row__isnull=False,
+            column__isnull=False,
+        )
+        .filter(range_filter)
+        .order_by("row", "column")
+    )
+
+    items = list(items)
+    if not forward:
+        items.reverse()
+
+    for item in items:
+        if forward:
+            item.row, item.column = _next_cell(item.row, item.column, max_cols)
+        else:
+            item.row -= 1 if item.column == 1 else 0
+            item.column = max_cols if item.column == 1 else item.column - 1
+        item.save(update_fields=["row", "column"])
+
+
+class StorageItemSwapView(View):
+    def post(self, request):
+        source = get_object_or_404(
+            StorageItem, pk=request.POST.get("item1"), user=request.user, deleted=False
+        )
+
+        old_row = source.row
+        old_col = source.column
+
+        target_id = request.POST.get("item2")
+        if target_id:
+            target = get_object_or_404(
+                StorageItem, pk=target_id, user=request.user, deleted=False
+            )
+            if source.storage_id != target.storage_id:
+                return JsonResponse(
+                    {"ok": False, "error": "Cannot move between different storages."},
+                    status=400,
+                )
+            new_row = target.row
+            new_col = target.column
+        else:
+            new_row = int(request.POST.get("row", 0))
+            new_col = int(request.POST.get("column", 0))
+            if source.storage_id != int(request.POST.get("storage", 0)):
+                return JsonResponse(
+                    {"ok": False, "error": "Cannot move between different storages."},
+                    status=400,
+                )
+            if source.storage.columns > 0:
+                if (
+                    new_row < 1
+                    or new_row > source.storage.rows
+                    or new_col < 1
+                    or new_col > source.storage.columns
+                ):
+                    return JsonResponse(
+                        {"ok": False, "error": "Invalid slot."}, status=400
+                    )
+                if source.storage.is_slot_occupied(new_row, new_col):
+                    return JsonResponse(
+                        {"ok": False, "error": "Slot is occupied."}, status=400
+                    )
+
+        with transaction.atomic():
+            if (
+                target_id
+                and old_row is not None
+                and new_row is not None
+                and source.storage.columns > 0
+                and _adjacent(
+                    old_row, old_col, new_row, new_col, source.storage.columns
+                )
+            ):
+                # Adjacent cells: just swap positions
+                target.row = old_row
+                target.column = old_col
+                target.save(update_fields=["row", "column"])
+                source.row = new_row
+                source.column = new_col
+                source.save(update_fields=["row", "column"])
+            else:
+                source.row = None
+                source.column = None
+                source.save(update_fields=["row", "column"])
+
+                if (
+                    target_id
+                    and old_row is not None
+                    and new_row is not None
+                    and source.storage.columns > 0
+                ):
+                    _move_gap(source.storage, old_row, old_col, new_row, new_col)
+
+                source.row = new_row
+                source.column = new_col
+                source.save(update_fields=["row", "column"])
+
+        return JsonResponse({"ok": True})

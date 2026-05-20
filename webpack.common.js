@@ -55,6 +55,9 @@ module.exports = {
     image_preview: {
       import: ['./wine_cellar/assets/js/image_preview.ts'],
     },
+    stock_drag: {
+      import: ['./wine_cellar/assets/js/stock_drag.ts'],
+    },
   },
   output: {
     path: path.resolve('./wine_cellar/static/'),
