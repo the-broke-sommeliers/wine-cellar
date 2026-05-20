@@ -18,14 +18,18 @@ html {
 
 /* for footer placement */
 .layout {
-  min-height: 99vh;
-  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .main {
   max-width: 1140px;
+  width: 100%;
+  box-sizing: border-box;
   padding: 0 2rem 4rem 2rem;
-  margin: 0 auto;
+  align-self: center;
+  flex: 1;
 }
 
 .header__title {
@@ -69,9 +73,6 @@ h2.header__title {
 .footer {
   text-align: center;
   width: 100%;
-  position: absolute;
-  bottom: 0;
-  left: 0;
 
   p {
     margin-bottom: 0;
