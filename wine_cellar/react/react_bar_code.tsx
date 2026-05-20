@@ -1,6 +1,6 @@
 import { BarcodeDetector, prepareZXingModule } from 'barcode-detector/ponyfill'
 import django from 'django'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { BarcodeScanner, type DetectedBarcode } from 'react-barcode-scanner'
 import { createRoot } from 'react-dom/client'
 
@@ -13,10 +13,22 @@ const translated = {
   close_barcode: django.gettext('Close Scanner'),
 }
 
-const Scanner = ({ targetInputId }: { targetInputId?: string }) => {
+const Scanner = ({
+  targetInputId,
+  autoOpen = false,
+}: {
+  targetInputId?: string
+  autoOpen?: boolean
+}) => {
   const [isOpen, setIsOpen] = useState(false)
   const [selectedFormat, setSelectedFormat] = useState('any')
   const defaultFormats = ['ean_13', 'ean_8', 'upc_a', 'code_39', 'itf']
+
+  useEffect(() => {
+    if (autoOpen) {
+      setIsOpen(true)
+    }
+  }, [autoOpen])
 
   const handleCapture = (barcodes: DetectedBarcode[]) => {
     const firstBarcode = barcodes[0]
@@ -90,6 +102,7 @@ const initScanner = () => {
   if (container) {
     const root = createRoot(container)
     const targetInputId = container.dataset.targetInput
+    const autoOpen = container.dataset.autoOpen === 'true'
     // Override the locateFile function
     prepareZXingModule({
       overrides: {
@@ -104,7 +117,7 @@ const initScanner = () => {
     })
     // @ts-expect-error
     globalThis.BarcodeDetector ??= BarcodeDetector
-    root.render(<Scanner targetInputId={targetInputId} />)
+    root.render(<Scanner targetInputId={targetInputId} autoOpen={autoOpen} />)
   }
 }
 
