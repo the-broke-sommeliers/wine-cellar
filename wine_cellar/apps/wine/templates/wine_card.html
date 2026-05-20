@@ -3,8 +3,8 @@
     <div class="wine-card__image-wrapper">
         <img src="{{ wine.image_thumbnail }}"
              class="wine-card__img"
-             height="200"
-             width="auto"
+             height="160"
+             width="120"
              loading="lazy"
              alt="{% blocktranslate with type=wine.get_type %}Image of a glass of {{ type }} wine{% endblocktranslate %}">
     </div>
@@ -13,22 +13,13 @@
             <a class="wine-card__link" href="{% url 'wine-detail' wine.pk %}">{{ wine.name }}</a>
         </h2>
         {% if wine.get_grapes %}
-            <div class="pure-u-1-1">
-                <span class="text--gray">{% translate "Grapes" %}</span>
-                <p>{{ wine.get_grapes | truncatechars:31 | title }}</p>
-            </div>
+            <p><span class="text--gray">{% translate "Grapes" %}:</span> {{ wine.get_grapes | truncatechars:31 | title }}</p>
         {% endif %}
         {% if wine.vintage %}
-            <div class="pure-u-1-1">
-                <span class="text--gray">{% translate "Vintage" %}</span>
-                <p>{{ wine.vintage }}</p>
-            </div>
+            <p><span class="text--gray">{% translate "Vintage" %}:</span> {{ wine.vintage }}</p>
         {% endif %}
         {% if wine.drink_by %}
-            <div class="pure-u-1-1">
-                <span class="text--gray">{% translate "Drink By" %}</span>
-                <p>{{ wine.drink_by }}</p>
-            </div>
+            <p><span class="text--gray">{% translate "Drink By" %}:</span> {{ wine.drink_by }}</p>
         {% endif %}
     </div>
     <div class="wine-card__stock">
