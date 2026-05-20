@@ -11,7 +11,7 @@ register = template.Library()
 
 @register.simple_tag()
 def react_detail_map(wine: Wine):
-    attributes = get_map_attributes(wines=[wine], height="30vh")
+    attributes = get_map_attributes(wines=[wine], height="100%")
     return format_html(
         '<div id="wine_map" ' 'data-attributes="{attributes}"></div>',
         attributes=json.dumps(attributes),
