@@ -215,7 +215,16 @@ p.form-hint {
 
 .form__scanner__button {
   margin-bottom: 12px;
-  margin-top: -4px;
+}
+
+.scan-page {
+  text-align: center;
+}
+
+.scan-page__helptext {
+  color: var(--text-color-gray);
+  margin: 0 0 1.5rem 0;
+  line-height: 1.5;
 }
 
 .form__scanner__details {
