@@ -27,10 +27,11 @@
 }
 
 .form-subhead {
-  font-size: var(--font-xl);
-  margin: 20px 0 10px 0;
+  font-size: var(--font-md);
+  margin: 0 4px 0 4px;
   font-weight: 300;
-  color: #333;
+  color: var(--text-color-gray);
+  padding-bottom: 2px;
 }
 
 .wine-form {
@@ -54,8 +55,15 @@
   }
 
   label {
-    margin-bottom: 0px;
-    line-height: 0.75rem;
+    display: block;
+  }
+
+  .form-hint {
+    margin: 0 0 4px 0;
+  }
+
+  .pure-controls {
+    margin-top: 1.5rem;
   }
 
   @media screen and (min-width: 48em) {
@@ -74,8 +82,14 @@
   }
 }
 
+.wine-form__fields {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
 .form-container {
-  margin-bottom: 1rem;
+  margin-bottom: 0;
 }
 
 div.form-hint,
