@@ -1,3 +1,4 @@
+from datetime import date, timedelta
 from decimal import Decimal
 
 import pycountry
@@ -194,6 +195,11 @@ class Wine(UserContentModel):
     )
     drink_by = models.DateField(blank=True, null=True)
     comment = models.CharField(max_length=250, blank=True)
+
+    @property
+    def drink_by_warning_date(self):
+        return date.today() + timedelta(days=30)
+
     rating = models.PositiveIntegerField(
         null=True,
         validators=[MinValueValidator(0), MaxValueValidator(10)],

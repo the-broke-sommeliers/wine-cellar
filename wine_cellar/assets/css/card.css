@@ -93,6 +93,29 @@
   border-radius: 8px;
 }
 
+.wine-card__rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+
+  i {
+    color: #d4a017;
+    font-size: 0.85rem;
+  }
+
+  span {
+    color: #666;
+    font-size: 0.85rem;
+  }
+}
+
+.wine-card__drink-warning {
+  color: #d47500;
+  font-size: 0.85rem;
+  margin-left: 4px;
+}
+
 .wine-card__stock {
   min-width: 100%;
   align-content: end;

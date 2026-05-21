@@ -130,7 +130,13 @@
                     {% if wine.drink_by %}
                         <div class="wine-detail__field">
                             <span class="wine-detail__field-label">{% translate "Drink By" %}</span>
-                            <span class="wine-detail__field-value">{{ wine.drink_by }}</span>
+                            <span class="wine-detail__field-value">
+                                {{ wine.drink_by }}
+                                {% if wine.drink_by <= wine.drink_by_warning_date %}
+                                    <i class="fa-solid fa-circle-exclamation wine-card__drink-warning"
+                                       aria-label="{% translate "Drink soon" %}"></i>
+                                {% endif %}
+                            </span>
                         </div>
                     {% endif %}
                     {% if wine.get_attributes %}
