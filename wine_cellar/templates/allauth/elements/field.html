@@ -10,7 +10,7 @@
             {% endif %}
         {% endif %}
     </label>
-    {% if attrs.help_text %}
+    {% if attrs.help_text and attrs.type != "password" %}
         <div class="form-hint">{% slot help_text %}{% endslot %}</div>
     {% endif %}
     {% if attrs.errors %}
@@ -39,5 +39,8 @@
                {% if attrs.value is not None %}value="{{ attrs.value }}"{% endif %}
                aria-invalid="{% if attrs.errors %}true{% else %}false{% endif %}"
                type="{{ attrs.type }}">
+    {% endif %}
+     {% if attrs.help_text and attrs.type == "password" %}
+        <div class="form-hint">{% slot help_text %}{% endslot %}</div>
     {% endif %}
 </div>

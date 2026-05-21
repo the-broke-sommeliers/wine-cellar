@@ -132,6 +132,10 @@
 }
 
 .form-container {
+  margin-bottom: 1rem;
+}
+
+.form .form__fields .form-container {
   margin-bottom: 0;
 }
 
