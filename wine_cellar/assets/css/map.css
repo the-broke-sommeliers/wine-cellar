@@ -1,3 +1,7 @@
+.wine-map__full {
+  height: 60vh;
+}
+
 .marker-cluster {
   background-clip: padding-box;
   border-radius: 20px;
@@ -69,4 +73,13 @@
 .popup-label {
   font-weight: 600;
   color: black;
+}
+
+.map-container {
+  flex: 1;
+  min-width: 260px;
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--container-box-shadow);
+  padding: 0.25rem;
 }
