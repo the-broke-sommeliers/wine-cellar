@@ -15,17 +15,21 @@
         <div class="pure-u-1 pure-u-lg-1-3 m-auto">
             <form method="post"
                   enctype="multipart/form-data"
-                  class="pure-form pure-form-stacked wine-form"
+                  class="form"
                   novalidate>
                 {% csrf_token %}
-                <fieldset>
+                <div class="form__fields">
                     {% for field in form %}
                         {% include 'forms/form_field.html' %}
                     {% endfor %}
-                    <div class="pure-controls">
-                        <button type="submit" class="pure-button button__primary">{% translate "Save" %}</button>
+                </div>
+                <div class="pure-controls">
+                    <div class="form__buttons">
+                        <div class="form__buttons-right">
+                            <button type="submit" class="pure-button button__primary">{% translate "Save" %}</button>
+                        </div>
                     </div>
-                </fieldset>
+                </div>
             </form>
         </div>
     </div>

@@ -13,7 +13,6 @@ module.exports = {
         './node_modules/purecss/build/grids-responsive.css',
         './wine_cellar/assets/css/menu.css',
         './wine_cellar/assets/css/detail.css',
-        './wine_cellar/assets/css/storage.css',
         './wine_cellar/assets/css/utility.css',
         './wine_cellar/assets/css/card.css',
         './wine_cellar/assets/css/forms.css',

@@ -17,7 +17,7 @@
             {% storage_cells free_cells_by_storage %}
             <form method="post"
                   enctype="multipart/form-data"
-                  class="pure-form pure-form-stacked wine-form"
+                  class="form"
                   novalidate>
                 {% csrf_token %}
                 {% if form.non_field_errors %}
@@ -25,25 +25,27 @@
                         {% for error in form.non_field_errors %}<li>{{ error|escape }}</li>{% endfor %}
                     </ul>
                 {% endif %}
-                {% include 'forms/form_field.html' with field=form.storage %}
-                {% include 'forms/form_field.html' with field=form.row %}
-                <ul id="storage__error-full"
-                    class="form-errorlist hidden"
-                    aria-live="assertive"
-                    aria-atomic="true">
-                    <li>
-                        <span>{% translate "This row of the shelf is full. Please choose another one." %}</span>
-                    </li>
-                </ul>
-                {% include 'forms/form_field.html' with field=form.column %}
-                {% include 'forms/form_field.html' with field=form.price %}
+                <div class="form__fields">
+                    {% include 'forms/form_field.html' with field=form.storage %}
+                    {% include 'forms/form_field.html' with field=form.row %}
+                    <ul id="storage__error-full"
+                        class="form-errorlist hidden"
+                        aria-live="assertive"
+                        aria-atomic="true">
+                        <li>
+                            <span>{% translate "This row of the shelf is full. Please choose another one." %}</span>
+                        </li>
+                    </ul>
+                    {% include 'forms/form_field.html' with field=form.column %}
+                    {% include 'forms/form_field.html' with field=form.price %}
+                </div>
                 <div class="pure-controls">
                     <div class="pure-g">
                         <div id="save_button_container" class="pure-u-1 pure-u-sm-1-1">
                             <button id="submit_button"
                                     type="submit"
                                     name="save"
-                                    class="pure-button button__secondary">{% translate "Save" %}</button>
+                                    class="pure-button button__primary">{% translate "Save" %}</button>
                         </div>
                     </div>
                 </div>

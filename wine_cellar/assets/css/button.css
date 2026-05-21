@@ -8,7 +8,8 @@
   }
 
   &:focus {
-    outline: revert;
+    outline: 2px solid var(--focus-ring-color);
+    outline-offset: 2px;
     background-color: var(--darker-green);
   }
 
@@ -27,7 +28,8 @@
   }
 
   &:focus {
-    outline: revert;
+    outline: 2px solid var(--focus-ring-color);
+    outline-offset: 2px;
     background-color: var(--darker-purple);
   }
 
@@ -37,22 +39,24 @@
 }
 
 .button__neutral {
-  color: black;
+  color: var(--darker-gray);
   background-color: var(--gray-green);
   text-decoration: none;
   border-radius: 6px;
 
   &:hover {
-    background-color: var(--gray-green);
+    background-color: #dadfcf;
   }
 
   &:focus {
-    outline: revert;
-    background-color: var(--darker-green);
+    outline: 2px solid var(--focus-ring-color);
+    outline-offset: 2px;
+    background-color: #dadfcf;
   }
 
   &:active {
     background-color: var(--darkest-green);
+    color: var(--light);
   }
 }
 

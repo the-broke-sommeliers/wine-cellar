@@ -8,7 +8,7 @@
              loading="lazy"
              alt="{% blocktranslate with type=wine.get_type %}Image of a glass of {{ type }} wine{% endblocktranslate %}">
     </div>
-    <div class="wine-card__detail_container">
+    <div class="wine-card__detail-container">
         <h2 class="wine-card__title">
             <a class="wine-card__link" href="{% url 'wine-detail' wine.pk %}">{{ wine.name }}</a>
         </h2>

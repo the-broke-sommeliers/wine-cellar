@@ -13,16 +13,16 @@
     <div class="pure-g settings-container">
         {% include "includes/settings_sidebar.html" %}
         <div class="pure-u-1 pure-u-lg-3-4">
-            <div class="wine-detail__summary">
-                <div class="wine-detail__card-header">
+            <div class="card">
+                <div class="card__header">
                     <h3>{% translate "General" %}</h3>
                 </div>
                 <form method="post"
                       enctype="multipart/form-data"
-                      class="wine-form"
+                      class="form"
                       novalidate>
                     {% csrf_token %}
-                    <div class="wine-form__fields">
+                    <div class="form__fields">
                         {% include 'forms/form_field.html' with field=form.language %}
                         {% include 'forms/form_field.html' with field=form.currency %}
                         {% include 'forms/form_field.html' with field=form.notifications %}

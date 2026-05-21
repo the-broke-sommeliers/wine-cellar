@@ -1,7 +1,5 @@
 function initWineCarousel() {
-  const wrapper = document.querySelector(
-    '.wine-detail__image-wrapper'
-  ) as HTMLElement
+  const wrapper = document.querySelector('.card__image-wrapper') as HTMLElement
   if (!wrapper) {
     return
   }
