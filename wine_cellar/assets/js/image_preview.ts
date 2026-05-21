@@ -1,14 +1,25 @@
 function initImagePreview() {
   document.querySelectorAll('input[type="file"]').forEach((inputEl) => {
     const input = inputEl as HTMLInputElement
-    const preview = input
-      .closest('.form-container')
-      ?.querySelector('.image-preview') as HTMLImageElement | null
+    const container = input.closest('.form-container')
+    const preview = container?.querySelector(
+      '.image-preview'
+    ) as HTMLImageElement | null
     const hasInitial = preview?.src !== ''
     const wrapper = preview?.parentElement
-    const clearCheckbox = input
-      .closest('.form-container')
-      ?.querySelector('.image-clear-checkbox') as HTMLInputElement | null
+    const clearCheckbox = container?.querySelector(
+      '.image-clear-checkbox'
+    ) as HTMLInputElement | null
+    const clearBtn = container?.querySelector(
+      '.image-clear-btn'
+    ) as HTMLButtonElement | null
+
+    if (clearBtn && clearCheckbox) {
+      clearBtn.addEventListener('click', () => {
+        clearCheckbox.checked = !clearCheckbox.checked
+        clearCheckbox.dispatchEvent(new Event('change', { bubbles: true }))
+      })
+    }
 
     input.addEventListener('change', (_e: Event) => {
       const file = input.files?.[0]
@@ -39,9 +50,10 @@ function initImagePreview() {
         const clearTitle = gettext('Clear Image')
         const restoreTitle = gettext('Restore image')
         const title = checked ? restoreTitle : clearTitle
-        clearCheckbox.title = title
-        clearCheckbox.setAttribute('aria-label', title)
-        clearCheckbox.setAttribute('aria-pressed', checked ? 'true' : 'false')
+        if (clearBtn) {
+          clearBtn.title = title
+          clearBtn.setAttribute('aria-label', title)
+        }
       }
 
       setClearControlLabels(!!clearCheckbox.checked)

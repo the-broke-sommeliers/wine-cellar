@@ -35,7 +35,7 @@
 }
 
 .wine-form {
-  input:not([type="checkbox"]),
+  input:not([type="checkbox"]):not([type="file"]),
   select,
   textarea {
     width: 100%;
@@ -48,6 +48,34 @@
     font-size: 13px;
     box-shadow: none;
     background-color: #fff;
+  }
+
+  input[type="file"] {
+    width: 100%;
+    max-width: none;
+    min-height: 36px;
+    padding: 6px;
+    border: 1px solid #d0d0d0;
+    border-radius: 3px;
+    box-sizing: border-box;
+    font-size: 13px;
+  }
+
+  input[type="file"]::file-selector-button {
+    padding: 5px 12px;
+    border: none;
+    border-radius: 4px;
+    background: var(--gray-green);
+    color: #333;
+    font-size: 12px;
+    cursor: pointer;
+    margin-right: 8px;
+    transition: background-color 0.15s;
+  }
+
+  input[type="file"]::file-selector-button:hover {
+    background: var(--dark-green);
+    color: var(--light);
   }
 
   .ts-wrapper {
@@ -148,7 +176,7 @@ p.form-hint {
   box-shadow: var(--container-box-shadow);
   padding: 1.25rem;
 
-  input:not([type="checkbox"]),
+  input:not([type="checkbox"]):not([type="file"]),
   select {
     width: 100%;
     max-width: none;
@@ -326,7 +354,9 @@ p.form-hint {
 }
 
 .image-preview-wrapper {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   height: 250px;
   border: 1px solid #e6e6e6;
@@ -334,23 +364,26 @@ p.form-hint {
   border-radius: 6px;
   background: #fff;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-  text-align: center;
   position: relative;
-  align-content: center;
   margin-bottom: 8px;
+  box-sizing: border-box;
 }
 
 .image-preview-wrapper .image-preview {
   display: block;
-  margin: 0 auto;
   max-width: 100%;
-  height: 225px;
+  max-height: 100%;
   width: auto;
+  height: auto;
   object-fit: contain;
   border-radius: 4px;
 }
 
 .image-clear-checkbox {
+  display: none;
+}
+
+.image-clear-btn {
   position: absolute;
   top: 8px;
   right: 8px;
@@ -359,41 +392,26 @@ p.form-hint {
   height: 36px;
   margin: 0;
   padding: 0;
-  appearance: none;
-  -webkit-appearance: none;
   border-radius: 6px;
   border: 1px solid #ddd;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.9);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-}
-
-.image-clear-checkbox:hover {
-  background: rgba(255, 255, 255, 0.95);
-}
-
-.image-clear-checkbox:focus {
-  outline: 3px solid rgba(21, 156, 228, 0.35);
-  outline-offset: 2px;
-}
-
-.image-clear-checkbox::before {
-  font-family: "Font Awesome 6 Free", sans-serif;
-  font-weight: 900;
-  content: "\f1f8";
   font-size: 16px;
   color: #333;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
   line-height: 1;
 }
 
-.image-clear-checkbox:checked::before {
-  content: "\f2ea";
+.image-clear-btn:hover {
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--red);
+}
+
+.image-clear-btn:focus {
+  outline: 3px solid rgba(21, 156, 228, 0.35);
+  outline-offset: 2px;
 }
 
 .wine__add-buttons {
