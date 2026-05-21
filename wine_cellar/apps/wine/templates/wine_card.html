@@ -19,7 +19,19 @@
             <p><span class="text--gray">{% translate "Vintage" %}:</span> {{ wine.vintage }}</p>
         {% endif %}
         {% if wine.drink_by %}
-            <p><span class="text--gray">{% translate "Drink By" %}:</span> {{ wine.drink_by }}</p>
+            <p>
+                <span class="text--gray">{% translate "Drink By" %}:</span> {{ wine.drink_by }}
+                {% if wine.drink_by <= wine.drink_by_warning_date %}
+                    <i class="fa-solid fa-circle-exclamation wine-card__drink-warning"
+                       aria-label="{% translate "Drink soon" %}"></i>
+                {% endif %}
+            </p>
+        {% endif %}
+        {% if wine.rating %}
+            <p class="wine-card__rating" aria-label="{% blocktranslate with rating=wine.rating %}Rating: {{ rating }} out of 10{% endblocktranslate %}">
+                <i class="fa-solid fa-star" aria-hidden="true"></i>
+                <span>{{ wine.rating }}/10</span>
+            </p>
         {% endif %}
     </div>
     <div class="wine-card__stock">
