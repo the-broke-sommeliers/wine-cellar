@@ -58,10 +58,13 @@ const Scanner = ({
       {isOpen && (
         <>
           <section className="form__scanner__details">
-            <details>
-              <summary>{translated.advanced}</summary>
+            <details className="scanner-advanced">
+              <summary className="scanner-advanced__summary">
+                {translated.advanced}
+              </summary>
               <p className="form-hint">{translated.helptext}</p>
               <select
+                className="scanner-format-select"
                 value={selectedFormat}
                 onChange={(e) => setSelectedFormat(e.target.value)}
               >
@@ -84,11 +87,11 @@ const Scanner = ({
                 formats: selectedFormat ? [selectedFormat] : defaultFormats,
               }}
             />
-            <div className="overlay">
-              <div className="overlay-element top-left" />
-              <div className="overlay-element top-right" />
-              <div className="overlay-element bottom-left" />
-              <div className="overlay-element bottom-right" />
+            <div className="scanner-overlay">
+              <div className="scanner-overlay__corner scanner-overlay__corner--tl" />
+              <div className="scanner-overlay__corner scanner-overlay__corner--tr" />
+              <div className="scanner-overlay__corner scanner-overlay__corner--bl" />
+              <div className="scanner-overlay__corner scanner-overlay__corner--br" />
             </div>
           </section>
         </>

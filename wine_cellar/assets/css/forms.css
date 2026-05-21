@@ -207,58 +207,80 @@ p.form-hint {
   }
 }
 
-.overlay {
-  --border-style: 3px solid red;
-  --border-space: 20px;
-
+.scanner-overlay {
   position: absolute;
-  top: 37.5%;
+  top: 10%;
   left: 10%;
   right: 10%;
-  bottom: 37.5%;
-  height: 35%;
-  width: 80%;
+  bottom: 10%;
+  pointer-events: none;
 }
 
-.overlay-element {
+.scanner-overlay__corner {
   position: absolute;
-  width: 15px;
-  height: 15px;
+  width: 24px;
+  height: 24px;
+  border-color: var(--dark-green);
+  border-style: solid;
 }
 
-.overlay .top-left {
-  border-left: var(--border-style);
-  border-top: var(--border-style);
-  top: var(--border-space);
-  left: var(--border-space);
+.scanner-overlay__corner--tl {
+  top: 0;
+  left: 0;
+  border-width: 3px 0 0 3px;
+  border-radius: 4px 0 0 0;
 }
 
-.overlay .top-right {
-  border-right: var(--border-style);
-  border-top: var(--border-style);
-  top: var(--border-space);
-  right: var(--border-space);
+.scanner-overlay__corner--tr {
+  top: 0;
+  right: 0;
+  border-width: 3px 3px 0 0;
+  border-radius: 0 4px 0 0;
 }
 
-.overlay .bottom-left {
-  border-left: var(--border-style);
-  border-bottom: var(--border-style);
-  bottom: var(--border-space);
-  left: var(--border-space);
+.scanner-overlay__corner--bl {
+  bottom: 0;
+  left: 0;
+  border-width: 0 0 3px 3px;
+  border-radius: 0 0 0 4px;
 }
 
-.overlay .bottom-right {
-  border-right: var(--border-style);
-  border-bottom: var(--border-style);
-  bottom: var(--border-space);
-  right: var(--border-space);
+.scanner-overlay__corner--br {
+  bottom: 0;
+  right: 0;
+  border-width: 0 3px 3px 0;
+  border-radius: 0 0 4px 0;
+}
+
+.scanner-advanced__summary {
+  font-size: 0.85rem;
+  color: var(--text-color-gray);
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+}
+
+.scanner-format-select {
+  width: 100%;
+  max-width: none;
+  min-height: 36px;
+  padding: 8px;
+  border: 1px solid #d0d0d0;
+  border-radius: 3px;
+  box-sizing: border-box;
+  font-size: 13px;
+  box-shadow: none;
+  background-color: #fff;
+  color: #303030;
 }
 
 .form__scanner {
   width: 100%;
-  padding-top: 100%; /* 1:1 Aspect Ratio */
+  padding-top: 100%;
   position: relative;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
 
   video {
     position: absolute;
@@ -266,25 +288,26 @@ p.form-hint {
     left: 0;
     bottom: 0;
     right: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 }
 
 .form__scanner__button {
-  margin-bottom: 12px;
-}
-
-.scan-page {
-  text-align: center;
+  display: block;
+  margin: 0 auto 12px auto;
 }
 
 .scan-page__helptext {
   color: var(--text-color-gray);
-  margin: 0 0 1.5rem 0;
+  margin: 0 0 1.25rem 0;
   line-height: 1.5;
+  text-align: center;
 }
 
 .form__scanner__details {
-  padding-bottom: 16px;
+  padding-bottom: 12px;
 }
 
 .image-preview-wrapper {
