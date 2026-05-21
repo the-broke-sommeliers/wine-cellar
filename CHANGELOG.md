@@ -3,19 +3,73 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.7.0-rc.0 (2026-05-17)
+## 0.7.0-rc.1 (2026-05-21)
 
 ### feat
+
+- add back button to wine add form
+
+- show a small warning if a wine is close to it's drink by date
+
+- redesign detail map
+
+- make bottles in storage detail view draggable for easier rearranging
+
+- redesign wine detail page
 
 - make wine images clickable and open in new tab
 
 
 ### fix
 
+- hide price if none on detail page
+
+- missing margin on login page, move forgot password below field
+
+- disable drag and drop on gridless storage
+
+- inconsistencies across templates and css
+    
+    - use consistent class names
+    - consistent button styling and placement
+    - some more various fixes
+
+- some form issues
+
+- some wine list ui issues
+
+- some ui inconsistencies
+
+- auto-open barcode scanner on scanning page, some layout fixes
+
+- **deps**: update dependency tom-select to v2.6.1
 - add more missing translations
 
 - **deps**: update react monorepo to v19.2.6
 - **deps**: update dependency barcode-detector to v3.1.3
+
+### refactor
+
+- more form redesign
+
+- redesign scanned barcode page
+
+- redesign edit wine page
+
+- redesign barcode scanner ui
+
+- redesign stock history view
+
+- redesign settings page
+
+- redesign wine create select page
+
+- redesign map page
+
+- redesign storage list page
+
+- redesign base forms
+
 
 
 ## 0.6.2 (2026-04-28)
