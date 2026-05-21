@@ -82,6 +82,7 @@
   align-items: center;
   margin-bottom: 1rem;
   padding-bottom: 0.75rem;
+  border-bottom: 1px solid #eee;
 }
 
 .wine-detail__card-header h3 {
@@ -89,6 +90,15 @@
   font-size: var(--font-md);
   font-weight: 300;
   color: var(--text-color-gray);
+}
+
+.settings-container .wine-detail__summary > h1 {
+  font-size: var(--font-md);
+  font-weight: 300;
+  color: var(--text-color-gray);
+  margin: 0 0 1rem 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #eee;
 }
 
 .wine-detail__action-btn {

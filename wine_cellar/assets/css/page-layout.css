@@ -68,6 +68,7 @@ h2.header__title {
 
 .settings-container {
   margin-top: 1rem;
+  gap: 0;
 }
 
 .footer {
