@@ -198,9 +198,11 @@ class WineCreateView(WineBaseView):
             self.update_wine_from_cleaned_data(form=form, wine=self.get_wine_instance())
             return super().form_valid(form)
         elif form_step < 5:
-            # FIXME: hacky workaround to increase form_step field
             form.data = form.data.copy()
-            form.data["form_step"] = form.cleaned_data["form_step"] + 1
+            if "back" in self.request.POST:
+                form.data["form_step"] = max(0, form.cleaned_data["form_step"] - 1)
+            else:
+                form.data["form_step"] = form.cleaned_data["form_step"] + 1
             return super().form_invalid(form)
         return super().form_invalid(form)
 

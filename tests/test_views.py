@@ -751,3 +751,59 @@ def test_wine_filter_price(client, user, wine_factory, storage_item_factory):
         wine_in_stock_expensive,
         wine_no_price,
     ]
+
+
+@pytest.mark.django_db
+def test_wine_create_continue_advances_step(client, user):
+    """Clicking Continue on step 0 should advance to step 1 and show step 1 fields."""
+    client.force_login(user)
+    size = Size.objects.first()
+    data = {
+        "name": "Test Wine",
+        "wine_type": "RE",
+        "country": "DE",
+        "size": size.pk,
+        "form_step": 0,
+    }
+    r = client.post(reverse("wine-add"), data=data)
+    assert r.status_code == HTTPStatus.OK
+    form = r.context["form"]
+    assert int(form["form_step"].value()) == 1
+    content = r.content.decode()
+    assert 'id="create__fs_1"' in content
+    assert 'id="create__fs_1" class="hidden"' not in content
+
+
+@pytest.mark.django_db
+def test_wine_create_back_goes_to_previous_step(client, user):
+    """Clicking Back on step 1 should return to step 0 and show step 0 fields."""
+    client.force_login(user)
+    size = Size.objects.first()
+    data = {
+        "name": "Test Wine",
+        "wine_type": "RE",
+        "country": "DE",
+        "size": size.pk,
+        "form_step": 1,
+    }
+    r = client.post(reverse("wine-add"), data={**data, "back": ""})
+    assert r.status_code == HTTPStatus.OK
+    assert int(r.context["form"]["form_step"].value()) == 0
+    assert 'id="create__fs_0"' in r.content.decode()
+
+
+@pytest.mark.django_db
+def test_wine_create_back_does_not_go_below_zero(client, user):
+    """Back on step 0 should stay at step 0."""
+    client.force_login(user)
+    size = Size.objects.first()
+    data = {
+        "name": "Test Wine",
+        "wine_type": "RE",
+        "country": "DE",
+        "size": size.pk,
+        "form_step": 0,
+    }
+    r = client.post(reverse("wine-add"), data={**data, "back": ""})
+    assert r.status_code == HTTPStatus.OK
+    assert int(r.context["form"]["form_step"].value()) == 0

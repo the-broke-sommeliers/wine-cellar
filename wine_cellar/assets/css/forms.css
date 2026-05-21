@@ -62,6 +62,21 @@
     margin: 0 0 4px 0;
   }
 
+  .wine-form__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .wine-form__buttons-right {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-left: auto;
+  }
+
   .pure-controls {
     margin-top: 1.5rem;
   }
