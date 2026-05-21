@@ -22,10 +22,10 @@
         <div class="pure-u-1 pure-u-lg-1-2 m-auto">
             <form method="post"
                   enctype="multipart/form-data"
-                  class="wine-form"
+                  class="form"
                   novalidate>
                 {% csrf_token %}
-                <div class="wine-form__fields">
+                <div class="form__fields">
                     {% for field in form %}
                         {% include 'forms/form_field.html' %}
                         {% if field.name == "barcode" %}
@@ -36,7 +36,11 @@
                     {% endfor %}
                 </div>
                 <div class="pure-controls">
-                    <button type="submit" class="pure-button button__primary">{% translate "Save" %}</button>
+                    <div class="form__buttons">
+                        <div class="form__buttons-right">
+                            <button type="submit" class="pure-button button__primary">{% translate "Save" %}</button>
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>

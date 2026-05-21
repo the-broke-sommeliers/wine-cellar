@@ -28,7 +28,7 @@
         {% else %}
             <form method="post"
                   enctype="multipart/form-data"
-                  class="pure-form pure-form-stacked wine-form"
+                  class="form"
                   novalidate>
                 {% csrf_token %}
                 {% if form.non_field_errors %}
@@ -36,14 +36,14 @@
                         {% for error in form.non_field_errors %}<li>{{ error|escape }}</li>{% endfor %}
                     </ul>
                 {% endif %}
-                <fieldset>
+                <div class="form__fields">
                     {% for field in form %}
                         {% include 'forms/form_field.html' %}
                     {% endfor %}
-                    <div class="pure-controls">
-                        <button type="submit" class="pure-button button__primary">{% translate "Upload" %}</button>
-                    </div>
-                </fieldset>
+                </div>
+                <div class="pure-controls">
+                    <button type="submit" class="pure-button button__primary">{% translate "Upload" %}</button>
+                </div>
             </form>
             {% endif %}
         </div>

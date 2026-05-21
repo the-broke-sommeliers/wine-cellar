@@ -4,53 +4,53 @@
     <h1 class="header__title">{{ storage.name }}</h1>
 {% endblock header %}
 {% block content %}
-    <div class="wine-detail__container">
-        <div class="wine-detail__summary">
-            <div class="wine-detail__card-header">
+    <div class="card__container">
+        <div class="card">
+            <div class="card__header">
                 <h3>{% translate "Overview" %}</h3>
                 {% url 'storage-edit' storage.pk as edit_url %}
                 {% url 'storage-delete' storage.pk as delete_url %}
                 {% include "includes/edit_delete_buttons.html" with edit_url=edit_url delete_url=delete_url %}
             </div>
-            <div class="wine-detail__highlights">
-                <div class="wine-detail__highlight">
-                    <span class="wine-detail__highlight-value">{{ storage.used_slots }}</span>
-                    <span class="wine-detail__highlight-label">{% translate "Bottles" %}</span>
+            <div class="card__highlights">
+                <div class="card__highlight">
+                    <span class="card__highlight-value">{{ storage.used_slots }}</span>
+                    <span class="card__highlight-label">{% translate "Bottles" %}</span>
                 </div>
                 {% if storage.total_slots > 0 %}
-                    <div class="wine-detail__highlight">
-                        <span class="wine-detail__highlight-value">{{ storage.used_slots }}/{{ storage.total_slots }}</span>
-                        <span class="wine-detail__highlight-label">{% translate "Capacity" %}</span>
+                    <div class="card__highlight">
+                        <span class="card__highlight-value">{{ storage.used_slots }}/{{ storage.total_slots }}</span>
+                        <span class="card__highlight-label">{% translate "Capacity" %}</span>
                     </div>
                 {% endif %}
-                <div class="wine-detail__highlight">
-                    <span class="wine-detail__highlight-value">{{ storage.rows }}×{{ storage.columns }}</span>
-                    <span class="wine-detail__highlight-label">{% translate "Grid" %}</span>
+                <div class="card__highlight">
+                    <span class="card__highlight-value">{{ storage.rows }}×{{ storage.columns }}</span>
+                    <span class="card__highlight-label">{% translate "Grid" %}</span>
                 </div>
             </div>
             {% if storage.location %}
-                <div class="wine-detail__fields">
+                <div class="card__fields">
                     <div>
-                        <span class="wine-detail__field-label">{% translate "Location" %}</span>
-                        <span class="wine-detail__field-value">{{ storage.location }}</span>
+                        <span class="card__field-label">{% translate "Location" %}</span>
+                        <span class="card__field-value">{{ storage.location }}</span>
                     </div>
                     {% if storage.description %}
                         <div>
-                            <span class="wine-detail__field-label">{% translate "Description" %}</span>
-                            <span class="wine-detail__field-value">{{ storage.description }}</span>
+                            <span class="card__field-label">{% translate "Description" %}</span>
+                            <span class="card__field-value">{{ storage.description }}</span>
                         </div>
                     {% endif %}
                 </div>
             {% endif %}
         </div>
 
-        <div class="wine-detail__section">
-            <div class="wine-detail__summary">
-                <div class="wine-detail__card-header">
+        <div class="card__section">
+            <div class="card">
+                <div class="card__header">
                     <h3>{% translate "Contents" %}</h3>
                 </div>
                 {% if object_list %}
-                    <table class="wine-detail__stock-table"
+                    <table class="card__table"
                            data-swap-url="{% url 'stock-swap' %}"
                            data-storage="{{ storage.pk }}">
                         <thead>
@@ -64,7 +64,7 @@
                         </thead>
                         {% for entry in object_list %}
                             {% if entry.is_empty %}
-                                <tr class="wine-detail__stock-empty"
+                                <tr class="card__table-empty"
                                     data-row="{{ entry.row }}"
                                     data-column="{{ entry.column }}"
                                     draggable="false">
@@ -76,7 +76,7 @@
                                 </tr>
                             {% else %}
                                 <tr data-item-id="{{ entry.pk }}" draggable="true">
-                                    <td class="wine-detail__stock-drag">
+                                    <td class="card__table-drag">
                                         <i class="fa-solid fa-grip-vertical"></i>
                                     </td>
                                     <td>
@@ -84,9 +84,9 @@
                                     </td>
                                     <td>{{ entry.row|default_if_none:"—" }}</td>
                                     <td>{{ entry.column|default_if_none:"—" }}</td>
-                                    <td class="wine-detail__stock-actions">
-                                        <a href="{% url 'stock-edit' entry.pk %}?next=storage" title="{% translate "Edit" %}"><i class="fa-regular fa-pen-to-square"></i></a>
-                                        <a href="{% url 'stock-delete' entry.pk %}?next=storage" title="{% translate "Remove" %}"><i class="fa-regular fa-trash-can"></i></a>
+                                    <td class="card__table-actions">
+                                        <a href="{% url 'stock-edit' entry.pk %}?next=storage" title="{% translate "Edit" %}" aria-label="{% translate "Edit" %}"><i class="fa-regular fa-pen-to-square" aria-hidden="true"></i></a>
+                                        <a href="{% url 'stock-delete' entry.pk %}?next=storage" title="{% translate "Remove" %}" aria-label="{% translate "Remove" %}"><i class="fa-regular fa-trash-can" aria-hidden="true"></i></a>
                                     </td>
                                 </tr>
                             {% endif %}

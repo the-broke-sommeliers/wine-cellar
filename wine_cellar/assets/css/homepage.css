@@ -24,7 +24,7 @@
   align-content: center;
 
   text-decoration: none;
-  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  box-shadow: var(--container-box-shadow);
   transition:
     box-shadow 0.25s,
     background-color 0.25s;
@@ -38,7 +38,7 @@
 
 .stats__number {
   font-size: var(--font-xl);
-  color: #333;
+  color: var(--darker-gray);
   margin: 0;
   line-height: initial;
 }

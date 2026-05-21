@@ -56,7 +56,7 @@
   outline-offset: 1.5px;
 }
 
-.wine-card__detail_container {
+.wine-card__detail-container {
   margin-inline-start: 14px;
   flex: 1;
   min-width: 120px;
@@ -100,19 +100,19 @@
   margin: 0;
 
   i {
-    color: #d4a017;
-    font-size: 0.85rem;
+    color: var(--star-gold);
+    font-size: var(--font-xs);
   }
 
   span {
-    color: #666;
-    font-size: 0.85rem;
+    color: var(--text-color-gray);
+    font-size: var(--font-xs);
   }
 }
 
 .wine-card__drink-warning {
-  color: #d47500;
-  font-size: 0.85rem;
+  color: var(--warning);
+  font-size: var(--font-xs);
   margin-left: 4px;
 }
 

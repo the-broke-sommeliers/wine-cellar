@@ -1,4 +1,4 @@
-.wine-detail__hero {
+.card__hero {
   display: flex;
   gap: 2rem;
   flex-wrap: wrap;
@@ -12,7 +12,7 @@
   }
 }
 
-.wine-detail__image-wrapper {
+.card__image-wrapper {
   text-align: center;
   flex-shrink: 0;
 
@@ -27,7 +27,7 @@
     width: 36px;
     height: 36px;
     border-radius: 6px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     background: white;
     display: inline-flex;
     align-items: center;
@@ -36,18 +36,18 @@
   }
 
   .image-controls button:not(:disabled):hover {
-    outline: 3px solid rgba(21, 156, 228, 0.35);
+    outline: 3px solid var(--focus-ring-color);
     outline-offset: 2px;
   }
 
   .image-controls button i {
     font-size: 16px;
-    color: #333;
+    color: var(--darker-gray);
     line-height: 1;
   }
 }
 
-.wine-detail__image {
+.card__image {
   height: 280px;
   width: 196px;
   background-color: white;
@@ -67,7 +67,7 @@
   }
 }
 
-.wine-detail__summary {
+.card {
   flex: 1;
   min-width: 260px;
   background: white;
@@ -76,32 +76,32 @@
   padding: 1.5rem;
 }
 
-.wine-detail__card-header {
+.card__header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-color-light);
 }
 
-.wine-detail__card-header h3 {
+.card__header h3 {
   margin: 0;
   font-size: var(--font-md);
   font-weight: 300;
   color: var(--text-color-gray);
 }
 
-.settings-container .wine-detail__summary > h1 {
+.settings-container .card > h1 {
   font-size: var(--font-md);
   font-weight: 300;
   color: var(--text-color-gray);
   margin: 0 0 1rem 0;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-color-light);
 }
 
-.wine-detail__action-btn {
+.card__action-btn {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -113,70 +113,70 @@
   transition: background-color 0.15s, color 0.15s;
 }
 
-.wine-detail__action-btn:hover {
+.card__action-btn:hover {
   background: var(--gray-green);
-  color: #333;
+  color: var(--darker-gray);
 }
 
-.wine-detail__action-btn--delete:hover {
-  background: #fde8e8;
+.card__action-btn--delete:hover {
+  background: var(--danger-tint);
   color: var(--red);
 }
 
-.wine-detail__highlights {
+.card__highlights {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
   margin-bottom: 1rem;
 }
 
-.wine-detail__highlight {
+.card__highlight {
   display: flex;
   flex-direction: column;
   align-items: center;
   min-width: 64px;
 }
 
-.wine-detail__highlight-value {
+.card__highlight-value {
   font-size: var(--font-lg);
   font-weight: 400;
-  color: #333;
+  color: var(--darker-gray);
 }
 
-.wine-detail__highlight-label {
+.card__highlight-label {
   font-size: var(--font-xs);
   color: var(--text-color-gray);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-.wine-detail__fields {
+.card__fields {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.5rem 1.5rem;
 }
 
-.wine-detail__field {
+.card__field {
   display: flex;
   flex-direction: column;
 }
 
-.wine-detail__field-label {
+.card__field-label {
   font-size: var(--font-xs);
   color: var(--text-color-gray);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-.wine-detail__field-value {
-  color: #333;
+.card__field-value {
+  color: var(--darker-gray);
 }
 
-.wine-detail__section {
+.card__section {
   margin-top: 2rem;
 }
 
-.wine-detail__map {
+.card__map {
   height: 360px;
   width: 100%;
   border-radius: 8px;
@@ -184,20 +184,20 @@
   background: #f0f0f0;
 }
 
-.wine-detail__map #wine_map,
-.wine-detail__map #wine_map > div,
-.wine-detail__map #wine_map > div > div {
+.card__map > *,
+.card__map > * > *,
+.card__map > * > * > * {
   height: 100%;
   width: 100%;
 }
 
-.wine-detail__map .leaflet-container {
+.card__map .leaflet-container {
   height: 100%;
   width: 100%;
   border-radius: 8px;
 }
 
-.wine-detail__stock-summary {
+.card__table-summary {
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -209,7 +209,7 @@
   font-size: var(--font-sm);
 }
 
-.wine-detail__stock-table {
+.card__table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
@@ -221,12 +221,12 @@
     letter-spacing: 0.5px;
     font-weight: 500;
     padding: 8px 12px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border-color-light);
   }
 
   td {
     padding: 8px 12px;
-    border-bottom: 1px solid #f5f5f5;
+    border-bottom: 1px solid var(--border-color-lighter);
     vertical-align: middle;
   }
 
@@ -239,7 +239,7 @@
   }
 }
 
-.wine-detail__stock-drag {
+.card__table-drag {
   width: 24px;
   color: #ccc;
   cursor: grab;
@@ -251,31 +251,31 @@
   }
 }
 
-.wine-detail__stock-table tr[draggable="true"] {
+.card__table tr[draggable="true"] {
   transition: opacity 0.15s;
 }
 
-.wine-detail__stock-table tr.dragging {
+.card__table tr.dragging {
   opacity: 0.4;
 }
 
-.wine-detail__stock-table tr.drag-over {
+.card__table tr.drag-over {
   outline: 2px dashed var(--dark-green);
   outline-offset: -2px;
 }
 
-.wine-detail__stock-empty td {
+.card__table-empty td {
   color: #bbb;
   font-style: italic;
 }
 
-.wine-detail__stock-empty.drag-over {
-  background: rgba(64, 128, 72, 0.08);
+.card__table-empty.drag-over {
+  background: var(--green-tint);
   outline: 2px dashed var(--dark-green);
   outline-offset: -2px;
 }
 
-.wine-detail__stock-actions {
+.card__table-actions {
   text-align: right;
   white-space: nowrap;
 
@@ -293,11 +293,11 @@
 
   a:hover {
     background: var(--gray-green);
-    color: #333;
+    color: var(--darker-gray);
   }
 
   a:last-child:hover {
-    background: #fde8e8;
+    background: var(--danger-tint);
     color: var(--red);
   }
 }

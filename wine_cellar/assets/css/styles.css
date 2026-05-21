@@ -11,6 +11,9 @@
   --darkest-purple: #23021f;
   --gray-green: rgba(64, 128, 72, 0.21);
   --red: #bb0000;
+  --danger-tint: #fde8e8;
+  --warning: #d47500;
+  --star-gold: #d4a017;
   --light: #f6f5ef;
   --text-color-gray: #525252;
   --darker-gray: #333333;
@@ -19,8 +22,14 @@
   --font-md: 1.25rem;
   --font-lg: 1.75rem;
   --font-xl: 2rem;
+  --font-input: 0.8125rem;
   --border-radius: 10px;
+  --border-color: #d0d0d0;
+  --border-color-light: #eee;
+  --border-color-lighter: #f5f5f5;
   --container-box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  --focus-ring-color: rgba(21, 156, 228, 0.35);
+  --green-tint: rgba(64, 128, 72, 0.08);
 }
 
 .pure-table {

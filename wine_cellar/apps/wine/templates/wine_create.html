@@ -22,7 +22,7 @@
         <div class="pure-u-1 pure-u-lg-1-2 m-auto">
             <form method="post"
                   enctype="multipart/form-data"
-                  class="wine-form"
+                  class="form"
                   novalidate>
                 {% csrf_token %}
                 {% with step=form.form_step.value|add:"0" %}
@@ -30,7 +30,7 @@
                         <legend>
                             <h2 class="form-subhead">{% translate "Details" %}</h2>
                         </legend>
-                        <div class="wine-form__fields">
+                        <div class="form__fields">
                             {% include 'forms/form_field.html' with field=form.name %}
                             {% include 'forms/form_field.html' with field=form.wine_type %}
                             {% include 'forms/form_field.html' with field=form.country %}
@@ -41,7 +41,7 @@
                         <legend>
                             <h2 class="form-subhead">{% translate "Characteristics" %}</h2>
                         </legend>
-                        <div class="wine-form__fields">
+                        <div class="form__fields">
                             {% include 'forms/form_field.html' with field=form.attributes %}
                             {% include 'forms/form_field.html' with field=form.grapes %}
                             {% include 'forms/form_field.html' with field=form.vintage %}
@@ -53,7 +53,7 @@
                         <legend>
                             <h2 class="form-subhead">{% translate "Origin" %}</h2>
                         </legend>
-                        <div class="wine-form__fields">
+                        <div class="form__fields">
                             {% include 'forms/form_field.html' with field=form.vineyard %}
                             {% include 'forms/form_field.html' with field=form.region %}
                             {% include 'forms/form_field.html' with field=form.appellation %}
@@ -64,7 +64,7 @@
                         <legend>
                             <h2 class="form-subhead">{% translate "Purchase" %}</h2>
                         </legend>
-                        <div class="wine-form__fields">
+                        <div class="form__fields">
                             {% include 'forms/form_field.html' with field=form.source %}
                             {% include 'forms/form_field.html' with field=form.price %}
                             {% include 'forms/form_field.html' with field=form.barcode %}
@@ -77,7 +77,7 @@
                         <legend>
                             <h2 class="form-subhead">{% translate "Personal Notes" %}</h2>
                         </legend>
-                        <div class="wine-form__fields">
+                        <div class="form__fields">
                             {% include 'forms/form_field.html' with field=form.drink_by %}
                             {% include 'forms/form_field.html' with field=form.stock %}
                             {% include 'forms/form_field.html' with field=form.food_pairings %}
@@ -89,7 +89,7 @@
                         <legend>
                             <h2 class="form-subhead">{% translate "Image" %}</h2>
                         </legend>
-                        <div class="wine-form__fields">
+                        <div class="form__fields">
                             {% include 'forms/form_field.html' with field=form.image_front %}
                             {% include 'forms/form_field.html' with field=form.image_back %}
                             {% include 'forms/form_field.html' with field=form.image_front_label %}
@@ -98,7 +98,7 @@
                     </fieldset>
                     {{ form.form_step }}
                     <div class="pure-controls">
-                        <div class="wine-form__buttons">
+                        <div class="form__buttons">
                             <div>
                                 {% if step > 0 %}
                                     <button type="submit" name="back" class="pure-button button__neutral">
@@ -106,7 +106,7 @@
                                     </button>
                                 {% endif %}
                             </div>
-                            <div class="wine-form__buttons-right">
+                            <div class="form__buttons-right">
                                 {% if step < 5 %}
                                     <button type="submit" name="continue" class="pure-button button__primary">{% translate "Continue" %}</button>
                                 {% endif %}
