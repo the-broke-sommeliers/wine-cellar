@@ -51,11 +51,11 @@
                 </div>
                 {% if object_list %}
                     <table class="card__table"
-                           data-swap-url="{% url 'stock-swap' %}"
+                           {% if storage.rows > 0 and storage.columns > 0 %}data-swap-url="{% url 'stock-swap' %}"{% endif %}
                            data-storage="{{ storage.pk }}">
                         <thead>
                             <tr>
-                                <th></th>
+                                {% if storage.rows > 0 and storage.columns > 0 %}<th></th>{% endif %}
                                 <th>{% translate "Wine" %}</th>
                                 <th>{% translate "Row" %}</th>
                                 <th>{% translate "Cell" %}</th>
@@ -68,17 +68,19 @@
                                     data-row="{{ entry.row }}"
                                     data-column="{{ entry.column }}"
                                     draggable="false">
-                                    <td></td>
+                                    {% if storage.rows > 0 and storage.columns > 0 %}<td></td>{% endif %}
                                     <td><span class="text--gray">—</span></td>
                                     <td>{{ entry.row }}</td>
                                     <td>{{ entry.column }}</td>
                                     <td></td>
                                 </tr>
                             {% else %}
-                                <tr data-item-id="{{ entry.pk }}" draggable="true">
+                                <tr data-item-id="{{ entry.pk }}" draggable="{% if storage.rows > 0 and storage.columns > 0 %}true{% else %}false{% endif %}">
+                                    {% if storage.rows > 0 and storage.columns > 0 %}
                                     <td class="card__table-drag">
                                         <i class="fa-solid fa-grip-vertical"></i>
                                     </td>
+                                    {% endif %}
                                     <td>
                                         <a href="{% url 'wine-detail' entry.wine.pk %}">{{ entry.wine.name }}</a>
                                     </td>
@@ -101,5 +103,7 @@
     </div>
 {% endblock content %}
 {% block extra_js %}
-    <script src="{% static 'stock_drag.js' %}"></script>
+    {% if storage.rows > 0 and storage.columns > 0 %}
+        <script src="{% static 'stock_drag.js' %}"></script>
+    {% endif %}
 {% endblock extra_js %}
