@@ -106,8 +106,12 @@
 }
 
 .settings-sidebar {
-  margin-top: 2rem;
-  background-color: revert;
+  margin-right: 1.25rem;
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--container-box-shadow);
+  padding: 0.75rem 0;
+  overflow: hidden;
 
   .pure-menu-list {
     list-style: none;
@@ -116,17 +120,29 @@
   }
 
   .pure-menu-item {
-    padding-right: 24px;
+    padding: 0;
+  }
+
+  .pure-menu-link {
+    display: block;
+    padding: 0.6rem 1.25rem;
+    font-size: 0.95rem;
+    font-weight: 300;
+    color: var(--text-color-gray);
+    text-decoration: none;
+    transition: background-color 0.15s;
   }
 
   .pure-menu-link:hover,
   .pure-menu-link:focus {
     background-color: var(--gray-green);
+    color: #333;
   }
 
-  .pure-menu-link {
-    font-size: var(--font-md);
-    font-weight: 300;
-    color: var(--text-color-gray);
+  .pure-menu-selected .pure-menu-link {
+    color: var(--dark-green);
+    font-weight: 400;
+    background: rgba(64, 128, 72, 0.06);
+    border-right: 3px solid var(--dark-green);
   }
 }
