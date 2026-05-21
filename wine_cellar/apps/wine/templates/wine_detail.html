@@ -74,7 +74,7 @@
                             <span class="card__highlight-label">{% translate "Rating" %}</span>
                         </div>
                     {% endif %}
-                    {% if wine.get_price_with_currency %}
+                    {% if wine.price is not None %}
                         <div class="card__highlight">
                             <span class="card__highlight-value">{{ wine.get_price_with_currency }}</span>
                             <span class="card__highlight-label">{% translate "Price" %}</span>
