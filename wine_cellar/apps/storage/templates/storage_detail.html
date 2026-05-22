@@ -29,18 +29,16 @@
                 </div>
             </div>
             {% if storage.location %}
-                <div class="card__fields">
-                    <div>
-                        <span class="card__field-label">{% translate "Location" %}</span>
-                        <span class="card__field-value">{{ storage.location }}</span>
-                    </div>
-                    {% if storage.description %}
-                        <div>
-                            <span class="card__field-label">{% translate "Description" %}</span>
-                            <span class="card__field-value">{{ storage.description }}</span>
-                        </div>
-                    {% endif %}
+                <div class="card__field">
+                    <span class="card__field-label">{% translate "Location" %}</span>
+                    <span class="card__field-value">{{ storage.location }}</span>
                 </div>
+                {% if storage.description %}
+                    <div class="card__field">
+                        <span class="card__field-label">{% translate "Description" %}</span>
+                        <span class="card__field-value">{{ storage.description }}</span>
+                    </div>
+                {% endif %}
             {% endif %}
         </div>
 
