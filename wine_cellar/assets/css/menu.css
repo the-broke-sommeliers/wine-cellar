@@ -106,7 +106,7 @@
 }
 
 .settings-sidebar {
-  margin-right: 1.25rem;
+  margin-bottom: 1.25rem;
   background: white;
   border-radius: var(--border-radius);
   box-shadow: var(--container-box-shadow);
@@ -144,5 +144,12 @@
     font-weight: 400;
     background: rgba(64, 128, 72, 0.06);
     border-right: 3px solid var(--dark-green);
+  }
+}
+
+@media screen and (min-width: 64em) {
+  .settings-sidebar {
+    margin-bottom: 0;
+    margin-right: 1.25rem;
   }
 }

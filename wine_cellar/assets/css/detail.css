@@ -74,12 +74,15 @@
   border-radius: var(--border-radius);
   box-shadow: var(--container-box-shadow);
   padding: 1.5rem;
+  overflow-x: auto;
 }
 
 .card__header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
   margin-bottom: 1rem;
   padding-bottom: 0.75rem;
   border-bottom: 1px solid var(--border-color-light);
@@ -213,6 +216,7 @@
   width: 100%;
   border-collapse: collapse;
   text-align: left;
+  min-width: 400px;
 
   th {
     font-size: var(--font-xs);
