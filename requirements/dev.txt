@@ -1,7 +1,7 @@
 -r base.txt
 
 Faker==40.18.0
-black==26.3.1
+black==26.5.0
 django-debug-toolbar==6.3.0
 djlint==1.36.4
 factory-boy==3.3.3
