@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.7.0-rc.1 (2026-05-21)
+## 0.7.0 (2026-05-29)
 
 ### feat
 
@@ -21,6 +21,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 
 ### fix
+
+- some layout issues on smaller screens
 
 - hide price if none on detail page
 
@@ -50,6 +52,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### refactor
 
+- **storage detail**: move location and description value below label
 - more form redesign
 
 - redesign scanned barcode page
