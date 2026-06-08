@@ -18,15 +18,15 @@
     "leaflet": "1.9.4",
     "leaflet.markercluster": "1.5.3",
     "purecss": "3.0.0",
-    "react": "19.2.6",
+    "react": "19.2.7",
     "react-barcode-scanner": "4.0.1",
-    "react-dom": "19.2.6",
+    "react-dom": "19.2.7",
     "react-leaflet": "5.0.0",
     "tom-select": "2.6.1"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.16",
-    "@types/react": "19.2.15",
+    "@types/react": "19.2.16",
     "@types/react-dom": "19.2.3",
     "autoprefixer": "10.5.0",
     "copy-webpack-plugin": "14.0.0",
