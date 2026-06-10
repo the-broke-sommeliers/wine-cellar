@@ -218,6 +218,9 @@
                                 <td>{{ item.column|default_if_none:"—" }}</td>
                                 <td class="card__table-actions">
                                     <a href="{% url 'stock-edit' item.pk %}" title="{% translate "Edit" %}" aria-label="{% translate "Edit" %}"><i class="fa-regular fa-pen-to-square" aria-hidden="true"></i></a>
+                                    {% if not item.opened %}
+                                        <a href="{% url 'stock-open' item.pk %}" title="{% translate "Open" %}" aria-label="{% translate "Open" %}"><i class="fa-solid fa-bottle-droplet" aria-hidden="true"></i></a>
+                                    {% endif %}
                                     <a href="{% url 'stock-delete' item.pk %}" title="{% translate "Remove" %}" aria-label="{% translate "Remove" %}"><i class="fa-regular fa-trash-can" aria-hidden="true"></i></a>
                                 </td>
                             </tr>

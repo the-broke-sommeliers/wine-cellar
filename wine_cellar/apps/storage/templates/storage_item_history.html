@@ -8,7 +8,7 @@
         <div class="pure-u-1 pure-u-lg-2-3 m-auto">
             <div class="card">
                 <div class="card__header">
-                    <h3>{% translate "Recently Removed" %}</h3>
+                    <h3>{% translate "Bottle History" %}</h3>
                     <a href="{% url 'storage-list' %}" class="pure-button button__neutral"><i class="fa-solid fa-arrow-left"></i> <span>{% translate "Back to Storages" %}</span></a>
                 </div>
                 {% if storage_items %}
@@ -19,20 +19,34 @@
                                 <th>{% translate "Location" %}</th>
                                 <th>{% translate "Row" %}</th>
                                 <th>{% translate "Cell" %}</th>
-                                <th>{% translate "Removed" %}</th>
+                                <th>{% translate "Note" %}</th>
+                                <th>{% translate "Status" %}</th>
+                                <th>{% translate "Date" %}</th>
                             </tr>
                         </thead>
-                        {% for item in storage_items %}
-                            <tr>
-                                <td>
-                                    <a href="{% url 'wine-detail' item.wine.pk %}">{{ item.wine.name }}</a>
-                                </td>
-                                <td>{{ item.storage.name }}</td>
-                                <td>{{ item.row|default_if_none:"—" }}</td>
-                                <td>{{ item.column|default_if_none:"—" }}</td>
-                                <td>{{ item.modified|date }}</td>
-                            </tr>
-                        {% endfor %}
+                        <tbody>
+                            {% for item in storage_items %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'wine-detail' item.wine.pk %}">{{ item.wine.name }}</a>
+                                    </td>
+                                    <td>{{ item.storage.name }}</td>
+                                    <td>{{ item.row|default_if_none:"—" }}</td>
+                                    <td>{{ item.column|default_if_none:"—" }}</td>
+                                    <td>{{ item.opened_note|default:"—" }}</td>
+                                    <td>
+                                        {% if item.opened and item.deleted %}
+                                            {% translate "Consumed" %}
+                                        {% elif item.deleted %}
+                                            {% translate "Removed" %}
+                                        {% else %}
+                                            {% translate "Opened" %}
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ item.modified|date }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
                     </table>
                     {% include "includes/pagination.html" %}
                 {% else %}

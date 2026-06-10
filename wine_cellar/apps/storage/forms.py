@@ -138,3 +138,27 @@ class StockForm(forms.Form):
                         params={"row": row, "column": column},
                     )
         return cleaned_data
+
+
+class StockOpenForm(forms.Form):
+    note = forms.CharField(
+        label=_("Note"),
+        required=False,
+        widget=forms.Textarea(attrs={"rows": 3}),
+        help_text=_("Why are you opening this bottle? (e.g. birthday dinner)"),
+    )
+    mark_consumed = forms.BooleanField(
+        label=_("Drink entire bottle"),
+        help_text=_(
+            "Check this box if you plan to drink the whole bottle immediately."
+        ),
+        required=False,
+    )
+    drink_in_days = forms.IntegerField(
+        label=_("Drink Reminder"),
+        required=False,
+        min_value=1,
+        help_text=_(
+            "Send a reminder to drink the rest of this bottle by this many days."
+        ),
+    )
