@@ -305,3 +305,26 @@
     color: var(--red);
   }
 }
+
+.stock-open__card .wine-card {
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.stock-open__wine {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.stock-open__icon {
+  font-size: 1.5rem;
+  color: var(--dark-green);
+  flex-shrink: 0;
+}
+
+.stock-open__storage {
+  display: block;
+  font-size: var(--font-xs);
+  margin-top: 2px;
+}

@@ -1,14 +1,18 @@
+from datetime import timedelta
+
 from django.db import models, transaction
+from django.db.models import Q
 from django.forms import model_to_dict
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import DeleteView, DetailView, FormView, ListView
 from django.views.generic.list import MultipleObjectMixin
 
-from wine_cellar.apps.storage.forms import StockForm, StorageForm
+from wine_cellar.apps.storage.forms import StockForm, StockOpenForm, StorageForm
 from wine_cellar.apps.storage.models import Storage, StorageItem
 from wine_cellar.apps.wine.models import Wine
 
@@ -307,6 +311,47 @@ class StorageItemDeleteView(DeleteView):
         return redirect(self.get_success_url())
 
 
+class StorageItemOpenView(FormView):
+    template_name = "stock_open.html"
+    form_class = StockOpenForm
+
+    def get_object(self):
+        return get_object_or_404(
+            StorageItem,
+            pk=self.kwargs["pk"],
+            user=self.request.user,
+            deleted=False,
+            opened=False,
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["storage_item"] = self.get_object()
+        return context
+
+    def get_success_url(self):
+        next_param = self.request.GET.get("next")
+        if next_param == "storage":
+            return reverse_lazy("storage-detail", kwargs={"pk": self.object.storage.pk})
+        return reverse_lazy("wine-detail", kwargs={"pk": self.object.wine.pk})
+
+    def form_valid(self, form):
+        self.object = self.get_object()
+        with transaction.atomic():
+            self.object.opened = True
+            self.object.opened_note = form.cleaned_data.get("note") or None
+            if form.cleaned_data.get("mark_consumed"):
+                self.object.deleted = True
+            if form.cleaned_data.get("drink_in_days"):
+                self.object.drink_by = timezone.now().date() + timedelta(
+                    days=form.cleaned_data["drink_in_days"]
+                )
+            self.object.save(
+                update_fields=["opened", "opened_note", "deleted", "drink_by"]
+            )
+        return redirect(self.get_success_url())
+
+
 class StorageItemHistoryView(ListView):
     model = StorageItem
     template_name = "storage_item_history.html"
@@ -314,8 +359,12 @@ class StorageItemHistoryView(ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        qs = super().get_queryset().order_by("-created")
-        return qs.filter(user=self.request.user, deleted=True)
+        qs = super().get_queryset()
+        return (
+            qs.filter(user=self.request.user)
+            .filter(Q(deleted=True) | Q(opened=True))
+            .order_by("-modified")
+        )
 
 
 def _adjacent(r1, c1, r2, c2, max_cols):

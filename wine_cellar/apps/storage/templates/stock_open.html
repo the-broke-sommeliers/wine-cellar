@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+{% block title %}
+    {% translate "Open Bottle" %}
+{% endblock title %}
+{% block header %}
+    <h1 class="header__title">{% translate "Open Bottle" %}</h1>
+{% endblock header %}
+{% block content %}
+    <div class="pure-g">
+        <div class="pure-u-1 pure-u-sm-7-12 pure-u-lg-3-8 m-auto">
+            <form method="post"
+                  class="form"
+                  novalidate>
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                    <ul class="form-errorlist" aria-live="assertive" aria-atomic="true">
+                        {% for error in form.non_field_errors %}<li>{{ error|escape }}</li>{% endfor %}
+                    </ul>
+                {% endif %}
+                <ul class="wine-card__list stock-open__card">
+                    {% include 'wine_card.html' with wine=storage_item.wine %}
+                </ul>
+                <div class="form__fields">
+                    {% include 'forms/form_field.html' with field=form.mark_consumed %}
+                    {% include 'forms/form_field.html' with field=form.drink_in_days %}
+                    {% include 'forms/form_field.html' with field=form.note %}
+                </div>
+                <div class="pure-controls">
+                    <div class="pure-g">
+                        <div class="pure-u-1 pure-u-sm-1-2">
+                            {% if request.GET.next == "storage" %}
+                                <a href="{% url 'storage-detail' storage_item.storage.pk %}"
+                                   class="pure-button button__neutral">{% translate "Cancel" %}</a>
+                            {% else %}
+                                <a href="{% url 'wine-detail' storage_item.wine.pk %}"
+                                   class="pure-button button__neutral">{% translate "Cancel" %}</a>
+                            {% endif %}
+                        </div>
+                        <div id="save_button_container" class="pure-u-1 pure-u-sm-1-2">
+                            <button type="submit" name="save" class="pure-button button__primary">{% translate "Open Bottle" %}</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock content %}

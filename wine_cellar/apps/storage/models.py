@@ -42,3 +42,6 @@ class StorageItem(UserContentModel):
     column = models.PositiveIntegerField(null=True, blank=True)
     deleted = models.BooleanField(default=False)
     price = models.DecimalField(max_digits=6, decimal_places=2, null=True)
+    opened = models.BooleanField(default=False)
+    opened_note = models.TextField(blank=True, null=True)
+    drink_by = models.DateField(blank=True, null=True)
