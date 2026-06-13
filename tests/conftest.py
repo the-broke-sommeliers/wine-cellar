@@ -40,7 +40,8 @@ register(AppellationFactory)
 def clear_image_folder():
     yield
     path = settings.BASE_DIR / Path("test_media")
-    shutil.rmtree(path)
+    if path.exists():
+        shutil.rmtree(path)
 
 
 @pytest.fixture
