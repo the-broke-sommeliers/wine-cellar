@@ -9,7 +9,8 @@ from pytest_django.asserts import (
     assertTemplateUsed,
 )
 
-from wine_cellar.apps.wine.models import Size, Wine
+from tests.helpers import random_png
+from wine_cellar.apps.wine.models import ImageType, Size, Wine, WineImage
 
 
 @pytest.mark.django_db
@@ -807,3 +808,40 @@ def test_wine_create_back_does_not_go_below_zero(client, user):
     r = client.post(reverse("wine-add"), data={**data, "back": ""})
     assert r.status_code == HTTPStatus.OK
     assert int(r.context["form"]["form_step"].value()) == 0
+
+
+@pytest.mark.django_db
+def test_wine_edit_replace_front_image(client, user, wine_factory, clear_image_folder):
+    """Replacing an existing front image on edit should succeed without error."""
+    wine = wine_factory(user=user)
+    client.force_login(user)
+    size = Size.objects.first()
+
+    base_data = {
+        "name": wine.name,
+        "wine_type": wine.wine_type,
+        "country": wine.country,
+        "size": size.pk,
+    }
+
+    r = client.post(
+        reverse("wine-edit", kwargs={"pk": wine.pk}),
+        {**base_data, "image_front": random_png("front1.png")},
+        follow=True,
+    )
+    assert r.status_code == HTTPStatus.OK
+    assertRedirects(
+        response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
+    )
+    assert WineImage.objects.filter(wine=wine, image_type=ImageType.FRONT).count() == 1
+
+    r = client.post(
+        reverse("wine-edit", kwargs={"pk": wine.pk}),
+        {**base_data, "image_front": random_png("front2.png")},
+        follow=True,
+    )
+    assert r.status_code == HTTPStatus.OK
+    assertRedirects(
+        response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
+    )
+    assert WineImage.objects.filter(wine=wine, image_type=ImageType.FRONT).count() == 1
