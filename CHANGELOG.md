@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.8.0-rc.0 (2026-06-13)
+
+### feat
+
+- add option to mark bottle as opened
+    
+    Allows to leave a note for what occasion the bottle was opened and get a
+    reminder to drink an open bottle if it wasn't finished immediately.
+
+
+### fix
+
+- error when uploading existing image
+
+- **deps**: update dependency barcode-detector to v3.2.0
+- **deps**: update react monorepo
+
+
 ## 0.7.0 (2026-05-29)
 
 ### feat
