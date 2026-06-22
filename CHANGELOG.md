@@ -3,9 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.8.0-rc.0 (2026-06-13)
+## 0.8.0 (2026-06-22)
 
 ### feat
+
+- **landing page**: show number of bottles in stock
+- highlight opened bottles in stock
 
 - add option to mark bottle as opened
     
