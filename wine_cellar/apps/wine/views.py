@@ -47,6 +47,9 @@ class HomePageView(TemplateView):
             .distinct()
             .count()
         )
+        bottles_in_stock = StorageItem.objects.filter(
+            deleted=False, wine__user=self.request.user
+        ).count()
         countries = (
             Wine.objects.filter(user=self.request.user)
             .values_list("country")
@@ -89,6 +92,7 @@ class HomePageView(TemplateView):
             {
                 "wines": wines,
                 "wines_in_stock": wines_in_stock,
+                "bottles_in_stock": bottles_in_stock,
                 "countries": countries,
                 "oldest": oldest,
                 "youngest": youngest,
