@@ -208,14 +208,19 @@
                                 <th>{% translate "Location" %}</th>
                                 <th>{% translate "Row" %}</th>
                                 <th>{% translate "Cell" %}</th>
+                                <th>{% translate "Drink by" %}</th>
                                 <th></th>
                             </tr>
                         </thead>
                         {% for item in wine.get_stock %}
-                            <tr>
-                                <td>{{ item.storage }}</td>
+                            <tr{% if item.opened %} class="stock-item--opened"{% endif %}>
+                                <td>
+                                    {{ item.storage }}
+                                    {% if item.opened %}<span class="visually-hidden">{% translate "Opened" %}</span>{% endif %}
+                                </td>
                                 <td>{{ item.row|default_if_none:"—" }}</td>
                                 <td>{{ item.column|default_if_none:"—" }}</td>
+                                <td>{{ item.drink_by|default_if_none:"—" }}</td>
                                 <td class="card__table-actions">
                                     <a href="{% url 'stock-edit' item.pk %}" title="{% translate "Edit" %}" aria-label="{% translate "Edit" %}"><i class="fa-regular fa-pen-to-square" aria-hidden="true"></i></a>
                                     {% if not item.opened %}
@@ -226,6 +231,10 @@
                             </tr>
                         {% endfor %}
                     </table>
+                    <div class="table-legend">
+                        <span class="table-legend__swatch table-legend__swatch--opened" aria-hidden="true"></span>
+                        <span>{% translate "Opened" %}</span>
+                    </div>
                 {% else %}
                     <p class="text--gray">{% translate "No bottles in stock." %}</p>
                 {% endif %}

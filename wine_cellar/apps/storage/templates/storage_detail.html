@@ -57,6 +57,7 @@
                                 <th>{% translate "Wine" %}</th>
                                 <th>{% translate "Row" %}</th>
                                 <th>{% translate "Cell" %}</th>
+                                <th>{% translate "Drink by" %}</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -71,9 +72,10 @@
                                     <td>{{ entry.row }}</td>
                                     <td>{{ entry.column }}</td>
                                     <td></td>
+                                    <td></td>
                                 </tr>
                             {% else %}
-                                <tr data-item-id="{{ entry.pk }}" draggable="{% if storage.rows > 0 and storage.columns > 0 %}true{% else %}false{% endif %}">
+                                <tr data-item-id="{{ entry.pk }}" draggable="{% if storage.rows > 0 and storage.columns > 0 %}true{% else %}false{% endif %}"{% if entry.opened %} class="stock-item--opened"{% endif %}>
                                     {% if storage.rows > 0 and storage.columns > 0 %}
                                     <td class="card__table-drag">
                                         <i class="fa-solid fa-grip-vertical"></i>
@@ -81,9 +83,11 @@
                                     {% endif %}
                                     <td>
                                         <a href="{% url 'wine-detail' entry.wine.pk %}">{{ entry.wine.name }}</a>
+                                        {% if entry.opened %}<span class="visually-hidden">{% translate "Opened" %}</span>{% endif %}
                                     </td>
                                     <td>{{ entry.row|default_if_none:"—" }}</td>
                                     <td>{{ entry.column|default_if_none:"—" }}</td>
+                                    <td>{{ entry.drink_by|default_if_none:"—" }}</td>
                                     <td class="card__table-actions">
                                         <a href="{% url 'stock-edit' entry.pk %}?next=storage" title="{% translate "Edit" %}" aria-label="{% translate "Edit" %}"><i class="fa-regular fa-pen-to-square" aria-hidden="true"></i></a>
                                         {% if not entry.opened %}
@@ -95,6 +99,10 @@
                             {% endif %}
                         {% endfor %}
                     </table>
+                    <div class="table-legend">
+                        <span class="table-legend__swatch table-legend__swatch--opened" aria-hidden="true"></span>
+                        <span>{% translate "Opened" %}</span>
+                    </div>
                     {% include "includes/pagination.html" %}
                 {% else %}
                     <p class="text--gray">{% translate "No wines here yet." %}</p>

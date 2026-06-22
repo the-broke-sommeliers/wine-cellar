@@ -306,6 +306,32 @@
   }
 }
 
+.stock-item--opened td {
+  background: rgba(212, 117, 0, 0.05);
+}
+
+.table-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8rem;
+  color: var(--darker-gray);
+}
+
+.table-legend__swatch {
+  display: inline-block;
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.table-legend__swatch--opened {
+  background: rgba(212, 117, 0, 0.05);
+  border: 1px solid rgba(212, 117, 0, 0.25);
+}
+
 .stock-open__card .wine-card {
   width: 100%;
   margin-bottom: 1.5rem;
