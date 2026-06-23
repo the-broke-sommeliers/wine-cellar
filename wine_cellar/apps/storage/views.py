@@ -340,15 +340,58 @@ class StorageItemOpenView(FormView):
         with transaction.atomic():
             self.object.opened = True
             self.object.opened_note = form.cleaned_data.get("note") or None
-            if form.cleaned_data.get("mark_consumed"):
-                self.object.deleted = True
             if form.cleaned_data.get("drink_in_days"):
                 self.object.drink_by = timezone.now().date() + timedelta(
                     days=form.cleaned_data["drink_in_days"]
                 )
-            self.object.save(
-                update_fields=["opened", "opened_note", "deleted", "drink_by"]
-            )
+            self.object.save(update_fields=["opened", "opened_note", "drink_by"])
+        return redirect(self.get_success_url())
+
+
+class StorageItemConsumeView(DeleteView):
+    model = StorageItem
+    template_name = "stock_consume.html"
+
+    def get_success_url(self):
+        next_param = self.request.GET.get("next")
+        if next_param == "storage":
+            return reverse_lazy("storage-detail", kwargs={"pk": self.object.storage.pk})
+        return reverse_lazy("wine-detail", kwargs={"pk": self.object.wine.pk})
+
+    def get_queryset(self):
+        return super().get_queryset().filter(user=self.request.user, deleted=False)
+
+    def form_valid(self, form):
+        self.object = self.get_object()
+        self.object.opened = True
+        self.object.deleted = True
+        self.object.save(update_fields=["opened", "deleted"])
+        return redirect(self.get_success_url())
+
+
+class StorageItemUndoOpenView(DeleteView):
+    model = StorageItem
+    template_name = "stock_undo_open.html"
+
+    def get_success_url(self):
+        next_param = self.request.GET.get("next")
+        if next_param == "storage":
+            return reverse_lazy("storage-detail", kwargs={"pk": self.object.storage.pk})
+        return reverse_lazy("wine-detail", kwargs={"pk": self.object.wine.pk})
+
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .filter(user=self.request.user, deleted=False, opened=True)
+        )
+
+    def form_valid(self, form):
+        self.object = self.get_object()
+        self.object.opened = False
+        self.object.opened_note = None
+        self.object.drink_by = None
+        self.object.save(update_fields=["opened", "opened_note", "drink_by"])
         return redirect(self.get_success_url())
 
 

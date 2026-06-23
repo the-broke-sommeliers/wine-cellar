@@ -225,7 +225,10 @@
                                     <a href="{% url 'stock-edit' item.pk %}" title="{% translate "Edit" %}" aria-label="{% translate "Edit" %}"><i class="fa-regular fa-pen-to-square" aria-hidden="true"></i></a>
                                     {% if not item.opened %}
                                         <a href="{% url 'stock-open' item.pk %}" title="{% translate "Open" %}" aria-label="{% translate "Open" %}"><i class="fa-solid fa-bottle-droplet" aria-hidden="true"></i></a>
+                                    {% else %}
+                                        <a href="{% url 'stock-undo-open' item.pk %}" title="{% translate "Undo Opening" %}" aria-label="{% translate "Undo Opening" %}"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i></a>
                                     {% endif %}
+                                    <a href="{% url 'stock-consume' item.pk %}" title="{% translate "Finish Bottle" %}" aria-label="{% translate "Finish Bottle" %}"><i class="fa-solid fa-wine-glass-empty" aria-hidden="true"></i></a>
                                     <a href="{% url 'stock-delete' item.pk %}" title="{% translate "Remove" %}" aria-label="{% translate "Remove" %}"><i class="fa-regular fa-trash-can" aria-hidden="true"></i></a>
                                 </td>
                             </tr>
