@@ -147,13 +147,6 @@ class StockOpenForm(forms.Form):
         widget=forms.Textarea(attrs={"rows": 3}),
         help_text=_("Why are you opening this bottle? (e.g. birthday dinner)"),
     )
-    mark_consumed = forms.BooleanField(
-        label=_("Drink entire bottle"),
-        help_text=_(
-            "Check this box if you plan to drink the whole bottle immediately."
-        ),
-        required=False,
-    )
     drink_in_days = forms.IntegerField(
         label=_("Drink Reminder"),
         required=False,
