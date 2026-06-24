@@ -23,7 +23,7 @@ services:
       retries: 5
       start_period: 20s
   db:
-    image: postgres:16
+    image: postgres:16@sha256:a4f57f2c250b724a6fb1d41892b177f886ec282be6286c5bfc2afc9f546bb59d
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
@@ -31,7 +31,7 @@ services:
       - POSTGRES_PASSWORD=django_dev_password
       - POSTGRES_DB=django_dev
   redis:
-    image: redis:alpine
+    image: redis:7-alpine@sha256:6ab0b6e7381779332f97b8ca76193e45b0756f38d4c0dcda72dbb3c32061ab99
   celery:
     build: .
     command: celery -A wine_cellar.conf worker -l info

@@ -3,7 +3,7 @@
 ###########
 
 # pull official base image
-FROM python:3.13.3-slim-bookworm AS builder
+FROM python:3.13.3-slim-bookworm@sha256:56a11364ffe0fee3bd60af6d6d5209eba8a99c2c16dc4c7c5861dc06261503cc AS builder
 
 # set work directory
 WORKDIR /usr/src/app
@@ -37,7 +37,7 @@ RUN npm run build:prod
 #########
 
 # pull official base image
-FROM python:3.13.3-slim-bookworm
+FROM python:3.13.3-slim-bookworm@sha256:56a11364ffe0fee3bd60af6d6d5209eba8a99c2c16dc4c7c5861dc06261503cc
 
 # create directory for the app user
 RUN mkdir -p /home/app

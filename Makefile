@@ -15,7 +15,6 @@ install:
 
 .PHONY: clean
 clean:
-	if [ -f package-lock.json ]; then rm package-lock.json; fi
 	if [ -d node_modules ]; then rm -rf node_modules; fi
 	if [ -d .venv ]; then rm -rf .venv; fi
 
