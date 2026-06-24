@@ -11,6 +11,10 @@ WORKDIR /usr/src/app
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV UV_PROJECT_ENVIRONMENT=/usr/src/app/.venv
+
+# install uv
+COPY --from=ghcr.io/astral-sh/uv:0.11.14@sha256:1025398289b62de8269e70c45b91ffa37c373f38118d7da036fb8bb8efc85d97 /uv /uvx /bin/
 
 # install system dependencies
 RUN apt-get update && \
@@ -19,11 +23,10 @@ RUN apt-get update && \
 RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - && \
     apt-get install -y nodejs
 
-RUN pip install --upgrade pip
 COPY . .
 
 # install python dependencies
-RUN pip wheel --no-cache-dir  --wheel-dir /usr/src/app/wheels -r requirements/prod.txt
+RUN uv sync --frozen --no-dev --group prod
 # install js dependencies
 RUN npm install
 # build js
@@ -52,9 +55,10 @@ WORKDIR $APP_HOME
 
 # install dependencies
 RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends netcat-traditional libpq5 gettext curl
-COPY --from=builder /usr/src/app/wheels /wheels
-RUN pip install --upgrade pip
-RUN pip install --no-cache /wheels/*
+
+# copy venv from builder
+COPY --from=builder /usr/src/app/.venv $APP_HOME/.venv
+ENV PATH="$APP_HOME/.venv/bin:$PATH"
 
 # copy entrypoint.prod.sh
 COPY ./entrypoint.prod.sh .
