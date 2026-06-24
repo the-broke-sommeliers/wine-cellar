@@ -2,6 +2,8 @@ import base64
 import json
 from decimal import Decimal
 
+import litellm
+import litellm.exceptions
 from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
 from django.db import connections
@@ -348,11 +350,64 @@ class WineUploadAIView(FormView):
             back_url = f"data:{back_img.content_type or 'image/jpeg'};base64,{back_b64}"
             content.append({"type": "image_url", "image_url": {"url": back_url}})
 
-        response = completion(
-            model=settings.AI_MODEL,
-            messages=[{"role": "user", "content": content}],
-            api_key=settings.AI_API_KEY,
-        )
+        try:
+            response = completion(
+                model=settings.AI_MODEL,
+                messages=[{"role": "user", "content": content}],
+                api_key=settings.AI_API_KEY,
+            )
+        except litellm.exceptions.AuthenticationError:
+            form.add_error(
+                None,
+                _(
+                    "AI request failed: invalid API key. Please check your "
+                    "configuration."
+                ),
+            )
+            return self.form_invalid(form)
+        except litellm.exceptions.RateLimitError:
+            form.add_error(
+                None,
+                _(
+                    "AI request failed: rate limit reached. "
+                    "Please wait a moment and try again."
+                ),
+            )
+            return self.form_invalid(form)
+        except (
+            litellm.exceptions.ServiceUnavailableError,
+            litellm.exceptions.BadGatewayError,
+            litellm.exceptions.InternalServerError,
+        ):
+            form.add_error(
+                None,
+                _(
+                    "AI service is temporarily unavailable. "
+                    "Please try again in a few minutes."
+                ),
+            )
+            return self.form_invalid(form)
+        except litellm.exceptions.Timeout:
+            form.add_error(
+                None,
+                _("AI request timed out. Please try again."),
+            )
+            return self.form_invalid(form)
+        except litellm.exceptions.APIConnectionError:
+            form.add_error(
+                None,
+                _(
+                    "Could not connect to the AI service. Please check your "
+                    "network and configuration."
+                ),
+            )
+            return self.form_invalid(form)
+        except litellm.exceptions.APIError:
+            form.add_error(
+                None,
+                _("AI request failed. Please try again or check your configuration."),
+            )
+            return self.form_invalid(form)
         ai_text = response.choices[0].message.content.strip()
 
         try:
