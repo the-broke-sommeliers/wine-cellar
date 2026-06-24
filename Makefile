@@ -1,4 +1,4 @@
-VIRTUAL_ENV ?= venv
+VIRTUAL_ENV ?= .venv
 NODE_BIN = node_modules/.bin
 SOURCE_DIRS = wine_cellar tests
 ARGUMENTS=$(filter-out $(firstword $(MAKECMDGOALS)), $(MAKECMDGOALS))
@@ -10,15 +10,14 @@ all: help
 install:
 	npm install --no-save
 	npm run build
-	if [ ! -f $(VIRTUAL_ENV)/bin/python3 ]; then python3 -m venv $(VIRTUAL_ENV); fi
-	$(VIRTUAL_ENV)/bin/python3 -m pip install --upgrade -r requirements.txt
+	uv sync
 	$(VIRTUAL_ENV)/bin/python3 manage.py migrate
 
 .PHONY: clean
 clean:
 	if [ -f package-lock.json ]; then rm package-lock.json; fi
 	if [ -d node_modules ]; then rm -rf node_modules; fi
-	if [ -d venv ]; then rm -rf venv; fi
+	if [ -d .venv ]; then rm -rf .venv; fi
 
 .PHONY: server
 server:
@@ -107,8 +106,8 @@ lint-py:
 
 .PHONY: po
 po:
-	$(VIRTUAL_ENV)/bin/python manage.py makemessages --all --no-obsolete -d django --extension html,email,py --ignore 'venv/*' --ignore 'build/*' --ignore "wine_cellar/static/**"
-	$(VIRTUAL_ENV)/bin/python manage.py makemessages --all --no-obsolete -d djangojs --extension js,jsx,ts,tsx --ignore 'venv/*' --ignore 'node_modules/*' --ignore 'build/*' --ignore "wine_cellar/static/**"
+	$(VIRTUAL_ENV)/bin/python manage.py makemessages --all --no-obsolete -d django --extension html,email,py --ignore '.venv/*' --ignore 'build/*' --ignore "wine_cellar/static/**"
+	$(VIRTUAL_ENV)/bin/python manage.py makemessages --all --no-obsolete -d djangojs --extension js,jsx,ts,tsx --ignore '.venv/*' --ignore 'node_modules/*' --ignore 'build/*' --ignore "wine_cellar/static/**"
 	find locale -name "*.po" -exec msgattrib --no-fuzzy {} -o {} \;
 	msgen locale/en_GB/LC_MESSAGES/django.po -o locale/en_GB/LC_MESSAGES/django.po
 	msgen locale/en_GB/LC_MESSAGES/djangojs.po -o locale/en_GB/LC_MESSAGES/djangojs.po
