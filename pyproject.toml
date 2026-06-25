@@ -20,7 +20,7 @@ dependencies = [
     "django-allauth[socialaccount]==65.18.0",
     "django-filter==25.2",
     "django-widget-tweaks==1.5.1",
-    "litellm==1.89.1",
+    "litellm==1.89.2",
     "pillow==12.2.0",
     "pycountry==26.2.16",
     "requests==2.34.2",
