@@ -104,13 +104,24 @@ class WineFormPostCleanMixin:
 
         for name in fields_to_update:
             value = self.cleaned_data.get(name)
-            if not value:
+            field = self.fields.get(name)
+            new_values = (
+                list(field.new_values)
+                if isinstance(field, OpenMultipleChoiceField)
+                else []
+            )
+
+            if not value and not new_values:
                 continue
 
             if isinstance(value, list) or isinstance(value, QuerySet):
                 items = [v.pk if hasattr(v, "pk") else v for v in value]
-            else:
+            elif value:
                 items = [value.pk if hasattr(value, "pk") else value]
+            else:
+                items = []
+
+            items.extend(new_values)
 
             create = name in (
                 "grapes",

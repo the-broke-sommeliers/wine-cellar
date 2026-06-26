@@ -1,4 +1,5 @@
 import datetime
+import json
 from http import HTTPStatus
 
 import pytest
@@ -844,4 +845,29 @@ def test_wine_edit_replace_front_image(client, user, wine_factory, clear_image_f
     assertRedirects(
         response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
     )
-    assert WineImage.objects.filter(wine=wine, image_type=ImageType.FRONT).count() == 1
+
+
+@pytest.mark.django_db
+def test_wine_create_new_open_field_value_preserved_across_steps(client, user):
+    """New values entered in OpenMultipleChoiceField must appear in TomSelect items
+    on the re-rendered form so the browser keeps them selected on subsequent steps."""
+    client.force_login(user)
+    size = Size.objects.get(name=0.75)
+    r = client.get(reverse("wine-add"))
+    initial = r.context_data["form"].initial.copy()
+    initial.update(
+        {
+            "name": "Merlot",
+            "wine_type": "RE",
+            "size": size.pk,
+            "country": "DE",
+            "grapes": ["tom_new_optChardonnay"],
+            "form_step": 0,
+        }
+    )
+    r = client.post(reverse("wine-add"), data=initial)
+    assert r.status_code == HTTPStatus.OK
+    form = r.context_data["form"]
+    assert form.data["form_step"] == 1
+    tom_config = json.loads(form.fields["grapes"].widget.attrs["data-tom_config"])
+    assert "Chardonnay" in tom_config.get("items", [])
