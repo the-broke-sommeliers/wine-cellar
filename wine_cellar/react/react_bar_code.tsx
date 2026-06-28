@@ -1,8 +1,10 @@
 import { BarcodeDetector, prepareZXingModule } from 'barcode-detector/ponyfill'
 import django from 'django'
 import { useEffect, useState } from 'react'
-import { BarcodeScanner, type DetectedBarcode } from 'react-barcode-scanner'
 import { createRoot } from 'react-dom/client'
+import { BarcodeScanner } from './BarcodeScanner'
+
+type DetectedBarcode = { rawValue: string }
 
 const translated = {
   advanced: django.gettext('Advanced'),

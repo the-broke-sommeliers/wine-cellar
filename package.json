@@ -20,7 +20,6 @@
     "leaflet.markercluster": "1.5.3",
     "purecss": "3.0.0",
     "react": "19.2.7",
-    "react-barcode-scanner": "4.0.1",
     "react-dom": "19.2.7",
     "react-leaflet": "5.0.0",
     "tom-select": "2.6.1"

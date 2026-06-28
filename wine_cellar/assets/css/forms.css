@@ -256,11 +256,13 @@ p.form-hint {
 
 .scanner-overlay {
   position: absolute;
-  top: 10%;
-  left: 10%;
-  right: 10%;
-  bottom: 10%;
+  top: 50%;
+  left: 18%;
+  right: 18%;
+  height: 16%;
+  transform: translateY(-50%);
   pointer-events: none;
+  box-shadow: 0 0 0 100vw rgba(0, 0, 0, 0.45);
 }
 
 .scanner-overlay__corner {
