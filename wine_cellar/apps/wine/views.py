@@ -6,7 +6,7 @@ import litellm
 import litellm.exceptions
 from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
-from django.db import connections
+from django.db import IntegrityError, connections, transaction
 from django.db.models import Avg, F, Q, Sum
 from django.db.models.functions import Coalesce
 from django.forms import model_to_dict
@@ -201,7 +201,16 @@ class WineCreateView(WineBaseView):
         if form_step is None:
             form_step = 5
         if form_step == 5 or "save_finish" in self.request.POST:
-            self.update_wine_from_cleaned_data(form=form, wine=self.get_wine_instance())
+            try:
+                with transaction.atomic():
+                    self.update_wine_from_cleaned_data(
+                        form=form, wine=self.get_wine_instance()
+                    )
+            except IntegrityError:
+                form.add_error(
+                    None, _("A wine with these details already exists in your cellar.")
+                )
+                return super().form_invalid(form)
             return super().form_valid(form)
         elif form_step < 5:
             form.data = form.data.copy()
@@ -225,7 +234,14 @@ class WineUpdateView(WineBaseView):
 
     def form_valid(self, form):
         wine = self.get_wine_instance()
-        self.update_wine_from_cleaned_data(form=form, wine=wine)
+        try:
+            with transaction.atomic():
+                self.update_wine_from_cleaned_data(form=form, wine=wine)
+        except IntegrityError:
+            form.add_error(
+                None, _("A wine with these details already exists in your cellar.")
+            )
+            return super().form_invalid(form)
         self.success_url = reverse_lazy("wine-detail", kwargs={"pk": wine.pk})
         return super().form_valid(form)
 
