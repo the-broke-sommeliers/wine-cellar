@@ -50,7 +50,6 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.openid_connect",
-    "widget_tweaks",
     "wine_cellar.apps.wine",
     "wine_cellar.apps.user",
     "wine_cellar.apps.storage",

@@ -1,5 +1,6 @@
 import { createControlComponent } from '@react-leaflet/core'
-import { booleanPointInPolygon, point } from '@turf/turf'
+import booleanPointInPolygon from '@turf/boolean-point-in-polygon'
+import { point } from '@turf/helpers'
 import L from 'leaflet'
 import { makeIcon } from './GeoJsonMarker'
 

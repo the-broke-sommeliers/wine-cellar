@@ -73,7 +73,7 @@ module.exports = {
         exclude: /node_modules/,
       },
       {
-        test: /\.s?css$/,
+        test: /\.css$/,
         use: [
           {
             loader: MiniCssExtractPlugin.loader,
@@ -120,11 +120,7 @@ module.exports = {
     ],
   },
   resolve: {
-    fallback: {
-      path: require.resolve('path-browserify'),
-      url: require.resolve('url/'),
-    },
-    extensions: ['*', '.js', '.jsx', '.scss', '.css', '.ts', '.tsx'],
+    extensions: ['*', '.js', '.jsx', '.css', '.ts', '.tsx'],
     alias: {},
     // when using `npm link`, dependencies are resolved against the linked
     // folder by default. This may result in dependencies being included twice.
