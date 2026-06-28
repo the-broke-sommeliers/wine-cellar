@@ -4,7 +4,7 @@ services:
   web:
     build: .
     command: >
-      sh -c "npm run watch & exec python manage.py runserver 0.0.0.0:8000"
+      sh -c "npm install && npm run watch & exec python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/usr/src/app
     ports:
