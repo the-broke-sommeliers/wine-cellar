@@ -3,6 +3,35 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.9.0-rc.0 (2026-06-28)
+
+### feat
+
+- **celery**: add a new ENV variable REDIS_URL to be able to pass a custom url to celery
+
+### fix
+
+- fix docker-compose command for dev container
+
+- Dockerfile.prod broken after switch to uv
+
+- handle adding an existing wine more gracefully by showing an error in the form
+
+- **docker**: fix incorrect permission setting for home folder
+- **celery**: set correct default config path
+- wine creation form not saving new values between steps
+    
+    When adding select fields which accept new values (grapes, attributes,
+    food pairings, source, size) the form would forget those when pressing
+    continue. This means that some of those values got lost when you added a
+    wine to your cellar.
+
+- **deps**: update dependency litellm to v1.89.3
+- **deps**: update dependency litellm to v1.89.2
+- add better error handling for ai parsing
+
+
+
 ## 0.8.1 (2026-06-23)
 
 ### fix
