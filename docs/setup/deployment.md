@@ -30,6 +30,10 @@ The easiest way to run Wine Cellar is by using docker compose as described below
    cp .env.prod-sample .env.prod
    ```
 ##### 4. Edit both `.env` files with secure credentials and your desired settings.
+
+???+ Note
+    The `.env.prod` and `.env.prod.db` files are read by Docker Compose via the `env_file` directive. If you run Wine Cellar **without Docker Compose** (e.g. bare metal, Kubernetes, Nomad, or another orchestrator), you must supply these variables to the application process by other means — for example a systemd `EnvironmentFile=`, Kubernetes `ConfigMap`/`Secret`, or shell `export` statements. Key variables that must always be present: `SECRET_KEY`, `DJANGO_ALLOWED_HOSTS`, `DJANGO_CSRF_TRUSTED_ORIGINS`, `DJANGO_SETTINGS_MODULE`, `SQL_*`, and `ADMIN_USER_*`.
+
 ##### 5. Start the production container:
 === "Docker"
     ```sh
@@ -41,6 +45,8 @@ The easiest way to run Wine Cellar is by using docker compose as described below
     ```
 ##### 6. Configure your reverse proxy to forward traffic to `http://127.0.0.1:8085`.
 
+???+ Warning
+    The Caddy container (port 8085) is responsible for serving `/static/*` and `/media/*` directly from the `static_volume` and `media_volume` Docker volumes. If you remove or bypass the Caddy container and proxy traffic straight to Gunicorn (port 8000), those paths will return errors. In that case your reverse proxy must itself serve the static and media files from those volumes — for example by mounting the volumes into your reverse proxy container and adding the appropriate `alias` / `root` directives. If your proxy cannot share the Docker volumes, the simplest option is to keep Caddy in the stack and place your existing reverse proxy in front of it.
 
 #### Update
 
@@ -128,6 +134,9 @@ Below is a sample nginx config using Letsencrypt for your reverse proxy.
 
 ???+ Info
     Replace `<your full domain>` with the domain you want to use and make sure you have a Letsencrypt certificate for it already. Alternatively remove/modify the ssl block as needed.
+
+???+ Warning
+    This config proxies to port **8085**, which is the Caddy container. Caddy handles serving `/static/*` and `/media/*` from the Docker volumes. If you want NGINX to talk directly to Gunicorn (port 8000) and remove Caddy from the stack, you must add NGINX `location /static` and `location /media` blocks that serve the files from the `static_volume` and `media_volume` Docker volumes — otherwise those paths will not be served correctly.
 
 ```
 server {
