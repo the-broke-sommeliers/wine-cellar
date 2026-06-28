@@ -594,6 +594,76 @@ def test_wine_create_post_all_valid_fields(
 
 
 @pytest.mark.django_db
+def test_wine_create_duplicate(client, user, wine_factory):
+    size = Size.objects.get(name=0.75)
+    wine_factory(
+        user=user,
+        name="Merlot",
+        wine_type="RE",
+        abv=13.0,
+        size=size,
+        vintage=2002,
+        country="DE",
+    )
+    client.force_login(user)
+    data = {
+        "name": "Merlot",
+        "wine_type": "RE",
+        "category": "DR",
+        "abv": 13.0,
+        "size": size.pk,
+        "vintage": 2002,
+        "country": "DE",
+        "form_step": 5,
+    }
+    r = client.get(reverse("wine-add"))
+    initial = r.context_data["form"].initial.copy()
+    initial.update(data)
+    r = client.post(reverse("wine-add"), data=initial)
+    assert r.status_code == HTTPStatus.OK
+    assert r.context_data["form"].errors
+    assert Wine.objects.count() == 1
+
+
+@pytest.mark.django_db
+def test_wine_update_duplicate(client, user, wine_factory):
+    size = Size.objects.get(name=0.75)
+    wine1 = wine_factory(
+        user=user,
+        name="Merlot",
+        wine_type="RE",
+        abv=13.0,
+        size=size,
+        vintage=2002,
+        country="DE",
+    )
+    wine2 = wine_factory(
+        user=user,
+        name="Chardonnay",
+        wine_type="WH",
+        abv=12.0,
+        size=size,
+        vintage=2020,
+        country="FR",
+    )
+    client.force_login(user)
+    data = {
+        "name": wine1.name,
+        "wine_type": wine1.wine_type,
+        "category": "DR",
+        "abv": wine1.abv,
+        "size": size.pk,
+        "vintage": wine1.vintage,
+        "country": wine1.country,
+    }
+    r = client.post(reverse("wine-edit", kwargs={"pk": wine2.pk}), data)
+    assert r.status_code == HTTPStatus.OK
+    assert r.context_data["form"].errors
+    wine2.refresh_from_db()
+    assert wine2.name == "Chardonnay"
+
+
+@pytest.mark.django_db
 def test_wine_update_valid_fields(
     client,
     user,
