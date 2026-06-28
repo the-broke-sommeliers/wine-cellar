@@ -1,6 +1,6 @@
 from django.db import models
 
-from wine_cellar.apps.wine.models import UserContentModel, Wine
+from wine_cellar.apps.wine.models import UserContentModel, Vintage
 
 
 class Storage(UserContentModel):
@@ -37,7 +37,7 @@ class Storage(UserContentModel):
 
 class StorageItem(UserContentModel):
     storage = models.ForeignKey(Storage, on_delete=models.CASCADE, related_name="items")
-    wine = models.ForeignKey(Wine, on_delete=models.CASCADE)
+    vintage = models.ForeignKey(Vintage, on_delete=models.CASCADE)
     row = models.PositiveIntegerField(null=True, blank=True)
     column = models.PositiveIntegerField(null=True, blank=True)
     deleted = models.BooleanField(default=False)

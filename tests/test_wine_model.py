@@ -35,7 +35,8 @@ def test_attribute_model(attribute):
 @pytest.mark.django_db
 def test_wine_image(clear_image_folder, user, wine_factory, wine_image_factory):
     wine = wine_factory(user=user)
-    wine_image = wine_image_factory(user=user, wine=wine)
+    vintage = wine.latest_vintage
+    wine_image = wine_image_factory(user=user, vintage=vintage)
     assert wine.image == wine_image.image.url
     assert wine_image.image.path == str(
         settings.MEDIA_ROOT / Path("user_" + str(user.pk) + "/example.jpg")
@@ -45,33 +46,35 @@ def test_wine_image(clear_image_folder, user, wine_factory, wine_image_factory):
 @pytest.mark.django_db
 def test_get_average_price_with_currency(user, wine_factory, storage_item_factory):
     wine = wine_factory(user=user)
-    storage_item_factory(wine=wine, price=10.00)
-    storage_item_factory(wine=wine, price=20.00)
+    vintage = wine.latest_vintage
+    storage_item_factory(vintage=vintage, price=10.00)
+    storage_item_factory(vintage=vintage, price=20.00)
 
     avg = Decimal("15.00")
     currency = settings.CURRENCY_SYMBOLS.get("EUR")
     expected = f"{number_format(avg, use_l10n=True)}{currency}"
 
-    assert wine.get_average_price_with_currency == expected
+    assert vintage.get_average_price_with_currency == expected
 
 
 @pytest.mark.django_db
 def test_get_average_price_no_items_returns_none(user, wine_factory):
     wine = wine_factory(user=user)
-    assert wine.get_average_price_with_currency is None
+    assert wine.latest_vintage.get_average_price_with_currency is None
 
 
 @pytest.mark.django_db
 def test_get_average_ignores_null_prices(user, wine_factory, storage_item_factory):
     wine = wine_factory(user=user)
+    vintage = wine.latest_vintage
     # create one item with null price and one with a price
-    storage_item_factory(wine=wine)  # price is None by default
-    storage_item_factory(wine=wine, price=Decimal("20.00"))
+    storage_item_factory(vintage=vintage)  # price is None by default
+    storage_item_factory(vintage=vintage, price=Decimal("20.00"))
 
     avg = Decimal("20.00")
     currency = settings.CURRENCY_SYMBOLS.get("EUR")
     expected = f"{number_format(avg, use_l10n=True)}{currency}"
-    assert wine.get_average_price_with_currency == expected
+    assert vintage.get_average_price_with_currency == expected
 
 
 @pytest.mark.django_db
@@ -79,20 +82,22 @@ def test_get_average_all_null_prices_returns_none(
     user, wine_factory, storage_item_factory
 ):
     wine = wine_factory(user=user)
-    storage_item_factory(wine=wine)
-    storage_item_factory(wine=wine)
-    assert wine.get_average_price_with_currency is None
+    vintage = wine.latest_vintage
+    storage_item_factory(vintage=vintage)
+    storage_item_factory(vintage=vintage)
+    assert vintage.get_average_price_with_currency is None
 
 
 @pytest.mark.django_db
 def test_get_average_respects_user_currency(user, wine_factory, storage_item_factory):
     wine = wine_factory(user=user)
-    storage_item_factory(wine=wine, price=Decimal("10.00"))
-    storage_item_factory(wine=wine, price=Decimal("20.00"))
+    vintage = wine.latest_vintage
+    storage_item_factory(vintage=vintage, price=Decimal("10.00"))
+    storage_item_factory(vintage=vintage, price=Decimal("20.00"))
 
     # set user preference to USD
     us = UserSettings.objects.create(user=user, currency="USD")
     avg = Decimal("15.00")
     currency = settings.CURRENCY_SYMBOLS.get(us.currency)
     expected = f"{number_format(avg, use_l10n=True)}{currency}"
-    assert wine.get_average_price_with_currency == expected
+    assert vintage.get_average_price_with_currency == expected

@@ -14,7 +14,7 @@ from django.views.generic.list import MultipleObjectMixin
 
 from wine_cellar.apps.storage.forms import StockForm, StockOpenForm, StorageForm
 from wine_cellar.apps.storage.models import Storage, StorageItem
-from wine_cellar.apps.wine.models import Wine
+from wine_cellar.apps.wine.models import Vintage
 
 
 class StorageListView(ListView):
@@ -198,13 +198,15 @@ class StorageItemAddView(FormView):
         return context
 
     def form_valid(self, form):
-        wine = get_object_or_404(Wine, pk=self.kwargs["pk"], user=self.request.user)
-        self.process_form_data(wine, self.request.user, form.cleaned_data)
-        self.success_url = reverse_lazy("wine-detail", kwargs={"pk": wine.pk})
+        vintage = get_object_or_404(
+            Vintage, pk=self.kwargs["pk"], wine__user=self.request.user
+        )
+        self.process_form_data(vintage, self.request.user, form.cleaned_data)
+        self.success_url = reverse_lazy("wine-detail", kwargs={"pk": vintage.wine.pk})
         return super().form_valid(form)
 
     @staticmethod
-    def process_form_data(wine, user, cleaned_data):
+    def process_form_data(vintage, user, cleaned_data):
         storage = cleaned_data["storage"]
         row = cleaned_data["row"]
         column = cleaned_data["column"]
@@ -212,7 +214,7 @@ class StorageItemAddView(FormView):
 
         StorageItem.objects.create(
             storage=storage,
-            wine=wine,
+            vintage=vintage,
             row=row,
             column=column,
             user=user,
@@ -276,7 +278,7 @@ class StorageItemUpdateView(FormView):
         )
         self.success_url = reverse_lazy(
             "wine-detail",
-            kwargs={"pk": self.storage_item.wine.pk},
+            kwargs={"pk": self.storage_item.vintage.wine.pk},
         )
         return super().form_valid(form)
 
@@ -298,7 +300,7 @@ class StorageItemDeleteView(DeleteView):
         next = self.request.GET.get("next")
         if next == "storage":
             return reverse_lazy("storage-detail", kwargs={"pk": self.object.storage.pk})
-        return reverse_lazy("wine-detail", kwargs={"pk": self.object.wine.pk})
+        return reverse_lazy("wine-detail", kwargs={"pk": self.object.vintage.wine.pk})
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -333,7 +335,7 @@ class StorageItemOpenView(FormView):
         next_param = self.request.GET.get("next")
         if next_param == "storage":
             return reverse_lazy("storage-detail", kwargs={"pk": self.object.storage.pk})
-        return reverse_lazy("wine-detail", kwargs={"pk": self.object.wine.pk})
+        return reverse_lazy("wine-detail", kwargs={"pk": self.object.vintage.wine.pk})
 
     def form_valid(self, form):
         self.object = self.get_object()

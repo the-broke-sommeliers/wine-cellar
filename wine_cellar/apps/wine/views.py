@@ -7,7 +7,7 @@ import litellm.exceptions
 from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
 from django.db import connections
-from django.db.models import Avg, F, Q, Sum
+from django.db.models import Avg, Q, Sum
 from django.db.models.functions import Coalesce
 from django.forms import model_to_dict
 from django.http import JsonResponse
@@ -24,12 +24,14 @@ from wine_cellar.apps.user.views import get_user_settings
 from wine_cellar.apps.wine.fields import OpenChoiceModelFormViewMixin
 from wine_cellar.apps.wine.filters import WineFilter
 from wine_cellar.apps.wine.forms import (
+    VintageForm,
     WineForm,
     WineUploadAIForm,
     image_fields_map,
 )
 from wine_cellar.apps.wine.models import (
     Category,
+    Vintage,
     Wine,
     WineImage,
     WineType,
@@ -44,7 +46,10 @@ class HomePageView(TemplateView):
         context = super().get_context_data(**kwargs)
         wines = Wine.objects.filter(user=self.request.user).count()
         wines_in_stock = (
-            Wine.objects.filter(storageitem__isnull=False, storageitem__deleted=False)
+            Wine.objects.filter(
+                vintages__storageitem__isnull=False,
+                vintages__storageitem__deleted=False,
+            )
             .filter(user=self.request.user)
             .distinct()
             .count()
@@ -62,23 +67,29 @@ class HomePageView(TemplateView):
         youngest = "-"
         try:
             oldest = (
-                Wine.objects.filter(user=self.request.user)
-                .filter(vintage__isnull=False)
-                .earliest("vintage")
-                .vintage
+                Vintage.objects.filter(wine__user=self.request.user)
+                .filter(year__isnull=False)
+                .order_by("year")
+                .values_list("year", flat=True)
+                .first()
             )
             youngest = (
-                Wine.objects.filter(user=self.request.user)
-                .filter(vintage__isnull=False)
-                .latest("vintage")
-                .vintage
+                Vintage.objects.filter(wine__user=self.request.user)
+                .filter(year__isnull=False)
+                .order_by("-year")
+                .values_list("year", flat=True)
+                .first()
             )
-        except Wine.DoesNotExist:
+            if oldest is None:
+                oldest = "-"
+            if youngest is None:
+                youngest = "-"
+        except Vintage.DoesNotExist:
             pass
         total_value = StorageItem.objects.aggregate(
             total=Sum(
-                Coalesce("price", "wine__price"),
-                filter=Q(deleted=False, wine__user=self.request.user),
+                Coalesce("price", "vintage__price"),
+                filter=Q(deleted=False, vintage__wine__user=self.request.user),
             )
         )["total"] or Decimal("0")
         total_value = total_value.quantize(Decimal("0"))
@@ -118,6 +129,25 @@ class WineChooseActionView(TemplateView):
         return context
 
 
+WINE_FIELDS = [
+    "category",
+    "country",
+    "name",
+    "wine_type",
+    "location",
+]
+
+VINTAGE_FIELDS = [
+    "abv",
+    "barcode",
+    "comment",
+    "year",
+    "drink_by",
+    "price",
+    "rating",
+]
+
+
 class WineBaseView(OpenChoiceModelFormViewMixin, FormView):
     form_class = WineForm
 
@@ -129,27 +159,16 @@ class WineBaseView(OpenChoiceModelFormViewMixin, FormView):
     def get_wine_instance(self):
         raise NotImplementedError
 
+    def get_vintage_instance(self, wine):
+        raise NotImplementedError
+
     def update_wine_from_cleaned_data(self, form, wine=None):
         cleaned_data = form.cleaned_data
         user = self.request.user
 
         self.create_new_objects(form)
 
-        wine_fields = [
-            "abv",
-            "category",
-            "barcode",
-            "comment",
-            "country",
-            "name",
-            "rating",
-            "vintage",
-            "drink_by",
-            "wine_type",
-            "price",
-            "location",
-        ]
-        for field in wine_fields:
+        for field in WINE_FIELDS:
             setattr(wine, field, cleaned_data[field])
         wine.size = cleaned_data["size"][0]
         wine.region = cleaned_data["region"][0] if cleaned_data["region"] else None
@@ -162,10 +181,16 @@ class WineBaseView(OpenChoiceModelFormViewMixin, FormView):
         for field in ["vineyard", "grapes", "food_pairings", "attributes", "source"]:
             getattr(wine, field).set(cleaned_data[field])
 
+        vintage = self.get_vintage_instance(wine)
+        for field in VINTAGE_FIELDS:
+            setattr(vintage, field, cleaned_data.get(field))
+        vintage.user = user
+        vintage.save()
+
         for form_field, image_type in image_fields_map.items():
             image = cleaned_data.get(form_field)
             existing = WineImage.objects.filter(
-                wine=wine, user=user, image_type=image_type
+                vintage=vintage, user=user, image_type=image_type
             )
             if image is False or (image and not hasattr(image, "instance")):
                 if existing.exists():
@@ -175,7 +200,7 @@ class WineBaseView(OpenChoiceModelFormViewMixin, FormView):
                     existing.delete()
             if image and not hasattr(image, "instance"):
                 WineImage.objects.get_or_create(
-                    image=image, wine=wine, user=user, image_type=image_type
+                    image=image, vintage=vintage, user=user, image_type=image_type
                 )
         return wine
 
@@ -194,6 +219,9 @@ class WineCreateView(WineBaseView):
 
     def get_wine_instance(self):
         return Wine()
+
+    def get_vintage_instance(self, wine):
+        return Vintage(wine=wine)
 
     def form_valid(self, form):
         form_step = form.cleaned_data.get("form_step", 5)
@@ -218,10 +246,22 @@ class WineUpdateView(WineBaseView):
 
     def get_initial(self):
         wine = get_object_or_404(Wine, pk=self.kwargs["pk"], user=self.request.user)
-        return {**super().get_initial(), **model_to_dict(wine)}
+        initial = {**super().get_initial(), **model_to_dict(wine)}
+        vintage = wine.latest_vintage
+        if vintage:
+            initial["vintage_id"] = vintage.pk
+            for field in VINTAGE_FIELDS:
+                initial[field] = getattr(vintage, field)
+        return initial
 
     def get_wine_instance(self):
         return get_object_or_404(Wine, pk=self.kwargs["pk"], user=self.request.user)
+
+    def get_vintage_instance(self, wine):
+        vintage = wine.latest_vintage
+        if vintage is None:
+            return Vintage(wine=wine)
+        return vintage
 
     def form_valid(self, form):
         wine = self.get_wine_instance()
@@ -238,6 +278,11 @@ class WineDetailView(DetailView):
         qs = super().get_queryset()
         return qs.filter(user=self.request.user)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["vintages"] = self.object.vintages.order_by("-year")
+        return context
+
 
 class WineListView(FilterView):
     model = Wine
@@ -250,8 +295,8 @@ class WineListView(FilterView):
         qs = super().get_queryset().order_by("-created")
         qs = qs.annotate(
             effective_price=Coalesce(
-                Avg("storageitem__price"),
-                F("price"),
+                Avg("vintages__storageitem__price"),
+                Avg("vintages__price"),
             )
         )
         return qs.filter(user=self.request.user)
@@ -266,13 +311,32 @@ class WineScannedView(TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         barcode = self.kwargs["barcode"]
-        wine = (
-            Wine.objects.filter(barcode=barcode).filter(user=self.request.user).first()
-        )
-        if wine:
-            return redirect(reverse("wine-detail", kwargs={"pk": wine.pk}))
+        vintages = Vintage.objects.filter(
+            barcode=barcode, wine__user=self.request.user
+        ).select_related("wine")
+
+        if vintages.count() == 1:
+            return redirect(
+                reverse("wine-detail", kwargs={"pk": vintages.first().wine.pk})
+            )
+        if vintages.count() > 1:
+            return redirect(reverse("wine-scan-multiple", kwargs={"barcode": barcode}))
 
         return super().dispatch(request, *args, **kwargs)
+
+
+class WineScanMultipleView(TemplateView):
+    template_name = "wine_scan_multiple.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        barcode = self.kwargs["barcode"]
+        vintages = Vintage.objects.filter(
+            barcode=barcode, wine__user=self.request.user
+        ).select_related("wine")
+        context["vintages"] = vintages
+        context["barcode"] = barcode
+        return context
 
 
 class WineDeleteView(DeleteView):
@@ -298,6 +362,140 @@ class WineMapView(TemplateView):
             }
         )
         return context
+
+
+class VintageCreateView(OpenChoiceModelFormViewMixin, FormView):
+    template_name = "vintage_form.html"
+    form_class = VintageForm
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.setdefault("user", self.request.user)
+        return kwargs
+
+    def get_wine(self):
+        return get_object_or_404(
+            Wine, pk=self.kwargs["wine_pk"], user=self.request.user
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["wine"] = self.get_wine()
+        return context
+
+    def form_valid(self, form):
+        wine = self.get_wine()
+        cleaned_data = form.cleaned_data
+        user = self.request.user
+
+        vintage = Vintage(wine=wine, user=user)
+        for field in VINTAGE_FIELDS:
+            setattr(vintage, field, cleaned_data.get(field))
+        vintage.save()
+
+        for form_field, image_type in image_fields_map.items():
+            image = cleaned_data.get(form_field)
+            if image and not hasattr(image, "instance"):
+                WineImage.objects.get_or_create(
+                    image=image, vintage=vintage, user=user, image_type=image_type
+                )
+
+        self.success_url = reverse_lazy("wine-detail", kwargs={"pk": wine.pk})
+        return super().form_valid(form)
+
+
+class VintageUpdateView(OpenChoiceModelFormViewMixin, FormView):
+    template_name = "vintage_form.html"
+    form_class = VintageForm
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.setdefault("user", self.request.user)
+        return kwargs
+
+    def get_vintage(self):
+        return get_object_or_404(
+            Vintage,
+            pk=self.kwargs["pk"],
+            wine__pk=self.kwargs["wine_pk"],
+            wine__user=self.request.user,
+        )
+
+    def get_initial(self):
+        vintage = self.get_vintage()
+        initial = super().get_initial()
+        initial["vintage_id"] = vintage.pk
+        for field in VINTAGE_FIELDS:
+            initial[field] = getattr(vintage, field)
+        return initial
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        vintage = self.get_vintage()
+        context["wine"] = vintage.wine
+        context["vintage"] = vintage
+        return context
+
+    def form_valid(self, form):
+        vintage = self.get_vintage()
+        cleaned_data = form.cleaned_data
+        user = self.request.user
+
+        for field in VINTAGE_FIELDS:
+            setattr(vintage, field, cleaned_data.get(field))
+        vintage.save()
+
+        for form_field, image_type in image_fields_map.items():
+            image = cleaned_data.get(form_field)
+            existing = WineImage.objects.filter(
+                vintage=vintage, user=user, image_type=image_type
+            )
+            if image is False or (image and not hasattr(image, "instance")):
+                if existing.exists():
+                    old = existing.first()
+                    old.image.delete()
+                    old.thumbnail.delete()
+                    existing.delete()
+            if image and not hasattr(image, "instance"):
+                WineImage.objects.get_or_create(
+                    image=image, vintage=vintage, user=user, image_type=image_type
+                )
+
+        self.success_url = reverse_lazy("wine-detail", kwargs={"pk": vintage.wine.pk})
+        return super().form_valid(form)
+
+
+class VintageDeleteView(DeleteView):
+    model = Vintage
+    template_name = "vintage_confirm_delete.html"
+
+    def get_queryset(self):
+        return Vintage.objects.filter(
+            wine__pk=self.kwargs["wine_pk"],
+            wine__user=self.request.user,
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["wine"] = self.object.wine
+        return context
+
+    def get_success_url(self):
+        return reverse_lazy("wine-detail", kwargs={"pk": self.object.wine.pk})
+
+    def form_valid(self, form):
+        vintage = self.get_object()
+        wine = vintage.wine
+        if wine.vintages.count() <= 1:
+            form.add_error(
+                None,
+                _(
+                    "Cannot delete the last vintage. "
+                    "Delete the wine instead to remove it entirely."
+                ),
+            )
+            return self.form_invalid(form)
+        return super().form_valid(form)
 
 
 class WineUploadAIView(FormView):

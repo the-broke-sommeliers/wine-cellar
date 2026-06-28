@@ -14,6 +14,7 @@ from wine_cellar.apps.wine.models import (
     Size,
     Source,
     Vineyard,
+    Vintage,
     Wine,
     WineImage,
     WineType,
@@ -83,8 +84,6 @@ class WineFactory(DjangoModelFactory):
     user = factory.SubFactory(UserFactory)
     name = factory.Faker("name")
     wine_type = random.choice(WineType.choices)[0]
-    vintage = random.randint(1900, 2024)
-    abv = 12.0
     country = "DE"
 
     @post_generation
@@ -99,11 +98,30 @@ class WineFactory(DjangoModelFactory):
             for grape in extracted:
                 obj.grapes.add(grape)
 
+    @post_generation
+    def _create_default_vintage(obj, create, extracted, **kwargs):
+        if not create:
+            return
+        if extracted is False:
+            return
+        if not obj.vintages.exists():
+            VintageFactory(wine=obj, user=obj.user)
+
+
+class VintageFactory(DjangoModelFactory):
+    class Meta:
+        model = Vintage
+
+    wine = factory.SubFactory(WineFactory, _create_default_vintage=False)
+    user = factory.LazyAttribute(lambda v: v.wine.user)
+    year = factory.LazyFunction(lambda: random.randint(1900, 2024))
+    abv = 12.0
+
 
 class WineImageFactory(DjangoModelFactory):
     class Meta:
         model = WineImage
 
     image = ImageField()
-    wine = factory.SubFactory(WineFactory)
+    vintage = factory.SubFactory(VintageFactory)
     user = factory.SubFactory(UserFactory)

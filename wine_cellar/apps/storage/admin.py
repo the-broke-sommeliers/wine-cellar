@@ -12,6 +12,6 @@ class StorageAdmin(admin.ModelAdmin):
 
 @admin.register(StorageItem)
 class StorageItemAdmin(admin.ModelAdmin):
-    list_display = ("id", "storage", "wine", "row", "column", "created")
-    search_fields = ("wine__name", "storage__name")
+    list_display = ("id", "storage", "vintage", "row", "column", "created")
+    search_fields = ("vintage__wine__name", "storage__name")
     list_filter = ("storage",)

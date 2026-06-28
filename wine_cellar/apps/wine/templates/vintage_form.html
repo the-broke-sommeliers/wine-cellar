@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+{% block extra_js %}
+    {{ block.super }}
+    <script src="{% static 'image_preview.js' %}" type="module" defer></script>
+    <script src="{% static 'barcode_scanner.js' %}" type="module" defer></script>
+    {{ form.media.js }}
+{% endblock extra_js %}
+{% block styles %}
+    {{ block.super }}
+    {{ form.media.css }}
+{% endblock styles %}
+{% block title %}
+    {% if vintage %}{% translate "Edit Vintage" %}{% else %}{% translate "Add Vintage" %}{% endif %}
+{% endblock title %}
+{% block header %}
+    <h1 class="header__title">{{ wine.name }}</h1>
+{% endblock header %}
+{% block content %}
+    <div class="pure-g">
+        <div class="pure-u-1 pure-u-lg-1-2 m-auto">
+            <form method="post"
+                  enctype="multipart/form-data"
+                  class="form"
+                  novalidate>
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                    <ul class="form-errorlist" aria-live="assertive" aria-atomic="true">
+                        {% for error in form.non_field_errors %}<li>{{ error|escape }}</li>{% endfor %}
+                    </ul>
+                {% endif %}
+                <div class="form__fields">
+                    {% include 'forms/form_field.html' with field=form.year %}
+                    {% include 'forms/form_field.html' with field=form.abv %}
+                    {% include 'forms/form_field.html' with field=form.barcode %}
+                    <div id="scanner"
+                         data-zxing_wasm_url="{% static 'zxing_reader.wasm' %}"
+                         data-target-input="id_barcode"></div>
+                    {% include 'forms/form_field.html' with field=form.price %}
+                    {% include 'forms/form_field.html' with field=form.drink_by %}
+                    {% include 'forms/form_field.html' with field=form.rating %}
+                    {% include 'forms/form_field.html' with field=form.comment %}
+                    {% include 'forms/form_field.html' with field=form.image_front %}
+                    {% include 'forms/form_field.html' with field=form.image_back %}
+                    {% include 'forms/form_field.html' with field=form.image_front_label %}
+                    {% include 'forms/form_field.html' with field=form.image_back_label %}
+                </div>
+                <div class="pure-controls">
+                    <div class="form__buttons">
+                        <div>
+                            <a href="{% url 'wine-detail' wine.pk %}" class="pure-button button__neutral">
+                                <i class="fa-solid fa-arrow-left"></i> <span>{% translate "Back" %}</span>
+                            </a>
+                        </div>
+                        <div class="form__buttons-right">
+                            <button type="submit" class="pure-button button__primary">{% translate "Save" %}</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock content %}

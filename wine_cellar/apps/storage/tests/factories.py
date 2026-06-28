@@ -5,7 +5,7 @@ from factory.django import DjangoModelFactory
 
 from wine_cellar.apps.storage.models import Storage, StorageItem
 from wine_cellar.apps.user.tests.factories import UserFactory
-from wine_cellar.apps.wine.tests.factories import WineFactory
+from wine_cellar.apps.wine.tests.factories import VintageFactory
 
 
 class StorageFactory(DjangoModelFactory):
@@ -24,4 +24,4 @@ class StorageItemFactory(DjangoModelFactory):
         model = StorageItem
 
     storage = factory.SubFactory(StorageFactory)
-    wine = factory.SubFactory(WineFactory)
+    vintage = factory.SubFactory(VintageFactory)

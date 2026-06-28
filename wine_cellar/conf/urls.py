@@ -39,12 +39,16 @@ from wine_cellar.apps.storage.views import (
 from wine_cellar.apps.user.views import UserSettingsView
 from wine_cellar.apps.wine.views import (
     HomePageView,
+    VintageCreateView,
+    VintageDeleteView,
+    VintageUpdateView,
     WineChooseActionView,
     WineCreateView,
     WineDeleteView,
     WineDetailView,
     WineListView,
     WineMapView,
+    WineScanMultipleView,
     WineScannedView,
     WineScanView,
     WineUpdateView,
@@ -83,6 +87,26 @@ urlpatterns = [
     path("wines/", WineListView.as_view(), name="wine-list"),
     path("wine/scan", WineScanView.as_view(), name="wine-scan"),
     path("wine/scan/<str:barcode>", WineScannedView.as_view(), name="wine-scan"),
+    path(
+        "wine/scan-multiple/<str:barcode>",
+        WineScanMultipleView.as_view(),
+        name="wine-scan-multiple",
+    ),
+    path(
+        "wine/<int:wine_pk>/vintage/add/",
+        VintageCreateView.as_view(),
+        name="vintage-add",
+    ),
+    path(
+        "wine/<int:wine_pk>/vintage/<int:pk>/edit/",
+        VintageUpdateView.as_view(),
+        name="vintage-edit",
+    ),
+    path(
+        "wine/<int:wine_pk>/vintage/<int:pk>/delete/",
+        VintageDeleteView.as_view(),
+        name="vintage-delete",
+    ),
     path("wines/map", WineMapView.as_view(), name="wine-map"),
     path("storage/history", StorageItemHistoryView.as_view(), name="stock-history"),
     path("health/", health_check, name="health_check"),

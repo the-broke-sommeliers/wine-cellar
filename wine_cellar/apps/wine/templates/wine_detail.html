@@ -4,10 +4,94 @@
     {{ block.super }}
     <script src="{% static 'wine_carousel.js' %}" type="module" defer></script>
     <script src="{% static 'maps.js' %}"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const tabs = document.querySelectorAll(".vintage-tabs__tab");
+        const panels = document.querySelectorAll(".vintage-tabs__panel");
+        const imgWrapper = document.getElementById("wine-image-wrapper");
+        const imgEl = document.getElementById("wine-image");
+        const imgAnchor = imgWrapper ? imgWrapper.querySelector(".image-fullscreen-anchor") : null;
+
+        const stockAddBtn = document.getElementById("stock-add-btn");
+
+        function activateTab(tab) {
+          tabs.forEach(function (t) {
+            t.classList.remove("is-active");
+            t.setAttribute("aria-selected", "false");
+          });
+          panels.forEach(function (p) { p.hidden = true; });
+          tab.classList.add("is-active");
+          tab.setAttribute("aria-selected", "true");
+          const panel = document.getElementById(tab.getAttribute("aria-controls"));
+          if (panel) panel.hidden = false;
+
+          if (stockAddBtn && tab.dataset.stockAddUrl) {
+            stockAddBtn.href = tab.dataset.stockAddUrl;
+          }
+
+          if (imgEl) {
+            const thumb = tab.dataset.thumbnail;
+            const full = tab.dataset.image;
+            const imagesRaw = tab.dataset.images;
+            imgEl.src = thumb;
+            if (imgAnchor) imgAnchor.href = full;
+            if (imgWrapper) {
+              const images = JSON.parse(imagesRaw || "[]");
+              imgWrapper.dataset.images = JSON.stringify(images);
+              imgWrapper.dispatchEvent(new CustomEvent("vintage-changed", { detail: { images } }));
+            }
+          }
+        }
+
+        tabs.forEach(function (tab) {
+          tab.addEventListener("click", function () { activateTab(tab); });
+        });
+      });
+    </script>
 {% endblock extra_js %}
 {% block styles %}
     {{ block.super }}
     <link rel="stylesheet" href="{% static 'maps.css' %}" />
+    <style>
+      .vintage-tabs__nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.375rem;
+        margin-bottom: 1.25rem;
+      }
+      .vintage-tabs__tab {
+        padding: 0.3rem 0.875rem;
+        border: 1px solid var(--border-color);
+        background: none;
+        cursor: pointer;
+        font-size: var(--font-sm);
+        color: var(--text-color-gray);
+        border-radius: 6px;
+        transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+        font-family: inherit;
+      }
+      .vintage-tabs__tab:hover {
+        background-color: var(--gray-green);
+        border-color: var(--dark-green);
+        color: var(--darker-gray);
+      }
+      .vintage-tabs__tab.is-active {
+        background-color: var(--dark-green);
+        border-color: var(--dark-green);
+        color: var(--light);
+        font-weight: 500;
+      }
+      .vintage-tabs__panel-actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--border-color-light);
+      }
+      .vintage-tabs__comment {
+        margin-top: 1rem;
+      }
+    </style>
 {% endblock styles %}
 {% block header %}
     <h1 class="header__title">{{ wine.name }}</h1>
@@ -23,7 +107,7 @@
                            target="_blank"
                            class="image-fullscreen-anchor"
                            rel="noopener noreferrer"
-                           aria-label="Open full-size image in a new tab">
+                           aria-label="{% translate 'Open full-size image in a new tab' %}">
                             <img id="wine-image"
                                  src="{{ wine.image_thumbnail }}"
                                  height="264"
@@ -34,16 +118,16 @@
                     {% if wine.image_thumbnails|length > 1 %}
                         <div class="image-controls"
                              role="group"
-                             aria-label="{% translate "Image carousel controls" %}">
+                             aria-label="{% translate 'Image carousel controls' %}">
                             <button type="button"
                                     class="wine-prev"
-                                    aria-label="{% translate "Previous image" %}"
+                                    aria-label="{% translate 'Previous image' %}"
                                     disabled
-                                    title="{% translate "Previous image" %}">«</button>
+                                    title="{% translate 'Previous image' %}">«</button>
                             <button type="button"
                                     class="wine-next"
-                                    aria-label="{% translate "Next image" %}"
-                                    title="{% translate "Next image" %}">»</button>
+                                    aria-label="{% translate 'Next image' %}"
+                                    title="{% translate 'Next image' %}">»</button>
                         </div>
                     {% endif %}
                 </div>
@@ -58,28 +142,14 @@
                 </div>
 
                 <div class="card__highlights">
-                    {% if wine.vintage %}
-                        <div class="card__highlight">
-                            <span class="card__highlight-value">{{ wine.vintage }}</span>
-                            <span class="card__highlight-label">{% translate "Vintage" %}</span>
-                        </div>
-                    {% endif %}
                     <div class="card__highlight">
                         <span class="card__highlight-value">{{ wine.get_type }}</span>
                         <span class="card__highlight-label">{% translate "Type" %}</span>
                     </div>
-                    {% if wine.rating %}
-                        <div class="card__highlight">
-                            <span class="card__highlight-value">{{ wine.rating }}/10</span>
-                            <span class="card__highlight-label">{% translate "Rating" %}</span>
-                        </div>
-                    {% endif %}
-                    {% if wine.price is not None %}
-                        <div class="card__highlight">
-                            <span class="card__highlight-value">{{ wine.get_price_with_currency }}</span>
-                            <span class="card__highlight-label">{% translate "Price" %}</span>
-                        </div>
-                    {% endif %}
+                    <div class="card__highlight">
+                        <span class="card__highlight-value">{{ wine.total_stock }}</span>
+                        <span class="card__highlight-label">{% translate "In Stock" %}</span>
+                    </div>
                 </div>
 
                 <div class="card__fields">
@@ -115,28 +185,10 @@
                         <span class="card__field-label">{% translate "Category" %}</span>
                         <span class="card__field-value">{{ wine.get_category }}</span>
                     </div>
-                    {% if wine.abv %}
-                        <div class="card__field">
-                            <span class="card__field-label">{% translate "ABV" %}</span>
-                            <span class="card__field-value">{{ wine.abv | localize }}</span>
-                        </div>
-                    {% endif %}
                     {% if wine.size %}
                         <div class="card__field">
                             <span class="card__field-label">{% translate "Size" %}</span>
                             <span class="card__field-value">{{ wine.size }}</span>
-                        </div>
-                    {% endif %}
-                    {% if wine.drink_by %}
-                        <div class="card__field">
-                            <span class="card__field-label">{% translate "Drink By" %}</span>
-                            <span class="card__field-value">
-                                {{ wine.drink_by }}
-                                {% if wine.drink_by <= wine.drink_by_warning_date %}
-                                    <i class="fa-solid fa-circle-exclamation wine-card__drink-warning"
-                                       aria-label="{% translate "Drink soon" %}"></i>
-                                {% endif %}
-                            </span>
                         </div>
                     {% endif %}
                     {% if wine.get_attributes %}
@@ -157,20 +209,7 @@
                             <span class="card__field-value">{{ wine.get_food_pairings | linebreaksbr }}</span>
                         </div>
                     {% endif %}
-                    {% if wine.get_average_price_with_currency %}
-                        <div class="card__field">
-                            <span class="card__field-label">{% translate "Average Price" %}</span>
-                            <span class="card__field-value">{{ wine.get_average_price_with_currency }}</span>
-                        </div>
-                    {% endif %}
                 </div>
-
-                {% if wine.comment %}
-                    <div class="card__section">
-                        <span class="card__field-label">{% translate "Comment" %}</span>
-                        <p class="card__field-value">{{ wine.comment }}</p>
-                    </div>
-                {% endif %}
             </div>
         </div>
 
@@ -188,23 +227,134 @@
         <div class="card__section">
             <div class="card">
                 <div class="card__header">
-                    <h3>{% translate "Stock" %}</h3>
+                    <h3>{% translate "Vintages" %}</h3>
+                    {% if vintages %}
+                        <a href="{% url 'vintage-add' wine.pk %}"
+                           class="pure-button button__primary">
+                            <i class="fa-regular fa-plus"></i> <span>{% translate "Add Vintage" %}</span>
+                        </a>
+                    {% endif %}
+                </div>
+                {% if vintages %}
+                    <div class="vintage-tabs__nav" role="tablist">
+                        {% for vintage in vintages %}
+                            <button class="vintage-tabs__tab {% if forloop.first %}is-active{% endif %}"
+                                    role="tab"
+                                    aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+                                    aria-controls="vintage-panel-{{ vintage.pk }}"
+                                    id="vintage-tab-{{ vintage.pk }}"
+                                    data-stock-add-url="{% url 'stock-add' vintage.pk %}"
+                                    data-image="{{ vintage.image }}"
+                                    data-thumbnail="{{ vintage.image_thumbnail }}"
+                                    data-images='[{% for img in vintage.image_thumbnails %}"{{ img }}"{% if not forloop.last %},{% endif %}{% endfor %}]'>
+                                {{ vintage.year|default:"N/V" }}
+                            </button>
+                        {% endfor %}
+                    </div>
+
+                    {% for vintage in vintages %}
+                        <div id="vintage-panel-{{ vintage.pk }}"
+                             role="tabpanel"
+                             aria-labelledby="vintage-tab-{{ vintage.pk }}"
+                             class="vintage-tabs__panel"
+                             {% if not forloop.first %}hidden{% endif %}>
+
+                            <div class="vintage-tabs__panel-actions">
+                                {% url 'vintage-edit' wine.pk vintage.pk as vintage_edit_url %}
+                                {% url 'vintage-delete' wine.pk vintage.pk as vintage_delete_url %}
+                                {% include "includes/edit_delete_buttons.html" with edit_url=vintage_edit_url delete_url=vintage_delete_url %}
+                            </div>
+
+                            {% if vintage.rating or vintage.price is not None or vintage.abv %}
+                                <div class="card__highlights">
+                                    {% if vintage.rating %}
+                                        <div class="card__highlight">
+                                            <span class="card__highlight-value">{{ vintage.rating }}/10</span>
+                                            <span class="card__highlight-label">{% translate "Rating" %}</span>
+                                        </div>
+                                    {% endif %}
+                                    {% if vintage.price is not None %}
+                                        <div class="card__highlight">
+                                            <span class="card__highlight-value">{{ vintage.get_price_with_currency }}</span>
+                                            <span class="card__highlight-label">{% translate "Price" %}</span>
+                                        </div>
+                                    {% endif %}
+                                    {% if vintage.abv %}
+                                        <div class="card__highlight">
+                                            <span class="card__highlight-value">{{ vintage.abv | localize }}%</span>
+                                            <span class="card__highlight-label">{% translate "ABV" %}</span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+
+                            {% if vintage.drink_by or vintage.get_average_price_with_currency %}
+                                <div class="card__fields">
+                                    {% if vintage.drink_by %}
+                                        <div class="card__field">
+                                            <span class="card__field-label">{% translate "Drink By" %}</span>
+                                            <span class="card__field-value">
+                                                {{ vintage.drink_by }}
+                                                {% if vintage.drink_by <= vintage.drink_by_warning_date %}
+                                                    <i class="fa-solid fa-circle-exclamation wine-card__drink-warning"
+                                                       aria-label="{% translate "Drink soon" %}"></i>
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                    {% endif %}
+                                    {% if vintage.get_average_price_with_currency %}
+                                        <div class="card__field">
+                                            <span class="card__field-label">{% translate "Average Price" %}</span>
+                                            <span class="card__field-value">{{ vintage.get_average_price_with_currency }}</span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+
+                            {% if vintage.comment %}
+                                <div class="vintage-tabs__comment">
+                                    <span class="card__field-label">{% translate "Comment" %}</span>
+                                    <p class="card__field-value">{{ vintage.comment }}</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text--gray">{% translate "No vintages yet." %}</p>
+                    <a href="{% url 'vintage-add' wine.pk %}"
+                       class="pure-button button__primary">
+                        <i class="fa-regular fa-plus"></i> <span>{% translate "Add Vintage" %}</span>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card__section">
+            <div class="card">
+                <div class="card__header">
                     <div class="card__table-summary">
-                        <span class="stock__count">
+                        <h3>{% translate "Stock" %}</h3>
+                        <p class="stock__count">
                             {% blocktranslate count counter=wine.total_stock %}
                                 {{ counter }} bottle
                             {% plural %}
                                 {{ counter }} bottles
                             {% endblocktranslate %}
-                        </span>
-                        <a href="{% url 'stock-add' wine.pk %}"
-                           class="pure-button button__primary"><i class="fa-regular fa-plus"></i> <span>{% translate "Add" %}</span></a>
+                        </p>
                     </div>
+                    {% if vintages %}
+                        <a href="{% url 'stock-add' vintages.0.pk %}"
+                           id="stock-add-btn"
+                           class="pure-button button__primary">
+                            <i class="fa-regular fa-plus"></i> <span>{% translate "Add" %}</span>
+                        </a>
+                    {% endif %}
                 </div>
-                {% if wine.get_stock %}
+                {% if wine.total_stock > 0 %}
                     <table class="card__table">
                         <thead>
                             <tr>
+                                <th>{% translate "Vintage" %}</th>
                                 <th>{% translate "Location" %}</th>
                                 <th>{% translate "Row" %}</th>
                                 <th>{% translate "Cell" %}</th>
@@ -212,8 +362,16 @@
                                 <th></th>
                             </tr>
                         </thead>
+<<<<<<< HEAD
                         {% for item in wine.get_stock %}
+=======
+                        <tbody>
+                            {% for vintage in vintages %}
+                                {% for item in vintage.storageitem_set.all %}
+                                    {% if not item.deleted %}
+
                             <tr{% if item.opened %} class="stock-item--opened"{% endif %}>
+                                            <td>{{ vintage.year|default:"N/V" }}</td>
                                 <td>
                                     {{ item.storage }}
                                     {% if item.opened %}<span class="visually-hidden">{% translate "Opened" %}</span>{% endif %}
@@ -232,7 +390,10 @@
                                     <a href="{% url 'stock-delete' item.pk %}" title="{% translate "Remove" %}" aria-label="{% translate "Remove" %}"><i class="fa-regular fa-trash-can" aria-hidden="true"></i></a>
                                 </td>
                             </tr>
-                        {% endfor %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                        </tbody>
                     </table>
                     <div class="table-legend">
                         <span class="table-legend__swatch table-legend__swatch--opened" aria-hidden="true"></span>

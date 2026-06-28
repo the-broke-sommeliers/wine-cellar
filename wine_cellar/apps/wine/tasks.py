@@ -8,7 +8,7 @@ from wine_cellar.apps.wine.emails import (
     send_drink_by_reminder,
     send_opened_bottle_reminder,
 )
-from wine_cellar.apps.wine.models import Wine
+from wine_cellar.apps.wine.models import Vintage
 
 
 @shared_task(name="drink_by_reminder")
@@ -21,11 +21,11 @@ def drink_by_reminder():
     )
     date = timezone.now().date() + timedelta(days=14)
     for user in users:
-        wines = Wine.objects.filter(
-            user=user, drink_by=date, storageitem__isnull=False
+        vintages = Vintage.objects.filter(
+            wine__user=user, drink_by=date, storageitem__isnull=False
         ).distinct()
-        if wines.count() > 0:
-            send_drink_by_reminder(user, wines)
+        if vintages.count() > 0:
+            send_drink_by_reminder(user, vintages)
 
 
 @shared_task(name="opened_bottle_reminder")

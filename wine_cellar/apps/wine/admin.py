@@ -7,16 +7,24 @@ from wine_cellar.apps.wine.models import (
     Size,
     Source,
     Vineyard,
+    Vintage,
     Wine,
 )
 
 
+class VintageInline(admin.TabularInline):
+    model = Vintage
+    extra = 0
+    fields = [
+        "year", "abv", "barcode", "price", "drink_by", "rating", "comment", "user"
+    ]
+
+
 @admin.register(Wine)
 class WineAdmin(admin.ModelAdmin):
-    list_display = ["name", "barcode", "user"]
+    list_display = ["name", "user"]
     fields = [
         "name",
-        "barcode",
         "user",
         "location",
         "region",
@@ -26,6 +34,7 @@ class WineAdmin(admin.ModelAdmin):
         "grapes",
         "attributes",
     ]
+    inlines = [VintageInline]
 
 
 @admin.register(Size)

@@ -15,24 +15,28 @@
         {% if wine.get_grapes %}
             <p><span class="text--gray">{% translate "Grapes" %}:</span> {{ wine.get_grapes | truncatechars:31 | title }}</p>
         {% endif %}
-        {% if wine.vintage %}
-            <p><span class="text--gray">{% translate "Vintage" %}:</span> {{ wine.vintage }}</p>
-        {% endif %}
-        {% if wine.drink_by %}
-            <p>
-                <span class="text--gray">{% translate "Drink By" %}:</span> {{ wine.drink_by }}
-                {% if wine.drink_by <= wine.drink_by_warning_date %}
-                    <i class="fa-solid fa-circle-exclamation wine-card__drink-warning"
-                       aria-label="{% translate "Drink soon" %}"></i>
+        {% with latest=wine.latest_vintage %}
+            {% if latest %}
+                {% if latest.year %}
+                    <p><span class="text--gray">{% translate "Vintage" %}:</span> {{ latest.year }}</p>
                 {% endif %}
-            </p>
-        {% endif %}
-        {% if wine.rating %}
-            <p class="wine-card__rating" aria-label="{% blocktranslate with rating=wine.rating %}Rating: {{ rating }} out of 10{% endblocktranslate %}">
-                <i class="fa-solid fa-star" aria-hidden="true"></i>
-                <span>{{ wine.rating }}/10</span>
-            </p>
-        {% endif %}
+                {% if latest.drink_by %}
+                    <p>
+                        <span class="text--gray">{% translate "Drink By" %}:</span> {{ latest.drink_by }}
+                        {% if latest.drink_by <= latest.drink_by_warning_date %}
+                            <i class="fa-solid fa-circle-exclamation wine-card__drink-warning"
+                               aria-label="{% translate "Drink soon" %}"></i>
+                        {% endif %}
+                    </p>
+                {% endif %}
+                {% if latest.rating %}
+                    <p class="wine-card__rating" aria-label="{% blocktranslate with rating=latest.rating %}Rating: {{ rating }} out of 10{% endblocktranslate %}">
+                        <i class="fa-solid fa-star" aria-hidden="true"></i>
+                        <span>{{ latest.rating }}/10</span>
+                    </p>
+                {% endif %}
+            {% endif %}
+        {% endwith %}
     </div>
     <div class="wine-card__stock">
         <p>{% translate "Stock:" %} {{ wine.total_stock }}</p>

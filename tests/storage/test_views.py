@@ -173,13 +173,14 @@ def test_storage_can_delete_multiple(client, user, storage_factory):
 @pytest.mark.django_db
 def test_unauthenticated_cant_add_stock(client, user, wine_factory):
     wine = wine_factory(user=user)
-    r = client.post(reverse("stock-add", kwargs={"pk": wine.pk}), follow=True)
+    vintage = wine.latest_vintage
+    r = client.post(reverse("stock-add", kwargs={"pk": vintage.pk}), follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(
         response=r,
         expected_url=reverse("account_login")
         + "?next="
-        + reverse("stock-add", kwargs={"pk": wine.pk}),
+        + reverse("stock-add", kwargs={"pk": vintage.pk}),
     )
     assertTemplateUsed(response=r, template_name="base.html")
     assertTemplateUsed(response=r, template_name="account/login.html")
@@ -190,18 +191,19 @@ def test_user_can_add_stock(client, user, wine_factory):
     client.force_login(user)
     storage = Storage.objects.first()
     wine = wine_factory(user=user)
+    vintage = wine.latest_vintage
     data = {
         "storage": storage.pk,
     }
     r = client.post(
-        reverse("stock-add", kwargs={"pk": wine.pk}), data=data, follow=True
+        reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
     )
     assert r.status_code == HTTPStatus.OK
     assertRedirects(
         response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
     )
     assert storage.used_slots == 1
-    assert storage.items.first().wine == wine
+    assert storage.items.first().vintage.wine == wine
 
 
 @pytest.mark.django_db
@@ -213,18 +215,20 @@ def test_user_cant_add_stock_to_other_users_storage(
     other_storage = Storage.objects.filter(user=other_user).first()
     client.force_login(user)
     wine = wine_factory(user=user)
+    vintage = wine.latest_vintage
     other_wine = wine_factory(user=other_user)
+    other_vintage = other_wine.latest_vintage
     data = {
         "storage": other_storage.pk,
     }
     r = client.post(
-        reverse("stock-add", kwargs={"pk": wine.pk}), data=data, follow=True
+        reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
     )
     assert r.status_code == HTTPStatus.OK
     assert r.context["form"].errors
     assert other_storage.used_slots == 0
     r = client.post(
-        reverse("stock-add", kwargs={"pk": other_wine.pk}), data=data, follow=True
+        reverse("stock-add", kwargs={"pk": other_vintage.pk}), data=data, follow=True
     )
     assert r.status_code == HTTPStatus.OK
     assert r.context["form"].errors
@@ -234,7 +238,7 @@ def test_user_cant_add_stock_to_other_users_storage(
         "storage": storage.pk,
     }
     r = client.post(
-        reverse("stock-add", kwargs={"pk": other_wine.pk}), data=data, follow=True
+        reverse("stock-add", kwargs={"pk": other_vintage.pk}), data=data, follow=True
     )
     assert r.status_code == HTTPStatus.NOT_FOUND
     assert other_storage.used_slots == 0
@@ -246,7 +250,8 @@ def test_user_can_delete_stock(client, user, wine_factory, storage_item_factory)
     client.force_login(user)
     storage = Storage.objects.first()
     wine = wine_factory(user=user)
-    item = storage_item_factory(storage=storage, wine=wine, user=user)
+    vintage = wine.latest_vintage
+    item = storage_item_factory(storage=storage, vintage=vintage, user=user)
     assert item.deleted is False
     assert StorageItem.objects.count() == 1
     r = client.post(reverse("stock-delete", kwargs={"pk": item.pk}), follow=True)
@@ -267,7 +272,8 @@ def test_user_cant_delete_other_users_stock(
     user2 = user_factory()
     storage = Storage.objects.filter(user=user2).first()
     wine = wine_factory(user=user2)
-    item = storage_item_factory(storage=storage, wine=wine, user=user2)
+    vintage = wine.latest_vintage
+    item = storage_item_factory(storage=storage, vintage=vintage, user=user2)
     assert item.deleted is False
     assert StorageItem.objects.count() == 1
     r = client.post(reverse("stock-delete", kwargs={"pk": item.pk}), follow=True)
@@ -284,14 +290,15 @@ def test_user_cant_add_to_full_slot(
     storage = storage_factory(user=user, rows=1, columns=1)
     client.force_login(user)
     wine = wine_factory(user=user)
-    storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
+    vintage = wine.latest_vintage
+    storage_item_factory(storage=storage, vintage=vintage, row=1, column=1, user=user)
     data = {
         "storage": storage.pk,
         "row": 1,
         "column": 1,
     }
     r = client.post(
-        reverse("stock-add", kwargs={"pk": wine.pk}), data=data, follow=True
+        reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
     )
     assert r.status_code == HTTPStatus.OK
     assert r.context["form"].errors
@@ -302,20 +309,21 @@ def test_user_can_add_to_specific_slot(client, user, storage_factory, wine_facto
     storage = storage_factory(user=user, rows=2, columns=2)
     client.force_login(user)
     wine = wine_factory(user=user)
+    vintage = wine.latest_vintage
     data = {
         "storage": storage.pk,
         "row": 2,
         "column": 1,
     }
     r = client.post(
-        reverse("stock-add", kwargs={"pk": wine.pk}), data=data, follow=True
+        reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
     )
     assert r.status_code == HTTPStatus.OK
     assertRedirects(
         response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
     )
     item = storage.items.first()
-    assert item.wine == wine
+    assert item.vintage.wine == wine
     assert item.row == 2
     assert item.column == 1
 
@@ -325,13 +333,14 @@ def test_user_cant_add_to_invalid_slot(client, user, storage_factory, wine_facto
     storage = storage_factory(user=user, rows=2, columns=2)
     client.force_login(user)
     wine = wine_factory(user=user)
+    vintage = wine.latest_vintage
     data = {
         "storage": storage.pk,
         "row": 3,
         "column": 1,
     }
     r = client.post(
-        reverse("stock-add", kwargs={"pk": wine.pk}), data=data, follow=True
+        reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
     )
     assert r.status_code == HTTPStatus.OK
     assert r.context["form"].errors
@@ -344,15 +353,16 @@ def test_form_context_has_empty_slots(
     storage = storage_factory(user=user, rows=2, columns=2)
     client.force_login(user)
     wine = wine_factory(user=user)
-    r = client.get(reverse("stock-add", kwargs={"pk": wine.pk}))
+    vintage = wine.latest_vintage
+    r = client.get(reverse("stock-add", kwargs={"pk": vintage.pk}))
     assert r.status_code == HTTPStatus.OK
     assert r.context["free_cells_by_storage"][storage.pk] == {
         1: [1, 2],
         2: [1, 2],
     }
-    storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
-    storage_item_factory(storage=storage, wine=wine, row=2, column=2, user=user)
-    r = client.get(reverse("stock-add", kwargs={"pk": wine.pk}))
+    storage_item_factory(storage=storage, vintage=vintage, row=1, column=1, user=user)
+    storage_item_factory(storage=storage, vintage=vintage, row=2, column=2, user=user)
+    r = client.get(reverse("stock-add", kwargs={"pk": vintage.pk}))
     assert r.status_code == HTTPStatus.OK
     assert r.context["free_cells_by_storage"][storage.pk] == {
         1: [2],
@@ -365,10 +375,12 @@ def test_used_slot_is_free_after_delete(
     client, user, storage_factory, storage_item_factory, wine_factory
 ):
     wine = wine_factory(user=user)
+    vintage = wine.latest_vintage
     wine_new = wine_factory(user=user)
+    vintage_new = wine_new.latest_vintage
     storage = storage_factory(user=user, rows=2, columns=2)
     storage_item_factory(
-        storage=storage, wine=wine, row=1, column=1, user=user, deleted=True
+        storage=storage, vintage=vintage, row=1, column=1, user=user, deleted=True
     )
     client.force_login(user)
     data = {
@@ -377,14 +389,14 @@ def test_used_slot_is_free_after_delete(
         "column": 1,
     }
     r = client.post(
-        reverse("stock-add", kwargs={"pk": wine_new.pk}), data=data, follow=True
+        reverse("stock-add", kwargs={"pk": vintage_new.pk}), data=data, follow=True
     )
     assert r.status_code == HTTPStatus.OK
     assertRedirects(
         response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine_new.pk})
     )
     item = storage.items.filter(deleted=False).first()
-    assert item.wine == wine_new
+    assert item.vintage.wine == wine_new
     assert item.row == 1
     assert item.column == 1
     assert item.deleted is False
@@ -397,7 +409,10 @@ def test_user_can_edit_existing_item_new_slot(
     storage = storage_factory(user=user, rows=2, columns=2)
     client.force_login(user)
     wine = wine_factory(user=user)
-    item = storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
+    vintage = wine.latest_vintage
+    item = storage_item_factory(
+        storage=storage, vintage=vintage, row=1, column=1, user=user
+    )
     data = {
         "storage": storage.pk,
         "row": 2,
@@ -411,9 +426,9 @@ def test_user_can_edit_existing_item_new_slot(
         response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
     )
     assert storage.used_slots == 1
-    assert storage.items.first().wine == wine
+    assert storage.items.first().vintage.wine == wine
     item = storage.items.first()
-    assert item.wine == wine
+    assert item.vintage.wine == wine
     assert item.row == 2
     assert item.column == 1
 
@@ -425,8 +440,9 @@ def test_user_can_edit_existing_item_new_price(
     storage = storage_factory(user=user, rows=2, columns=2)
     client.force_login(user)
     wine = wine_factory(user=user)
+    vintage = wine.latest_vintage
     item = storage_item_factory(
-        storage=storage, wine=wine, row=1, column=1, user=user, price=10.0
+        storage=storage, vintage=vintage, row=1, column=1, user=user, price=10.0
     )
     data = {
         "storage": storage.pk,
@@ -442,9 +458,9 @@ def test_user_can_edit_existing_item_new_price(
         response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
     )
     assert storage.used_slots == 1
-    assert storage.items.first().wine == wine
+    assert storage.items.first().vintage.wine == wine
     item = storage.items.first()
-    assert item.wine == wine
+    assert item.vintage.wine == wine
     assert item.row == 1
     assert item.column == 1
     assert item.price == 15.0
@@ -457,9 +473,16 @@ def test_user_cant_edit_to_occupied_slot(
     storage = storage_factory(user=user, rows=2, columns=2)
     client.force_login(user)
     wine = wine_factory(user=user)
-    item = storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
+    vintage = wine.latest_vintage
+    item = storage_item_factory(
+        storage=storage, vintage=vintage, row=1, column=1, user=user
+    )
     storage_item_factory(
-        storage=storage, wine=wine_factory(user=user), row=2, column=1, user=user
+        storage=storage,
+        vintage=wine_factory(user=user).latest_vintage,
+        row=2,
+        column=1,
+        user=user,
     )
     data = {
         "storage": storage.pk,
@@ -482,10 +505,10 @@ def test_stock_swap_success(
     wine1 = wine_factory(user=user)
     wine2 = wine_factory(user=user)
     item1 = storage_item_factory(
-        storage=storage, wine=wine1, row=1, column=1, user=user
+        storage=storage, vintage=wine1.latest_vintage, row=1, column=1, user=user
     )
     item2 = storage_item_factory(
-        storage=storage, wine=wine2, row=1, column=2, user=user
+        storage=storage, vintage=wine2.latest_vintage, row=1, column=2, user=user
     )
     data = {"item1": item1.pk, "item2": item2.pk}
     r = client.post(reverse("stock-swap"), data=data)
@@ -508,11 +531,12 @@ def test_stock_swap_cross_storage_rejected(
     storage1 = storage_factory(user=user, rows=2, columns=2)
     storage2 = storage_factory(user=user, rows=2, columns=2)
     wine = wine_factory(user=user)
+    vintage = wine.latest_vintage
     item1 = storage_item_factory(
-        storage=storage1, wine=wine, row=1, column=1, user=user
+        storage=storage1, vintage=vintage, row=1, column=1, user=user
     )
     item2 = storage_item_factory(
-        storage=storage2, wine=wine, row=2, column=2, user=user
+        storage=storage2, vintage=vintage, row=2, column=2, user=user
     )
     data = {"item1": item1.pk, "item2": item2.pk}
     r = client.post(reverse("stock-swap"), data=data)
@@ -528,11 +552,20 @@ def test_stock_swap_chain_shift_forward(
     client.force_login(user)
     storage = storage_factory(user=user, rows=2, columns=4)
     wine = wine_factory(user=user)
+    vintage = wine.latest_vintage
     # A@(1,1)  B@(1,2)  C@(1,3)  D@(1,4)
-    a = storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
-    b = storage_item_factory(storage=storage, wine=wine, row=1, column=2, user=user)
-    c = storage_item_factory(storage=storage, wine=wine, row=1, column=3, user=user)
-    d = storage_item_factory(storage=storage, wine=wine, row=1, column=4, user=user)
+    a = storage_item_factory(
+        storage=storage, vintage=vintage, row=1, column=1, user=user
+    )
+    b = storage_item_factory(
+        storage=storage, vintage=vintage, row=1, column=2, user=user
+    )
+    c = storage_item_factory(
+        storage=storage, vintage=vintage, row=1, column=3, user=user
+    )
+    d = storage_item_factory(
+        storage=storage, vintage=vintage, row=1, column=4, user=user
+    )
     # Move A from (1,1) to (1,4): B,C,D shift backward to fill gap
     r = client.post(
         reverse("stock-swap"),
@@ -557,11 +590,20 @@ def test_stock_swap_chain_shift_backward(
     client.force_login(user)
     storage = storage_factory(user=user, rows=1, columns=4)
     wine = wine_factory(user=user)
+    vintage = wine.latest_vintage
     # A@(1,1)  B@(1,2)  C@(1,3)  D@(1,4)
-    a = storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
-    b = storage_item_factory(storage=storage, wine=wine, row=1, column=2, user=user)
-    c = storage_item_factory(storage=storage, wine=wine, row=1, column=3, user=user)
-    d = storage_item_factory(storage=storage, wine=wine, row=1, column=4, user=user)
+    a = storage_item_factory(
+        storage=storage, vintage=vintage, row=1, column=1, user=user
+    )
+    b = storage_item_factory(
+        storage=storage, vintage=vintage, row=1, column=2, user=user
+    )
+    c = storage_item_factory(
+        storage=storage, vintage=vintage, row=1, column=3, user=user
+    )
+    d = storage_item_factory(
+        storage=storage, vintage=vintage, row=1, column=4, user=user
+    )
     # Move D from (1,4) to (1,1): A,B,C shift forward to fill gap at (1,4)
     r = client.post(
         reverse("stock-swap"),
@@ -586,7 +628,10 @@ def test_stock_move_to_empty_slot(
     client.force_login(user)
     storage = storage_factory(user=user, rows=1, columns=3)
     wine = wine_factory(user=user)
-    item = storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
+    vintage = wine.latest_vintage
+    item = storage_item_factory(
+        storage=storage, vintage=vintage, row=1, column=1, user=user
+    )
     data = {
         "item1": item.pk,
         "storage": storage.pk,
@@ -609,7 +654,10 @@ def test_stock_move_to_empty_slot_cross_storage_rejected(
     storage1 = storage_factory(user=user, rows=1, columns=3)
     storage2 = storage_factory(user=user, rows=1, columns=3)
     wine = wine_factory(user=user)
-    item = storage_item_factory(storage=storage1, wine=wine, row=1, column=1, user=user)
+    vintage = wine.latest_vintage
+    item = storage_item_factory(
+        storage=storage1, vintage=vintage, row=1, column=1, user=user
+    )
     data = {
         "item1": item.pk,
         "storage": storage2.pk,
@@ -628,8 +676,11 @@ def test_stock_move_to_occupied_slot_rejected(
     client.force_login(user)
     storage = storage_factory(user=user, rows=1, columns=2)
     wine = wine_factory(user=user)
-    item1 = storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
-    storage_item_factory(storage=storage, wine=wine, row=1, column=2, user=user)
+    vintage = wine.latest_vintage
+    item1 = storage_item_factory(
+        storage=storage, vintage=vintage, row=1, column=1, user=user
+    )
+    storage_item_factory(storage=storage, vintage=vintage, row=1, column=2, user=user)
     data = {
         "item1": item1.pk,
         "storage": storage.pk,
@@ -658,11 +709,12 @@ def test_stock_swap_other_user(
     client.force_login(user)
     storage = storage_factory(user=other, rows=2, columns=2)
     wine = wine_factory(user=other)
+    vintage = wine.latest_vintage
     item1 = storage_item_factory(
-        storage=storage, wine=wine, row=1, column=1, user=other
+        storage=storage, vintage=vintage, row=1, column=1, user=other
     )
     item2 = storage_item_factory(
-        storage=storage, wine=wine, row=1, column=2, user=other
+        storage=storage, vintage=vintage, row=1, column=2, user=other
     )
     data = {"item1": item1.pk, "item2": item2.pk}
     r = client.post(reverse("stock-swap"), data=data)
@@ -676,10 +728,13 @@ def test_stock_swap_deleted_item(
     client.force_login(user)
     storage = storage_factory(user=user, rows=2, columns=2)
     wine = wine_factory(user=user)
+    vintage = wine.latest_vintage
     item1 = storage_item_factory(
-        storage=storage, wine=wine, row=1, column=1, user=user, deleted=True
+        storage=storage, vintage=vintage, row=1, column=1, user=user, deleted=True
     )
-    item2 = storage_item_factory(storage=storage, wine=wine, row=1, column=2, user=user)
+    item2 = storage_item_factory(
+        storage=storage, vintage=vintage, row=1, column=2, user=user
+    )
     data = {"item1": item1.pk, "item2": item2.pk}
     r = client.post(reverse("stock-swap"), data=data)
     assert r.status_code == HTTPStatus.NOT_FOUND
@@ -703,7 +758,10 @@ def test_user_cant_edit_to_other_users_storage(
     storage = storage_factory(user=user, rows=2, columns=2)
     client.force_login(user)
     wine = wine_factory(user=user)
-    item = storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
+    vintage = wine.latest_vintage
+    item = storage_item_factory(
+        storage=storage, vintage=vintage, row=1, column=1, user=user
+    )
     data = {
         "storage": other_storage.pk,
     }

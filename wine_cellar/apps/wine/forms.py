@@ -198,17 +198,16 @@ class WineForm(TomSelectMixin, WineFormPostCleanMixin, forms.Form):
             self.set_tom_config(name=name, items=items, **config)
 
     def _init_existing_images(self):
+        vintage_id = self.initial.get("vintage_id")
 
-        wine_id = self.initial.get("id")
-
-        if not wine_id:
+        if not vintage_id:
             return
 
         for field_name, image_type in image_fields_map.items():
 
             image = (
                 WineImage.objects.filter(
-                    wine=wine_id,
+                    vintage=vintage_id,
                     image_type=image_type,
                 )
                 .order_by("-id")
@@ -276,6 +275,18 @@ class WineForm(TomSelectMixin, WineFormPostCleanMixin, forms.Form):
             "Please enter the volume of bottle or box ect. in liters, e.g. 0.75."
         ),
     )
+    year = forms.IntegerField(
+        required=False,
+        validators=[
+            validators.MinValueValidator(1900),
+            validators.MaxValueValidator(datetime.now().year),
+        ],
+        label=_("Vintage Year"),
+        help_text=_(
+            "Enter the year the grapes were harvested to produce the wine. Typically,"
+            " vintage years are prominently displayed on wine labels."
+        ),
+    )
     abv = forms.FloatField(
         required=False,
         validators=[
@@ -295,17 +306,6 @@ class WineForm(TomSelectMixin, WineFormPostCleanMixin, forms.Form):
                 "inputmode": "decimal",
                 "pattern": r"\d+(\.\d+)?",
             }
-        ),
-    )
-    vintage = forms.IntegerField(
-        required=False,
-        validators=[
-            validators.MinValueValidator(1900),
-            validators.MaxValueValidator(datetime.now().year),
-        ],
-        help_text=_(
-            "Enter the year the grapes were harvested to produce the wine. Typically,"
-            " vintage years are prominently displayed on wine labels."
         ),
     )
     grapes = OpenMultipleChoiceField(
@@ -435,6 +435,124 @@ class WineFilterForm(TomSelectMixin, WineFormPostCleanMixin, forms.Form):
         self.set_tom_config(
             name="country", create=False, max_options=-1, placeholder=""
         )
+
+
+class VintageForm(TomSelectMixin, forms.Form):
+
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if user:
+            self._set_currency_help(user)
+        self._init_existing_images()
+
+    def _set_currency_help(self, user):
+        settings_obj = get_user_settings(user)
+        self.fields["price"].help_text = _(
+            "Enter the price of the bottle in %(currency)s."
+        ) % {"currency": settings.CURRENCY_SYMBOLS[settings_obj.currency]}
+
+    def _init_existing_images(self):
+        vintage_id = self.initial.get("vintage_id")
+        if not vintage_id:
+            return
+        for field_name, image_type in image_fields_map.items():
+            image = (
+                WineImage.objects.filter(vintage=vintage_id, image_type=image_type)
+                .order_by("-id")
+                .first()
+            )
+            if image:
+                self.initial[field_name] = image.thumbnail
+                self.fields[field_name].widget.attrs[
+                    "data-existing-url"
+                ] = image.thumbnail.url
+
+    year = forms.IntegerField(
+        required=False,
+        validators=[
+            validators.MinValueValidator(1900),
+            validators.MaxValueValidator(datetime.now().year),
+        ],
+        label=_("Vintage Year"),
+        help_text=_("Enter the year the grapes were harvested to produce the wine."),
+    )
+    abv = forms.FloatField(
+        required=False,
+        validators=[
+            validators.MinValueValidator(0.0),
+            validators.MaxValueValidator(100.0),
+        ],
+        help_text=_("Please enter the percentage of alcohol in the wine."),
+        localize=True,
+        widget=forms.NumberInput(
+            attrs={
+                "step": "0.1",
+                "inputmode": "decimal",
+                "pattern": r"\d+(\.\d+)?",
+            }
+        ),
+    )
+    barcode = forms.CharField(
+        max_length=100,
+        required=False,
+        help_text=_(
+            "Enter the barcode number of the wine as indicated"
+            " on the label or scan using the button below."
+        ),
+    )
+    price = forms.DecimalField(
+        required=False,
+        max_digits=6,
+        decimal_places=2,
+        localize=True,
+        widget=forms.NumberInput(
+            attrs={
+                "step": "0.01",
+                "inputmode": "decimal",
+                "pattern": r"\d+(\.\d+)?",
+            }
+        ),
+    )
+    drink_by = DateField(
+        required=False,
+        help_text=_("Select the date this wine should be drunk by."),
+        widget=forms.DateInput(format="%Y-%m-%d", attrs={"type": "date"}),
+        localize=True,
+    )
+    rating = forms.IntegerField(
+        required=False,
+        validators=[MinValueValidator(0), MaxValueValidator(10)],
+        help_text=_("Rate this wine on a scale from 0 to 10."),
+    )
+    comment = forms.CharField(
+        max_length=250,
+        required=False,
+        widget=forms.Textarea,
+        help_text=_(
+            "Share your thoughts, tasting experiences, or any anecdotes"
+            " related to this wine."
+        ),
+    )
+    image_front = ImageField(
+        widget=NoFilenameClearableFileInput(attrs={"accept": "image/*"}),
+        required=False,
+        help_text=_("Upload a photo of the front of the wine bottle."),
+    )
+    image_back = ImageField(
+        widget=NoFilenameClearableFileInput(attrs={"accept": "image/*"}),
+        required=False,
+        help_text=_("Upload a photo of the back of the wine bottle."),
+    )
+    image_front_label = ImageField(
+        widget=NoFilenameClearableFileInput(attrs={"accept": "image/*"}),
+        required=False,
+        help_text=_("Upload a photo of the front of the bottle label."),
+    )
+    image_back_label = ImageField(
+        widget=NoFilenameClearableFileInput(attrs={"accept": "image/*"}),
+        required=False,
+        help_text=_("Upload a photo of the back of the bottle label."),
+    )
 
 
 class WineUploadAIForm(forms.Form):

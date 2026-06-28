@@ -77,9 +77,9 @@ class WineAiSerializer:
         if ai_json.get("name"):
             initial["name"] = ai_json["name"]
 
-        vintage = ai_json.get("vintage")
-        if isinstance(vintage, int) and 1900 <= vintage <= 2100:
-            initial["vintage"] = vintage
+        year = ai_json.get("vintage")
+        if isinstance(year, int) and 1900 <= year <= 2100:
+            initial["year"] = year
 
         try:
             abv = float(ai_json.get("abs"))

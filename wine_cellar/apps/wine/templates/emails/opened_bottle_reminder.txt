@@ -5,7 +5,7 @@ Hello {{ user }},
 this is a reminder that you have opened bottle(s) that should be finished soon:
 {% endblocktranslate %}
 {% for item in items %}
-{{ item.wine.name }}: {% translate "finish by" %} {{ item.drink_by }}
+{{ item.vintage.wine.name }}: {% translate "finish by" %} {{ item.drink_by }}
 {% endfor %}
 
 {% blocktranslate%}You can find your cellar here:{% endblocktranslate %} {% get_setting "SITE_URL" %}

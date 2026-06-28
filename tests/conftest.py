@@ -17,12 +17,14 @@ from wine_cellar.apps.wine.tests.factories import (
     SizeFactory,
     SourceFactory,
     VineyardFactory,
+    VintageFactory,
     WineFactory,
     WineImageFactory,
 )
 
 register(UserFactory)
 register(WineFactory)
+register(VintageFactory)
 register(GrapeFactory)
 register(WineImageFactory)
 register(VineyardFactory)

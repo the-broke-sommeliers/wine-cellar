@@ -181,29 +181,12 @@ class Source(UserContentModel):
 class Wine(UserContentModel):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=100)
-    barcode = models.CharField(max_length=100, null=True)
     wine_type = models.CharField(max_length=2, choices=WineType)
     category = models.CharField(max_length=2, choices=Category, null=True)
     grapes = models.ManyToManyField(Grape)
     attributes = models.ManyToManyField(Attribute)
     food_pairings = models.ManyToManyField(FoodPairing)
-    abv = models.FloatField(null=True, blank=True)
     size = models.ForeignKey(Size, on_delete=models.SET_NULL, null=True)
-    vintage = models.PositiveIntegerField(
-        validators=[MinValueValidator(1900)],
-        null=True,
-    )
-    drink_by = models.DateField(blank=True, null=True)
-    comment = models.CharField(max_length=250, blank=True)
-
-    @property
-    def drink_by_warning_date(self):
-        return date.today() + timedelta(days=30)
-
-    rating = models.PositiveIntegerField(
-        null=True,
-        validators=[MinValueValidator(0), MaxValueValidator(10)],
-    )
     country = models.CharField(
         max_length=3,
         choices={country.alpha_2: country.name for country in pycountry.countries},
@@ -213,7 +196,6 @@ class Wine(UserContentModel):
     location = models.JSONField(max_length=500, null=True, blank=True)
     vineyard = models.ManyToManyField(Vineyard)
     source = models.ManyToManyField(Source)
-    price = models.DecimalField(max_digits=6, decimal_places=2, null=True)
 
     def get_absolute_url(self):
         return reverse("wine-detail", kwargs={"pk": self.pk})
@@ -235,6 +217,106 @@ class Wine(UserContentModel):
         return "\n".join([str(attribute) for attribute in self.attributes.all()])
 
     @property
+    def get_food_pairings(self):
+        return "\n".join([str(pairing) for pairing in self.food_pairings.all()])
+
+    @property
+    def get_type(self):
+        return WineType(self.wine_type).label
+
+    @property
+    def get_category(self):
+        if self.category:
+            return Category(self.category).label
+
+    @property
+    def latest_vintage(self):
+        return self.vintages.order_by("-year").first()
+
+    @property
+    def image(self):
+        v = self.latest_vintage
+        if v:
+            return v.image
+        return static("images/bottle.svg")
+
+    @property
+    def image_thumbnail(self):
+        v = self.latest_vintage
+        if v:
+            return v.image_thumbnail
+        return static("images/bottle.svg")
+
+    @property
+    def image_thumbnails(self):
+        v = self.latest_vintage
+        if v:
+            return v.image_thumbnails
+        return []
+
+    @property
+    def total_stock(self):
+        from wine_cellar.apps.storage.models import StorageItem
+
+        return StorageItem.objects.filter(vintage__wine=self, deleted=False).count()
+
+    @property
+    def get_stock(self):
+        from wine_cellar.apps.storage.models import StorageItem
+
+        return StorageItem.objects.filter(vintage__wine=self, deleted=False).order_by(
+            "storage", "row", "column"
+        )
+
+    @property
+    def country_name(self):
+        return pycountry.countries.get(alpha_2=self.country).name
+
+    @property
+    def country_icon(self):
+        return pycountry.countries.get(alpha_2=self.country).flag
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=[
+                    "name",
+                    "wine_type",
+                    "size",
+                    "country",
+                    "user",
+                ],
+                name="unique wine",
+            )
+        ]
+
+
+class Vintage(UserContentModel):
+    wine = models.ForeignKey(Wine, on_delete=models.CASCADE, related_name="vintages")
+    year = models.PositiveIntegerField(
+        validators=[MinValueValidator(1900)],
+        null=True,
+        blank=True,
+    )
+    abv = models.FloatField(null=True, blank=True)
+    barcode = models.CharField(max_length=100, null=True, blank=True)
+    price = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    drink_by = models.DateField(blank=True, null=True)
+    comment = models.CharField(max_length=250, blank=True)
+    rating = models.PositiveIntegerField(
+        null=True,
+        validators=[MinValueValidator(0), MaxValueValidator(10)],
+    )
+
+    def __str__(self):
+        year = self.year or _("N/V")
+        return f"{self.wine.name} {year}"
+
+    @property
+    def drink_by_warning_date(self):
+        return date.today() + timedelta(days=30)
+
+    @property
     def get_price_with_currency(self):
         user_settings = get_user_settings(self.user)
         currency = settings.CURRENCY_SYMBOLS.get(
@@ -252,35 +334,11 @@ class Wine(UserContentModel):
         avg_price = self.storageitem_set.aggregate(avg_price=models.Avg("price"))[
             "avg_price"
         ]
-
         if avg_price is None:
             return None
         avg_price = avg_price.quantize(Decimal("0.00"))
         formatted_price = number_format(avg_price, use_l10n=True)
         return f"{formatted_price}{currency}"
-
-    @property
-    def get_food_pairings(self):
-        return "\n".join([str(pairing) for pairing in self.food_pairings.all()])
-
-    @property
-    def get_type(self):
-        return WineType(self.wine_type).label
-
-    @property
-    def get_category(self):
-        if self.category:
-            return Category(self.category).label
-
-    @property
-    def total_stock(self):
-        return self.storageitem_set.filter(deleted=False).count()
-
-    @property
-    def get_stock(self):
-        return self.storageitem_set.filter(deleted=False).order_by(
-            "storage", "row", "column"
-        )
 
     @property
     def image(self):
@@ -297,7 +355,6 @@ class Wine(UserContentModel):
         front = i.first()
         if front.thumbnail:
             return front.thumbnail.url
-        # return normal image as fallback
         return front.image.url
 
     @property
@@ -317,27 +374,11 @@ class Wine(UserContentModel):
                 result.append(src)
         return result
 
-    @property
-    def country_name(self):
-        return pycountry.countries.get(alpha_2=self.country).name
-
-    @property
-    def country_icon(self):
-        return pycountry.countries.get(alpha_2=self.country).flag
-
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=[
-                    "name",
-                    "wine_type",
-                    "abv",
-                    "size",
-                    "vintage",
-                    "country",
-                    "user",
-                ],
-                name="unique wine",
+                fields=["wine", "year", "user"],
+                name="unique vintage",
             )
         ]
 
@@ -345,7 +386,7 @@ class Wine(UserContentModel):
 class WineImage(models.Model):
     image = models.ImageField(upload_to=user_directory_path)
     thumbnail = models.ImageField(upload_to=user_directory_path, blank=True, null=True)
-    wine = models.ForeignKey(Wine, on_delete=models.CASCADE)
+    vintage = models.ForeignKey(Vintage, on_delete=models.CASCADE)
     user = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True)
     image_type = models.CharField(
         max_length=3, choices=ImageType, default=ImageType.FRONT

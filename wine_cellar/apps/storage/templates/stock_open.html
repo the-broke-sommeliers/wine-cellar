@@ -19,7 +19,7 @@
                     </ul>
                 {% endif %}
                 <ul class="wine-card__list stock-open__card">
-                    {% include 'wine_card.html' with wine=storage_item.wine %}
+                    {% include 'wine_card.html' with wine=storage_item.vintage.wine %}
                 </ul>
                 <div class="form__fields">
                     {% include 'forms/form_field.html' with field=form.drink_in_days %}
@@ -32,7 +32,7 @@
                                 <a href="{% url 'storage-detail' storage_item.storage.pk %}"
                                    class="pure-button button__neutral">{% translate "Cancel" %}</a>
                             {% else %}
-                                <a href="{% url 'wine-detail' storage_item.wine.pk %}"
+                                <a href="{% url 'wine-detail' storage_item.vintage.wine.pk %}"
                                    class="pure-button button__neutral">{% translate "Cancel" %}</a>
                             {% endif %}
                         </div>

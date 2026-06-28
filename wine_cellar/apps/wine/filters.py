@@ -40,15 +40,16 @@ class WineFilter(django_filters.FilterSet):
         empty_label=None,
         null_label=None,
     )
+    vintage = django_filters.NumberFilter(
+        field_name="vintages__year",
+        label=_("Vintage"),
+    )
     order = NullsLastOrderingFilter(
         choices=(
             ("-created", _("Recently Added")),
             ("created", _("Least Recently Added")),
             ("-name", _("Name Descending")),
             ("name", _("Name Ascending")),
-            ("-vintage", _("Youngest First")),
-            ("vintage", _("Oldest First")),
-            ("drink_by", _("Drink By")),
             ("-effective_price", _("Highest Price (Avg)")),
             ("effective_price", _("Lowest Price (Avg)")),
         ),
@@ -60,7 +61,8 @@ class WineFilter(django_filters.FilterSet):
     def filter_stock(self, queryset, name, value):
         if value == "1":
             return queryset.filter(
-                storageitem__isnull=False, storageitem__deleted=False
+                vintages__storageitem__isnull=False,
+                vintages__storageitem__deleted=False,
             ).distinct()
         else:
             return queryset

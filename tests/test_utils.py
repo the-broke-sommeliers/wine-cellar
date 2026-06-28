@@ -17,7 +17,7 @@ def test_wine_to_json_none(wine_factory, geojson_point):
         "country_name": "Germany",
         "country_icon": "🇩🇪",
         "image": wine.image_thumbnail,
-        "vintage": wine.vintage,
+        "vintage": wine.latest_vintage.year if wine.latest_vintage else None,
         "location": geojson_point,
         "url": wine.get_absolute_url(),
     }
@@ -57,7 +57,7 @@ def test_get_map_attributes_with_wine(wine_factory, geojson_point):
                 "country_name": "Germany",
                 "country_icon": "🇩🇪",
                 "image": wine.image_thumbnail,
-                "vintage": wine.vintage,
+                "vintage": wine.latest_vintage.year if wine.latest_vintage else None,
                 "location": geojson_point,
                 "url": wine.get_absolute_url(),
             }

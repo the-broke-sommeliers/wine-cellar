@@ -28,7 +28,7 @@
                             {% for item in storage_items %}
                                 <tr>
                                     <td>
-                                        <a href="{% url 'wine-detail' item.wine.pk %}">{{ item.wine.name }}</a>
+                                        <a href="{% url 'wine-detail' item.vintage.wine.pk %}">{{ item.vintage.wine.name }}</a>
                                     </td>
                                     <td>{{ item.storage.name }}</td>
                                     <td>{{ item.row|default_if_none:"—" }}</td>

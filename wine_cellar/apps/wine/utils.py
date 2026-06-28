@@ -62,7 +62,7 @@ def wine_to_json(wine: Wine) -> dict:
         "country_name": wine.country_name,
         "country_icon": wine.country_icon,
         "image": wine.image_thumbnail,
-        "vintage": wine.vintage,
+        "vintage": wine.latest_vintage.year if wine.latest_vintage else None,
         "location": wine.location,
         "url": wine.get_absolute_url(),
     }
