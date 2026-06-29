@@ -712,3 +712,78 @@ def test_user_cant_edit_to_other_users_storage(
     )
     assert r.status_code == HTTPStatus.OK
     assert r.context["form"].errors
+
+
+# ---------------------------------------------------------------------------
+# StorageListView
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_storage_list_view(client, user):
+    client.force_login(user)
+    r = client.get(reverse("storage-list"))
+    assert r.status_code == HTTPStatus.OK
+    assertTemplateUsed(response=r, template_name="storage_list.html")
+
+
+@pytest.mark.django_db
+def test_storage_list_unauthenticated(client, user):
+    r = client.get(reverse("storage-list"), follow=True)
+    assert r.status_code == HTTPStatus.OK
+    assertRedirects(
+        response=r,
+        expected_url=reverse("account_login") + "?next=" + reverse("storage-list"),
+    )
+
+
+# ---------------------------------------------------------------------------
+# StorageDetailView
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_storage_detail_view(client, user, wine_factory, storage_item_factory):
+    storage = Storage.objects.filter(user=user).first()
+    wine = wine_factory(user=user)
+    storage_item_factory(storage=storage, wine=wine)
+    client.force_login(user)
+    r = client.get(reverse("storage-detail", kwargs={"pk": storage.pk}))
+    assert r.status_code == HTTPStatus.OK
+    assertTemplateUsed(response=r, template_name="storage_detail.html")
+
+
+@pytest.mark.django_db
+def test_storage_detail_other_user_returns_404(
+    client, user, user_factory, storage_factory
+):
+    other_user = user_factory()
+    other_storage = Storage.objects.filter(user=other_user).first()
+    client.force_login(user)
+    r = client.get(reverse("storage-detail", kwargs={"pk": other_storage.pk}))
+    assert r.status_code == HTTPStatus.NOT_FOUND
+
+
+# ---------------------------------------------------------------------------
+# Stock add with price
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_user_can_add_stock_with_price(client, user, wine_factory):
+    from decimal import Decimal
+
+    client.force_login(user)
+    storage = Storage.objects.filter(user=user).first()
+    wine = wine_factory(user=user)
+    data = {
+        "storage": storage.pk,
+        "price": "12.50",
+    }
+    r = client.post(
+        reverse("stock-add", kwargs={"pk": wine.pk}), data=data, follow=True
+    )
+    assert r.status_code == HTTPStatus.OK
+    item = StorageItem.objects.filter(wine=wine).first()
+    assert item is not None
+    assert item.price == Decimal("12.50")

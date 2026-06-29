@@ -86,3 +86,7 @@ def test_latlong_to_point(geojson_point_dict):
     long = geojson_point_dict["geometry"]["coordinates"][0]
     lat = geojson_point_dict["geometry"]["coordinates"][1]
     assert lat_long_to_geojson(str(lat) + "," + str(long)) == geojson_point_dict
+
+
+def test_wine_to_json_none_returns_none():
+    assert wine_to_json(None) is None
