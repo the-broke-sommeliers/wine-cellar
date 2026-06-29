@@ -21,11 +21,11 @@ msgstr ""
 
 #: wine_cellar/assets/js/image_preview.ts:50
 msgid "Clear Image"
-msgstr ""
+msgstr "Effacer l'image"
 
 #: wine_cellar/assets/js/image_preview.ts:51
 msgid "Restore image"
-msgstr ""
+msgstr "Restaurer l'image"
 
 #: wine_cellar/react/maps/ItemPopup.tsx:5
 msgctxt "Singular"
@@ -54,11 +54,11 @@ msgstr ""
 
 #: wine_cellar/react/react_bar_code.tsx:12
 msgid "Scan Barcode"
-msgstr ""
+msgstr "Scanner le code-barre"
 
 #: wine_cellar/react/react_bar_code.tsx:13
 msgid "Close Scanner"
-msgstr ""
+msgstr "Fermer le scanner"
 
 #: wine_cellar/react/react_bar_code.tsx:71
 msgid "All"

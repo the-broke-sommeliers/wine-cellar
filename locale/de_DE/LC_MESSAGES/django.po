@@ -89,19 +89,19 @@ msgstr ""
 #: wine_cellar/apps/storage/forms.py:145
 #: wine_cellar/apps/storage/templates/storage_item_history.html:22
 msgid "Note"
-msgstr ""
+msgstr "Notiz"
 
 #: wine_cellar/apps/storage/forms.py:148
 msgid "Why are you opening this bottle? (e.g. birthday dinner)"
-msgstr ""
+msgstr "Warum öffnest du diese Flasche? (z. B. Geburtstagsessen)"
 
 #: wine_cellar/apps/storage/forms.py:151
 msgid "Drink Reminder"
-msgstr ""
+msgstr "Trinkerinnerung"
 
 #: wine_cellar/apps/storage/forms.py:155
 msgid "Send a reminder to drink the rest of this bottle by this many days."
-msgstr ""
+msgstr "Sende eine Erinnerung, den Rest dieser Flasche in so vielen Tagen zu trinken."
 
 #: wine_cellar/apps/storage/templates/stock_add.html:9
 #: wine_cellar/apps/storage/templates/stock_add.html:12
@@ -138,7 +138,7 @@ msgstr "Abbrechen"
 #: wine_cellar/apps/storage/templates/storage_detail.html:96
 #: wine_cellar/apps/wine/templates/wine_detail.html:229
 msgid "Undo Opening"
-msgstr ""
+msgstr "Öffnung rückgängig machen"
 
 #: wine_cellar/apps/storage/templates/stock_undo_open.html:17
 #, python-format
@@ -146,6 +146,8 @@ msgid ""
 "Mark \"%(name)s\" as sealed again? This will clear the drink reminder and "
 "opening note."
 msgstr ""
+"\"%(name)s\" wieder als versiegelt markieren? Damit werden die "
+"Trinkerinnerung und die Öffnungsnotiz gelöscht."
 
 #: wine_cellar/apps/storage/templates/storage_confirm_delete.html:4
 #: wine_cellar/apps/storage/templates/storage_confirm_delete.html:7
@@ -210,12 +212,12 @@ msgstr "Fach"
 #: wine_cellar/apps/wine/templates/wine_detail.html:219
 #: wine_cellar/apps/wine/templates/wine_detail.html:239
 msgid "Opened"
-msgstr ""
+msgstr "Geöffnet"
 
 #: wine_cellar/apps/storage/templates/storage_detail.html:94
 #: wine_cellar/apps/wine/templates/wine_detail.html:227
 msgid "Open"
-msgstr ""
+msgstr "Öffnen"
 
 #: wine_cellar/apps/storage/templates/storage_detail.html:111
 #: wine_cellar/apps/storage/templates/storage_item_history.html:53
@@ -233,7 +235,7 @@ msgid ""
 "Are you sure you want to take the bottle \"%(name)s\" out of "
 "\"%(storage)s\"? This will remove it from your cellar inventory."
 msgstr ""
-"Willst du die Flasche „%(name)s“ wirklich aus „%(storage)s“ nehmen? Dadurch "
+"Willst du die Flasche \"%(name)s\" wirklich aus \"%(storage)s\" nehmen? Dadurch "
 "wird sie aus deinem Kellerbestand entfernt."
 
 #: wine_cellar/apps/storage/templates/storage_item_history.html:4
@@ -242,15 +244,15 @@ msgstr "Bestandsverlauf"
 
 #: wine_cellar/apps/storage/templates/storage_item_history.html:23
 msgid "Status"
-msgstr ""
+msgstr "Status"
 
 #: wine_cellar/apps/storage/templates/storage_item_history.html:24
 msgid "Date"
-msgstr ""
+msgstr "Datum"
 
 #: wine_cellar/apps/storage/templates/storage_item_history.html:39
 msgid "Consumed"
-msgstr ""
+msgstr "Verbraucht"
 
 #: wine_cellar/apps/storage/templates/storage_item_history.html:41
 msgid "Removed"
@@ -874,35 +876,45 @@ msgstr "Hochladen"
 
 #: wine_cellar/apps/wine/views.py:211 wine_cellar/apps/wine/views.py:242
 msgid "A wine with these details already exists in your cellar."
-msgstr ""
+msgstr "Ein Wein mit diesen Daten existiert bereits in deinem Keller."
 
 #: wine_cellar/apps/wine/views.py:379
 msgid "AI request failed: invalid API key. Please check your configuration."
 msgstr ""
+"KI-Anfrage fehlgeschlagen: ungültiger API-Schlüssel. Bitte überprüfe deine "
+"Konfiguration."
 
 #: wine_cellar/apps/wine/views.py:388
 msgid ""
 "AI request failed: rate limit reached. Please wait a moment and try again."
 msgstr ""
+"KI-Anfrage fehlgeschlagen: Rate-Limit erreicht. Bitte warte einen Moment und "
+"versuche es erneut."
 
 #: wine_cellar/apps/wine/views.py:401
 msgid ""
 "AI service is temporarily unavailable. Please try again in a few minutes."
 msgstr ""
+"KI-Dienst vorübergehend nicht verfügbar. Bitte versuche es in einigen Minuten "
+"erneut."
 
 #: wine_cellar/apps/wine/views.py:409
 msgid "AI request timed out. Please try again."
-msgstr ""
+msgstr "KI-Anfrage hat das Zeitlimit überschritten. Bitte versuche es erneut."
 
 #: wine_cellar/apps/wine/views.py:416
 msgid ""
 "Could not connect to the AI service. Please check your network and "
 "configuration."
 msgstr ""
+"Verbindung zum KI-Dienst fehlgeschlagen. Bitte überprüfe dein Netzwerk und "
+"deine Konfiguration."
 
 #: wine_cellar/apps/wine/views.py:424
 msgid "AI request failed. Please try again or check your configuration."
 msgstr ""
+"KI-Anfrage fehlgeschlagen. Bitte versuche es erneut oder überprüfe deine "
+"Konfiguration."
 
 #: wine_cellar/apps/wine/views.py:440
 msgid ""
