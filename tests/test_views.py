@@ -1,8 +1,12 @@
 import datetime
 import json
 from http import HTTPStatus
+from unittest.mock import MagicMock, patch
 
+import httpx
+import litellm.exceptions
 import pytest
+from django.test import override_settings
 from django.urls import reverse
 from pytest_django.asserts import (
     assertRedirects,
@@ -12,6 +16,12 @@ from pytest_django.asserts import (
 
 from tests.helpers import random_png
 from wine_cellar.apps.wine.models import ImageType, Size, Wine, WineImage
+
+
+def _make_litellm_exc(exc_cls, status=503):
+    req = httpx.Request("POST", "https://api.example.com/")
+    resp = httpx.Response(status, request=req)
+    return exc_cls("test error", llm_provider="test", model="test", response=resp)
 
 
 @pytest.mark.django_db
@@ -941,3 +951,329 @@ def test_wine_create_new_open_field_value_preserved_across_steps(client, user):
     assert form.data["form_step"] == 1
     tom_config = json.loads(form.fields["grapes"].widget.attrs["data-tom_config"])
     assert "Chardonnay" in tom_config.get("items", [])
+
+
+# ---------------------------------------------------------------------------
+# WineDetailView
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_wine_detail_authenticated(client, user, wine_factory):
+    wine = wine_factory(user=user)
+    client.force_login(user)
+    r = client.get(reverse("wine-detail", kwargs={"pk": wine.pk}))
+    assert r.status_code == HTTPStatus.OK
+    assertTemplateUsed(response=r, template_name="wine_detail.html")
+
+
+@pytest.mark.django_db
+def test_wine_detail_unauthenticated(client, user, wine_factory):
+    wine = wine_factory(user=user)
+    r = client.get(reverse("wine-detail", kwargs={"pk": wine.pk}), follow=True)
+    assert r.status_code == HTTPStatus.OK
+    assertRedirects(
+        response=r,
+        expected_url=reverse("account_login")
+        + "?next="
+        + reverse("wine-detail", kwargs={"pk": wine.pk}),
+    )
+
+
+@pytest.mark.django_db
+def test_wine_detail_other_user_returns_404(client, user, user_factory, wine_factory):
+    other_user = user_factory()
+    wine = wine_factory(user=other_user)
+    client.force_login(user)
+    r = client.get(reverse("wine-detail", kwargs={"pk": wine.pk}))
+    assert r.status_code == HTTPStatus.NOT_FOUND
+
+
+# ---------------------------------------------------------------------------
+# WineDeleteView
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_wine_delete(client, user, wine_factory):
+    wine = wine_factory(user=user)
+    client.force_login(user)
+    r = client.post(reverse("wine-delete", kwargs={"pk": wine.pk}), follow=True)
+    assert r.status_code == HTTPStatus.OK
+    assertRedirects(response=r, expected_url=reverse("wine-list"))
+    assert not Wine.objects.exists()
+
+
+@pytest.mark.django_db
+def test_wine_delete_other_user_returns_404(client, user, user_factory, wine_factory):
+    other_user = user_factory()
+    wine = wine_factory(user=other_user)
+    client.force_login(user)
+    r = client.post(reverse("wine-delete", kwargs={"pk": wine.pk}))
+    assert r.status_code == HTTPStatus.NOT_FOUND
+    assert Wine.objects.count() == 1
+
+
+# ---------------------------------------------------------------------------
+# WineChooseActionView
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_wine_choose_action_ai_disabled(client, user):
+    client.force_login(user)
+    r = client.get(reverse("wine-add-choose"))
+    assert r.status_code == HTTPStatus.OK
+    assert r.context_data["ai_enabled"] is False
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+def test_wine_choose_action_ai_enabled(client, user):
+    client.force_login(user)
+    r = client.get(reverse("wine-add-choose"))
+    assert r.status_code == HTTPStatus.OK
+    assert r.context_data["ai_enabled"] is True
+
+
+# ---------------------------------------------------------------------------
+# WineMapView
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_wine_map_view(client, user, wine_factory):
+    wine_factory(user=user)
+    client.force_login(user)
+    r = client.get(reverse("wine-map"))
+    assert r.status_code == HTTPStatus.OK
+    assertTemplateUsed(response=r, template_name="wine_map.html")
+
+
+# ---------------------------------------------------------------------------
+# WineUploadAIView
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_ai_upload_no_images_rejected(client, user):
+    client.force_login(user)
+    r = client.post(reverse("wine-ai-upload"), data={})
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["form"].errors
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("wine_cellar.apps.wine.views.completion")
+def test_ai_upload_success_redirects_to_create(mock_completion, client, user):
+    mock_resp = MagicMock()
+    mock_resp.choices[0].message.content = '{"name": "Test Wine", "country": "DE"}'
+    mock_completion.return_value = mock_resp
+    client.force_login(user)
+    r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
+    assert r.status_code == HTTPStatus.FOUND
+    assert reverse("wine-add") in r["Location"]
+    assert "ai_initial" in r["Location"]
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("wine_cellar.apps.wine.views.completion")
+def test_ai_upload_json_inside_markdown_block(mock_completion, client, user):
+    mock_resp = MagicMock()
+    mock_resp.choices[0].message.content = '```json\n{"name": "Test Wine"}\n```'
+    mock_completion.return_value = mock_resp
+    client.force_login(user)
+    r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
+    assert r.status_code == HTTPStatus.FOUND
+    assert "ai_initial" in r["Location"]
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("wine_cellar.apps.wine.views.completion")
+def test_ai_upload_invalid_json_shows_error(mock_completion, client, user):
+    mock_resp = MagicMock()
+    mock_resp.choices[0].message.content = "not valid json at all"
+    mock_completion.return_value = mock_resp
+    client.force_login(user)
+    r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["form"].non_field_errors()
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("wine_cellar.apps.wine.views.completion")
+def test_ai_upload_authentication_error(mock_completion, client, user):
+    mock_completion.side_effect = _make_litellm_exc(
+        litellm.exceptions.AuthenticationError, status=401
+    )
+    client.force_login(user)
+    r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["form"].non_field_errors()
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("wine_cellar.apps.wine.views.completion")
+def test_ai_upload_rate_limit_error(mock_completion, client, user):
+    mock_completion.side_effect = _make_litellm_exc(
+        litellm.exceptions.RateLimitError, status=429
+    )
+    client.force_login(user)
+    r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["form"].non_field_errors()
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("wine_cellar.apps.wine.views.completion")
+def test_ai_upload_service_unavailable_error(mock_completion, client, user):
+    mock_completion.side_effect = _make_litellm_exc(
+        litellm.exceptions.ServiceUnavailableError, status=503
+    )
+    client.force_login(user)
+    r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["form"].non_field_errors()
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("wine_cellar.apps.wine.views.completion")
+def test_ai_upload_timeout_error(mock_completion, client, user):
+    mock_completion.side_effect = litellm.exceptions.Timeout(
+        "timeout", model="test", llm_provider="test"
+    )
+    client.force_login(user)
+    r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["form"].non_field_errors()
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("wine_cellar.apps.wine.views.completion")
+def test_ai_upload_connection_error(mock_completion, client, user):
+    mock_completion.side_effect = litellm.exceptions.APIConnectionError(
+        "connection error", llm_provider="test", model="test"
+    )
+    client.force_login(user)
+    r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["form"].non_field_errors()
+
+
+# ---------------------------------------------------------------------------
+# WineFilter — additional filter fields
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_wine_filter_by_wine_type(client, user, wine_factory):
+    wine_red = wine_factory(user=user, wine_type="RE", name="Red Wine")
+    wine_white = wine_factory(user=user, wine_type="WH", name="White Wine")
+    client.force_login(user)
+    r = client.get(reverse("wine-list") + "?wine_type=RE")
+    assert r.status_code == HTTPStatus.OK
+    wines = list(r.context_data["wines"])
+    assert wine_red in wines
+    assert wine_white not in wines
+
+
+@pytest.mark.django_db
+def test_wine_filter_by_country(client, user, wine_factory):
+    wine_de = wine_factory(user=user, country="DE", name="German Wine")
+    wine_fr = wine_factory(user=user, country="FR", name="French Wine")
+    client.force_login(user)
+    r = client.get(reverse("wine-list") + "?country=DE")
+    assert r.status_code == HTTPStatus.OK
+    wines = list(r.context_data["wines"])
+    assert wine_de in wines
+    assert wine_fr not in wines
+
+
+@pytest.mark.django_db
+def test_wine_filter_by_name(client, user, wine_factory):
+    wine_merlot = wine_factory(user=user, name="Grand Merlot Reserve")
+    wine_other = wine_factory(user=user, name="Chardonnay")
+    client.force_login(user)
+    r = client.get(reverse("wine-list") + "?name=merlot")
+    assert r.status_code == HTTPStatus.OK
+    wines = list(r.context_data["wines"])
+    assert wine_merlot in wines
+    assert wine_other not in wines
+
+
+@pytest.mark.django_db
+def test_wine_filter_by_vintage(client, user, wine_factory):
+    wine_2020 = wine_factory(user=user, vintage=2020, name="Vintage 2020")
+    wine_2019 = wine_factory(user=user, vintage=2019, name="Vintage 2019")
+    client.force_login(user)
+    r = client.get(reverse("wine-list") + "?vintage=2020")
+    assert r.status_code == HTTPStatus.OK
+    wines = list(r.context_data["wines"])
+    assert wine_2020 in wines
+    assert wine_2019 not in wines
+
+
+@pytest.mark.django_db
+def test_wine_choose_action_with_barcode(client, user):
+    client.force_login(user)
+    r = client.get(reverse("wine-add-choose") + "?barcode=9780201633610")
+    assert r.status_code == HTTPStatus.OK
+    assert r.context_data["barcode"] == "9780201633610"
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("wine_cellar.apps.wine.views.completion")
+def test_ai_upload_back_image_only(mock_completion, client, user):
+    mock_resp = MagicMock()
+    mock_resp.choices[0].message.content = '{"name": "Test Wine"}'
+    mock_completion.return_value = mock_resp
+    client.force_login(user)
+    r = client.post(reverse("wine-ai-upload"), data={"back": random_png("back.png")})
+    assert r.status_code == HTTPStatus.FOUND
+    assert "ai_initial" in r["Location"]
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("wine_cellar.apps.wine.views.completion")
+def test_ai_upload_success_with_barcode_param(mock_completion, client, user):
+    mock_resp = MagicMock()
+    mock_resp.choices[0].message.content = '{"name": "Test Wine"}'
+    mock_completion.return_value = mock_resp
+    client.force_login(user)
+    url = reverse("wine-ai-upload") + "?barcode=12345"
+    r = client.post(url, data={"front": random_png("front.png")})
+    assert r.status_code == HTTPStatus.FOUND
+    assert "barcode=12345" in r["Location"]
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("wine_cellar.apps.wine.views.completion")
+def test_ai_upload_api_error(mock_completion, client, user):
+    mock_completion.side_effect = litellm.exceptions.APIError(
+        status_code=500, message="api error", llm_provider="test", model="test"
+    )
+    client.force_login(user)
+    r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["form"].non_field_errors()
+
+
+@pytest.mark.django_db
+def test_health_check(client):
+    r = client.get(reverse("health_check"))
+    assert r.status_code == HTTPStatus.OK
+    import json as _json
+
+    data = _json.loads(r.content)
+    assert data["status"] == "ok"
