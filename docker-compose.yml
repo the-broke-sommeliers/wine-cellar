@@ -31,7 +31,7 @@ services:
       - POSTGRES_PASSWORD=django_dev_password
       - POSTGRES_DB=django_dev
   redis:
-    image: redis:7-alpine@sha256:6ab0b6e7381779332f97b8ca76193e45b0756f38d4c0dcda72dbb3c32061ab99
+    image: redis:8-alpine@sha256:9d317178eceac8454a2284a9e6df2466b93c745529947f0cd42a0fa9609d7005
   celery:
     build: .
     command: celery -A wine_cellar.conf worker -l info
