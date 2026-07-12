@@ -1170,7 +1170,7 @@ wheels = [
 
 [[package]]
 name = "litellm"
-version = "1.90.2"
+version = "1.91.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -1186,9 +1186,9 @@ dependencies = [
     { name = "tiktoken" },
     { name = "tokenizers" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/88/00/4187e33818d0de19fd602214ce15a6e1cfa5bf04fb50a6e59606214a92df/litellm-1.90.2.tar.gz", hash = "sha256:b536603894ba2a0ccd14a6f1ebeb5f46cc35b19d4537e8fda7bfdfc7757f19d3", size = 14819154, upload-time = "2026-07-01T02:29:58.397Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/86/1e/90cfeada42170986a290feebaca0a90923b3c310cddeb0f8690abd239ad4/litellm-1.91.0.tar.gz", hash = "sha256:4fd469fe7356ba8fcc86f4efdf332e3426b760962ab12331fdaf1a01aeec065f", size = 14872290, upload-time = "2026-07-04T19:18:28.466Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/24/30/3afa7b212ce1f9bb8b6fa5f58c631f437c1d7b3a025e4e4ed6b01b3d28ad/litellm-1.90.2-py3-none-any.whl", hash = "sha256:6fb46f485150cc861be62a62d670f94d33adbd26991091befeb51bcdfdad34f6", size = 16612720, upload-time = "2026-07-01T02:29:55.215Z" },
+    { url = "https://files.pythonhosted.org/packages/a4/15/81fc2d162513803fe08b359c2e2a98f7a33195034fb94b005e263e272c6b/litellm-1.91.0-py3-none-any.whl", hash = "sha256:c3eb52dd2c6a5779e9efd67350f3640f9055d9c05d4b572fc1dd01a217e562ad", size = 16669331, upload-time = "2026-07-04T19:18:25.203Z" },
 ]
 
 [[package]]
@@ -2448,7 +2448,7 @@ requires-dist = [
     { name = "django-allauth", extras = ["socialaccount"], specifier = "==65.18.0" },
     { name = "django-filter", specifier = "==25.2" },
     { name = "django-widget-tweaks", specifier = "==1.5.1" },
-    { name = "litellm", specifier = "==1.90.2" },
+    { name = "litellm", specifier = "==1.91.0" },
     { name = "pillow", specifier = "==12.3.0" },
     { name = "pycountry", specifier = "==26.2.16" },
     { name = "requests", specifier = "==2.34.2" },
