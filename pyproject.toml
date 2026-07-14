@@ -15,7 +15,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 dependencies = [
-    "Django==6.0.6",
+    "Django==6.0.7",
     "celery==5.6.3",
     "django-allauth[socialaccount]==65.18.0",
     "django-filter==25.2",
