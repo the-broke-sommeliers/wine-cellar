@@ -41,7 +41,7 @@ dev = [
     "pytest-factoryboy==2.8.1",
     "pytest==9.1.1",
     "commitizen==4.16.4",
-    "zensical==0.0.46",
+    "zensical==0.0.50",
 ]
 prod = [
     "psycopg[c]==3.3.4",
