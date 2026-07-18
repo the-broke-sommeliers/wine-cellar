@@ -89,6 +89,14 @@
                         <legend>
                             <h2 class="form-subhead">{% translate "Image" %}</h2>
                         </legend>
+                        {% if ai_images_pending %}
+                            <p>
+                                {% blocktranslate trimmed %}
+                                    Photos from the AI upload will be used automatically for
+                                    front and back unless you choose different ones below.
+                                {% endblocktranslate %}
+                            </p>
+                        {% endif %}
                         <div class="form__fields">
                             {% include 'forms/form_field.html' with field=form.image_front %}
                             {% include 'forms/form_field.html' with field=form.image_back %}
@@ -97,6 +105,7 @@
                         </div>
                     </fieldset>
                     {{ form.form_step }}
+                    {{ form.ai_images_token }}
                     <div class="pure-controls">
                         <div class="form__buttons">
                             <div>

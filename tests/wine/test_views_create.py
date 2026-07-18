@@ -1,8 +1,10 @@
 import datetime
 import json
 from http import HTTPStatus
+from unittest.mock import MagicMock, patch
 
 import pytest
+from django.test import override_settings
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects, assertTemplateUsed
 
@@ -665,6 +667,94 @@ def test_wine_edit_replace_front_image(client, user, wine_factory, clear_image_f
     assertRedirects(
         response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
     )
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("wine_cellar.apps.wine.views.completion")
+def test_wine_create_uses_ai_uploaded_front_image(
+    mock_completion, client, user, clear_image_folder
+):
+    """Front image uploaded to the AI form should become the wine's front image
+    without having to be re-uploaded on the create form."""
+    mock_resp = MagicMock()
+    mock_resp.choices[0].message.content = '{"name": "AI Wine", "country": "DE"}'
+    mock_completion.return_value = mock_resp
+    client.force_login(user)
+
+    r = client.post(
+        reverse("wine-ai-upload"),
+        data={"front": random_png("ai_front.png"), "use_as_wine_images": "on"},
+    )
+    assert r.status_code == HTTPStatus.FOUND
+    assert "ai_images_token" in r["Location"]
+
+    r = client.get(r["Location"])
+    assert r.status_code == HTTPStatus.OK
+    initial = {k: v for k, v in r.context_data["form"].initial.items() if v is not None}
+    assert initial["ai_images_token"]
+
+    size = Size.objects.get(name=0.75)
+    initial.update(
+        {
+            "name": "AI Wine",
+            "wine_type": "RE",
+            "category": "DR",
+            "abv": 13.0,
+            "size": size.pk,
+            "vintage": 2002,
+            "country": "DE",
+            "form_step": 5,
+        }
+    )
+    r = client.post(reverse("wine-add"), data=initial, follow=True)
+    assert r.status_code == HTTPStatus.OK
+    assertRedirects(response=r, expected_url=reverse("wine-list"))
+    wine = Wine.objects.first()
+    assert WineImage.objects.filter(wine=wine, image_type=ImageType.FRONT).count() == 1
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("wine_cellar.apps.wine.views.completion")
+def test_wine_create_explicit_image_overrides_ai_stashed_image(
+    mock_completion, client, user, clear_image_folder
+):
+    """Manually selecting a front image on the create form should take
+    precedence over an image stashed from the AI upload step."""
+    mock_resp = MagicMock()
+    mock_resp.choices[0].message.content = '{"name": "AI Wine", "country": "DE"}'
+    mock_completion.return_value = mock_resp
+    client.force_login(user)
+
+    r = client.post(
+        reverse("wine-ai-upload"),
+        data={"front": random_png("ai_front.png"), "use_as_wine_images": "on"},
+    )
+    r = client.get(r["Location"])
+    initial = {k: v for k, v in r.context_data["form"].initial.items() if v is not None}
+
+    size = Size.objects.get(name=0.75)
+    initial.update(
+        {
+            "name": "AI Wine",
+            "wine_type": "RE",
+            "category": "DR",
+            "abv": 13.0,
+            "size": size.pk,
+            "vintage": 2002,
+            "country": "DE",
+            "form_step": 5,
+            "image_front": random_png("manual_front.png"),
+        }
+    )
+    r = client.post(reverse("wine-add"), data=initial, follow=True)
+    assert r.status_code == HTTPStatus.OK
+    wine = Wine.objects.first()
+    images = WineImage.objects.filter(wine=wine, image_type=ImageType.FRONT)
+    assert images.count() == 1
+    assert "manual_front" in images.first().image.name
+    assert "ai_front" not in images.first().image.name
 
 
 @pytest.mark.django_db

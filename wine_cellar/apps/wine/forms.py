@@ -430,6 +430,9 @@ class WineForm(TomSelectMixin, WineFormPostCleanMixin, forms.Form):
             validators.MaxValueValidator(5),
         ],
     )
+    ai_images_token = forms.CharField(
+        widget=forms.HiddenInput(), label="", required=False
+    )
 
 
 class WineFilterForm(TomSelectMixin, WineFormPostCleanMixin, forms.Form):
@@ -460,6 +463,15 @@ class WineUploadAIForm(forms.Form):
         widget=NoFilenameClearableFileInput(attrs={"accept": "image/*"}),
         required=False,
         help_text=_("Upload an image of the back label."),
+    )
+    use_as_wine_images = forms.BooleanField(
+        required=False,
+        initial=True,
+        label=_("Use these images as the wine's front and back photos"),
+        help_text=_(
+            "If checked, the images uploaded above will be attached to the "
+            "new wine as its front and back photos."
+        ),
     )
 
     def clean(self):
