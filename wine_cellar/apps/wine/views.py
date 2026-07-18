@@ -1,11 +1,13 @@
 import base64
 import json
+import uuid
 from decimal import Decimal
 
 import litellm
 import litellm.exceptions
 from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
+from django.core.files.base import ContentFile
 from django.db import IntegrityError, connections, transaction
 from django.db.models import Avg, F, Q, Sum
 from django.db.models.functions import Coalesce
@@ -190,10 +192,35 @@ class WineCreateView(WineBaseView):
             initial["barcode"] = barcode
         if b64 := self.request.GET.get("ai_initial"):
             initial.update(WineAiSerializer().deserialize_ai_payload(b64))
+        if token := self.request.GET.get("ai_images_token"):
+            initial["ai_images_token"] = token
         return initial
 
     def get_wine_instance(self):
         return Wine()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        token = self.request.POST.get("ai_images_token") or self.request.GET.get(
+            "ai_images_token"
+        )
+        context["ai_images_pending"] = bool(
+            token and self.request.session.get(f"ai_images_{token}")
+        )
+        return context
+
+    def _apply_ai_images(self, form, token):
+        images = self.request.session.get(f"ai_images_{token}", {})
+        field_map = {"front": "image_front", "back": "image_back"}
+        for key, form_field in field_map.items():
+            if form.cleaned_data.get(form_field):
+                continue
+            stashed = images.get(key)
+            if not stashed:
+                continue
+            form.cleaned_data[form_field] = ContentFile(
+                base64.b64decode(stashed["data"]), name=stashed["name"]
+            )
 
     def form_valid(self, form):
         form_step = form.cleaned_data.get("form_step", 5)
@@ -201,6 +228,9 @@ class WineCreateView(WineBaseView):
         if form_step is None:
             form_step = 5
         if form_step == 5 or "save_finish" in self.request.POST:
+            token = form.cleaned_data.get("ai_images_token")
+            if token:
+                self._apply_ai_images(form, token)
             try:
                 with transaction.atomic():
                     self.update_wine_from_cleaned_data(
@@ -211,6 +241,8 @@ class WineCreateView(WineBaseView):
                     None, _("A wine with these details already exists in your cellar.")
                 )
                 return super().form_invalid(form)
+            if token:
+                self.request.session.pop(f"ai_images_{token}", None)
             return super().form_valid(form)
         elif form_step < 5:
             form.data = form.data.copy()
@@ -445,6 +477,26 @@ class WineUploadAIView(FormView):
 
         b64_initial = WineAiSerializer().serialize_ai_payload(ai_json)
         create_url = reverse("wine-add") + f"?ai_initial={b64_initial}"
+
+        if form.cleaned_data.get("use_as_wine_images"):
+            images = {}
+            if front_img:
+                images["front"] = {
+                    "data": front_b64,
+                    "name": front_img.name,
+                    "content_type": front_img.content_type or "image/jpeg",
+                }
+            if back_img:
+                images["back"] = {
+                    "data": back_b64,
+                    "name": back_img.name,
+                    "content_type": back_img.content_type or "image/jpeg",
+                }
+            if images:
+                token = uuid.uuid4().hex
+                self.request.session[f"ai_images_{token}"] = images
+                create_url += f"&ai_images_token={token}"
+
         if barcode := self.request.GET.get("barcode"):
             create_url += f"&barcode={barcode}"
         return redirect(create_url)

@@ -184,6 +184,37 @@ def test_ai_upload_success_with_barcode_param(mock_completion, client, user):
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
 @patch("wine_cellar.apps.wine.views.completion")
+def test_ai_upload_use_as_wine_images_checked_stashes_token(
+    mock_completion, client, user
+):
+    mock_resp = MagicMock()
+    mock_resp.choices[0].message.content = '{"name": "Test Wine"}'
+    mock_completion.return_value = mock_resp
+    client.force_login(user)
+    r = client.post(
+        reverse("wine-ai-upload"),
+        data={"front": random_png("front.png"), "use_as_wine_images": "on"},
+    )
+    assert r.status_code == HTTPStatus.FOUND
+    assert "ai_images_token" in r["Location"]
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("wine_cellar.apps.wine.views.completion")
+def test_ai_upload_use_as_wine_images_unchecked_no_token(mock_completion, client, user):
+    mock_resp = MagicMock()
+    mock_resp.choices[0].message.content = '{"name": "Test Wine"}'
+    mock_completion.return_value = mock_resp
+    client.force_login(user)
+    r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
+    assert r.status_code == HTTPStatus.FOUND
+    assert "ai_images_token" not in r["Location"]
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("wine_cellar.apps.wine.views.completion")
 def test_ai_upload_api_error(mock_completion, client, user):
     mock_completion.side_effect = litellm.exceptions.APIError(
         status_code=500, message="api error", llm_provider="test", model="test"
