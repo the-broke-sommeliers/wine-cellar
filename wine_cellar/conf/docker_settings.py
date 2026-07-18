@@ -61,6 +61,11 @@ if SENTRY_DSN:
     sentry_sdk.init(
         dsn=SENTRY_DSN,
         release="wine-cellar@" + __version__,
+        send_default_pii=True,
+        max_request_body_size="always",
+        traces_sample_rate=0,
+        send_client_reports=False,
+        auto_session_tracking=False,
     )
 
 AI_MODEL = os.environ.get("AI_MODEL", "")
