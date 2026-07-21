@@ -18,7 +18,7 @@ dependencies = [
     "Django==6.0.7",
     "celery==5.6.3",
     "django-allauth[socialaccount]==65.18.0",
-    "django-filter==25.2",
+    "django-filter==26.1",
     "django-widget-tweaks==1.5.1",
     "litellm==1.92.0",
     "pillow==12.3.0",
