@@ -9,9 +9,9 @@
     "format": "biome format --write wine_cellar/assets wine_cellar/react"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "7.3.0",
-    "@fortawesome/fontawesome-svg-core": "7.3.0",
-    "@fortawesome/free-solid-svg-icons": "7.3.0",
+    "@fortawesome/fontawesome-free": "7.3.1",
+    "@fortawesome/fontawesome-svg-core": "7.3.1",
+    "@fortawesome/free-solid-svg-icons": "7.3.1",
     "@maplibre/maplibre-gl-leaflet": "0.1.3",
     "@turf/turf": "7.3.5",
     "barcode-detector": "3.2.1",
