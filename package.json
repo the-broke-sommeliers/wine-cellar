@@ -35,7 +35,7 @@
     "lint-staged": "17.2.0",
     "mini-css-extract-plugin": "2.10.2",
     "path-browserify": "1.0.1",
-    "postcss": "8.5.22",
+    "postcss": "8.5.23",
     "postcss-loader": "8.2.1",
     "sass": "1.101.7",
     "sass-loader": "17.0.0",
