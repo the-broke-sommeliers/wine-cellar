@@ -89,17 +89,29 @@
                         <legend>
                             <h2 class="form-subhead">{% translate "Image" %}</h2>
                         </legend>
-                        {% if ai_images_pending %}
-                            <p>
-                                {% blocktranslate trimmed %}
-                                    Photos from the AI upload will be used automatically for
-                                    front and back unless you choose different ones below.
-                                {% endblocktranslate %}
-                            </p>
-                        {% endif %}
                         <div class="form__fields">
-                            {% include 'forms/form_field.html' with field=form.image_front %}
-                            {% include 'forms/form_field.html' with field=form.image_back %}
+                            <div>
+                                {% include 'forms/form_field.html' with field=form.image_front %}
+                                {% if ai_image_front_name %}
+                                    <p class="form-hint">
+                                        <i class="fa-solid fa-robot"></i>
+                                        {% blocktranslate trimmed with name=ai_image_front_name %}
+                                            AI photo "{{ name }}" will be used
+                                        {% endblocktranslate %}
+                                    </p>
+                                {% endif %}
+                            </div>
+                            <div>
+                                {% include 'forms/form_field.html' with field=form.image_back %}
+                                {% if ai_image_back_name %}
+                                    <p class="form-hint">
+                                        <i class="fa-solid fa-robot"></i>
+                                        {% blocktranslate trimmed with name=ai_image_back_name %}
+                                            AI photo "{{ name }}" will be used
+                                        {% endblocktranslate %}
+                                    </p>
+                                {% endif %}
+                            </div>
                             {% include 'forms/form_field.html' with field=form.image_front_label %}
                             {% include 'forms/form_field.html' with field=form.image_back_label %}
                         </div>

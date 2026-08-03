@@ -204,8 +204,13 @@ class WineCreateView(WineBaseView):
         token = self.request.POST.get("ai_images_token") or self.request.GET.get(
             "ai_images_token"
         )
-        context["ai_images_pending"] = bool(
-            token and self.request.session.get(f"ai_images_{token}")
+        images = token and self.request.session.get(f"ai_images_{token}", {})
+        context["ai_images_pending"] = bool(images)
+        context["ai_image_front_name"] = (
+            images.get("front", {}).get("name") if images else None
+        )
+        context["ai_image_back_name"] = (
+            images.get("back", {}).get("name") if images else None
         )
         return context
 
