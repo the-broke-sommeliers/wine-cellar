@@ -37,6 +37,7 @@ from wine_cellar.apps.wine.models import (
     WineType,
 )
 from wine_cellar.apps.wine.serializers import WineAiSerializer
+from wine_cellar.apps.wine.utils import lat_long_to_geojson
 
 
 class HomePageView(TemplateView):
@@ -353,6 +354,15 @@ class WineMapView(TemplateView):
         return context
 
 
+def _parse_ai_json(ai_text: str) -> dict:
+    ai_text = ai_text.strip()
+    if ai_text.startswith("```"):
+        ai_text = ai_text.split("```")[1]
+    if ai_text.startswith("json"):
+        ai_text = ai_text[4:]
+    return json.loads(ai_text)
+
+
 class WineUploadAIView(FormView):
     template_name = "wine_upload_ai.html"
     form_class = WineUploadAIForm
@@ -385,6 +395,57 @@ class WineUploadAIView(FormView):
                 ai_enabled = True
         context.update({"ai_enabled": ai_enabled})
         return context
+
+    def _reprompt_location(self, ai_json):
+        context = {
+            field: ai_json[field]
+            for field in (
+                "name",
+                "country",
+                "region",
+                "appellation",
+                "vineyard",
+                "vintage",
+            )
+            if ai_json.get(field)
+        }
+        prompt = (
+            "Based on this wine information, provide its approximate origin "
+            "coordinates.\n"
+            f"Wine details: {json.dumps(context)}\n"
+            "Return JSON with a single field, location, formatted as "
+            '"latitude,longitude" in decimal degrees using a plain ASCII '
+            'hyphen-minus for negative values (e.g. "48.1374,-0.6603"). '
+            'If coordinates cannot be determined, return {"location": null}.'
+        )
+        try:
+            response = completion(
+                model=settings.AI_MODEL,
+                messages=[{"role": "user", "content": prompt}],
+                api_key=settings.AI_API_KEY,
+            )
+            reprompt_json = _parse_ai_json(response.choices[0].message.content)
+            new_location = reprompt_json.get("location")
+            if new_location:
+                lat_long_to_geojson(new_location)
+                return new_location
+        except (
+            litellm.exceptions.AuthenticationError,
+            litellm.exceptions.RateLimitError,
+            litellm.exceptions.ServiceUnavailableError,
+            litellm.exceptions.BadGatewayError,
+            litellm.exceptions.InternalServerError,
+            litellm.exceptions.Timeout,
+            litellm.exceptions.APIConnectionError,
+            litellm.exceptions.APIError,
+            json.JSONDecodeError,
+            TypeError,
+            ValueError,
+            AttributeError,
+            IndexError,
+        ):
+            pass
+        return None
 
     def form_valid(self, form):
         front_img = form.cleaned_data.get("front")
@@ -464,12 +525,7 @@ class WineUploadAIView(FormView):
         ai_text = response.choices[0].message.content.strip()
 
         try:
-            if ai_text.startswith("```"):
-                ai_text = ai_text.split("```")[1]
-            if ai_text.startswith("json"):
-                ai_text = ai_text[4:]
-
-            ai_json = json.loads(ai_text)
+            ai_json = _parse_ai_json(ai_text)
         except json.JSONDecodeError:
             form.add_error(
                 None,
@@ -479,6 +535,13 @@ class WineUploadAIView(FormView):
                 ),
             )
             return self.form_invalid(form)
+
+        location = ai_json.get("location")
+        if location:
+            try:
+                lat_long_to_geojson(location)
+            except (TypeError, ValueError):
+                ai_json["location"] = self._reprompt_location(ai_json)
 
         b64_initial = WineAiSerializer().serialize_ai_payload(ai_json)
         create_url = reverse("wine-add") + f"?ai_initial={b64_initial}"

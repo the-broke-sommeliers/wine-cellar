@@ -114,6 +114,24 @@ def test_serialize_ai_payload_with_location():
 
 
 @pytest.mark.django_db
+def test_serialize_ai_payload_with_unicode_minus_location():
+    serializer = WineAiSerializer()
+    ai_json = {"name": "Wine", "location": "48.1374,−0.6603"}
+    b64 = serializer.serialize_ai_payload(ai_json)
+    decoded = json.loads(base64.urlsafe_b64decode(b64).decode())
+    assert decoded["location"]["geometry"]["coordinates"] == [-0.6603, 48.1374]
+
+
+@pytest.mark.django_db
+def test_serialize_ai_payload_with_invalid_location_dropped():
+    serializer = WineAiSerializer()
+    ai_json = {"name": "Wine", "location": "999,999"}
+    b64 = serializer.serialize_ai_payload(ai_json)
+    decoded = json.loads(base64.urlsafe_b64decode(b64).decode())
+    assert "location" not in decoded
+
+
+@pytest.mark.django_db
 def test_serialize_relation_unknown_region_returns_new(region_factory):
     serializer = WineAiSerializer()
     region_factory(name="Bordeaux")

@@ -119,9 +119,10 @@ class WineAiSerializer:
                 initial["size"] = size_obj.id
 
         if ai_json.get("location"):
-            point = lat_long_to_geojson(ai_json["location"])
-            if point:
-                initial["location"] = point
+            try:
+                initial["location"] = lat_long_to_geojson(ai_json["location"])
+            except (TypeError, ValueError):
+                pass
 
         return base64.urlsafe_b64encode(
             json.dumps(initial, separators=(",", ":")).encode()
