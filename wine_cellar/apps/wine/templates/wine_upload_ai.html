@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 {% load static i18n %}
+{% load render_bundle from webpack_loader %}
 {% block extra_js %}
     {{ block.super }}
-    <script src="{% static 'image_preview.js' %}" type="module" defer></script>
+    {% render_bundle 'image_preview' 'js' attrs='type="module" defer' %}
     {{ form.media.js }}
 {% endblock extra_js %}
 {% block styles %}

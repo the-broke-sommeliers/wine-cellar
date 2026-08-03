@@ -1,10 +1,11 @@
 {% extends 'base.html' %}
 {% load static i18n %}
+{% load render_bundle from webpack_loader %}
 {% block extra_js %}
     {{ block.super }}
-    <script src="{% static 'tom_select.js' %}" type="module" defer></script>
-    <script src="{% static 'image_preview.js' %}" type="module" defer></script>
-    <script src="{% static 'barcode_scanner.js' %}" type="module" defer></script>
+    {% render_bundle 'tom_select' 'js' attrs='type="module" defer' %}
+    {% render_bundle 'image_preview' 'js' attrs='type="module" defer' %}
+    {% render_bundle 'barcode_scanner' 'js' attrs='type="module" defer' %}
     {{ form.media.js }}
 {% endblock extra_js %}
 {% block styles %}

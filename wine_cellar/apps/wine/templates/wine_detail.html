@@ -1,13 +1,14 @@
 {% extends 'base.html' %}
 {% load static i18n l10n react_maps_tags %}
+{% load render_bundle from webpack_loader %}
 {% block extra_js %}
     {{ block.super }}
-    <script src="{% static 'wine_carousel.js' %}" type="module" defer></script>
-    <script src="{% static 'maps.js' %}"></script>
+    {% render_bundle 'wine_carousel' 'js' attrs='type="module" defer' %}
+    {% render_bundle 'maps' 'js' %}
 {% endblock extra_js %}
 {% block styles %}
     {{ block.super }}
-    <link rel="stylesheet" href="{% static 'maps.css' %}" />
+    {% render_bundle 'maps' 'css' %}
 {% endblock styles %}
 {% block header %}
     <h1 class="header__title">{{ wine.name }}</h1>

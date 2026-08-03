@@ -10,7 +10,7 @@ module.exports = merge(common, {
       new TerserPlugin({
         parallel: true,
         terserOptions: {
-          ecma: 5,
+          ecma: 2022,
         },
       }),
     ],
