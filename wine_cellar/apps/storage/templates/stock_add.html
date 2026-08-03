@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
 {% load static i18n storage_tags %}
+{% load render_bundle from webpack_loader %}
 {% block extra_js %}
     {{ block.super }}
-    <script src="{% static 'tom_select.js' %}" type="module" defer></script>
-    <script src="{% static 'stock_add.js' %}" defer></script>
+    {% render_bundle 'tom_select' 'js' attrs='type="module" defer' %}
+    {% render_bundle 'stock_add' 'js' attrs='defer' %}
 {% endblock extra_js %}
 {% block title %}
     {% translate "Add Bottle" %}

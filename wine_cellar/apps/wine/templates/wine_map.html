@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
 {% load static i18n react_maps_tags %}
+{% load render_bundle from webpack_loader %}
 {% block header %}
     <h1 class="header__title">{% translate "Map of your wines" %}</h1>
 {% endblock header %}
 {% block styles %}
     {{ block.super }}
-    <link rel="stylesheet" href="{% static 'maps.css' %}" />
+    {% render_bundle 'maps' 'css' %}
 {% endblock styles %}
 {% block content %}
     <div class="pure-g">
@@ -17,5 +18,5 @@
     </div>
 {% endblock content %}
 {% block extra_js %}
-    <script src="{% static 'maps.js' %}"></script>
+    {% render_bundle 'maps' 'js' %}
 {% endblock extra_js %}

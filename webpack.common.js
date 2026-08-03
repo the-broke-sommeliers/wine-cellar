@@ -1,6 +1,7 @@
 const path = require('path')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const BundleTracker = require('webpack-bundle-tracker')
 
 module.exports = {
   entry: {
@@ -60,10 +61,28 @@ module.exports = {
   },
   output: {
     path: path.resolve('./wine_cellar/static/'),
-    publicPath: '/static/',
+    publicPath: 'auto',
   },
   externals: {
     django: 'django',
+  },
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        maplibre: {
+          test: /[\\/]node_modules[\\/](maplibre-gl|@maplibre)[\\/]/,
+          name: 'vendor-maplibre',
+          chunks: 'all',
+          enforce: true,
+        },
+        react: {
+          test: /[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/,
+          name: 'vendor-react',
+          chunks: 'all',
+          enforce: true,
+        },
+      },
+    },
   },
   module: {
     rules: [
@@ -129,8 +148,9 @@ module.exports = {
     // when using `npm link`, dependencies are resolved against the linked
     // folder by default. This may result in dependencies being included twice.
     // Setting `resolve.root` forces webpack to resolve all dependencies
-    // against the local directory.
-    modules: [path.resolve('./node_modules')],
+    // against the local directory. Keep the default 'node_modules' lookup
+    // too, so nested (non-hoisted) transitive deps still resolve.
+    modules: ['node_modules', path.resolve('./node_modules')],
   },
   plugins: [
     new MiniCssExtractPlugin({
@@ -152,6 +172,10 @@ module.exports = {
           to: '[name][ext]',
         },
       ],
+    }),
+    new BundleTracker({
+      path: path.resolve('.'),
+      filename: 'webpack-stats.json',
     }),
   ],
 }

@@ -72,6 +72,7 @@ RUN chmod +x  $APP_HOME/entrypoint.prod.sh
 COPY . $APP_HOME
 # copy webpack build files
 COPY --from=builder $APP_HOME/wine_cellar/static wine_cellar/static
+COPY --from=builder $APP_HOME/webpack-stats.json webpack-stats.json
 
 # chown all the files to the app user
 RUN chown -R app:app $HOME

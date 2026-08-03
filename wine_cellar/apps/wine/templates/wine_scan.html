@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static i18n %}
+{% load render_bundle from webpack_loader %}
 {% block header %}
     <h1 class="header__title">{% translate "Scan Barcode" %}</h1>
 {% endblock header %}
@@ -16,5 +17,5 @@
     </div>
 {% endblock content %}
 {% block extra_js %}
-    <script src="{% static 'barcode_scanner.js' %}"></script>
+    {% render_bundle 'barcode_scanner' 'js' %}
 {% endblock extra_js %}

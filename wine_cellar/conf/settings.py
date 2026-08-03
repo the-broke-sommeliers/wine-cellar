@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "allauth.socialaccount.providers.openid_connect",
     "widget_tweaks",
+    "webpack_loader",
     "wine_cellar.apps.wine",
     "wine_cellar.apps.user",
     "wine_cellar.apps.storage",
@@ -167,6 +168,15 @@ STATIC_ROOT = "static/"
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
+
+WEBPACK_LOADER = {
+    "DEFAULT": {
+        "BUNDLE_DIR_NAME": "",
+        "CACHE": not DEBUG,
+        "STATS_FILE": ROOT_DIR / "webpack-stats.json",
+        "IGNORE": [r".+\.hot-update\.js", r".+\.map", r".+\.LICENSE\.txt"],
+    }
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

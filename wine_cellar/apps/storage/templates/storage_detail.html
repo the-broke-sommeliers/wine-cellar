@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static i18n %}
+{% load render_bundle from webpack_loader %}
 {% block header %}
     <h1 class="header__title">{{ storage.name }}</h1>
 {% endblock header %}
@@ -116,6 +117,6 @@
 {% endblock content %}
 {% block extra_js %}
     {% if storage.rows > 0 and storage.columns > 0 %}
-        <script src="{% static 'stock_drag.js' %}"></script>
+        {% render_bundle 'stock_drag' 'js' %}
     {% endif %}
 {% endblock extra_js %}

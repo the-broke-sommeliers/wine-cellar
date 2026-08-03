@@ -6,6 +6,7 @@ venv/
 *.pyc
 node_modules/
 static/
+webpack-stats.json
 build/
 *.egg-info/
 media/

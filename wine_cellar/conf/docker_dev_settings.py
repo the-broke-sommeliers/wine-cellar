@@ -6,6 +6,7 @@ from wine_cellar.__init__ import __version__
 from wine_cellar.conf.dev import *  # noqa: F403
 
 DEBUG = os.getenv("DJANGO_DEBUG", "True") == "True"
+WEBPACK_LOADER["DEFAULT"]["CACHE"] = not DEBUG  # noqa: F405
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
 SECRET_KEY = os.environ.get("SECRET_KEY")
 DATABASES = {
