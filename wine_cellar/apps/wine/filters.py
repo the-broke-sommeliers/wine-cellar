@@ -4,6 +4,7 @@ from django.db.models.expressions import OrderBy
 from django.utils.translation import gettext_lazy as _
 from django_filters import ChoiceFilter, OrderingFilter
 
+from wine_cellar.apps.storage.models import Storage
 from wine_cellar.apps.wine.forms import WineFilterForm
 from wine_cellar.apps.wine.models import Wine
 
@@ -40,6 +41,11 @@ class WineFilter(django_filters.FilterSet):
         empty_label=None,
         null_label=None,
     )
+    storage = django_filters.ModelChoiceFilter(
+        queryset=Storage.objects.none(),
+        method="filter_storage",
+        label=_("Storage"),
+    )
     order = NullsLastOrderingFilter(
         choices=(
             ("-created", _("Recently Added")),
@@ -65,6 +71,13 @@ class WineFilter(django_filters.FilterSet):
         else:
             return queryset
 
+    def filter_storage(self, queryset, name, value):
+        if not value:
+            return queryset
+        return queryset.filter(
+            storageitem__storage=value, storageitem__deleted=False
+        ).distinct()
+
     class Meta:
         form = WineFilterForm
         model = Wine
@@ -80,6 +93,7 @@ class WineFilter(django_filters.FilterSet):
             "source",
             "country",
             "stock",
+            "storage",
         ]
         labels = {
             "name": _("Name Contains"),
@@ -92,6 +106,7 @@ class WineFilter(django_filters.FilterSet):
             "food_pairings": _("Food Pairings"),
             "source": _("Source"),
             "country": _("Country"),
+            "storage": _("Storage"),
         }
 
     def __init__(self, data=None, queryset=None, *, request=None, prefix=None):
@@ -107,6 +122,10 @@ class WineFilter(django_filters.FilterSet):
             self.filters[user_filter].queryset = self.filters[
                 user_filter
             ].queryset.filter(Q(user=None) | Q(user=request.user))
+
+        self.filters["storage"].queryset = Storage.objects.filter(
+            user=request.user
+        ).order_by("name")
 
         for key, fil in self.filters.items():
             if key in self.Meta.labels:
