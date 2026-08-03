@@ -3,6 +3,44 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.10.0-rc.0 (2026-08-03)
+
+### feat
+
+- add storage to filters
+
+- show better message that ai upload pictures will be saved
+
+- add option to use ai uploaded images for created wine
+
+
+### fix
+
+- properly verify ai returned coordinates, try reprompting if incorrect
+
+- mark size field as create again to allow adding custom sizes
+
+- **deps**: update dependency django-filter to v26
+- **deps**: update react monorepo to v19.2.8
+- **deps**: update dependency litellm to v1.93.0
+- **deps**: update font awesome to v7.3.1
+- **deps**: update dependency barcode-detector to v3.2.1
+- **deps**: update dependency litellm to v1.92.0
+- use bugsink recommended settings for sentry sdk
+
+- **deps**: update dependency litellm to v1.91.2
+- **deps**: update dependency tom-select to v2.6.2
+- **deps**: update dependency litellm to v1.91.1
+- **deps**: update dependency django to v6.0.7
+- **deps**: update dependency litellm to v1.91.0
+- **deps**: update dependency pillow to v12.3.0
+- **deps**: update dependency litellm to v1.90.2
+- **deps**: update dependency litellm to v1.90.1
+- **deps**: update font awesome to v7.3.0
+- **deps**: update dependency litellm to v1.90.0
+- **deps**: update dependency litellm to v1.89.4
+
+
 ## 0.9.0 (2026-06-28)
 
 ### feat
