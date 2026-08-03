@@ -147,6 +147,53 @@ def test_wine_filter_by_name(client, user, wine_factory):
 
 
 @pytest.mark.django_db
+def test_wine_filter_by_storage(
+    client, user, wine_factory, storage_factory, storage_item_factory
+):
+    storage_a = storage_factory(user=user)
+    storage_b = storage_factory(user=user)
+    wine_in_a = wine_factory(user=user, name="Wine in A")
+    wine_in_b = wine_factory(user=user, name="Wine in B")
+    wine_no_storage = wine_factory(user=user, name="Wine without storage")
+    storage_item_factory(storage=storage_a, wine=wine_in_a)
+    storage_item_factory(storage=storage_b, wine=wine_in_b)
+    client.force_login(user)
+    r = client.get(reverse("wine-list") + f"?storage={storage_a.pk}")
+    assert r.status_code == HTTPStatus.OK
+    wines = list(r.context_data["wines"])
+    assert wines == [wine_in_a]
+    assert wine_in_b not in wines
+    assert wine_no_storage not in wines
+
+
+@pytest.mark.django_db
+def test_wine_filter_by_storage_ignores_deleted_items(
+    client, user, wine_factory, storage_factory, storage_item_factory
+):
+    storage = storage_factory(user=user)
+    wine_removed = wine_factory(user=user, name="Removed Wine")
+    storage_item_factory(storage=storage, wine=wine_removed, deleted=True)
+    client.force_login(user)
+    r = client.get(reverse("wine-list") + f"?storage={storage.pk}")
+    assert r.status_code == HTTPStatus.OK
+    assert wine_removed not in list(r.context_data["wines"])
+
+
+@pytest.mark.django_db
+def test_wine_filter_storage_options_scoped_to_user(
+    client, user, user_factory, storage_factory
+):
+    own_storage = storage_factory(user=user)
+    other_storage = storage_factory(user=user_factory())
+    client.force_login(user)
+    r = client.get(reverse("wine-list"))
+    assert r.status_code == HTTPStatus.OK
+    storage_options = r.context_data["filter"].form.fields["storage"].queryset
+    assert own_storage in storage_options
+    assert other_storage not in storage_options
+
+
+@pytest.mark.django_db
 def test_wine_filter_by_vintage(client, user, wine_factory):
     wine_2020 = wine_factory(user=user, vintage=2020, name="Vintage 2020")
     wine_2019 = wine_factory(user=user, vintage=2019, name="Vintage 2019")
