@@ -48,7 +48,7 @@ TOM_FIELDS = {
     "country": {"max_items": 1, "max_options": -1},
     "region": {"create": True, "max_items": 1, "max_options": -1},
     "appellation": {"create": True, "max_items": 1, "max_options": -1},
-    "size": {"max_items": 1, "max_options": -1},
+    "size": {"create": True, "max_items": 1, "max_options": -1},
 }
 
 
