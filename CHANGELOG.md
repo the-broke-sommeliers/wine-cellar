@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.10.0-rc.0 (2026-08-03)
+## 0.10.0-rc.1 (2026-08-03)
 
 ### feat
 
@@ -15,6 +15,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 
 ### fix
+
+- add missing terser-plugin
 
 - properly verify ai returned coordinates, try reprompting if incorrect
 
