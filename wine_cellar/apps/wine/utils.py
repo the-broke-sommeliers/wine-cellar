@@ -9,6 +9,9 @@ from PIL import ExifTags, Image
 if TYPE_CHECKING:
     from wine_cellar.apps.wine.models import Wine
 
+_DASH_CHARS = "‐‑‒–—―−"  # hyphen..horizontal bar, minus sign
+_DASH_TRANSLATION = str.maketrans({c: "-" for c in _DASH_CHARS})
+
 
 def user_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
@@ -93,9 +96,12 @@ def get_map_attributes(
 
 
 def lat_long_to_geojson(lat_long: str) -> dict:
-    lat_str, long_str = lat_long.split(",")
+    lat_str, long_str = lat_long.translate(_DASH_TRANSLATION).split(",")
     lat = float(lat_str.strip())
     long = float(long_str.strip())
+
+    if not (-90 <= lat <= 90) or not (-180 <= long <= 180):
+        raise ValueError(f"Coordinates out of range: lat={lat}, long={long}")
 
     return {
         "type": "Feature",

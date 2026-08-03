@@ -88,5 +88,34 @@ def test_latlong_to_point(geojson_point_dict):
     assert lat_long_to_geojson(str(lat) + "," + str(long)) == geojson_point_dict
 
 
+def test_latlong_to_point_unicode_minus_sign():
+    result = lat_long_to_geojson("48.1374,−0.6603")
+    assert result["geometry"]["coordinates"] == [-0.6603, 48.1374]
+
+
+@pytest.mark.parametrize(
+    "dash_char",
+    ["‐", "‑", "‒", "–", "—", "―", "−"],
+)
+def test_latlong_to_point_dash_variants(dash_char):
+    result = lat_long_to_geojson(f"48.1374,{dash_char}0.6603")
+    assert result["geometry"]["coordinates"] == [-0.6603, 48.1374]
+
+
+def test_latlong_to_point_lat_out_of_range_raises():
+    with pytest.raises(ValueError):
+        lat_long_to_geojson("120,10")
+
+
+def test_latlong_to_point_long_out_of_range_raises():
+    with pytest.raises(ValueError):
+        lat_long_to_geojson("45,200")
+
+
+def test_latlong_to_point_malformed_raises_value_error():
+    with pytest.raises(ValueError):
+        lat_long_to_geojson("not,numbers")
+
+
 def test_wine_to_json_none_returns_none():
     assert wine_to_json(None) is None
