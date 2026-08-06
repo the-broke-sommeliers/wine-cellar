@@ -670,6 +670,118 @@ def test_wine_edit_replace_front_image(client, user, wine_factory, clear_image_f
 
 
 @pytest.mark.django_db
+def test_wine_edit_overwrite_front_and_back_with_newer_images(
+    client, user, wine_factory, clear_image_folder
+):
+    """Uploading new front/back images for a wine that already has images should
+    replace them in place (no duplicate rows) and store the newer files."""
+    wine = wine_factory(user=user)
+    client.force_login(user)
+    size = Size.objects.first()
+
+    base_data = {
+        "name": wine.name,
+        "wine_type": wine.wine_type,
+        "country": wine.country,
+        "size": size.pk,
+    }
+
+    r = client.post(
+        reverse("wine-edit", kwargs={"pk": wine.pk}),
+        {
+            **base_data,
+            "image_front": random_png("front_old.png"),
+            "image_back": random_png("back_old.png"),
+        },
+        follow=True,
+    )
+    assert r.status_code == HTTPStatus.OK
+    assert WineImage.objects.filter(wine=wine, image_type=ImageType.FRONT).count() == 1
+    assert WineImage.objects.filter(wine=wine, image_type=ImageType.BACK).count() == 1
+
+    r = client.post(
+        reverse("wine-edit", kwargs={"pk": wine.pk}),
+        {
+            **base_data,
+            "image_front": random_png("front_new.png"),
+            "image_back": random_png("back_new.png"),
+        },
+        follow=True,
+    )
+    assert r.status_code == HTTPStatus.OK
+    assertRedirects(
+        response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
+    )
+
+    front_images = WineImage.objects.filter(wine=wine, image_type=ImageType.FRONT)
+    back_images = WineImage.objects.filter(wine=wine, image_type=ImageType.BACK)
+    # Overwriting must not leave the old row (and file) behind.
+    assert front_images.count() == 1
+    assert back_images.count() == 1
+    assert "front_new" in front_images.first().image.name
+    assert "front_old" not in front_images.first().image.name
+    assert "back_new" in back_images.first().image.name
+    assert "back_old" not in back_images.first().image.name
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("wine_cellar.apps.wine.views.completion")
+def test_wine_create_overwriting_ai_stashed_images_with_newer_ones(
+    mock_completion, client, user, clear_image_folder
+):
+    """Manually uploading newer front/back images on the create form should
+    overwrite the images stashed from the AI upload step, for both fields at
+    once, without creating duplicate rows."""
+    mock_resp = MagicMock()
+    mock_resp.choices[0].message.content = '{"name": "AI Wine", "country": "DE"}'
+    mock_completion.return_value = mock_resp
+    client.force_login(user)
+
+    r = client.post(
+        reverse("wine-ai-upload"),
+        data={
+            "front": random_png("ai_front.png"),
+            "back": random_png("ai_back.png"),
+            "use_as_wine_images": "on",
+        },
+    )
+    assert r.status_code == HTTPStatus.FOUND
+
+    r = client.get(r["Location"])
+    initial = {k: v for k, v in r.context_data["form"].initial.items() if v is not None}
+
+    size = Size.objects.get(name=0.75)
+    initial.update(
+        {
+            "name": "AI Wine",
+            "wine_type": "RE",
+            "category": "DR",
+            "abv": 13.0,
+            "size": size.pk,
+            "vintage": 2002,
+            "country": "DE",
+            "form_step": 5,
+            "image_front": random_png("newer_front.png"),
+            "image_back": random_png("newer_back.png"),
+        }
+    )
+    r = client.post(reverse("wine-add"), data=initial, follow=True)
+    assert r.status_code == HTTPStatus.OK
+    assertRedirects(response=r, expected_url=reverse("wine-list"))
+
+    wine = Wine.objects.first()
+    front_images = WineImage.objects.filter(wine=wine, image_type=ImageType.FRONT)
+    back_images = WineImage.objects.filter(wine=wine, image_type=ImageType.BACK)
+    assert front_images.count() == 1
+    assert back_images.count() == 1
+    assert "newer_front" in front_images.first().image.name
+    assert "ai_front" not in front_images.first().image.name
+    assert "newer_back" in back_images.first().image.name
+    assert "ai_back" not in back_images.first().image.name
+
+
+@pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
 @patch("wine_cellar.apps.wine.views.completion")
 def test_wine_create_uses_ai_uploaded_front_image(
@@ -755,6 +867,85 @@ def test_wine_create_explicit_image_overrides_ai_stashed_image(
     assert images.count() == 1
     assert "manual_front" in images.first().image.name
     assert "ai_front" not in images.first().image.name
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("wine_cellar.apps.wine.views.completion")
+def test_wine_create_shows_preview_of_ai_stashed_image(
+    mock_completion, client, user, clear_image_folder
+):
+    """The create form should show a live preview (with its usual clear button)
+    of an image stashed from the AI upload step, before it has been saved."""
+    mock_resp = MagicMock()
+    mock_resp.choices[0].message.content = '{"name": "AI Wine", "country": "DE"}'
+    mock_completion.return_value = mock_resp
+    client.force_login(user)
+
+    r = client.post(
+        reverse("wine-ai-upload"),
+        data={"front": random_png("ai_front.png"), "use_as_wine_images": "on"},
+    )
+    assert r.status_code == HTTPStatus.FOUND
+
+    r = client.get(r["Location"])
+    assert r.status_code == HTTPStatus.OK
+    form = r.context_data["form"]
+
+    front_field = form["image_front"]
+    assert front_field.value().url.startswith("data:image/png;base64,")
+
+    # Render just this field's widget so assertions aren't polluted by the
+    # other (empty, still-hidden) image fields on the same page.
+    front_html = str(front_field)
+    assert "data:image/png;base64," in front_html
+    # The wrapper must not carry the "hidden" class, and the usual clear
+    # button/checkbox for the field must be rendered alongside the preview.
+    assert "image-preview-wrapper hidden" not in front_html
+    assert "image-clear-btn" in front_html
+    assert 'name="image_front-clear"' in front_html
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("wine_cellar.apps.wine.views.completion")
+def test_wine_create_clearing_ai_stashed_image_discards_it(
+    mock_completion, client, user, clear_image_folder
+):
+    """Checking the clear checkbox for the stashed AI image should behave like
+    clearing any other image field: the wine ends up with no front image."""
+    mock_resp = MagicMock()
+    mock_resp.choices[0].message.content = '{"name": "AI Wine", "country": "DE"}'
+    mock_completion.return_value = mock_resp
+    client.force_login(user)
+
+    r = client.post(
+        reverse("wine-ai-upload"),
+        data={"front": random_png("ai_front.png"), "use_as_wine_images": "on"},
+    )
+    r = client.get(r["Location"])
+    initial = {k: v for k, v in r.context_data["form"].initial.items() if v is not None}
+    initial.pop("image_front", None)
+
+    size = Size.objects.get(name=0.75)
+    initial.update(
+        {
+            "name": "AI Wine",
+            "wine_type": "RE",
+            "category": "DR",
+            "abv": 13.0,
+            "size": size.pk,
+            "vintage": 2002,
+            "country": "DE",
+            "form_step": 5,
+            "image_front-clear": "on",
+        }
+    )
+    r = client.post(reverse("wine-add"), data=initial, follow=True)
+    assert r.status_code == HTTPStatus.OK
+    assertRedirects(response=r, expected_url=reverse("wine-list"))
+    wine = Wine.objects.first()
+    assert WineImage.objects.filter(wine=wine, image_type=ImageType.FRONT).count() == 0
 
 
 @pytest.mark.django_db

@@ -94,9 +94,8 @@
                                 {% include 'forms/form_field.html' with field=form.image_front %}
                                 {% if ai_image_front_name %}
                                     <p class="form-hint">
-                                        <i class="fa-solid fa-robot"></i>
                                         {% blocktranslate trimmed with name=ai_image_front_name %}
-                                            AI photo "{{ name }}" will be used
+                                            Photo "{{ name }}" will be used
                                         {% endblocktranslate %}
                                     </p>
                                 {% endif %}
@@ -105,9 +104,8 @@
                                 {% include 'forms/form_field.html' with field=form.image_back %}
                                 {% if ai_image_back_name %}
                                     <p class="form-hint">
-                                        <i class="fa-solid fa-robot"></i>
                                         {% blocktranslate trimmed with name=ai_image_back_name %}
-                                            AI photo "{{ name }}" will be used
+                                            Photo "{{ name }}" will be used
                                         {% endblocktranslate %}
                                     </p>
                                 {% endif %}

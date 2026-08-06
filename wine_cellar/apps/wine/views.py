@@ -183,6 +183,20 @@ class WineBaseView(OpenChoiceModelFormViewMixin, FormView):
         return wine
 
 
+class _PendingAiImage:
+    """Placeholder ``initial`` value for an image stashed by the AI upload flow.
+
+    It only exposes ``url`` (a data URI) so that ``NoFilenameClearableFileInput``
+    renders its normal preview/clear-button UI for an image that hasn't actually
+    been saved anywhere yet. It is never a real file - :meth:`WineCreateView.
+    _apply_ai_images` swaps it out for the real, stashed ``ContentFile`` once the
+    form is submitted.
+    """
+
+    def __init__(self, url):
+        self.url = url
+
+
 class WineCreateView(WineBaseView):
     template_name = "wine_create.html"
     success_url = reverse_lazy("wine-list")
@@ -193,8 +207,12 @@ class WineCreateView(WineBaseView):
             initial["barcode"] = barcode
         if b64 := self.request.GET.get("ai_initial"):
             initial.update(WineAiSerializer().deserialize_ai_payload(b64))
-        if token := self.request.GET.get("ai_images_token"):
+        if token := self._get_ai_images_token():
             initial["ai_images_token"] = token
+        images = self._get_pending_ai_images()
+        for key, form_field in {"front": "image_front", "back": "image_back"}.items():
+            if stashed := images.get(key):
+                initial[form_field] = _PendingAiImage(self._ai_image_data_url(stashed))
         return initial
 
     def get_wine_instance(self):
@@ -202,24 +220,35 @@ class WineCreateView(WineBaseView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        token = self.request.POST.get("ai_images_token") or self.request.GET.get(
+        images = self._get_pending_ai_images()
+        context["ai_images_pending"] = bool(images)
+        context["ai_image_front_name"] = images.get("front", {}).get("name")
+        context["ai_image_back_name"] = images.get("back", {}).get("name")
+        return context
+
+    def _get_ai_images_token(self):
+        return self.request.POST.get("ai_images_token") or self.request.GET.get(
             "ai_images_token"
         )
-        images = token and self.request.session.get(f"ai_images_{token}", {})
-        context["ai_images_pending"] = bool(images)
-        context["ai_image_front_name"] = (
-            images.get("front", {}).get("name") if images else None
-        )
-        context["ai_image_back_name"] = (
-            images.get("back", {}).get("name") if images else None
-        )
-        return context
+
+    def _get_pending_ai_images(self):
+        token = self._get_ai_images_token()
+        return self.request.session.get(f"ai_images_{token}", {}) if token else {}
+
+    @staticmethod
+    def _ai_image_data_url(image):
+        content_type = image.get("content_type") or "image/jpeg"
+        return f"data:{content_type};base64,{image['data']}"
 
     def _apply_ai_images(self, form, token):
         images = self.request.session.get(f"ai_images_{token}", {})
         field_map = {"front": "image_front", "back": "image_back"}
         for key, form_field in field_map.items():
-            if form.cleaned_data.get(form_field):
+            value = form.cleaned_data.get(form_field)
+            # `False` means the user explicitly cleared it via the widget's clear
+            # checkbox, and a real uploaded file means they replaced it - in both
+            # cases the stashed AI image should not be applied.
+            if value is False or (value and not isinstance(value, _PendingAiImage)):
                 continue
             stashed = images.get(key)
             if not stashed:
