@@ -3,9 +3,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.10.0-rc.1 (2026-08-03)
+## 0.10.0-rc.2 (2026-08-06)
 
 ### feat
+
+- show preview when reusing ai upload images
 
 - add storage to filters
 
@@ -41,6 +43,11 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **deps**: update font awesome to v7.3.0
 - **deps**: update dependency litellm to v1.90.0
 - **deps**: update dependency litellm to v1.89.4
+
+### refactor
+
+- use djang-webpack-loader to allow code splitting for smaller bundle size
+
 
 
 ## 0.9.0 (2026-06-28)
