@@ -48,6 +48,8 @@ from wine_cellar.apps.wine.views import (
     WineScannedView,
     WineScanView,
     WineUpdateView,
+    WineUploadAIPollView,
+    WineUploadAIStatusView,
     WineUploadAIView,
     health_check,
 )
@@ -77,6 +79,16 @@ urlpatterns = [
     path("wine/add/choose", WineChooseActionView.as_view(), name="wine-add-choose"),
     path("wine/add/", WineCreateView.as_view(), name="wine-add"),
     path("wine/ai/", WineUploadAIView.as_view(), name="wine-ai-upload"),
+    path(
+        "wine/ai/status/<str:token>/",
+        WineUploadAIStatusView.as_view(),
+        name="wine-ai-upload-status",
+    ),
+    path(
+        "wine/ai/status/<str:token>/poll/",
+        WineUploadAIPollView.as_view(),
+        name="wine-ai-upload-poll",
+    ),
     path("wine/<int:pk>", WineDetailView.as_view(), name="wine-detail"),
     path("wine/edit/<int:pk>", WineUpdateView.as_view(), name="wine-edit"),
     path("wine/delete/<int:pk>", WineDeleteView.as_view(), name="wine-delete"),

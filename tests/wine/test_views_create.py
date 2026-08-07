@@ -2,15 +2,29 @@ import datetime
 import json
 from http import HTTPStatus
 from unittest.mock import MagicMock, patch
+from urllib.parse import urlparse
 
 import pytest
 from django.core.cache import caches
 from django.test import override_settings
-from django.urls import reverse
+from django.urls import resolve, reverse
 from pytest_django.asserts import assertRedirects, assertTemplateUsed
 
 from tests.helpers import random_png
 from wine_cellar.apps.wine.models import ImageType, Size, Wine, WineImage
+
+
+def _wine_add_redirect(client, ai_upload_location):
+    """Given the `Location` header from POSTing to `wine-ai-upload` (a
+    redirect to the status page), poll its status until done and return the
+    final `wine-add?prefill_token=...` URL. `CELERY_TASK_ALWAYS_EAGER=True`
+    (test.py) means the task has already finished by the time the initial
+    POST returns, so a single poll always reflects the final state."""
+    token = resolve(urlparse(ai_upload_location).path).kwargs["token"]
+    r = client.get(reverse("wine-ai-upload-poll", kwargs={"token": token}))
+    data = r.json()
+    assert data["status"] == "done", data
+    return data["redirect"]
 
 
 @pytest.mark.django_db
@@ -733,7 +747,7 @@ def test_wine_edit_overwrite_front_and_back_with_newer_images(
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.views.completion")
+@patch("wine_cellar.apps.wine.tasks.completion")
 def test_wine_create_overwriting_ai_stashed_images_with_newer_ones(
     mock_completion, client, user, clear_image_folder
 ):
@@ -755,7 +769,7 @@ def test_wine_create_overwriting_ai_stashed_images_with_newer_ones(
     )
     assert r.status_code == HTTPStatus.FOUND
 
-    r = client.get(r["Location"])
+    r = client.get(_wine_add_redirect(client, r["Location"]))
     initial = {k: v for k, v in r.context_data["form"].initial.items() if v is not None}
 
     size = Size.objects.get(name=0.75)
@@ -790,7 +804,7 @@ def test_wine_create_overwriting_ai_stashed_images_with_newer_ones(
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.views.completion")
+@patch("wine_cellar.apps.wine.tasks.completion")
 def test_wine_create_uses_ai_uploaded_front_image(
     mock_completion, client, user, clear_image_folder
 ):
@@ -806,9 +820,10 @@ def test_wine_create_uses_ai_uploaded_front_image(
         data={"front": random_png("ai_front.png"), "use_as_wine_images": "on"},
     )
     assert r.status_code == HTTPStatus.FOUND
-    assert "prefill_token" in r["Location"]
+    wine_add_url = _wine_add_redirect(client, r["Location"])
+    assert "prefill_token" in wine_add_url
 
-    r = client.get(r["Location"])
+    r = client.get(wine_add_url)
     assert r.status_code == HTTPStatus.OK
     initial = {k: v for k, v in r.context_data["form"].initial.items() if v is not None}
     assert initial["prefill_token"]
@@ -889,7 +904,7 @@ def test_wine_create_other_users_prefill_token_not_deleted_on_save(
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.views.completion")
+@patch("wine_cellar.apps.wine.tasks.completion")
 def test_wine_create_explicit_image_overrides_ai_stashed_image(
     mock_completion, client, user, clear_image_folder
 ):
@@ -904,7 +919,7 @@ def test_wine_create_explicit_image_overrides_ai_stashed_image(
         reverse("wine-ai-upload"),
         data={"front": random_png("ai_front.png"), "use_as_wine_images": "on"},
     )
-    r = client.get(r["Location"])
+    r = client.get(_wine_add_redirect(client, r["Location"]))
     initial = {k: v for k, v in r.context_data["form"].initial.items() if v is not None}
 
     size = Size.objects.get(name=0.75)
@@ -932,7 +947,7 @@ def test_wine_create_explicit_image_overrides_ai_stashed_image(
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.views.completion")
+@patch("wine_cellar.apps.wine.tasks.completion")
 def test_wine_create_shows_preview_of_ai_stashed_image(
     mock_completion, client, user, clear_image_folder
 ):
@@ -949,7 +964,7 @@ def test_wine_create_shows_preview_of_ai_stashed_image(
     )
     assert r.status_code == HTTPStatus.FOUND
 
-    r = client.get(r["Location"])
+    r = client.get(_wine_add_redirect(client, r["Location"]))
     assert r.status_code == HTTPStatus.OK
     form = r.context_data["form"]
 
@@ -969,7 +984,7 @@ def test_wine_create_shows_preview_of_ai_stashed_image(
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.views.completion")
+@patch("wine_cellar.apps.wine.tasks.completion")
 def test_wine_create_clearing_ai_stashed_image_discards_it(
     mock_completion, client, user, clear_image_folder
 ):
@@ -984,7 +999,7 @@ def test_wine_create_clearing_ai_stashed_image_discards_it(
         reverse("wine-ai-upload"),
         data={"front": random_png("ai_front.png"), "use_as_wine_images": "on"},
     )
-    r = client.get(r["Location"])
+    r = client.get(_wine_add_redirect(client, r["Location"]))
     initial = {k: v for k, v in r.context_data["form"].initial.items() if v is not None}
     initial.pop("image_front", None)
 

@@ -1,13 +1,9 @@
 import base64
-import json
 import uuid
 from decimal import Decimal
 
-import litellm
-import litellm.exceptions
 from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
-from django.core.cache import caches
 from django.core.files.base import ContentFile
 from django.db import IntegrityError, connections, transaction
 from django.db.models import Avg, F, Q, Sum
@@ -18,9 +14,8 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.formats import number_format
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import DeleteView, DetailView, FormView, TemplateView
+from django.views.generic import DeleteView, DetailView, FormView, TemplateView, View
 from django_filters.views import FilterView
-from litellm import completion
 
 from wine_cellar.apps.storage.models import StorageItem
 from wine_cellar.apps.user.views import get_user_settings
@@ -31,20 +26,10 @@ from wine_cellar.apps.wine.forms import (
     WineUploadAIForm,
     image_fields_map,
 )
-from wine_cellar.apps.wine.models import (
-    Category,
-    Wine,
-    WineImage,
-    WineType,
-)
+from wine_cellar.apps.wine.models import Wine, WineImage
 from wine_cellar.apps.wine.serializers import WineAiSerializer
-from wine_cellar.apps.wine.utils import lat_long_to_geojson
-
-# Short-lived storage for AI-scan/barcode wine-add prefill data, keyed by an
-# opaque `prefill_token`. Backed by Redis in Docker deployments (see
-# docker_settings.py/docker_dev_settings.py), local-memory otherwise.
-wine_prefill_cache = caches["wine_prefill"]
-WINE_PREFILL_TIMEOUT = 6 * 60 * 60  # seconds
+from wine_cellar.apps.wine.tasks import process_ai_wine_upload
+from wine_cellar.apps.wine.utils import WINE_PREFILL_TIMEOUT, wine_prefill_cache
 
 
 class HomePageView(TemplateView):
@@ -129,6 +114,7 @@ class WineChooseActionView(TemplateView):
             wine_prefill_cache.set(
                 f"wine_prefill_{token}",
                 {
+                    "status": "done",
                     "initial": {"barcode": barcode},
                     "images": {},
                     "user_id": self.request.user.pk,
@@ -249,13 +235,10 @@ class WineCreateView(WineBaseView):
         )
 
     def _get_prefill_data(self):
-        token = self._get_prefill_token()
-        if not token:
-            return {}
-        data = wine_prefill_cache.get(f"wine_prefill_{token}")
-        if not data or data.get("user_id") != self.request.user.pk:
-            # Missing, expired, or belongs to a different user - a foreign or
-            # guessed token must behave exactly like no token at all.
+        data = _get_owned_prefill_entry(self._get_prefill_token(), self.request.user)
+        if not data or data.get("status") != "done":
+            # Missing, expired, belonging to a different user, or not yet
+            # (or no longer) finished processing - all behave like no token.
             return {}
         return data
 
@@ -407,38 +390,19 @@ class WineMapView(TemplateView):
         return context
 
 
-def _parse_ai_json(ai_text: str) -> dict:
-    ai_text = ai_text.strip()
-    if ai_text.startswith("```"):
-        ai_text = ai_text.split("```")[1]
-    if ai_text.startswith("json"):
-        ai_text = ai_text[4:]
-    return json.loads(ai_text)
+def _get_owned_prefill_entry(token, user):
+    if not token:
+        return None
+    data = wine_prefill_cache.get(f"wine_prefill_{token}")
+    if not data or data.get("user_id") != user.pk:
+        return None
+    return data
 
 
 class WineUploadAIView(FormView):
     template_name = "wine_upload_ai.html"
     form_class = WineUploadAIForm
     success_url = reverse_lazy("wine-list")
-
-    wine_types = ", ".join([choice.label.lower() for choice in WineType])
-    sweetness_categories = ", ".join([choice.label.lower() for choice in Category])
-
-    MODEL_INSTRUCTIONS = f"""
-    Return JSON with fields:
-    name: wine name
-    country: ISO2 code
-    type: {wine_types}
-    size: float, bottle size in liters, e.g. 0.75, if no value guess
-    grapes: list of grapes
-    vintage: year
-    abs: float, alcohol %
-    sweetness: {sweetness_categories}
-    vineyard: list of vineyard names
-    region: region
-    appellation: appellation
-    location: lat,long; if unknown use region or omit
-    """
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -449,183 +413,83 @@ class WineUploadAIView(FormView):
         context.update({"ai_enabled": ai_enabled})
         return context
 
-    def _reprompt_location(self, ai_json):
-        context = {
-            field: ai_json[field]
-            for field in (
-                "name",
-                "country",
-                "region",
-                "appellation",
-                "vineyard",
-                "vintage",
-            )
-            if ai_json.get(field)
+    @staticmethod
+    def _encode_image(image):
+        if not image:
+            return None
+        return {
+            "data": base64.b64encode(image.read()).decode(),
+            "name": image.name,
+            "content_type": image.content_type or "image/jpeg",
         }
-        prompt = (
-            "Based on this wine information, provide its approximate origin "
-            "coordinates.\n"
-            f"Wine details: {json.dumps(context)}\n"
-            "Return JSON with a single field, location, formatted as "
-            '"latitude,longitude" in decimal degrees using a plain ASCII '
-            'hyphen-minus for negative values (e.g. "48.1374,-0.6603"). '
-            'If coordinates cannot be determined, return {"location": null}.'
-        )
-        try:
-            response = completion(
-                model=settings.AI_MODEL,
-                messages=[{"role": "user", "content": prompt}],
-                api_key=settings.AI_API_KEY,
-            )
-            reprompt_json = _parse_ai_json(response.choices[0].message.content)
-            new_location = reprompt_json.get("location")
-            if new_location:
-                lat_long_to_geojson(new_location)
-                return new_location
-        except (
-            litellm.exceptions.AuthenticationError,
-            litellm.exceptions.RateLimitError,
-            litellm.exceptions.ServiceUnavailableError,
-            litellm.exceptions.BadGatewayError,
-            litellm.exceptions.InternalServerError,
-            litellm.exceptions.Timeout,
-            litellm.exceptions.APIConnectionError,
-            litellm.exceptions.APIError,
-            json.JSONDecodeError,
-            TypeError,
-            ValueError,
-            AttributeError,
-            IndexError,
-        ):
-            pass
-        return None
 
     def form_valid(self, form):
-        front_img = form.cleaned_data.get("front")
-        back_img = form.cleaned_data.get("back")
-
-        content = [{"type": "text", "text": self.MODEL_INSTRUCTIONS}]
-        if front_img:
-            front_b64 = base64.b64encode(front_img.read()).decode()
-            front_url = (
-                f"data:{front_img.content_type or 'image/jpeg'};base64,{front_b64}"
-            )
-            content.append({"type": "image_url", "image_url": {"url": front_url}})
-
-        if back_img:
-            back_b64 = base64.b64encode(back_img.read()).decode()
-            back_url = f"data:{back_img.content_type or 'image/jpeg'};base64,{back_b64}"
-            content.append({"type": "image_url", "image_url": {"url": back_url}})
-
-        try:
-            response = completion(
-                model=settings.AI_MODEL,
-                messages=[{"role": "user", "content": content}],
-                api_key=settings.AI_API_KEY,
-            )
-        except litellm.exceptions.AuthenticationError:
-            form.add_error(
-                None,
-                _(
-                    "AI request failed: invalid API key. Please check your "
-                    "configuration."
-                ),
-            )
-            return self.form_invalid(form)
-        except litellm.exceptions.RateLimitError:
-            form.add_error(
-                None,
-                _(
-                    "AI request failed: rate limit reached. "
-                    "Please wait a moment and try again."
-                ),
-            )
-            return self.form_invalid(form)
-        except (
-            litellm.exceptions.ServiceUnavailableError,
-            litellm.exceptions.BadGatewayError,
-            litellm.exceptions.InternalServerError,
-        ):
-            form.add_error(
-                None,
-                _(
-                    "AI service is temporarily unavailable. "
-                    "Please try again in a few minutes."
-                ),
-            )
-            return self.form_invalid(form)
-        except litellm.exceptions.Timeout:
-            form.add_error(
-                None,
-                _("AI request timed out. Please try again."),
-            )
-            return self.form_invalid(form)
-        except litellm.exceptions.APIConnectionError:
-            form.add_error(
-                None,
-                _(
-                    "Could not connect to the AI service. Please check your "
-                    "network and configuration."
-                ),
-            )
-            return self.form_invalid(form)
-        except litellm.exceptions.APIError:
-            form.add_error(
-                None,
-                _("AI request failed. Please try again or check your configuration."),
-            )
-            return self.form_invalid(form)
-        ai_text = response.choices[0].message.content.strip()
-
-        try:
-            ai_json = _parse_ai_json(ai_text)
-        except json.JSONDecodeError:
-            form.add_error(
-                None,
-                _(
-                    "Failed to process AI response. "
-                    "Please check the uploaded images and try again."
-                ),
-            )
-            return self.form_invalid(form)
-
-        location = ai_json.get("location")
-        if location:
-            try:
-                lat_long_to_geojson(location)
-            except (TypeError, ValueError):
-                ai_json["location"] = self._reprompt_location(ai_json)
-
-        initial = WineAiSerializer().serialize_ai_payload(ai_json)
-        if barcode := self.request.GET.get("barcode"):
-            initial["barcode"] = barcode
-
-        images = {}
-        if form.cleaned_data.get("use_as_wine_images"):
-            if front_img:
-                images["front"] = {
-                    "data": front_b64,
-                    "name": front_img.name,
-                    "content_type": front_img.content_type or "image/jpeg",
-                }
-            if back_img:
-                images["back"] = {
-                    "data": back_b64,
-                    "name": back_img.name,
-                    "content_type": back_img.content_type or "image/jpeg",
-                }
+        front = self._encode_image(form.cleaned_data.get("front"))
+        back = self._encode_image(form.cleaned_data.get("back"))
 
         token = uuid.uuid4().hex
         wine_prefill_cache.set(
             f"wine_prefill_{token}",
-            {
-                "initial": initial,
-                "images": images,
-                "user_id": self.request.user.pk,
-            },
+            {"status": "pending", "user_id": self.request.user.pk},
             timeout=WINE_PREFILL_TIMEOUT,
         )
-        return redirect(f"{reverse('wine-add')}?prefill_token={token}")
+        try:
+            process_ai_wine_upload.delay(
+                token=token,
+                user_id=self.request.user.pk,
+                front=front,
+                back=back,
+                use_as_wine_images=form.cleaned_data.get("use_as_wine_images"),
+                barcode=self.request.GET.get("barcode"),
+            )
+        except Exception:
+            wine_prefill_cache.delete(f"wine_prefill_{token}")
+            form.add_error(
+                None,
+                _("Could not start the AI request. Please try again."),
+            )
+            return self.form_invalid(form)
+
+        return redirect(reverse("wine-ai-upload-status", kwargs={"token": token}))
+
+
+class WineUploadAIStatusView(TemplateView):
+    template_name = "wine_upload_ai_status.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        token = self.kwargs["token"]
+        entry = _get_owned_prefill_entry(token, self.request.user)
+        context["token"] = token
+        context["poll_url"] = reverse("wine-ai-upload-poll", kwargs={"token": token})
+        context["invalid"] = entry is None
+        return context
+
+
+class WineUploadAIPollView(View):
+    def get(self, request, *args, **kwargs):
+        entry = _get_owned_prefill_entry(self.kwargs["token"], request.user)
+        if not entry:
+            return JsonResponse(
+                {
+                    "status": "error",
+                    "message": str(_("This AI request has expired.")),
+                }
+            )
+        if entry.get("status") == "done":
+            return JsonResponse(
+                {
+                    "status": "done",
+                    "redirect": (
+                        f"{reverse('wine-add')}?prefill_token={self.kwargs['token']}"
+                    ),
+                }
+            )
+        if entry.get("status") == "error":
+            return JsonResponse(
+                {"status": "error", "message": entry.get("message", "")}
+            )
+        return JsonResponse({"status": "pending", "stage": entry.get("stage")})
 
 
 @login_not_required

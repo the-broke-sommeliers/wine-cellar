@@ -1,3 +1,5 @@
+import re
+
 import pycountry
 
 from wine_cellar.apps.wine.models import (
@@ -9,7 +11,35 @@ from wine_cellar.apps.wine.models import (
     Vineyard,
     WineType,
 )
-from wine_cellar.apps.wine.utils import lat_long_to_geojson
+from wine_cellar.apps.wine.utils import lat_long_to_geojson, match_choice_label
+
+_SIZE_UNITS_TO_LITERS = {"ml": 0.001, "cl": 0.01, "l": 1.0}
+_SIZE_RE = re.compile(r"^\s*([\d.]+)\s*(ml|cl|l)?\s*$", re.IGNORECASE)
+
+
+def _normalize_size_liters(value):
+    """Coerce an AI-reported bottle size to liters. Accepts a bare number
+    (assumed already liters, unless implausibly large for a bottle - then
+    it's assumed to be mL) or a string with an ml/cl/l suffix."""
+    if isinstance(value, (int, float)):
+        number, unit = value, None
+    elif isinstance(value, str):
+        match = _SIZE_RE.match(value)
+        if not match:
+            return None
+        try:
+            number = float(match.group(1))
+        except ValueError:
+            return None
+        unit = match.group(2)
+    else:
+        return None
+
+    liters = number * _SIZE_UNITS_TO_LITERS[unit.lower()] if unit else number
+    # A real bottle is never >10L - an unsuffixed number that large is mL.
+    if not unit and liters > 10:
+        liters /= 1000
+    return round(liters, 2)
 
 
 class WineAiSerializer:
@@ -74,12 +104,18 @@ class WineAiSerializer:
         if ai_json.get("name"):
             initial["name"] = ai_json["name"]
 
-        vintage = ai_json.get("vintage")
-        if isinstance(vintage, int) and 1900 <= vintage <= 2100:
-            initial["vintage"] = vintage
-
         try:
-            abv = float(ai_json.get("abs"))
+            vintage = int(ai_json.get("vintage"))
+            if 1900 <= vintage <= 2100:
+                initial["vintage"] = vintage
+        except (TypeError, ValueError):
+            pass
+
+        abv_raw = ai_json.get("abs")
+        if isinstance(abv_raw, str):
+            abv_raw = abv_raw.strip().rstrip("%")
+        try:
+            abv = float(abv_raw)
             if 0 <= abv <= 100:
                 initial["abv"] = abv
         except (TypeError, ValueError):
@@ -91,17 +127,11 @@ class WineAiSerializer:
             if country:
                 initial["country"] = country.alpha_2
 
-        ai_type = (ai_json.get("type") or "").strip().lower()
-        for val, label in WineType.choices:
-            if label.lower() == ai_type:
-                initial["wine_type"] = val
-                break
+        if wine_type := match_choice_label(ai_json.get("type"), WineType.choices):
+            initial["wine_type"] = wine_type
 
-        ai_sweetness = (ai_json.get("sweetness") or "").strip().lower()
-        for value, label in Category.choices:
-            if label.lower() == ai_sweetness:
-                initial["category"] = value
-                break
+        if category := match_choice_label(ai_json.get("sweetness"), Category.choices):
+            initial["category"] = category
 
         for field, cfg in self.FIELD_CONFIG.items():
             value = ai_json.get(field)
@@ -109,7 +139,7 @@ class WineAiSerializer:
                 value=value, model=cfg["model"], multi=cfg["multi"]
             )
 
-        size_val = ai_json.get("size")
+        size_val = _normalize_size_liters(ai_json.get("size"))
         if size_val:
             size_obj = Size.objects.filter(name=size_val).only("id").first()
             if size_obj:

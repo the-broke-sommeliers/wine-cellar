@@ -21,6 +21,7 @@ module.exports = {
         './wine_cellar/assets/css/page-layout.css',
         './wine_cellar/assets/css/homepage.css',
         './wine_cellar/assets/css/button.css',
+        './wine_cellar/assets/css/spinner.css',
       ],
     },
     tom_select: {
@@ -57,6 +58,9 @@ module.exports = {
     },
     stock_drag: {
       import: ['./wine_cellar/assets/js/stock_drag.ts'],
+    },
+    ai_upload_status: {
+      import: ['./wine_cellar/assets/js/ai_upload_status.ts'],
     },
   },
   output: {
