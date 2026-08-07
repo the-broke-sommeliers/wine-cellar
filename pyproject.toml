@@ -21,7 +21,7 @@ dependencies = [
     "django-filter==26.1",
     "django-webpack-loader==3.2.4",
     "django-widget-tweaks==1.5.1",
-    "litellm==1.93.0",
+    "litellm==1.94.1",
     "pillow==12.3.0",
     "pycountry==26.2.16",
     "requests==2.34.2",
