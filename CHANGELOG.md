@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.10.0-rc.3 (2026-08-07)
+## 0.10.0-rc.4 (2026-08-07)
 
 ### feat
 
@@ -53,6 +53,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **deps**: update dependency litellm to v1.89.4
 
 ### refactor
+
+- make whole ai upload workflow async
 
 - store ai upload data in cache instead of a get parameter
 
