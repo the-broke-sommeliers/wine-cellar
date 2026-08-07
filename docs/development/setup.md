@@ -10,19 +10,19 @@
 
 #### Steps:
 
-1. Copy the development environment configuration:
+1. Start the application:
+   ```sh
+   make docker-server
+   ```
+   This copies `.env.dev-sample` to `.env.dev` (if it doesn't exist yet),
+   builds the Docker image, and starts the stack. Equivalent to running
+   these manually:
    ```sh
    cp .env.dev-sample .env.dev
-   ```
-2. Build the Docker image:
-   ```sh
    docker build -t wine-cellar-dev .
-   ```
-3. Start the application:
-   ```sh
    docker compose up
    ```
-4. (optional): populate database with some sample data:
+2. (optional): populate database with some sample data:
    ```sh
    make docker-fixtures
    ```

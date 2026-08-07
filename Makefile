@@ -36,6 +36,11 @@ fixtures:
 	$(VIRTUAL_ENV)/bin/python3 manage.py loaddata fixtures/wines.json
 	$(VIRTUAL_ENV)/bin/python3 manage.py loaddata fixtures/stock.json
 
+.PHONY: docker-server
+docker-server:
+	if [ ! -f .env.dev ]; then cp .env.dev-sample .env.dev; fi
+	docker compose up --build
+
 .PHONY: docker-fixtures
 docker-fixtures:
 	docker compose exec web python3 manage.py loaddata fixtures/region_and_appellation.json
