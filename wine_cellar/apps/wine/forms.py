@@ -430,7 +430,7 @@ class WineForm(TomSelectMixin, WineFormPostCleanMixin, forms.Form):
             validators.MaxValueValidator(5),
         ],
     )
-    ai_images_token = forms.CharField(
+    prefill_token = forms.CharField(
         widget=forms.HiddenInput(), label="", required=False
     )
 
