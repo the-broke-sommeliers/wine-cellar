@@ -1,5 +1,3 @@
-import base64
-import json
 from http import HTTPStatus
 from unittest.mock import MagicMock, patch
 from urllib.parse import parse_qs, urlparse
@@ -7,10 +5,13 @@ from urllib.parse import parse_qs, urlparse
 import httpx
 import litellm.exceptions
 import pytest
+from django.core.cache import caches
 from django.test import override_settings
 from django.urls import reverse
 
 from tests.helpers import random_png
+
+wine_prefill_cache = caches["wine_prefill"]
 
 
 def _make_litellm_exc(exc_cls, status=503):
@@ -19,10 +20,10 @@ def _make_litellm_exc(exc_cls, status=503):
     return exc_cls("test error", llm_provider="test", model="test", response=resp)
 
 
-def _decode_ai_initial(location_header):
+def _prefill_data(location_header):
     query = parse_qs(urlparse(location_header).query)
-    b64_initial = query["ai_initial"][0]
-    return json.loads(base64.urlsafe_b64decode(b64_initial).decode())
+    token = query["prefill_token"][0]
+    return wine_prefill_cache.get(f"wine_prefill_{token}")
 
 
 def _mock_response(content):
@@ -54,6 +55,9 @@ def test_wine_choose_action_with_barcode(client, user):
     r = client.get(reverse("wine-add-choose") + "?barcode=9780201633610")
     assert r.status_code == HTTPStatus.OK
     assert r.context_data["barcode"] == "9780201633610"
+    token = r.context_data["prefill_token"]
+    data = wine_prefill_cache.get(f"wine_prefill_{token}")
+    assert data["initial"]["barcode"] == "9780201633610"
 
 
 @pytest.mark.django_db
@@ -75,7 +79,37 @@ def test_ai_upload_success_redirects_to_create(mock_completion, client, user):
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
     assert r.status_code == HTTPStatus.FOUND
     assert reverse("wine-add") in r["Location"]
-    assert "ai_initial" in r["Location"]
+    assert "prefill_token" in r["Location"]
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("wine_cellar.apps.wine.views.completion")
+def test_ai_upload_prefill_not_visible_to_other_user(
+    mock_completion, client, user, user_factory
+):
+    """A guessed/observed `prefill_token` from someone else's AI upload must
+    not prefill the create form for a different logged-in user."""
+    mock_resp = MagicMock()
+    mock_resp.choices[0].message.content = '{"name": "Secret Wine", "country": "DE"}'
+    mock_completion.return_value = mock_resp
+    client.force_login(user)
+    r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
+    assert r.status_code == HTTPStatus.FOUND
+    token = parse_qs(urlparse(r["Location"]).query)["prefill_token"][0]
+
+    other_user = user_factory()
+    client.force_login(other_user)
+    r = client.get(reverse("wine-add") + f"?prefill_token={token}")
+    assert r.status_code == HTTPStatus.OK
+    initial = {k: v for k, v in r.context_data["form"].initial.items() if v is not None}
+    assert "name" not in initial
+    assert r.context_data["ai_images_pending"] is False
+
+    # the original owner's entry must be untouched
+    data = wine_prefill_cache.get(f"wine_prefill_{token}")
+    assert data["user_id"] == user.pk
+    assert data["initial"]["name"] == "Secret Wine"
 
 
 @pytest.mark.django_db
@@ -88,7 +122,7 @@ def test_ai_upload_json_inside_markdown_block(mock_completion, client, user):
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
     assert r.status_code == HTTPStatus.FOUND
-    assert "ai_initial" in r["Location"]
+    assert "prefill_token" in r["Location"]
 
 
 @pytest.mark.django_db
@@ -179,7 +213,7 @@ def test_ai_upload_back_image_only(mock_completion, client, user):
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"back": random_png("back.png")})
     assert r.status_code == HTTPStatus.FOUND
-    assert "ai_initial" in r["Location"]
+    assert "prefill_token" in r["Location"]
 
 
 @pytest.mark.django_db
@@ -193,13 +227,15 @@ def test_ai_upload_success_with_barcode_param(mock_completion, client, user):
     url = reverse("wine-ai-upload") + "?barcode=12345"
     r = client.post(url, data={"front": random_png("front.png")})
     assert r.status_code == HTTPStatus.FOUND
-    assert "barcode=12345" in r["Location"]
+    assert "barcode" not in r["Location"]
+    data = _prefill_data(r["Location"])
+    assert data["initial"]["barcode"] == "12345"
 
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
 @patch("wine_cellar.apps.wine.views.completion")
-def test_ai_upload_use_as_wine_images_checked_stashes_token(
+def test_ai_upload_use_as_wine_images_checked_stashes_images(
     mock_completion, client, user
 ):
     mock_resp = MagicMock()
@@ -211,20 +247,25 @@ def test_ai_upload_use_as_wine_images_checked_stashes_token(
         data={"front": random_png("front.png"), "use_as_wine_images": "on"},
     )
     assert r.status_code == HTTPStatus.FOUND
-    assert "ai_images_token" in r["Location"]
+    assert "prefill_token" in r["Location"]
+    data = _prefill_data(r["Location"])
+    assert data["images"]
 
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
 @patch("wine_cellar.apps.wine.views.completion")
-def test_ai_upload_use_as_wine_images_unchecked_no_token(mock_completion, client, user):
+def test_ai_upload_use_as_wine_images_unchecked_no_images_stashed(
+    mock_completion, client, user
+):
     mock_resp = MagicMock()
     mock_resp.choices[0].message.content = '{"name": "Test Wine"}'
     mock_completion.return_value = mock_resp
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
     assert r.status_code == HTTPStatus.FOUND
-    assert "ai_images_token" not in r["Location"]
+    data = _prefill_data(r["Location"])
+    assert data["images"] == {}
 
 
 @pytest.mark.django_db
@@ -253,8 +294,8 @@ def test_ai_upload_unicode_minus_location_succeeds_without_reprompt(
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
     assert r.status_code == HTTPStatus.FOUND
     assert mock_completion.call_count == 1
-    decoded = _decode_ai_initial(r["Location"])
-    assert decoded["location"]["geometry"]["coordinates"] == [-0.6603, 48.1374]
+    initial = _prefill_data(r["Location"])["initial"]
+    assert initial["location"]["geometry"]["coordinates"] == [-0.6603, 48.1374]
 
 
 @pytest.mark.django_db
@@ -269,8 +310,8 @@ def test_ai_upload_invalid_location_reprompt_succeeds(mock_completion, client, u
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
     assert r.status_code == HTTPStatus.FOUND
     assert mock_completion.call_count == 2
-    decoded = _decode_ai_initial(r["Location"])
-    assert decoded["location"]["geometry"]["coordinates"] == [-0.6603, 48.1374]
+    initial = _prefill_data(r["Location"])["initial"]
+    assert initial["location"]["geometry"]["coordinates"] == [-0.6603, 48.1374]
 
 
 @pytest.mark.django_db
@@ -287,8 +328,8 @@ def test_ai_upload_invalid_location_reprompt_still_invalid_drops_location(
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
     assert r.status_code == HTTPStatus.FOUND
     assert mock_completion.call_count == 2
-    decoded = _decode_ai_initial(r["Location"])
-    assert "location" not in decoded
+    initial = _prefill_data(r["Location"])["initial"]
+    assert "location" not in initial
 
 
 @pytest.mark.django_db
@@ -305,8 +346,8 @@ def test_ai_upload_invalid_location_reprompt_bad_json_drops_location(
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
     assert r.status_code == HTTPStatus.FOUND
     assert mock_completion.call_count == 2
-    decoded = _decode_ai_initial(r["Location"])
-    assert "location" not in decoded
+    initial = _prefill_data(r["Location"])["initial"]
+    assert "location" not in initial
 
 
 @pytest.mark.django_db
@@ -323,8 +364,8 @@ def test_ai_upload_invalid_location_reprompt_litellm_error_drops_location(
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
     assert r.status_code == HTTPStatus.FOUND
     assert mock_completion.call_count == 2
-    decoded = _decode_ai_initial(r["Location"])
-    assert "location" not in decoded
+    initial = _prefill_data(r["Location"])["initial"]
+    assert "location" not in initial
 
 
 @pytest.mark.django_db

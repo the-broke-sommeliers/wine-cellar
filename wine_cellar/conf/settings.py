@@ -105,6 +105,14 @@ DATABASES = {
     }
 }
 
+# `wine_prefill` backs the short-lived AI-scan/barcode wine-add prefill data
+# (see wine_cellar.apps.wine.views); overridden to a Redis backend in
+# docker_settings.py/docker_dev_settings.py, local-memory here for dev/tests.
+CACHES = {
+    "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"},
+    "wine_prefill": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"},
+}
+
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",

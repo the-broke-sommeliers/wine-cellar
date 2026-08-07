@@ -7,6 +7,7 @@ import litellm
 import litellm.exceptions
 from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
+from django.core.cache import caches
 from django.core.files.base import ContentFile
 from django.db import IntegrityError, connections, transaction
 from django.db.models import Avg, F, Q, Sum
@@ -38,6 +39,12 @@ from wine_cellar.apps.wine.models import (
 )
 from wine_cellar.apps.wine.serializers import WineAiSerializer
 from wine_cellar.apps.wine.utils import lat_long_to_geojson
+
+# Short-lived storage for AI-scan/barcode wine-add prefill data, keyed by an
+# opaque `prefill_token`. Backed by Redis in Docker deployments (see
+# docker_settings.py/docker_dev_settings.py), local-memory otherwise.
+wine_prefill_cache = caches["wine_prefill"]
+WINE_PREFILL_TIMEOUT = 6 * 60 * 60  # seconds
 
 
 class HomePageView(TemplateView):
@@ -118,6 +125,17 @@ class WineChooseActionView(TemplateView):
         context.update({"ai_enabled": ai_enabled})
         if barcode := self.request.GET.get("barcode"):
             context.update({"barcode": barcode})
+            token = uuid.uuid4().hex
+            wine_prefill_cache.set(
+                f"wine_prefill_{token}",
+                {
+                    "initial": {"barcode": barcode},
+                    "images": {},
+                    "user_id": self.request.user.pk,
+                },
+                timeout=WINE_PREFILL_TIMEOUT,
+            )
+            context.update({"prefill_token": token})
         return context
 
 
@@ -203,13 +221,12 @@ class WineCreateView(WineBaseView):
 
     def get_initial(self):
         initial = super().get_initial()
-        if barcode := self.request.GET.get("barcode"):
-            initial["barcode"] = barcode
-        if b64 := self.request.GET.get("ai_initial"):
-            initial.update(WineAiSerializer().deserialize_ai_payload(b64))
-        if token := self._get_ai_images_token():
-            initial["ai_images_token"] = token
-        images = self._get_pending_ai_images()
+        data = self._get_prefill_data()
+        if data.get("initial"):
+            initial.update(WineAiSerializer().deserialize_ai_payload(data["initial"]))
+        if token := self._get_prefill_token():
+            initial["prefill_token"] = token
+        images = data.get("images", {})
         for key, form_field in {"front": "image_front", "back": "image_back"}.items():
             if stashed := images.get(key):
                 initial[form_field] = _PendingAiImage(self._ai_image_data_url(stashed))
@@ -220,28 +237,34 @@ class WineCreateView(WineBaseView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        images = self._get_pending_ai_images()
+        images = self._get_prefill_data().get("images", {})
         context["ai_images_pending"] = bool(images)
         context["ai_image_front_name"] = images.get("front", {}).get("name")
         context["ai_image_back_name"] = images.get("back", {}).get("name")
         return context
 
-    def _get_ai_images_token(self):
-        return self.request.POST.get("ai_images_token") or self.request.GET.get(
-            "ai_images_token"
+    def _get_prefill_token(self):
+        return self.request.POST.get("prefill_token") or self.request.GET.get(
+            "prefill_token"
         )
 
-    def _get_pending_ai_images(self):
-        token = self._get_ai_images_token()
-        return self.request.session.get(f"ai_images_{token}", {}) if token else {}
+    def _get_prefill_data(self):
+        token = self._get_prefill_token()
+        if not token:
+            return {}
+        data = wine_prefill_cache.get(f"wine_prefill_{token}")
+        if not data or data.get("user_id") != self.request.user.pk:
+            # Missing, expired, or belongs to a different user - a foreign or
+            # guessed token must behave exactly like no token at all.
+            return {}
+        return data
 
     @staticmethod
     def _ai_image_data_url(image):
         content_type = image.get("content_type") or "image/jpeg"
         return f"data:{content_type};base64,{image['data']}"
 
-    def _apply_ai_images(self, form, token):
-        images = self.request.session.get(f"ai_images_{token}", {})
+    def _apply_ai_images(self, form, images):
         field_map = {"front": "image_front", "back": "image_back"}
         for key, form_field in field_map.items():
             value = form.cleaned_data.get(form_field)
@@ -263,9 +286,10 @@ class WineCreateView(WineBaseView):
         if form_step is None:
             form_step = 5
         if form_step == 5 or "save_finish" in self.request.POST:
-            token = form.cleaned_data.get("ai_images_token")
-            if token:
-                self._apply_ai_images(form, token)
+            token = form.cleaned_data.get("prefill_token")
+            prefill_data = self._get_prefill_data() if token else {}
+            if prefill_data.get("images"):
+                self._apply_ai_images(form, prefill_data["images"])
             try:
                 with transaction.atomic():
                     self.update_wine_from_cleaned_data(
@@ -276,8 +300,8 @@ class WineCreateView(WineBaseView):
                     None, _("A wine with these details already exists in your cellar.")
                 )
                 return super().form_invalid(form)
-            if token:
-                self.request.session.pop(f"ai_images_{token}", None)
+            if prefill_data:
+                wine_prefill_cache.delete(f"wine_prefill_{token}")
             return super().form_valid(form)
         elif form_step < 5:
             form.data = form.data.copy()
@@ -572,11 +596,12 @@ class WineUploadAIView(FormView):
             except (TypeError, ValueError):
                 ai_json["location"] = self._reprompt_location(ai_json)
 
-        b64_initial = WineAiSerializer().serialize_ai_payload(ai_json)
-        create_url = reverse("wine-add") + f"?ai_initial={b64_initial}"
+        initial = WineAiSerializer().serialize_ai_payload(ai_json)
+        if barcode := self.request.GET.get("barcode"):
+            initial["barcode"] = barcode
 
+        images = {}
         if form.cleaned_data.get("use_as_wine_images"):
-            images = {}
             if front_img:
                 images["front"] = {
                     "data": front_b64,
@@ -589,14 +614,18 @@ class WineUploadAIView(FormView):
                     "name": back_img.name,
                     "content_type": back_img.content_type or "image/jpeg",
                 }
-            if images:
-                token = uuid.uuid4().hex
-                self.request.session[f"ai_images_{token}"] = images
-                create_url += f"&ai_images_token={token}"
 
-        if barcode := self.request.GET.get("barcode"):
-            create_url += f"&barcode={barcode}"
-        return redirect(create_url)
+        token = uuid.uuid4().hex
+        wine_prefill_cache.set(
+            f"wine_prefill_{token}",
+            {
+                "initial": initial,
+                "images": images,
+                "user_id": self.request.user.pk,
+            },
+            timeout=WINE_PREFILL_TIMEOUT,
+        )
+        return redirect(f"{reverse('wine-add')}?prefill_token={token}")
 
 
 @login_not_required

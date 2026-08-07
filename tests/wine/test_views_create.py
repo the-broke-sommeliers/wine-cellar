@@ -4,6 +4,7 @@ from http import HTTPStatus
 from unittest.mock import MagicMock, patch
 
 import pytest
+from django.core.cache import caches
 from django.test import override_settings
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects, assertTemplateUsed
@@ -90,7 +91,9 @@ def test_wine_create_post_with_barcode(client, user):
         "form_step": 5,
     }
     assert not Wine.objects.exists()
-    r = client.get(reverse("wine-add") + "?barcode=12345")
+    r = client.get(reverse("wine-add-choose") + "?barcode=12345")
+    token = r.context_data["prefill_token"]
+    r = client.get(reverse("wine-add") + f"?prefill_token={token}")
     initial = r.context_data["form"].initial.copy()
     initial.update(data)
     r = client.post(reverse("wine-add"), data=initial, follow=True)
@@ -124,7 +127,9 @@ def test_wine_create_post_with_drink_by(client, user):
         "form_step": 5,
     }
     assert not Wine.objects.exists()
-    r = client.get(reverse("wine-add") + "?barcode=12345")
+    r = client.get(reverse("wine-add-choose") + "?barcode=12345")
+    token = r.context_data["prefill_token"]
+    r = client.get(reverse("wine-add") + f"?prefill_token={token}")
     initial = r.context_data["form"].initial.copy()
     initial.update(data)
     r = client.post(reverse("wine-add"), data=initial, follow=True)
@@ -159,7 +164,9 @@ def test_wine_create_post_with_invalid_drink_by(client, user):
         "form_step": 5,
     }
     assert not Wine.objects.exists()
-    r = client.get(reverse("wine-add") + "?barcode=12345")
+    r = client.get(reverse("wine-add-choose") + "?barcode=12345")
+    token = r.context_data["prefill_token"]
+    r = client.get(reverse("wine-add") + f"?prefill_token={token}")
     initial = r.context_data["form"].initial.copy()
     initial.update(data)
     r = client.post(reverse("wine-add"), data=initial, follow=True)
@@ -799,12 +806,12 @@ def test_wine_create_uses_ai_uploaded_front_image(
         data={"front": random_png("ai_front.png"), "use_as_wine_images": "on"},
     )
     assert r.status_code == HTTPStatus.FOUND
-    assert "ai_images_token" in r["Location"]
+    assert "prefill_token" in r["Location"]
 
     r = client.get(r["Location"])
     assert r.status_code == HTTPStatus.OK
     initial = {k: v for k, v in r.context_data["form"].initial.items() if v is not None}
-    assert initial["ai_images_token"]
+    assert initial["prefill_token"]
 
     size = Size.objects.get(name=0.75)
     initial.update(
@@ -824,6 +831,60 @@ def test_wine_create_uses_ai_uploaded_front_image(
     assertRedirects(response=r, expected_url=reverse("wine-list"))
     wine = Wine.objects.first()
     assert WineImage.objects.filter(wine=wine, image_type=ImageType.FRONT).count() == 1
+
+
+@pytest.mark.django_db
+def test_wine_create_prefill_not_visible_to_other_user(client, user, user_factory):
+    """A guessed/observed `prefill_token` from someone else's AI-scan or
+    barcode "Add Manually" flow must not prefill or stash images for a
+    different logged-in user."""
+    client.force_login(user)
+    r = client.get(reverse("wine-add-choose") + "?barcode=9780201633610")
+    token = r.context_data["prefill_token"]
+
+    other_user = user_factory()
+    client.force_login(other_user)
+    r = client.get(reverse("wine-add") + f"?prefill_token={token}")
+    assert r.status_code == HTTPStatus.OK
+    initial = {k: v for k, v in r.context_data["form"].initial.items() if v is not None}
+    assert "barcode" not in initial
+    assert r.context_data["ai_images_pending"] is False
+
+    # the original owner's entry must be untouched
+    data = caches["wine_prefill"].get(f"wine_prefill_{token}")
+    assert data["user_id"] == user.pk
+    assert data["initial"]["barcode"] == "9780201633610"
+
+
+@pytest.mark.django_db
+def test_wine_create_other_users_prefill_token_not_deleted_on_save(
+    client, user, user_factory
+):
+    """Saving a wine while presenting someone else's `prefill_token` must not
+    delete that other user's still-valid cache entry."""
+    client.force_login(user)
+    r = client.get(reverse("wine-add-choose") + "?barcode=9780201633610")
+    token = r.context_data["prefill_token"]
+
+    other_user = user_factory()
+    client.force_login(other_user)
+    size = Size.objects.get(name=0.75)
+    data = {
+        "name": "Merlot",
+        "wine_type": "RE",
+        "category": "DR",
+        "abv": 13.0,
+        "size": size.pk,
+        "vintage": 2002,
+        "country": "DE",
+        "form_step": 5,
+        "prefill_token": token,
+    }
+    r = client.post(reverse("wine-add"), data=data, follow=True)
+    assert r.status_code == HTTPStatus.OK
+    assertRedirects(response=r, expected_url=reverse("wine-list"))
+
+    assert caches["wine_prefill"].get(f"wine_prefill_{token}") is not None
 
 
 @pytest.mark.django_db

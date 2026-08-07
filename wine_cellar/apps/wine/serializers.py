@@ -1,6 +1,3 @@
-import base64
-import json
-
 import pycountry
 
 from wine_cellar.apps.wine.models import (
@@ -124,15 +121,15 @@ class WineAiSerializer:
             except (TypeError, ValueError):
                 pass
 
-        return base64.urlsafe_b64encode(
-            json.dumps(initial, separators=(",", ":")).encode()
-        ).decode()
+        return initial
 
-    def deserialize_ai_payload(self, b64_initial):
-        initial = json.loads(base64.urlsafe_b64decode(b64_initial).decode())
+    def deserialize_ai_payload(self, initial):
+        initial = dict(initial)
         for field, cfg in self.FIELD_CONFIG.items():
+            if field not in initial:
+                continue
             initial[field] = self.deserialize_relation(
-                initial.get(field),
+                initial[field],
                 cfg["model"],
                 cfg["multi"],
             )

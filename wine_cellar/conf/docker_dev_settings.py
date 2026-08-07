@@ -57,6 +57,13 @@ CELERY_RESULT_BACKEND = os.environ.get(
     "redis://redis:6379",
 )
 
+# Use a separate logical DB (index 1) from Celery's broker/backend (index 0)
+# to keep key namespaces apart on the same Redis instance.
+CACHES["wine_prefill"] = {  # noqa: F405
+    "BACKEND": "django.core.cache.backends.redis.RedisCache",
+    "LOCATION": f"{os.environ.get('REDIS_URL', 'redis://redis:6379')}/1",
+}
+
 SENTRY_DSN = os.environ.get("SENTRY_DSN", "")
 if SENTRY_DSN:
     sentry_sdk.init(
