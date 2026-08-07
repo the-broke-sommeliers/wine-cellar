@@ -47,6 +47,18 @@
             <div class="card">
                 <div class="card__header">
                     <h3>{% translate "Contents" %}</h3>
+                    <div class="storage__label-buttons">
+                        {% if storage.rows > 0 and row_labels_enabled %}
+                            <a class="card__action-btn" href="{% url 'storage-labels' storage.pk 'row' %}" title="{% translate "Name Rows" %}">
+                                <i class="fa-solid fa-tag"></i> <span>{% translate "Name Rows" %}</span>
+                            </a>
+                        {% endif %}
+                        {% if storage.columns > 0 and column_labels_enabled %}
+                            <a class="card__action-btn" href="{% url 'storage-labels' storage.pk 'column' %}" title="{% translate "Name Columns" %}">
+                                <i class="fa-solid fa-tag"></i> <span>{% translate "Name Columns" %}</span>
+                            </a>
+                        {% endif %}
+                    </div>
                 </div>
                 {% if object_list %}
                     <table class="card__table"
@@ -56,8 +68,13 @@
                             <tr>
                                 {% if storage.rows > 0 and storage.columns > 0 %}<th></th>{% endif %}
                                 <th>{% translate "Wine" %}</th>
-                                <th>{% translate "Row" %}</th>
-                                <th>{% translate "Cell" %}</th>
+                                {% if swap_axes %}
+                                    <th>{% translate "Column" %}</th>
+                                    <th>{% translate "Row" %}</th>
+                                {% else %}
+                                    <th>{% translate "Row" %}</th>
+                                    <th>{% translate "Column" %}</th>
+                                {% endif %}
                                 <th>{% translate "Drink by" %}</th>
                                 <th></th>
                             </tr>
@@ -70,8 +87,13 @@
                                     draggable="false">
                                     {% if storage.rows > 0 and storage.columns > 0 %}<td></td>{% endif %}
                                     <td><span class="text--gray">—</span></td>
-                                    <td>{{ entry.row }}</td>
-                                    <td>{{ entry.column }}</td>
+                                    {% if swap_axes %}
+                                        <td>{{ entry.column }}{% if column_labels_enabled and entry.column_label %} ({{ entry.column_label }}){% endif %}</td>
+                                        <td>{{ entry.row }}{% if row_labels_enabled and entry.row_label %} ({{ entry.row_label }}){% endif %}</td>
+                                    {% else %}
+                                        <td>{{ entry.row }}{% if row_labels_enabled and entry.row_label %} ({{ entry.row_label }}){% endif %}</td>
+                                        <td>{{ entry.column }}{% if column_labels_enabled and entry.column_label %} ({{ entry.column_label }}){% endif %}</td>
+                                    {% endif %}
                                     <td></td>
                                     <td></td>
                                 </tr>
@@ -86,8 +108,13 @@
                                         <a href="{% url 'wine-detail' entry.wine.pk %}">{{ entry.wine.name }}</a>
                                         {% if entry.opened %}<span class="visually-hidden">{% translate "Opened" %}</span>{% endif %}
                                     </td>
-                                    <td>{{ entry.row|default_if_none:"—" }}</td>
-                                    <td>{{ entry.column|default_if_none:"—" }}</td>
+                                    {% if swap_axes %}
+                                        <td>{{ entry.column|default_if_none:"—" }}{% if column_labels_enabled and entry.column_label %} ({{ entry.column_label }}){% endif %}</td>
+                                        <td>{{ entry.row|default_if_none:"—" }}{% if row_labels_enabled and entry.row_label %} ({{ entry.row_label }}){% endif %}</td>
+                                    {% else %}
+                                        <td>{{ entry.row|default_if_none:"—" }}{% if row_labels_enabled and entry.row_label %} ({{ entry.row_label }}){% endif %}</td>
+                                        <td>{{ entry.column|default_if_none:"—" }}{% if column_labels_enabled and entry.column_label %} ({{ entry.column_label }}){% endif %}</td>
+                                    {% endif %}
                                     <td>{{ entry.drink_by|default_if_none:"—" }}</td>
                                     <td class="card__table-actions">
                                         <a href="{% url 'stock-edit' entry.pk %}?next=storage" title="{% translate "Edit" %}" aria-label="{% translate "Edit" %}"><i class="fa-regular fa-pen-to-square" aria-hidden="true"></i></a>

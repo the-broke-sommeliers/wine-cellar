@@ -70,3 +70,9 @@
   display: flex;
   gap: 6px;
 }
+
+.storage__label-buttons {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}

@@ -83,6 +83,56 @@ def test_storage_create_post(client, user):
 
 
 @pytest.mark.django_db
+def test_storage_create_post_swap_axes(client, user):
+    client.force_login(user)
+    data = {
+        "name": "Shelf 1",
+        "location": "Basement",
+        "rows": 5,
+        "columns": 10,
+        "swap_axes": "on",
+    }
+    r = client.post(reverse("storage-add"), data=data, follow=True)
+    assert r.status_code == HTTPStatus.OK
+    storage = Storage.objects.last()
+    assert storage.swap_axes is True
+
+
+@pytest.mark.django_db
+def test_storage_create_post_row_labels_enabled(client, user):
+    client.force_login(user)
+    data = {
+        "name": "Shelf 1",
+        "location": "Basement",
+        "rows": 5,
+        "columns": 10,
+        "row_labels_enabled": "on",
+    }
+    r = client.post(reverse("storage-add"), data=data, follow=True)
+    assert r.status_code == HTTPStatus.OK
+    storage = Storage.objects.last()
+    assert storage.row_labels_enabled is True
+    assert storage.column_labels_enabled is False
+
+
+@pytest.mark.django_db
+def test_storage_create_post_column_labels_enabled(client, user):
+    client.force_login(user)
+    data = {
+        "name": "Shelf 1",
+        "location": "Basement",
+        "rows": 5,
+        "columns": 10,
+        "column_labels_enabled": "on",
+    }
+    r = client.post(reverse("storage-add"), data=data, follow=True)
+    assert r.status_code == HTTPStatus.OK
+    storage = Storage.objects.last()
+    assert storage.column_labels_enabled is True
+    assert storage.row_labels_enabled is False
+
+
+@pytest.mark.django_db
 def test_storage_create_post_invalid(client, user):
     client.force_login(user)
     data = {
@@ -133,6 +183,87 @@ def test_storage_update_post(client, user):
     assert storage.user == user
     assert storage.rows == data["rows"]
     assert storage.columns == data["columns"]
+
+
+@pytest.mark.django_db
+def test_storage_update_post_swap_axes(client, user):
+    client.force_login(user)
+    storage = Storage.objects.first()
+    data = {
+        "name": storage.name,
+        "location": "Basement",
+        "rows": 1,
+        "columns": 10,
+        "swap_axes": "on",
+    }
+    r = client.post(
+        reverse("storage-edit", kwargs={"pk": storage.pk}), data=data, follow=True
+    )
+    assert r.status_code == HTTPStatus.OK
+    storage.refresh_from_db()
+    assert storage.swap_axes is True
+
+    data["swap_axes"] = ""
+    r = client.post(
+        reverse("storage-edit", kwargs={"pk": storage.pk}), data=data, follow=True
+    )
+    assert r.status_code == HTTPStatus.OK
+    storage.refresh_from_db()
+    assert storage.swap_axes is False
+
+
+@pytest.mark.django_db
+def test_storage_update_post_row_labels_enabled(client, user):
+    client.force_login(user)
+    storage = Storage.objects.first()
+    data = {
+        "name": storage.name,
+        "location": "Basement",
+        "rows": 1,
+        "columns": 10,
+        "row_labels_enabled": "on",
+    }
+    r = client.post(
+        reverse("storage-edit", kwargs={"pk": storage.pk}), data=data, follow=True
+    )
+    assert r.status_code == HTTPStatus.OK
+    storage.refresh_from_db()
+    assert storage.row_labels_enabled is True
+
+    data["row_labels_enabled"] = ""
+    r = client.post(
+        reverse("storage-edit", kwargs={"pk": storage.pk}), data=data, follow=True
+    )
+    assert r.status_code == HTTPStatus.OK
+    storage.refresh_from_db()
+    assert storage.row_labels_enabled is False
+
+
+@pytest.mark.django_db
+def test_storage_update_post_column_labels_enabled(client, user):
+    client.force_login(user)
+    storage = Storage.objects.first()
+    data = {
+        "name": storage.name,
+        "location": "Basement",
+        "rows": 1,
+        "columns": 10,
+        "column_labels_enabled": "on",
+    }
+    r = client.post(
+        reverse("storage-edit", kwargs={"pk": storage.pk}), data=data, follow=True
+    )
+    assert r.status_code == HTTPStatus.OK
+    storage.refresh_from_db()
+    assert storage.column_labels_enabled is True
+
+    data["column_labels_enabled"] = ""
+    r = client.post(
+        reverse("storage-edit", kwargs={"pk": storage.pk}), data=data, follow=True
+    )
+    assert r.status_code == HTTPStatus.OK
+    storage.refresh_from_db()
+    assert storage.column_labels_enabled is False
 
 
 @pytest.mark.django_db

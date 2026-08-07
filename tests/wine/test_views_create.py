@@ -745,7 +745,7 @@ def test_wine_edit_overwrite_front_and_back_with_newer_images(
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.tasks.completion")
+@patch("litellm.completion")
 def test_wine_create_overwriting_ai_stashed_images_with_newer_ones(
     mock_completion, client, user, clear_image_folder
 ):
@@ -802,7 +802,7 @@ def test_wine_create_overwriting_ai_stashed_images_with_newer_ones(
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.tasks.completion")
+@patch("litellm.completion")
 def test_wine_create_uses_ai_uploaded_front_image(
     mock_completion, client, user, clear_image_folder
 ):
@@ -902,7 +902,7 @@ def test_wine_create_other_users_prefill_token_not_deleted_on_save(
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.tasks.completion")
+@patch("litellm.completion")
 def test_wine_create_explicit_image_overrides_ai_stashed_image(
     mock_completion, client, user, clear_image_folder
 ):
@@ -945,7 +945,7 @@ def test_wine_create_explicit_image_overrides_ai_stashed_image(
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.tasks.completion")
+@patch("litellm.completion")
 def test_wine_create_shows_preview_of_ai_stashed_image(
     mock_completion, client, user, clear_image_folder
 ):
@@ -982,7 +982,7 @@ def test_wine_create_shows_preview_of_ai_stashed_image(
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.tasks.completion")
+@patch("litellm.completion")
 def test_wine_create_clearing_ai_stashed_image_discards_it(
     mock_completion, client, user, clear_image_folder
 ):

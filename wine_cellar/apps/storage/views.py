@@ -1,11 +1,12 @@
 from datetime import timedelta
 
+from django.core.paginator import Paginator
 from django.db import models, transaction
 from django.db.models import Q
 from django.forms import model_to_dict
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, redirect
-from django.urls import reverse_lazy
+from django.http import Http404, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views import View
@@ -13,7 +14,12 @@ from django.views.generic import DeleteView, DetailView, FormView, ListView
 from django.views.generic.list import MultipleObjectMixin
 
 from wine_cellar.apps.storage.forms import StockForm, StockOpenForm, StorageForm
-from wine_cellar.apps.storage.models import Storage, StorageItem
+from wine_cellar.apps.storage.models import (
+    Storage,
+    StorageItem,
+    StorageLabel,
+    StorageLabelAxis,
+)
 from wine_cellar.apps.wine.models import Wine
 
 
@@ -36,6 +42,7 @@ class StorageDetailView(DetailView, MultipleObjectMixin):
     def get_context_data(self, **kwargs):
         object = self.get_object()
         items = list(object.get_wines)
+        swap_axes = object.swap_axes
 
         # Build a combined list of items and empty slots, sorted by grid position
         rows = []
@@ -59,16 +66,33 @@ class StorageDetailView(DetailView, MultipleObjectMixin):
                             }
                         )
 
+        row_labels = object.row_labels
+        column_labels = object.column_labels
+        for entry in rows:
+            row = entry["row"] if isinstance(entry, dict) else entry.row
+            column = entry["column"] if isinstance(entry, dict) else entry.column
+            row_label = row_labels.get(row)
+            column_label = column_labels.get(column)
+            if isinstance(entry, dict):
+                entry["row_label"] = row_label
+                entry["column_label"] = column_label
+            else:
+                entry.row_label = row_label
+                entry.column_label = column_label
+
         def sort_key(x):
             r = x["row"] if isinstance(x, dict) else x.row
             c = x["column"] if isinstance(x, dict) else x.column
-            return (r or 0, c or 0)
+            return (c or 0, r or 0) if swap_axes else (r or 0, c or 0)
 
         rows.sort(key=sort_key)
 
         context = super(StorageDetailView, self).get_context_data(
             object_list=rows, **kwargs
         )
+        context["swap_axes"] = swap_axes
+        context["row_labels_enabled"] = object.row_labels_enabled
+        context["column_labels_enabled"] = object.column_labels_enabled
         return context
 
     def get_queryset(self):
@@ -92,6 +116,9 @@ class StorageCreateView(FormView):
         name = cleaned_data["name"]
         rows = cleaned_data["rows"] or 0
         columns = cleaned_data["columns"] or 0
+        swap_axes = cleaned_data["swap_axes"]
+        row_labels_enabled = cleaned_data["row_labels_enabled"]
+        column_labels_enabled = cleaned_data["column_labels_enabled"]
 
         Storage.objects.create(
             location=location,
@@ -99,6 +126,9 @@ class StorageCreateView(FormView):
             name=name,
             rows=rows,
             columns=columns,
+            swap_axes=swap_axes,
+            row_labels_enabled=row_labels_enabled,
+            column_labels_enabled=column_labels_enabled,
             user=user,
         )
 
@@ -131,14 +161,92 @@ class StorageUpdateView(FormView):
         name = cleaned_data["name"]
         rows = cleaned_data["rows"]
         columns = cleaned_data["columns"]
+        swap_axes = cleaned_data["swap_axes"]
+        row_labels_enabled = cleaned_data["row_labels_enabled"]
+        column_labels_enabled = cleaned_data["column_labels_enabled"]
 
         storage.location = location
         storage.description = description
         storage.name = name
         storage.rows = rows
         storage.columns = columns
+        storage.swap_axes = swap_axes
+        storage.row_labels_enabled = row_labels_enabled
+        storage.column_labels_enabled = column_labels_enabled
         storage.user = user
         storage.save()
+
+
+class StorageLabelsView(View):
+    """Dedicated screen to name every row (or every column) of a storage's
+    grid, one page of PAGE_SIZE indices at a time. Only ever touches the
+    single axis + page it was called with - saving one page/axis must never
+    delete or blank out labels belonging to a different page or axis."""
+
+    template_name = "storage_labels.html"
+    PAGE_SIZE = 25
+
+    @staticmethod
+    def _get_storage_and_count(request, pk, axis):
+        if axis not in (StorageLabelAxis.ROW, StorageLabelAxis.COLUMN):
+            raise Http404("Unknown axis")
+        storage = get_object_or_404(Storage, pk=pk, user=request.user)
+        enabled = (
+            storage.row_labels_enabled
+            if axis == StorageLabelAxis.ROW
+            else storage.column_labels_enabled
+        )
+        if not enabled:
+            raise Http404("Labels disabled for this axis")
+        count = storage.rows if axis == StorageLabelAxis.ROW else storage.columns
+        return storage, count
+
+    @classmethod
+    def _get_page(cls, count, page_number):
+        # Single source of truth for how `count` indices are sliced into
+        # pages - GET and POST must call this identically so "page N" always
+        # means the same set of indices.
+        return Paginator(range(1, count + 1), cls.PAGE_SIZE).get_page(page_number)
+
+    def get(self, request, pk, axis):
+        storage, count = self._get_storage_and_count(request, pk, axis)
+        labels = (
+            storage.row_labels
+            if axis == StorageLabelAxis.ROW
+            else storage.column_labels
+        )
+        page_obj = self._get_page(count, request.GET.get("page"))
+        context = {
+            "storage": storage,
+            "axis": axis,
+            "page_obj": page_obj,
+            "entries": [(i, labels.get(i, "")) for i in page_obj.object_list],
+        }
+        return render(request, self.template_name, context)
+
+    def post(self, request, pk, axis):
+        storage, count = self._get_storage_and_count(request, pk, axis)
+        # Recompute the exact slice for the page that was SUBMITTED (hidden
+        # field), not request.GET - and only ever touch those indices.
+        page_obj = self._get_page(count, request.POST.get("page"))
+
+        with transaction.atomic():
+            for index in page_obj.object_list:
+                name = request.POST.get(f"{axis}_{index}", "").strip()[:100]
+                if name:
+                    StorageLabel.objects.update_or_create(
+                        storage=storage,
+                        axis=axis,
+                        index=index,
+                        defaults={"name": name, "user": request.user},
+                    )
+                else:
+                    StorageLabel.objects.filter(
+                        storage=storage, axis=axis, index=index
+                    ).delete()
+
+        url = reverse("storage-labels", kwargs={"pk": storage.pk, "axis": axis})
+        return redirect(f"{url}?page={page_obj.number}")
 
 
 class StorageDeleteView(DeleteView):
