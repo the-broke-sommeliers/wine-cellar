@@ -1,14 +1,12 @@
 import json
 from datetime import timedelta
 
-import litellm.exceptions
 import pycountry
 from celery import shared_task
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from litellm import completion
 
 from wine_cellar.apps.wine.emails import (
     send_drink_by_reminder,
@@ -92,6 +90,13 @@ def _parse_ai_json(ai_text: str) -> dict:
 
 
 def _reprompt_field(ai_json, field, ask):
+    # `litellm` is a heavy import (~5s), so it's deferred to task runtime instead
+    # of module load time - Django's URL system checks import this module on
+    # every `manage.py` invocation via views.py, not just when the AI feature
+    # actually runs.
+    import litellm.exceptions
+    from litellm import completion
+
     context = {
         f: ai_json[f]
         for f in ("name", "country", "region", "appellation", "vineyard", "vintage")
@@ -194,6 +199,11 @@ def _set_prefill_error(token, user_id, message):
 def process_ai_wine_upload(
     token, user_id, front=None, back=None, use_as_wine_images=False, barcode=None
 ):
+    # See the comment in `_reprompt_field` - `litellm` import is deferred to
+    # task runtime to keep it out of Django's module-loading path.
+    import litellm.exceptions
+    from litellm import completion
+
     content = [{"type": "text", "text": MODEL_INSTRUCTIONS}]
     if front:
         content.append(

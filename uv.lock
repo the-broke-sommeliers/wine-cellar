@@ -2372,7 +2372,7 @@ brotli = [
 
 [[package]]
 name = "wine-cellar"
-version = "0.10.0rc2"
+version = "0.10.0rc4"
 source = { virtual = "." }
 dependencies = [
     { name = "celery" },
