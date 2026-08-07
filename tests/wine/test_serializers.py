@@ -115,6 +115,58 @@ def test_serialize_ai_payload_missing_size_skips():
 
 
 @pytest.mark.django_db
+def test_serialize_ai_payload_vintage_string_coerced():
+    serializer = WineAiSerializer()
+    ai_json = {"name": "Wine", "vintage": "2018"}
+    initial = serializer.serialize_ai_payload(ai_json)
+    assert initial["vintage"] == 2018
+
+
+@pytest.mark.django_db
+def test_serialize_ai_payload_vintage_non_numeric_dropped():
+    serializer = WineAiSerializer()
+    ai_json = {"name": "Wine", "vintage": "NV"}
+    initial = serializer.serialize_ai_payload(ai_json)
+    assert "vintage" not in initial
+
+
+@pytest.mark.django_db
+def test_serialize_ai_payload_abv_percent_suffix_stripped():
+    serializer = WineAiSerializer()
+    ai_json = {"name": "Wine", "abs": "13.5%"}
+    initial = serializer.serialize_ai_payload(ai_json)
+    assert initial["abv"] == 13.5
+
+
+@pytest.mark.django_db
+def test_serialize_ai_payload_size_ml_normalized():
+    # migration 0002_add_common_sizes already seeds a global Size(name=0.75).
+    size = Size.objects.get(name=0.75)
+    serializer = WineAiSerializer()
+    ai_json = {"name": "Wine", "size": "750ml"}
+    initial = serializer.serialize_ai_payload(ai_json)
+    assert initial["size"] == size.pk
+
+
+@pytest.mark.django_db
+def test_serialize_ai_payload_size_cl_normalized():
+    size = Size.objects.get(name=0.75)
+    serializer = WineAiSerializer()
+    ai_json = {"name": "Wine", "size": "75cl"}
+    initial = serializer.serialize_ai_payload(ai_json)
+    assert initial["size"] == size.pk
+
+
+@pytest.mark.django_db
+def test_serialize_ai_payload_size_bare_number_assumed_ml():
+    size = Size.objects.get(name=0.75)
+    serializer = WineAiSerializer()
+    ai_json = {"name": "Wine", "size": 750}
+    initial = serializer.serialize_ai_payload(ai_json)
+    assert initial["size"] == size.pk
+
+
+@pytest.mark.django_db
 def test_serialize_ai_payload_with_location():
     serializer = WineAiSerializer()
     ai_json = {"name": "Wine", "location": "48.1374, 11.5755"}

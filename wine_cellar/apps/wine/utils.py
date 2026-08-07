@@ -4,6 +4,7 @@ import os
 from typing import TYPE_CHECKING
 
 from django.conf import settings
+from django.core.cache import caches
 from PIL import ExifTags, Image
 
 if TYPE_CHECKING:
@@ -11,6 +12,9 @@ if TYPE_CHECKING:
 
 _DASH_CHARS = "‐‑‒–—―−"  # hyphen..horizontal bar, minus sign
 _DASH_TRANSLATION = str.maketrans({c: "-" for c in _DASH_CHARS})
+
+wine_prefill_cache = caches["wine_prefill"]
+WINE_PREFILL_TIMEOUT = 6 * 60 * 60  # seconds
 
 
 def user_directory_path(instance, filename):
@@ -93,6 +97,16 @@ def get_map_attributes(
         wines = [wine_to_json(w) for w in wines]
         attributes["wines"] = wines
     return attributes
+
+
+def match_choice_label(value, choices):
+    """Case-insensitive match of `value` against a Django choices list's
+    labels. Returns the matching value, or None if nothing matches."""
+    value = (value or "").strip().lower()
+    for val, label in choices:
+        if label.lower() == value:
+            return val
+    return None
 
 
 def lat_long_to_geojson(lat_long: str) -> dict:

@@ -1,13 +1,13 @@
 from http import HTTPStatus
 from unittest.mock import MagicMock, patch
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import urlparse
 
 import httpx
 import litellm.exceptions
 import pytest
 from django.core.cache import caches
 from django.test import override_settings
-from django.urls import reverse
+from django.urls import resolve, reverse
 
 from tests.helpers import random_png
 
@@ -20,9 +20,26 @@ def _make_litellm_exc(exc_cls, status=503):
     return exc_cls("test error", llm_provider="test", model="test", response=resp)
 
 
+def _status_token(location_header):
+    """Extract the `token` path param from a `wine-ai-upload-status` redirect."""
+    path = urlparse(location_header).path
+    return resolve(path).kwargs["token"]
+
+
+def _poll(client, location_header):
+    """Follow up on a `wine-ai-upload` redirect by polling its status page.
+
+    `CELERY_TASK_ALWAYS_EAGER=True` (test.py) means the task has already run
+    to completion by the time the initial POST returns, so a single poll
+    always reflects the final ("done"/"error") state.
+    """
+    token = _status_token(location_header)
+    r = client.get(reverse("wine-ai-upload-poll", kwargs={"token": token}))
+    return r.json()
+
+
 def _prefill_data(location_header):
-    query = parse_qs(urlparse(location_header).query)
-    token = query["prefill_token"][0]
+    token = _status_token(location_header)
     return wine_prefill_cache.get(f"wine_prefill_{token}")
 
 
@@ -70,21 +87,27 @@ def test_ai_upload_no_images_rejected(client, user):
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.views.completion")
-def test_ai_upload_success_redirects_to_create(mock_completion, client, user):
+@patch("wine_cellar.apps.wine.tasks.completion")
+def test_ai_upload_success_redirects_to_status_and_then_create(
+    mock_completion, client, user
+):
     mock_resp = MagicMock()
     mock_resp.choices[0].message.content = '{"name": "Test Wine", "country": "DE"}'
     mock_completion.return_value = mock_resp
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
     assert r.status_code == HTTPStatus.FOUND
-    assert reverse("wine-add") in r["Location"]
-    assert "prefill_token" in r["Location"]
+    assert resolve(urlparse(r["Location"]).path).url_name == "wine-ai-upload-status"
+
+    poll = _poll(client, r["Location"])
+    assert poll["status"] == "done"
+    assert reverse("wine-add") in poll["redirect"]
+    assert "prefill_token" in poll["redirect"]
 
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.views.completion")
+@patch("wine_cellar.apps.wine.tasks.completion")
 def test_ai_upload_prefill_not_visible_to_other_user(
     mock_completion, client, user, user_factory
 ):
@@ -96,7 +119,7 @@ def test_ai_upload_prefill_not_visible_to_other_user(
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
     assert r.status_code == HTTPStatus.FOUND
-    token = parse_qs(urlparse(r["Location"]).query)["prefill_token"][0]
+    token = _status_token(r["Location"])
 
     other_user = user_factory()
     client.force_login(other_user)
@@ -114,7 +137,7 @@ def test_ai_upload_prefill_not_visible_to_other_user(
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.views.completion")
+@patch("wine_cellar.apps.wine.tasks.completion")
 def test_ai_upload_json_inside_markdown_block(mock_completion, client, user):
     mock_resp = MagicMock()
     mock_resp.choices[0].message.content = '```json\n{"name": "Test Wine"}\n```'
@@ -122,90 +145,103 @@ def test_ai_upload_json_inside_markdown_block(mock_completion, client, user):
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
     assert r.status_code == HTTPStatus.FOUND
-    assert "prefill_token" in r["Location"]
+    poll = _poll(client, r["Location"])
+    assert poll["status"] == "done"
 
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.views.completion")
+@patch("wine_cellar.apps.wine.tasks.completion")
 def test_ai_upload_invalid_json_shows_error(mock_completion, client, user):
     mock_resp = MagicMock()
     mock_resp.choices[0].message.content = "not valid json at all"
     mock_completion.return_value = mock_resp
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
-    assert r.status_code == HTTPStatus.OK
-    assert r.context["form"].non_field_errors()
+    assert r.status_code == HTTPStatus.FOUND
+    poll = _poll(client, r["Location"])
+    assert poll["status"] == "error"
+    assert poll["message"]
 
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.views.completion")
+@patch("wine_cellar.apps.wine.tasks.completion")
 def test_ai_upload_authentication_error(mock_completion, client, user):
     mock_completion.side_effect = _make_litellm_exc(
         litellm.exceptions.AuthenticationError, status=401
     )
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
-    assert r.status_code == HTTPStatus.OK
-    assert r.context["form"].non_field_errors()
+    assert r.status_code == HTTPStatus.FOUND
+    poll = _poll(client, r["Location"])
+    assert poll["status"] == "error"
+    assert poll["message"]
 
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.views.completion")
+@patch("wine_cellar.apps.wine.tasks.completion")
 def test_ai_upload_rate_limit_error(mock_completion, client, user):
     mock_completion.side_effect = _make_litellm_exc(
         litellm.exceptions.RateLimitError, status=429
     )
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
-    assert r.status_code == HTTPStatus.OK
-    assert r.context["form"].non_field_errors()
+    assert r.status_code == HTTPStatus.FOUND
+    poll = _poll(client, r["Location"])
+    assert poll["status"] == "error"
+    assert poll["message"]
 
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.views.completion")
+@patch("wine_cellar.apps.wine.tasks.completion")
 def test_ai_upload_service_unavailable_error(mock_completion, client, user):
     mock_completion.side_effect = _make_litellm_exc(
         litellm.exceptions.ServiceUnavailableError, status=503
     )
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
-    assert r.status_code == HTTPStatus.OK
-    assert r.context["form"].non_field_errors()
+    assert r.status_code == HTTPStatus.FOUND
+    poll = _poll(client, r["Location"])
+    assert poll["status"] == "error"
+    assert poll["message"]
 
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.views.completion")
+@patch("wine_cellar.apps.wine.tasks.completion")
 def test_ai_upload_timeout_error(mock_completion, client, user):
     mock_completion.side_effect = litellm.exceptions.Timeout(
         "timeout", model="test", llm_provider="test"
     )
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
-    assert r.status_code == HTTPStatus.OK
-    assert r.context["form"].non_field_errors()
+    assert r.status_code == HTTPStatus.FOUND
+    poll = _poll(client, r["Location"])
+    assert poll["status"] == "error"
+    assert poll["message"]
 
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.views.completion")
+@patch("wine_cellar.apps.wine.tasks.completion")
 def test_ai_upload_connection_error(mock_completion, client, user):
     mock_completion.side_effect = litellm.exceptions.APIConnectionError(
         "connection error", llm_provider="test", model="test"
     )
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
-    assert r.status_code == HTTPStatus.OK
-    assert r.context["form"].non_field_errors()
+    assert r.status_code == HTTPStatus.FOUND
+    poll = _poll(client, r["Location"])
+    assert poll["status"] == "error"
+    assert poll["message"]
 
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.views.completion")
+@patch("wine_cellar.apps.wine.tasks.completion")
 def test_ai_upload_back_image_only(mock_completion, client, user):
     mock_resp = MagicMock()
     mock_resp.choices[0].message.content = '{"name": "Test Wine"}'
@@ -213,12 +249,13 @@ def test_ai_upload_back_image_only(mock_completion, client, user):
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"back": random_png("back.png")})
     assert r.status_code == HTTPStatus.FOUND
-    assert "prefill_token" in r["Location"]
+    poll = _poll(client, r["Location"])
+    assert poll["status"] == "done"
 
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.views.completion")
+@patch("wine_cellar.apps.wine.tasks.completion")
 def test_ai_upload_success_with_barcode_param(mock_completion, client, user):
     mock_resp = MagicMock()
     mock_resp.choices[0].message.content = '{"name": "Test Wine"}'
@@ -234,7 +271,7 @@ def test_ai_upload_success_with_barcode_param(mock_completion, client, user):
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.views.completion")
+@patch("wine_cellar.apps.wine.tasks.completion")
 def test_ai_upload_use_as_wine_images_checked_stashes_images(
     mock_completion, client, user
 ):
@@ -247,14 +284,13 @@ def test_ai_upload_use_as_wine_images_checked_stashes_images(
         data={"front": random_png("front.png"), "use_as_wine_images": "on"},
     )
     assert r.status_code == HTTPStatus.FOUND
-    assert "prefill_token" in r["Location"]
     data = _prefill_data(r["Location"])
     assert data["images"]
 
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.views.completion")
+@patch("wine_cellar.apps.wine.tasks.completion")
 def test_ai_upload_use_as_wine_images_unchecked_no_images_stashed(
     mock_completion, client, user
 ):
@@ -270,20 +306,22 @@ def test_ai_upload_use_as_wine_images_unchecked_no_images_stashed(
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.views.completion")
+@patch("wine_cellar.apps.wine.tasks.completion")
 def test_ai_upload_api_error(mock_completion, client, user):
     mock_completion.side_effect = litellm.exceptions.APIError(
         status_code=500, message="api error", llm_provider="test", model="test"
     )
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
-    assert r.status_code == HTTPStatus.OK
-    assert r.context["form"].non_field_errors()
+    assert r.status_code == HTTPStatus.FOUND
+    poll = _poll(client, r["Location"])
+    assert poll["status"] == "error"
+    assert poll["message"]
 
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.views.completion")
+@patch("wine_cellar.apps.wine.tasks.completion")
 def test_ai_upload_unicode_minus_location_succeeds_without_reprompt(
     mock_completion, client, user
 ):
@@ -300,7 +338,7 @@ def test_ai_upload_unicode_minus_location_succeeds_without_reprompt(
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.views.completion")
+@patch("wine_cellar.apps.wine.tasks.completion")
 def test_ai_upload_invalid_location_reprompt_succeeds(mock_completion, client, user):
     mock_completion.side_effect = [
         _mock_response('{"name": "Test Wine", "location": "999,999"}'),
@@ -316,7 +354,7 @@ def test_ai_upload_invalid_location_reprompt_succeeds(mock_completion, client, u
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.views.completion")
+@patch("wine_cellar.apps.wine.tasks.completion")
 def test_ai_upload_invalid_location_reprompt_still_invalid_drops_location(
     mock_completion, client, user
 ):
@@ -334,7 +372,7 @@ def test_ai_upload_invalid_location_reprompt_still_invalid_drops_location(
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.views.completion")
+@patch("wine_cellar.apps.wine.tasks.completion")
 def test_ai_upload_invalid_location_reprompt_bad_json_drops_location(
     mock_completion, client, user
 ):
@@ -352,7 +390,7 @@ def test_ai_upload_invalid_location_reprompt_bad_json_drops_location(
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.views.completion")
+@patch("wine_cellar.apps.wine.tasks.completion")
 def test_ai_upload_invalid_location_reprompt_litellm_error_drops_location(
     mock_completion, client, user
 ):
@@ -370,10 +408,126 @@ def test_ai_upload_invalid_location_reprompt_litellm_error_drops_location(
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.views.completion")
+@patch("wine_cellar.apps.wine.tasks.completion")
 def test_ai_upload_missing_location_no_reprompt(mock_completion, client, user):
     mock_completion.return_value = _mock_response('{"name": "Test Wine"}')
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
     assert r.status_code == HTTPStatus.FOUND
     assert mock_completion.call_count == 1
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("wine_cellar.apps.wine.tasks.completion")
+def test_ai_upload_invalid_country_reprompt_succeeds(mock_completion, client, user):
+    mock_completion.side_effect = [
+        _mock_response('{"name": "Test Wine", "country": "Germany"}'),
+        _mock_response('{"country": "DE"}'),
+    ]
+    client.force_login(user)
+    r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
+    assert r.status_code == HTTPStatus.FOUND
+    assert mock_completion.call_count == 2
+    initial = _prefill_data(r["Location"])["initial"]
+    assert initial["country"] == "DE"
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("wine_cellar.apps.wine.tasks.completion")
+def test_ai_upload_invalid_country_reprompt_still_invalid_drops_country(
+    mock_completion, client, user
+):
+    mock_completion.side_effect = [
+        _mock_response('{"name": "Test Wine", "country": "Germany"}'),
+        _mock_response('{"country": "Deutschland"}'),
+    ]
+    client.force_login(user)
+    r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
+    assert r.status_code == HTTPStatus.FOUND
+    assert mock_completion.call_count == 2
+    initial = _prefill_data(r["Location"])["initial"]
+    assert "country" not in initial
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("wine_cellar.apps.wine.tasks.completion")
+def test_ai_upload_invalid_type_reprompt_succeeds(mock_completion, client, user):
+    mock_completion.side_effect = [
+        _mock_response('{"name": "Test Wine", "type": "vino rosso"}'),
+        _mock_response('{"type": "red"}'),
+    ]
+    client.force_login(user)
+    r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
+    assert r.status_code == HTTPStatus.FOUND
+    assert mock_completion.call_count == 2
+    initial = _prefill_data(r["Location"])["initial"]
+    assert initial["wine_type"] == "RE"
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("wine_cellar.apps.wine.tasks.completion")
+def test_ai_upload_invalid_type_reprompt_still_invalid_drops_type(
+    mock_completion, client, user
+):
+    mock_completion.side_effect = [
+        _mock_response('{"name": "Test Wine", "type": "vino rosso"}'),
+        _mock_response('{"type": "vino ancora rosso"}'),
+    ]
+    client.force_login(user)
+    r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
+    assert r.status_code == HTTPStatus.FOUND
+    assert mock_completion.call_count == 2
+    initial = _prefill_data(r["Location"])["initial"]
+    assert "wine_type" not in initial
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("wine_cellar.apps.wine.tasks.completion")
+def test_ai_upload_invalid_sweetness_reprompt_succeeds(mock_completion, client, user):
+    mock_completion.side_effect = [
+        _mock_response('{"name": "Test Wine", "sweetness": "sec"}'),
+        _mock_response('{"sweetness": "dry"}'),
+    ]
+    client.force_login(user)
+    r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
+    assert r.status_code == HTTPStatus.FOUND
+    assert mock_completion.call_count == 2
+    initial = _prefill_data(r["Location"])["initial"]
+    assert initial["category"] == "DR"
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("wine_cellar.apps.wine.tasks.completion")
+def test_ai_upload_invalid_sweetness_reprompt_still_invalid_drops_sweetness(
+    mock_completion, client, user
+):
+    mock_completion.side_effect = [
+        _mock_response('{"name": "Test Wine", "sweetness": "sec"}'),
+        _mock_response('{"sweetness": "encore sec"}'),
+    ]
+    client.force_login(user)
+    r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
+    assert r.status_code == HTTPStatus.FOUND
+    assert mock_completion.call_count == 2
+    initial = _prefill_data(r["Location"])["initial"]
+    assert "category" not in initial
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("wine_cellar.apps.wine.tasks.process_ai_wine_upload.delay")
+def test_ai_upload_dispatch_failure_shows_form_error(mock_delay, client, user):
+    """If queuing the Celery task itself fails (e.g. broker unreachable),
+    the view must fall back to a normal inline form error instead of
+    redirecting to a status page that would poll forever."""
+    mock_delay.side_effect = ConnectionError("broker unreachable")
+    client.force_login(user)
+    r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["form"].non_field_errors()

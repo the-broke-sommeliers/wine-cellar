@@ -5,6 +5,8 @@ import sentry_sdk
 from wine_cellar.__init__ import __version__
 from wine_cellar.conf.dev import *  # noqa: F403
 
+CELERY_TASK_ALWAYS_EAGER = False
+
 DEBUG = os.getenv("DJANGO_DEBUG", "True") == "True"
 WEBPACK_LOADER["DEFAULT"]["CACHE"] = not DEBUG  # noqa: F405
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
