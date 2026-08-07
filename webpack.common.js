@@ -59,8 +59,8 @@ module.exports = {
     stock_drag: {
       import: ['./wine_cellar/assets/js/stock_drag.ts'],
     },
-    ai_upload_status: {
-      import: ['./wine_cellar/assets/js/ai_upload_status.ts'],
+    wine_upload_ai: {
+      import: ['./wine_cellar/assets/js/wine_upload_ai.ts'],
     },
   },
   output: {

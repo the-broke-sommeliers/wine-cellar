@@ -402,7 +402,6 @@ def _get_owned_prefill_entry(token, user):
 class WineUploadAIView(FormView):
     template_name = "wine_upload_ai.html"
     form_class = WineUploadAIForm
-    success_url = reverse_lazy("wine-list")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -444,26 +443,23 @@ class WineUploadAIView(FormView):
             )
         except Exception:
             wine_prefill_cache.delete(f"wine_prefill_{token}")
-            form.add_error(
-                None,
-                _("Could not start the AI request. Please try again."),
+            return JsonResponse(
+                {
+                    "errors": {
+                        "__all__": [
+                            str(_("Could not start the AI request. Please try again."))
+                        ]
+                    }
+                },
+                status=400,
             )
-            return self.form_invalid(form)
 
-        return redirect(reverse("wine-ai-upload-status", kwargs={"token": token}))
+        return JsonResponse(
+            {"poll_url": reverse("wine-ai-upload-poll", kwargs={"token": token})}
+        )
 
-
-class WineUploadAIStatusView(TemplateView):
-    template_name = "wine_upload_ai_status.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        token = self.kwargs["token"]
-        entry = _get_owned_prefill_entry(token, self.request.user)
-        context["token"] = token
-        context["poll_url"] = reverse("wine-ai-upload-poll", kwargs={"token": token})
-        context["invalid"] = entry is None
-        return context
+    def form_invalid(self, form):
+        return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
 
 
 class WineUploadAIPollView(View):
