@@ -20,26 +20,19 @@ def _make_litellm_exc(exc_cls, status=503):
     return exc_cls("test error", llm_provider="test", model="test", response=resp)
 
 
-def _status_token(location_header):
-    """Extract the `token` path param from a `wine-ai-upload-status` redirect."""
-    path = urlparse(location_header).path
-    return resolve(path).kwargs["token"]
-
-
-def _poll(client, location_header):
-    """Follow up on a `wine-ai-upload` redirect by polling its status page.
+def _poll(client, poll_url):
+    """Follow up on a `wine-ai-upload` response by polling its `poll_url`.
 
     `CELERY_TASK_ALWAYS_EAGER=True` (test.py) means the task has already run
     to completion by the time the initial POST returns, so a single poll
     always reflects the final ("done"/"error") state.
     """
-    token = _status_token(location_header)
-    r = client.get(reverse("wine-ai-upload-poll", kwargs={"token": token}))
+    r = client.get(poll_url)
     return r.json()
 
 
-def _prefill_data(location_header):
-    token = _status_token(location_header)
+def _prefill_data(poll_url):
+    token = resolve(urlparse(poll_url).path).kwargs["token"]
     return wine_prefill_cache.get(f"wine_prefill_{token}")
 
 
@@ -81,14 +74,14 @@ def test_wine_choose_action_with_barcode(client, user):
 def test_ai_upload_no_images_rejected(client, user):
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={})
-    assert r.status_code == HTTPStatus.OK
-    assert r.context["form"].errors
+    assert r.status_code == HTTPStatus.BAD_REQUEST
+    assert r.json()["errors"]
 
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
 @patch("wine_cellar.apps.wine.tasks.completion")
-def test_ai_upload_success_redirects_to_status_and_then_create(
+def test_ai_upload_success_returns_poll_url_and_then_create(
     mock_completion, client, user
 ):
     mock_resp = MagicMock()
@@ -96,10 +89,11 @@ def test_ai_upload_success_redirects_to_status_and_then_create(
     mock_completion.return_value = mock_resp
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
-    assert r.status_code == HTTPStatus.FOUND
-    assert resolve(urlparse(r["Location"]).path).url_name == "wine-ai-upload-status"
+    assert r.status_code == HTTPStatus.OK
+    poll_url = r.json()["poll_url"]
+    assert resolve(urlparse(poll_url).path).url_name == "wine-ai-upload-poll"
 
-    poll = _poll(client, r["Location"])
+    poll = _poll(client, poll_url)
     assert poll["status"] == "done"
     assert reverse("wine-add") in poll["redirect"]
     assert "prefill_token" in poll["redirect"]
@@ -118,8 +112,8 @@ def test_ai_upload_prefill_not_visible_to_other_user(
     mock_completion.return_value = mock_resp
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
-    assert r.status_code == HTTPStatus.FOUND
-    token = _status_token(r["Location"])
+    assert r.status_code == HTTPStatus.OK
+    token = resolve(urlparse(r.json()["poll_url"]).path).kwargs["token"]
 
     other_user = user_factory()
     client.force_login(other_user)
@@ -144,8 +138,8 @@ def test_ai_upload_json_inside_markdown_block(mock_completion, client, user):
     mock_completion.return_value = mock_resp
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
-    assert r.status_code == HTTPStatus.FOUND
-    poll = _poll(client, r["Location"])
+    assert r.status_code == HTTPStatus.OK
+    poll = _poll(client, r.json()["poll_url"])
     assert poll["status"] == "done"
 
 
@@ -158,8 +152,8 @@ def test_ai_upload_invalid_json_shows_error(mock_completion, client, user):
     mock_completion.return_value = mock_resp
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
-    assert r.status_code == HTTPStatus.FOUND
-    poll = _poll(client, r["Location"])
+    assert r.status_code == HTTPStatus.OK
+    poll = _poll(client, r.json()["poll_url"])
     assert poll["status"] == "error"
     assert poll["message"]
 
@@ -173,8 +167,8 @@ def test_ai_upload_authentication_error(mock_completion, client, user):
     )
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
-    assert r.status_code == HTTPStatus.FOUND
-    poll = _poll(client, r["Location"])
+    assert r.status_code == HTTPStatus.OK
+    poll = _poll(client, r.json()["poll_url"])
     assert poll["status"] == "error"
     assert poll["message"]
 
@@ -188,8 +182,8 @@ def test_ai_upload_rate_limit_error(mock_completion, client, user):
     )
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
-    assert r.status_code == HTTPStatus.FOUND
-    poll = _poll(client, r["Location"])
+    assert r.status_code == HTTPStatus.OK
+    poll = _poll(client, r.json()["poll_url"])
     assert poll["status"] == "error"
     assert poll["message"]
 
@@ -203,8 +197,8 @@ def test_ai_upload_service_unavailable_error(mock_completion, client, user):
     )
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
-    assert r.status_code == HTTPStatus.FOUND
-    poll = _poll(client, r["Location"])
+    assert r.status_code == HTTPStatus.OK
+    poll = _poll(client, r.json()["poll_url"])
     assert poll["status"] == "error"
     assert poll["message"]
 
@@ -218,8 +212,8 @@ def test_ai_upload_timeout_error(mock_completion, client, user):
     )
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
-    assert r.status_code == HTTPStatus.FOUND
-    poll = _poll(client, r["Location"])
+    assert r.status_code == HTTPStatus.OK
+    poll = _poll(client, r.json()["poll_url"])
     assert poll["status"] == "error"
     assert poll["message"]
 
@@ -233,8 +227,8 @@ def test_ai_upload_connection_error(mock_completion, client, user):
     )
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
-    assert r.status_code == HTTPStatus.FOUND
-    poll = _poll(client, r["Location"])
+    assert r.status_code == HTTPStatus.OK
+    poll = _poll(client, r.json()["poll_url"])
     assert poll["status"] == "error"
     assert poll["message"]
 
@@ -248,8 +242,8 @@ def test_ai_upload_back_image_only(mock_completion, client, user):
     mock_completion.return_value = mock_resp
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"back": random_png("back.png")})
-    assert r.status_code == HTTPStatus.FOUND
-    poll = _poll(client, r["Location"])
+    assert r.status_code == HTTPStatus.OK
+    poll = _poll(client, r.json()["poll_url"])
     assert poll["status"] == "done"
 
 
@@ -263,9 +257,9 @@ def test_ai_upload_success_with_barcode_param(mock_completion, client, user):
     client.force_login(user)
     url = reverse("wine-ai-upload") + "?barcode=12345"
     r = client.post(url, data={"front": random_png("front.png")})
-    assert r.status_code == HTTPStatus.FOUND
-    assert "barcode" not in r["Location"]
-    data = _prefill_data(r["Location"])
+    assert r.status_code == HTTPStatus.OK
+    assert "barcode" not in r.json()["poll_url"]
+    data = _prefill_data(r.json()["poll_url"])
     assert data["initial"]["barcode"] == "12345"
 
 
@@ -283,8 +277,8 @@ def test_ai_upload_use_as_wine_images_checked_stashes_images(
         reverse("wine-ai-upload"),
         data={"front": random_png("front.png"), "use_as_wine_images": "on"},
     )
-    assert r.status_code == HTTPStatus.FOUND
-    data = _prefill_data(r["Location"])
+    assert r.status_code == HTTPStatus.OK
+    data = _prefill_data(r.json()["poll_url"])
     assert data["images"]
 
 
@@ -299,8 +293,8 @@ def test_ai_upload_use_as_wine_images_unchecked_no_images_stashed(
     mock_completion.return_value = mock_resp
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
-    assert r.status_code == HTTPStatus.FOUND
-    data = _prefill_data(r["Location"])
+    assert r.status_code == HTTPStatus.OK
+    data = _prefill_data(r.json()["poll_url"])
     assert data["images"] == {}
 
 
@@ -313,8 +307,8 @@ def test_ai_upload_api_error(mock_completion, client, user):
     )
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
-    assert r.status_code == HTTPStatus.FOUND
-    poll = _poll(client, r["Location"])
+    assert r.status_code == HTTPStatus.OK
+    poll = _poll(client, r.json()["poll_url"])
     assert poll["status"] == "error"
     assert poll["message"]
 
@@ -330,9 +324,9 @@ def test_ai_upload_unicode_minus_location_succeeds_without_reprompt(
     )
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
-    assert r.status_code == HTTPStatus.FOUND
+    assert r.status_code == HTTPStatus.OK
     assert mock_completion.call_count == 1
-    initial = _prefill_data(r["Location"])["initial"]
+    initial = _prefill_data(r.json()["poll_url"])["initial"]
     assert initial["location"]["geometry"]["coordinates"] == [-0.6603, 48.1374]
 
 
@@ -346,9 +340,9 @@ def test_ai_upload_invalid_location_reprompt_succeeds(mock_completion, client, u
     ]
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
-    assert r.status_code == HTTPStatus.FOUND
+    assert r.status_code == HTTPStatus.OK
     assert mock_completion.call_count == 2
-    initial = _prefill_data(r["Location"])["initial"]
+    initial = _prefill_data(r.json()["poll_url"])["initial"]
     assert initial["location"]["geometry"]["coordinates"] == [-0.6603, 48.1374]
 
 
@@ -364,9 +358,9 @@ def test_ai_upload_invalid_location_reprompt_still_invalid_drops_location(
     ]
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
-    assert r.status_code == HTTPStatus.FOUND
+    assert r.status_code == HTTPStatus.OK
     assert mock_completion.call_count == 2
-    initial = _prefill_data(r["Location"])["initial"]
+    initial = _prefill_data(r.json()["poll_url"])["initial"]
     assert "location" not in initial
 
 
@@ -382,9 +376,9 @@ def test_ai_upload_invalid_location_reprompt_bad_json_drops_location(
     ]
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
-    assert r.status_code == HTTPStatus.FOUND
+    assert r.status_code == HTTPStatus.OK
     assert mock_completion.call_count == 2
-    initial = _prefill_data(r["Location"])["initial"]
+    initial = _prefill_data(r.json()["poll_url"])["initial"]
     assert "location" not in initial
 
 
@@ -400,9 +394,9 @@ def test_ai_upload_invalid_location_reprompt_litellm_error_drops_location(
     ]
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
-    assert r.status_code == HTTPStatus.FOUND
+    assert r.status_code == HTTPStatus.OK
     assert mock_completion.call_count == 2
-    initial = _prefill_data(r["Location"])["initial"]
+    initial = _prefill_data(r.json()["poll_url"])["initial"]
     assert "location" not in initial
 
 
@@ -413,7 +407,7 @@ def test_ai_upload_missing_location_no_reprompt(mock_completion, client, user):
     mock_completion.return_value = _mock_response('{"name": "Test Wine"}')
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
-    assert r.status_code == HTTPStatus.FOUND
+    assert r.status_code == HTTPStatus.OK
     assert mock_completion.call_count == 1
 
 
@@ -427,9 +421,9 @@ def test_ai_upload_invalid_country_reprompt_succeeds(mock_completion, client, us
     ]
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
-    assert r.status_code == HTTPStatus.FOUND
+    assert r.status_code == HTTPStatus.OK
     assert mock_completion.call_count == 2
-    initial = _prefill_data(r["Location"])["initial"]
+    initial = _prefill_data(r.json()["poll_url"])["initial"]
     assert initial["country"] == "DE"
 
 
@@ -445,9 +439,9 @@ def test_ai_upload_invalid_country_reprompt_still_invalid_drops_country(
     ]
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
-    assert r.status_code == HTTPStatus.FOUND
+    assert r.status_code == HTTPStatus.OK
     assert mock_completion.call_count == 2
-    initial = _prefill_data(r["Location"])["initial"]
+    initial = _prefill_data(r.json()["poll_url"])["initial"]
     assert "country" not in initial
 
 
@@ -461,9 +455,9 @@ def test_ai_upload_invalid_type_reprompt_succeeds(mock_completion, client, user)
     ]
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
-    assert r.status_code == HTTPStatus.FOUND
+    assert r.status_code == HTTPStatus.OK
     assert mock_completion.call_count == 2
-    initial = _prefill_data(r["Location"])["initial"]
+    initial = _prefill_data(r.json()["poll_url"])["initial"]
     assert initial["wine_type"] == "RE"
 
 
@@ -479,9 +473,9 @@ def test_ai_upload_invalid_type_reprompt_still_invalid_drops_type(
     ]
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
-    assert r.status_code == HTTPStatus.FOUND
+    assert r.status_code == HTTPStatus.OK
     assert mock_completion.call_count == 2
-    initial = _prefill_data(r["Location"])["initial"]
+    initial = _prefill_data(r.json()["poll_url"])["initial"]
     assert "wine_type" not in initial
 
 
@@ -495,9 +489,9 @@ def test_ai_upload_invalid_sweetness_reprompt_succeeds(mock_completion, client, 
     ]
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
-    assert r.status_code == HTTPStatus.FOUND
+    assert r.status_code == HTTPStatus.OK
     assert mock_completion.call_count == 2
-    initial = _prefill_data(r["Location"])["initial"]
+    initial = _prefill_data(r.json()["poll_url"])["initial"]
     assert initial["category"] == "DR"
 
 
@@ -513,9 +507,9 @@ def test_ai_upload_invalid_sweetness_reprompt_still_invalid_drops_sweetness(
     ]
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
-    assert r.status_code == HTTPStatus.FOUND
+    assert r.status_code == HTTPStatus.OK
     assert mock_completion.call_count == 2
-    initial = _prefill_data(r["Location"])["initial"]
+    initial = _prefill_data(r.json()["poll_url"])["initial"]
     assert "category" not in initial
 
 
@@ -524,10 +518,10 @@ def test_ai_upload_invalid_sweetness_reprompt_still_invalid_drops_sweetness(
 @patch("wine_cellar.apps.wine.tasks.process_ai_wine_upload.delay")
 def test_ai_upload_dispatch_failure_shows_form_error(mock_delay, client, user):
     """If queuing the Celery task itself fails (e.g. broker unreachable),
-    the view must fall back to a normal inline form error instead of
-    redirecting to a status page that would poll forever."""
+    the view must respond with a JSON error instead of a `poll_url` that
+    would poll forever."""
     mock_delay.side_effect = ConnectionError("broker unreachable")
     client.force_login(user)
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
-    assert r.status_code == HTTPStatus.OK
-    assert r.context["form"].non_field_errors()
+    assert r.status_code == HTTPStatus.BAD_REQUEST
+    assert r.json()["errors"]["__all__"]

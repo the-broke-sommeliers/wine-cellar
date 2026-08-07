@@ -4,6 +4,7 @@
 {% block extra_js %}
     {{ block.super }}
     {% render_bundle 'image_preview' 'js' attrs='type="module" defer' %}
+    {% render_bundle 'wine_upload_ai' 'js' attrs='type="module" defer' %}
     {{ form.media.js }}
 {% endblock extra_js %}
 {% block styles %}
@@ -27,25 +28,46 @@
             {% endblocktranslate %}
                 </div>
         {% else %}
-            <form method="post"
-                  enctype="multipart/form-data"
-                  class="form"
-                  novalidate>
-                {% csrf_token %}
-                {% if form.non_field_errors %}
-                    <ul class="form-errorlist" aria-live="assertive" aria-atomic="true">
-                        {% for error in form.non_field_errors %}<li>{{ error|escape }}</li>{% endfor %}
+            <div id="ai-upload">
+                <div id="ai-upload-form-section">
+                    <form id="ai-upload-form"
+                          method="post"
+                          enctype="multipart/form-data"
+                          class="form"
+                          novalidate>
+                        {% csrf_token %}
+                        <ul id="ai-upload-form-errors"
+                            class="form-errorlist hidden"
+                            aria-live="assertive"
+                            aria-atomic="true"></ul>
+                        <div class="form__fields">
+                            {% for field in form %}
+                                {% include 'forms/form_field.html' %}
+                            {% endfor %}
+                        </div>
+                        <div class="pure-controls">
+                            <button type="submit" class="pure-button button__primary">{% translate "Upload" %}</button>
+                        </div>
+                    </form>
+                </div>
+                <div id="ai-upload-status-section" class="hidden">
+                    <div id="ai-upload-pending" class="ai-upload-status__pending">
+                        <div class="spinner" aria-hidden="true"></div>
+                        <p id="ai-upload-pending-message">{% translate "Uploading your photos…" %}</p>
+                    </div>
+                    <ul id="ai-upload-error"
+                        class="form-errorlist hidden"
+                        aria-live="assertive"
+                        aria-atomic="true">
+                        <li id="ai-upload-error-message"></li>
                     </ul>
-                {% endif %}
-                <div class="form__fields">
-                    {% for field in form %}
-                        {% include 'forms/form_field.html' %}
-                    {% endfor %}
+                    <p id="ai-upload-retry" class="hidden">
+                        <button type="button"
+                                id="ai-upload-retry-button"
+                                class="pure-button button__primary">{% translate "Try again" %}</button>
+                    </p>
                 </div>
-                <div class="pure-controls">
-                    <button type="submit" class="pure-button button__primary">{% translate "Upload" %}</button>
-                </div>
-            </form>
+            </div>
             {% endif %}
         </div>
     </div>
