@@ -3,9 +3,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.10.0-rc.2 (2026-08-06)
+## 0.10.0-rc.3 (2026-08-07)
 
 ### feat
+
+- improve AI workflow
+    
+    - add better validation for ai data, reprompt if necessary
+    - do ai queries in background, with proper timeout
 
 - show preview when reusing ai upload images
 
@@ -18,6 +23,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### fix
 
+- docker dev setup
+
+- **deps**: update dependency litellm to v1.94.1
 - add missing terser-plugin
 
 - properly verify ai returned coordinates, try reprompting if incorrect
@@ -45,6 +53,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **deps**: update dependency litellm to v1.89.4
 
 ### refactor
+
+- store ai upload data in cache instead of a get parameter
 
 - use djang-webpack-loader to allow code splitting for smaller bundle size
 
