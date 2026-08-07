@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}
+    {% if axis == "row" %}
+        {% translate "Name Rows" %}
+    {% else %}
+        {% translate "Name Columns" %}
+    {% endif %}
+{% endblock title %}
+{% block header %}
+    <h1 class="header__title">
+        {% if axis == "row" %}
+            {% translate "Name Rows" %}
+        {% else %}
+            {% translate "Name Columns" %}
+        {% endif %}
+    </h1>
+{% endblock header %}
+{% block content %}
+    <div class="pure-g">
+        <div class="pure-u-1 pure-u-lg-1-3 m-auto">
+            <div class="card">
+                <form method="post" class="pure-form pure-form-stacked storage-labels-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="page" value="{{ page_obj.number }}">
+                    {% for index, label in entries %}
+                        <label class="storage-labels-form__field">
+                            <span>
+                                {% if axis == "row" %}
+                                    {% translate "Row" %}
+                                {% else %}
+                                    {% translate "Column" %}
+                                {% endif %}
+                                {{ index }}
+                            </span>
+                            <input type="text"
+                                   name="{{ axis }}_{{ index }}"
+                                   maxlength="100"
+                                   value="{{ label }}">
+                        </label>
+                    {% empty %}
+                        <p class="text--gray">{% translate "This storage has no grid to name yet." %}</p>
+                    {% endfor %}
+                    {% if page_obj.paginator.num_pages > 1 %}
+                        {% include "includes/pagination.html" %}
+                    {% endif %}
+                    <div class="pure-controls">
+                        <div class="form__buttons">
+                            <div class="form__buttons-right">
+                                <a href="{% url 'storage-detail' storage.pk %}" class="pure-button button__secondary">{% translate "Back to Storage" %}</a>
+                                <button type="submit" class="pure-button button__primary">{% translate "Save" %}</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

@@ -6,7 +6,11 @@ import pytest
 from django.conf import settings
 from pytest_factoryboy import register
 
-from wine_cellar.apps.storage.tests.factories import StorageFactory, StorageItemFactory
+from wine_cellar.apps.storage.tests.factories import (
+    StorageFactory,
+    StorageItemFactory,
+    StorageLabelFactory,
+)
 from wine_cellar.apps.user.tests.factories import UserFactory
 from wine_cellar.apps.wine.tests.factories import (
     AppellationFactory,
@@ -32,6 +36,7 @@ register(SizeFactory)
 register(SourceFactory)
 register(StorageFactory)
 register(StorageItemFactory)
+register(StorageLabelFactory)
 register(RegionFactory)
 register(AppellationFactory)
 

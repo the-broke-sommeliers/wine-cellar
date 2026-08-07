@@ -71,3 +71,27 @@ def test_get_wines_excludes_deleted(
     wines = list(storage.get_wines)
     assert len(wines) == 1
     assert wines[0] == active_item
+
+
+@pytest.mark.django_db
+def test_row_labels(user, storage_factory, storage_label_factory):
+    storage = storage_factory(user=user, rows=3, columns=3)
+    storage_label_factory(storage=storage, axis="row", index=1, name="Spain")
+    storage_label_factory(storage=storage, axis="row", index=3, name="Italy")
+    storage_label_factory(storage=storage, axis="column", index=1, name="Reds")
+    assert storage.row_labels == {1: "Spain", 3: "Italy"}
+
+
+@pytest.mark.django_db
+def test_column_labels(user, storage_factory, storage_label_factory):
+    storage = storage_factory(user=user, rows=3, columns=3)
+    storage_label_factory(storage=storage, axis="column", index=2, name="Cheap")
+    storage_label_factory(storage=storage, axis="row", index=1, name="Spain")
+    assert storage.column_labels == {2: "Cheap"}
+
+
+@pytest.mark.django_db
+def test_labels_empty_by_default(user, storage_factory):
+    storage = storage_factory(user=user, rows=2, columns=2)
+    assert storage.row_labels == {}
+    assert storage.column_labels == {}

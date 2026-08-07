@@ -354,3 +354,20 @@
   font-size: var(--font-xs);
   margin-top: 2px;
 }
+
+.storage-labels-form {
+  padding: 1rem 0.75rem 0.75rem;
+}
+
+.storage-labels-form__field {
+  display: grid;
+  grid-template-columns: 6rem 1fr;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+
+  span {
+    font-size: var(--font-sm);
+    color: var(--text-color-gray);
+  }
+}

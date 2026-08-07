@@ -34,6 +34,26 @@ class StorageForm(forms.Form):
         label=_("Number of Columns"),
         help_text=_("Enter the number of columns in the storage."),
     )
+    swap_axes = forms.BooleanField(
+        required=False,
+        label=_("Show Columns First"),
+        help_text=_(
+            "Group the storage view by column instead of row, e.g. if you"
+            " organize by column rather than by shelf."
+        ),
+    )
+    row_labels_enabled = forms.BooleanField(
+        required=False,
+        initial=True,
+        label=_("Show Row Labels"),
+        help_text=_('Display and allow naming individual rows (e.g. "Top Shelf").'),
+    )
+    column_labels_enabled = forms.BooleanField(
+        required=False,
+        initial=True,
+        label=_("Show Column Labels"),
+        help_text=_('Display and allow naming individual columns (e.g. "Left Bin").'),
+    )
 
 
 class StockForm(forms.Form):

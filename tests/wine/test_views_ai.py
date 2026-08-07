@@ -80,7 +80,7 @@ def test_ai_upload_no_images_rejected(client, user):
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.tasks.completion")
+@patch("litellm.completion")
 def test_ai_upload_success_returns_poll_url_and_then_create(
     mock_completion, client, user
 ):
@@ -101,7 +101,7 @@ def test_ai_upload_success_returns_poll_url_and_then_create(
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.tasks.completion")
+@patch("litellm.completion")
 def test_ai_upload_prefill_not_visible_to_other_user(
     mock_completion, client, user, user_factory
 ):
@@ -131,7 +131,7 @@ def test_ai_upload_prefill_not_visible_to_other_user(
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.tasks.completion")
+@patch("litellm.completion")
 def test_ai_upload_json_inside_markdown_block(mock_completion, client, user):
     mock_resp = MagicMock()
     mock_resp.choices[0].message.content = '```json\n{"name": "Test Wine"}\n```'
@@ -145,7 +145,7 @@ def test_ai_upload_json_inside_markdown_block(mock_completion, client, user):
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.tasks.completion")
+@patch("litellm.completion")
 def test_ai_upload_invalid_json_shows_error(mock_completion, client, user):
     mock_resp = MagicMock()
     mock_resp.choices[0].message.content = "not valid json at all"
@@ -160,7 +160,7 @@ def test_ai_upload_invalid_json_shows_error(mock_completion, client, user):
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.tasks.completion")
+@patch("litellm.completion")
 def test_ai_upload_authentication_error(mock_completion, client, user):
     mock_completion.side_effect = _make_litellm_exc(
         litellm.exceptions.AuthenticationError, status=401
@@ -175,7 +175,7 @@ def test_ai_upload_authentication_error(mock_completion, client, user):
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.tasks.completion")
+@patch("litellm.completion")
 def test_ai_upload_rate_limit_error(mock_completion, client, user):
     mock_completion.side_effect = _make_litellm_exc(
         litellm.exceptions.RateLimitError, status=429
@@ -190,7 +190,7 @@ def test_ai_upload_rate_limit_error(mock_completion, client, user):
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.tasks.completion")
+@patch("litellm.completion")
 def test_ai_upload_service_unavailable_error(mock_completion, client, user):
     mock_completion.side_effect = _make_litellm_exc(
         litellm.exceptions.ServiceUnavailableError, status=503
@@ -205,7 +205,7 @@ def test_ai_upload_service_unavailable_error(mock_completion, client, user):
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.tasks.completion")
+@patch("litellm.completion")
 def test_ai_upload_timeout_error(mock_completion, client, user):
     mock_completion.side_effect = litellm.exceptions.Timeout(
         "timeout", model="test", llm_provider="test"
@@ -220,7 +220,7 @@ def test_ai_upload_timeout_error(mock_completion, client, user):
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.tasks.completion")
+@patch("litellm.completion")
 def test_ai_upload_connection_error(mock_completion, client, user):
     mock_completion.side_effect = litellm.exceptions.APIConnectionError(
         "connection error", llm_provider="test", model="test"
@@ -235,7 +235,7 @@ def test_ai_upload_connection_error(mock_completion, client, user):
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.tasks.completion")
+@patch("litellm.completion")
 def test_ai_upload_back_image_only(mock_completion, client, user):
     mock_resp = MagicMock()
     mock_resp.choices[0].message.content = '{"name": "Test Wine"}'
@@ -249,7 +249,7 @@ def test_ai_upload_back_image_only(mock_completion, client, user):
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.tasks.completion")
+@patch("litellm.completion")
 def test_ai_upload_success_with_barcode_param(mock_completion, client, user):
     mock_resp = MagicMock()
     mock_resp.choices[0].message.content = '{"name": "Test Wine"}'
@@ -265,7 +265,7 @@ def test_ai_upload_success_with_barcode_param(mock_completion, client, user):
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.tasks.completion")
+@patch("litellm.completion")
 def test_ai_upload_use_as_wine_images_checked_stashes_images(
     mock_completion, client, user
 ):
@@ -284,7 +284,7 @@ def test_ai_upload_use_as_wine_images_checked_stashes_images(
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.tasks.completion")
+@patch("litellm.completion")
 def test_ai_upload_use_as_wine_images_unchecked_no_images_stashed(
     mock_completion, client, user
 ):
@@ -300,7 +300,7 @@ def test_ai_upload_use_as_wine_images_unchecked_no_images_stashed(
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.tasks.completion")
+@patch("litellm.completion")
 def test_ai_upload_api_error(mock_completion, client, user):
     mock_completion.side_effect = litellm.exceptions.APIError(
         status_code=500, message="api error", llm_provider="test", model="test"
@@ -315,7 +315,7 @@ def test_ai_upload_api_error(mock_completion, client, user):
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.tasks.completion")
+@patch("litellm.completion")
 def test_ai_upload_unicode_minus_location_succeeds_without_reprompt(
     mock_completion, client, user
 ):
@@ -332,7 +332,7 @@ def test_ai_upload_unicode_minus_location_succeeds_without_reprompt(
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.tasks.completion")
+@patch("litellm.completion")
 def test_ai_upload_invalid_location_reprompt_succeeds(mock_completion, client, user):
     mock_completion.side_effect = [
         _mock_response('{"name": "Test Wine", "location": "999,999"}'),
@@ -348,7 +348,7 @@ def test_ai_upload_invalid_location_reprompt_succeeds(mock_completion, client, u
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.tasks.completion")
+@patch("litellm.completion")
 def test_ai_upload_invalid_location_reprompt_still_invalid_drops_location(
     mock_completion, client, user
 ):
@@ -366,7 +366,7 @@ def test_ai_upload_invalid_location_reprompt_still_invalid_drops_location(
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.tasks.completion")
+@patch("litellm.completion")
 def test_ai_upload_invalid_location_reprompt_bad_json_drops_location(
     mock_completion, client, user
 ):
@@ -384,7 +384,7 @@ def test_ai_upload_invalid_location_reprompt_bad_json_drops_location(
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.tasks.completion")
+@patch("litellm.completion")
 def test_ai_upload_invalid_location_reprompt_litellm_error_drops_location(
     mock_completion, client, user
 ):
@@ -402,7 +402,7 @@ def test_ai_upload_invalid_location_reprompt_litellm_error_drops_location(
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.tasks.completion")
+@patch("litellm.completion")
 def test_ai_upload_missing_location_no_reprompt(mock_completion, client, user):
     mock_completion.return_value = _mock_response('{"name": "Test Wine"}')
     client.force_login(user)
@@ -413,7 +413,7 @@ def test_ai_upload_missing_location_no_reprompt(mock_completion, client, user):
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.tasks.completion")
+@patch("litellm.completion")
 def test_ai_upload_invalid_country_reprompt_succeeds(mock_completion, client, user):
     mock_completion.side_effect = [
         _mock_response('{"name": "Test Wine", "country": "Germany"}'),
@@ -429,7 +429,7 @@ def test_ai_upload_invalid_country_reprompt_succeeds(mock_completion, client, us
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.tasks.completion")
+@patch("litellm.completion")
 def test_ai_upload_invalid_country_reprompt_still_invalid_drops_country(
     mock_completion, client, user
 ):
@@ -447,7 +447,7 @@ def test_ai_upload_invalid_country_reprompt_still_invalid_drops_country(
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.tasks.completion")
+@patch("litellm.completion")
 def test_ai_upload_invalid_type_reprompt_succeeds(mock_completion, client, user):
     mock_completion.side_effect = [
         _mock_response('{"name": "Test Wine", "type": "vino rosso"}'),
@@ -463,7 +463,7 @@ def test_ai_upload_invalid_type_reprompt_succeeds(mock_completion, client, user)
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.tasks.completion")
+@patch("litellm.completion")
 def test_ai_upload_invalid_type_reprompt_still_invalid_drops_type(
     mock_completion, client, user
 ):
@@ -481,7 +481,7 @@ def test_ai_upload_invalid_type_reprompt_still_invalid_drops_type(
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.tasks.completion")
+@patch("litellm.completion")
 def test_ai_upload_invalid_sweetness_reprompt_succeeds(mock_completion, client, user):
     mock_completion.side_effect = [
         _mock_response('{"name": "Test Wine", "sweetness": "sec"}'),
@@ -497,7 +497,7 @@ def test_ai_upload_invalid_sweetness_reprompt_succeeds(mock_completion, client, 
 
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
-@patch("wine_cellar.apps.wine.tasks.completion")
+@patch("litellm.completion")
 def test_ai_upload_invalid_sweetness_reprompt_still_invalid_drops_sweetness(
     mock_completion, client, user
 ):
