@@ -37,9 +37,11 @@ dev = [
     "factory-boy==3.3.3",
     "flake8==7.3.0",
     "isort==8.0.1",
+    "playwright==1.62.0",
     "pytest-cov==7.1.0",
     "pytest-django==4.12.0",
     "pytest-factoryboy==2.8.1",
+    "pytest-playwright==0.8.0",
     "pytest==9.1.1",
     "commitizen==4.17.0",
     "zensical==0.0.52",
@@ -62,6 +64,13 @@ line_length = 88
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "wine_cellar.conf.test"
 python_files = ["test_*.py", "*_test.py"]
+# e2e tests are opt-in (slow, need `uv run playwright install chromium`) -
+# excluded by default so plain `py.test`/CI runs stay fast; run them
+# explicitly with `make e2e` or `pytest -m e2e`.
+addopts = "-m 'not e2e'"
+markers = [
+    "e2e: end-to-end browser test driven by Playwright, launches a real browser via pytest-playwright",
+]
 
 [tool.setuptools]
 packages = ["wine_cellar"]

@@ -22,4 +22,5 @@ wine_cellar/conf/local.py
 .playwright-mcp/
 CLAUDE.md
 .claude/
+.mcp.json
 .devcontainer/
