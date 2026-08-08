@@ -131,6 +131,7 @@ class WineFormPostCleanMixin:
                 "vineyard",
                 "region",
                 "appellation",
+                "size",
             )
             max_items = (
                 1 if name in ("country", "region", "appellation", "size") else None

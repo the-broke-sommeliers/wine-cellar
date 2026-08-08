@@ -26,6 +26,11 @@
                   class="form"
                   novalidate>
                 {% csrf_token %}
+                {% if form.non_field_errors %}
+                    <ul class="form-errorlist" aria-live="assertive" aria-atomic="true">
+                        {% for error in form.non_field_errors %}<li>{{ error|escape }}</li>{% endfor %}
+                    </ul>
+                {% endif %}
                 {% with step=form.form_step.value|add:"0" %}
                     <fieldset id="create__fs_0" class="{% if step != 0 %}hidden{% endif %}">
                         <legend>
@@ -80,7 +85,6 @@
                         </legend>
                         <div class="form__fields">
                             {% include 'forms/form_field.html' with field=form.drink_by %}
-                            {% include 'forms/form_field.html' with field=form.stock %}
                             {% include 'forms/form_field.html' with field=form.food_pairings %}
                             {% include 'forms/form_field.html' with field=form.rating %}
                             {% include 'forms/form_field.html' with field=form.comment %}

@@ -376,16 +376,21 @@ class StorageItemUpdateView(FormView):
         context["free_cells_by_storage"] = free_cells_by_storage
         return context
 
+    def get_success_url(self):
+        next_param = self.request.GET.get("next")
+        if next_param == "storage":
+            return reverse_lazy(
+                "storage-detail", kwargs={"pk": self.storage_item.storage.pk}
+            )
+        return reverse_lazy("wine-detail", kwargs={"pk": self.storage_item.wine.pk})
+
     def form_valid(self, form):
         self.process_form_data(
             self.storage_item,
             self.request.user,
             form.cleaned_data,
         )
-        self.success_url = reverse_lazy(
-            "wine-detail",
-            kwargs={"pk": self.storage_item.wine.pk},
-        )
+        self.success_url = self.get_success_url()
         return super().form_valid(form)
 
     @staticmethod
