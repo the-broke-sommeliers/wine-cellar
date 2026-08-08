@@ -4,10 +4,9 @@ fieldsets toggled by a hidden ``form_step`` field and full-page POSTs per
 step, no client-side state machine.
 
 Most tests here pre-create a ``Size`` via factory and pick it as an
-*existing* tom-select option, rather than typing a brand new size value -
-see ``test_new_size_value_should_survive_wizard_step_navigation`` at the
-bottom for why: creating a new size mid-wizard hits a real bug where the
-value is silently dropped as soon as you move to another step.
+*existing* tom-select option, rather than typing a brand new size value;
+``test_new_size_value_survives_wizard_step_navigation`` at the bottom
+covers the create-new-value path on its own.
 """
 
 import pytest
@@ -108,17 +107,13 @@ def test_blank_required_field_blocks_submission(
 
 
 @pytest.mark.django_db
-def test_duplicate_wine_error_should_be_shown_to_the_user(
+def test_duplicate_wine_error_is_shown_to_the_user(
     live_server, page, login, user, wine_factory, size_factory
 ):
     """WineCreateView.form_valid() catches the duplicate-wine IntegrityError
     and calls ``form.add_error(None, "...already exists...")`` - a
-    *non-field* error. But neither `wine_create.html` nor `wine_edit.html`
-    ever render `form.non_field_errors` anywhere, so that message is
-    silently swallowed: the user just watches the wizard bounce back to the
-    same step with no feedback at all about why nothing was saved. This
-    test asserts the obviously-intended behavior (the user is told what
-    went wrong) and is expected to fail against that gap."""
+    *non-field* error. `wine_create.html` renders `form.non_field_errors`
+    right after the CSRF token so that message actually reaches the user."""
     # The uniqueness constraint is on (name, wine_type, abv, size, vintage,
     # country, user) - SQL treats NULL as never equal to NULL, so any NULL
     # column would exempt the row from the constraint entirely. Every field
@@ -155,12 +150,9 @@ def test_duplicate_wine_error_should_be_shown_to_the_user(
 def test_personal_notes_step_has_no_dead_stock_field(
     live_server, page, login, user, size_factory
 ):
-    """`wine_create.html` includes ``form.stock`` in the Personal Notes
-    fieldset, but ``WineForm`` has no ``stock`` field (the ``Wine.stock``
-    model field was removed by migration 0010) - Django template lookup
-    silently resolves the missing attribute to an empty string, rendering a
-    broken, label-only field with no input. The wizard should not show any
-    such dead control."""
+    """``WineForm`` has no ``stock`` field (the ``Wine.stock`` model field
+    was removed by migration 0010) - the Personal Notes fieldset should not
+    render a leftover, label-only control for it."""
     size_factory(user=user, name=0.75)
     login(user)
     page.goto(f"{live_server.url}{reverse('wine-add')}")
@@ -185,22 +177,12 @@ def test_personal_notes_step_has_no_dead_stock_field(
 
 
 @pytest.mark.django_db
-def test_new_size_value_should_survive_wizard_step_navigation(
-    live_server, page, login, user
-):
+def test_new_size_value_survives_wizard_step_navigation(live_server, page, login, user):
     """A brand new "size" value typed via the create-new tom-select on step
-    0 should still be selected after navigating to another step and back -
-    exactly like grapes/vineyard/region/appellation/etc. do (see
+    0 should still be selected after navigating to another step - exactly
+    like grapes/vineyard/region/appellation/etc. do (see
     ``WineFormPostCleanMixin._post_clean`` re-deriving each field's
-    tom-select ``items`` so the client can re-create it on re-render).
-
-    ``wine_cellar/apps/wine/forms.py``'s ``_post_clean`` builds that
-    "recreate on re-render" tom-select config only for a fixed tuple of
-    field names, and "size" is missing from it (unlike the sibling
-    "create new" fields it's grouped with everywhere else in the form) -
-    so the freshly typed size is silently dropped as soon as the wizard
-    re-renders for the next step. This test documents the correct,
-    intended behavior and is expected to fail against that bug."""
+    tom-select ``items`` so the client can re-create it on re-render)."""
     login(user)
     page.goto(f"{live_server.url}{reverse('wine-add')}")
 

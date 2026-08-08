@@ -123,18 +123,13 @@ def test_editing_into_a_slot_taken_after_page_load_shows_validation_error(
 
 
 @pytest.mark.django_db
-def test_editing_stock_from_storage_grid_should_return_to_storage_detail(
+def test_editing_stock_from_storage_grid_returns_to_storage_detail(
     live_server, page, login, user, wine_factory, storage_factory, storage_item_factory
 ):
-    """Every other stock action reachable from the storage grid (open,
-    undo-open, consume, delete) honors `?next=storage` and returns the user
+    """Every stock action reachable from the storage grid (open, undo-open,
+    consume, delete, edit) honors `?next=storage` and returns the user
     there - see wine_cellar/apps/storage/views.py's `get_success_url`
-    methods. `StorageItemUpdateView.form_valid` is the odd one out: it
-    hardcodes a redirect to `wine-detail` and ignores `?next` entirely, so
-    editing a bottle from the storage grid strands the user on the wine
-    page instead of back where they came from. This test encodes the
-    consistent, intended behavior and is expected to fail against that
-    inconsistency."""
+    methods, including `StorageItemUpdateView`'s."""
     storage = storage_factory(user=user, name="Grid Rack", rows=1, columns=2)
     wine = wine_factory(user=user, name="Movable")
     item = storage_item_factory(storage=storage, wine=wine, user=user, row=1, column=1)
