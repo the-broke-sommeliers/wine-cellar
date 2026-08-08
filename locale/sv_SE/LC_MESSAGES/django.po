@@ -52,23 +52,23 @@ msgstr "Antal kolumner"
 msgid ""
 "Group the storage view by column instead of row, e.g. if you organize by "
 "column rather than by shelf."
-msgstr ""
+msgstr "Gruppera lagringsvyn efter kolumn istället för rad, t.ex. om du organiserar efter kolumn snarare än efter hylla."
 
 #: wine_cellar/apps/storage/forms.py:48
 msgid "Show Row Labels"
-msgstr ""
+msgstr "Visa radetiketter"
 
 #: wine_cellar/apps/storage/forms.py:49
 msgid "Display and allow naming individual rows (e.g. \"Top Shelf\")."
-msgstr ""
+msgstr "Visar enskilda rader och låter dig namnge dem (t.ex. \"Översta hyllan\")."
 
 #: wine_cellar/apps/storage/forms.py:54
 msgid "Show Column Labels"
-msgstr ""
+msgstr "Visa kolumnetiketter"
 
 #: wine_cellar/apps/storage/forms.py:55
 msgid "Display and allow naming individual columns (e.g. \"Left Bin\")."
-msgstr ""
+msgstr "Visar enskilda kolumner och låter dig namnge dem (t.ex. \"Vänstra facket\")."
 
 #: wine_cellar/apps/storage/forms.py:72 wine_cellar/apps/wine/forms.py:192
 #, python-format
@@ -137,7 +137,7 @@ msgstr "Rad"
 #: wine_cellar/apps/storage/templates/storage_detail.html:76
 #: wine_cellar/apps/storage/templates/storage_labels.html:32
 msgid "Column"
-msgstr ""
+msgstr "Kolumn"
 
 #: wine_cellar/apps/storage/templates/stock_add.html:10
 #: wine_cellar/apps/storage/templates/stock_add.html:13
@@ -353,7 +353,7 @@ msgstr "Ja"
 #: wine_cellar/apps/wine/filters.py:47 wine_cellar/apps/wine/filters.py:109
 #: wine_cellar/templates/base.html:53 wine_cellar/templates/base.html:91
 msgid "Storage"
-msgstr ""
+msgstr "Lagerplatser"
 
 #: wine_cellar/apps/wine/filters.py:51
 msgid "Recently Added"
@@ -503,338 +503,338 @@ msgstr "Välj datum när vinet senast bör drikcas"
 msgid ""
 "Enter dishes, cuisines, or ingredients that complement the flavors of this "
 "wine."
-msgstr ""
+msgstr "Ange rätter, kök eller ingredienser som kompletterar smakerna hos det här vinet."
 
 #: wine_cellar/apps/wine/forms.py:361
 msgid "Enter the names of the vineyards which produced the wine."
-msgstr ""
+msgstr "Ange namnen på vingårdarna som producerade vinet."
 
 #: wine_cellar/apps/wine/forms.py:367
 msgid "Where did you get the wine from?"
-msgstr ""
+msgstr "Var fick du vinet ifrån?"
 
 #: wine_cellar/apps/wine/forms.py:396
 msgid ""
 "Share your thoughts, tasting experiences, or any anecdotes related to this "
 "wine."
-msgstr ""
+msgstr "Dela dina tankar, provningsupplevelser eller anekdoter kopplade till det här vinet."
 
 #: wine_cellar/apps/wine/forms.py:403
 msgid "Rate this wine on a scale from 0 to 10."
-msgstr ""
+msgstr "Betygsätt det här vinet på en skala från 0 till 10."
 
 #: wine_cellar/apps/wine/forms.py:408
 msgid "Upload a photo of the front of the wine bottle."
-msgstr ""
+msgstr "Ladda upp ett foto av framsidan av vinflaskan."
 
 #: wine_cellar/apps/wine/forms.py:413
 msgid "Upload a photo of the back of the wine bottle."
-msgstr ""
+msgstr "Ladda upp ett foto av baksidan av vinflaskan."
 
 #: wine_cellar/apps/wine/forms.py:418
 msgid "Upload a photo of the front of the bottle label."
-msgstr ""
+msgstr "Ladda upp ett foto av framsidan av flaskans etikett."
 
 #: wine_cellar/apps/wine/forms.py:423
 msgid "Upload a photo of the back of the bottle label."
-msgstr ""
+msgstr "Ladda upp ett foto av baksidan av flaskans etikett."
 
 #: wine_cellar/apps/wine/forms.py:471
 msgid "Use these images as the wine's front and back photos"
-msgstr ""
+msgstr "Använd dessa bilder som vinets fram- och baksidesfoton"
 
 #: wine_cellar/apps/wine/forms.py:473
 msgid ""
 "If checked, the images uploaded above will be attached to the new wine as "
 "its front and back photos."
-msgstr ""
+msgstr "Om markerad kommer bilderna som laddats upp ovan att kopplas till det nya vinet som dess fram- och baksidesfoton."
 
 #: wine_cellar/apps/wine/forms.py:484
 msgid "At least one image (front or back) must be uploaded."
-msgstr ""
+msgstr "Minst en bild (fram- eller baksida) måste laddas upp."
 
 #: wine_cellar/apps/wine/models.py:28
 msgid "White"
-msgstr ""
+msgstr "Vitt"
 
 #: wine_cellar/apps/wine/models.py:29
 msgid "Red"
-msgstr ""
+msgstr "Rött"
 
 #: wine_cellar/apps/wine/models.py:30
 msgid "Rose"
-msgstr ""
+msgstr "Rosé"
 
 #: wine_cellar/apps/wine/models.py:31
 msgid "Sparkling"
-msgstr ""
+msgstr "Mousserande"
 
 #: wine_cellar/apps/wine/models.py:32
 msgid "Dessert"
-msgstr ""
+msgstr "Dessertvin"
 
 #: wine_cellar/apps/wine/models.py:33
 msgid "Fortified"
-msgstr ""
+msgstr "Starkvin"
 
 #: wine_cellar/apps/wine/models.py:34
 msgid "Orange"
-msgstr ""
+msgstr "Orange"
 
 #: wine_cellar/apps/wine/models.py:38
 msgid "Dry"
-msgstr ""
+msgstr "Torrt"
 
 #: wine_cellar/apps/wine/models.py:39
 msgid "Semi-Dry"
-msgstr ""
+msgstr "Halvtorrt"
 
 #: wine_cellar/apps/wine/models.py:40
 msgid "Medium Sweet"
-msgstr ""
+msgstr "Halvsött"
 
 #: wine_cellar/apps/wine/models.py:41
 msgid "Sweet"
-msgstr ""
+msgstr "Sött"
 
 #: wine_cellar/apps/wine/models.py:42
 msgid "Feinherb"
-msgstr ""
+msgstr "Lätt torrt"
 
 #: wine_cellar/apps/wine/models.py:46
 msgid "Front"
-msgstr ""
+msgstr "Framsida"
 
 #: wine_cellar/apps/wine/models.py:47
 #: wine_cellar/apps/wine/templates/wine_create.html:129
 msgid "Back"
-msgstr ""
+msgstr "Baksida"
 
 #: wine_cellar/apps/wine/models.py:48
 msgid "Label Front"
-msgstr ""
+msgstr "Etikett framsida"
 
 #: wine_cellar/apps/wine/models.py:49
 msgid "Label Back"
-msgstr ""
+msgstr "Etikett baksida"
 
 #: wine_cellar/apps/wine/models.py:68
 msgid "Grape"
-msgstr ""
+msgstr "Druva"
 
 #: wine_cellar/apps/wine/models.py:85
 #: wine_cellar/apps/wine/templates/wine_detail.html:93
 msgid "Region"
-msgstr ""
+msgstr "Region"
 
 #: wine_cellar/apps/wine/models.py:100
 #: wine_cellar/apps/wine/templates/wine_detail.html:99
 msgid "Appellation"
-msgstr ""
+msgstr "Appellation"
 
 #: wine_cellar/apps/wine/models.py:137
 msgid "Food"
-msgstr ""
+msgstr "Mat"
 
 #: wine_cellar/apps/wine/tasks.py:229
 msgid "AI request failed: invalid API key. Please check your configuration."
-msgstr ""
+msgstr "AI-förfrågan misslyckades: ogiltig API-nyckel. Kontrollera din konfiguration."
 
 #: wine_cellar/apps/wine/tasks.py:239
 msgid ""
 "AI request failed: rate limit reached. Please wait a moment and try again."
-msgstr ""
+msgstr "AI-förfrågan misslyckades: hastighetsgränsen har nåtts. Vänta en stund och försök igen."
 
 #: wine_cellar/apps/wine/tasks.py:253
 msgid ""
 "AI service is temporarily unavailable. Please try again in a few minutes."
-msgstr ""
+msgstr "AI-tjänsten är tillfälligt otillgänglig. Försök igen om några minuter."
 
 #: wine_cellar/apps/wine/tasks.py:259
 msgid "AI request timed out. Please try again."
-msgstr ""
+msgstr "AI-förfrågan tog för lång tid. Försök igen."
 
 #: wine_cellar/apps/wine/tasks.py:266
 msgid ""
 "Could not connect to the AI service. Please check your network and "
 "configuration."
-msgstr ""
+msgstr "Kunde inte ansluta till AI-tjänsten. Kontrollera ditt nätverk och din konfiguration."
 
 #: wine_cellar/apps/wine/tasks.py:275
 msgid "AI request failed. Please try again or check your configuration."
-msgstr ""
+msgstr "AI-förfrågan misslyckades. Försök igen eller kontrollera din konfiguration."
 
 #: wine_cellar/apps/wine/tasks.py:288
 msgid ""
 "Failed to process AI response. Please check the uploaded images and try "
 "again."
-msgstr ""
+msgstr "Kunde inte bearbeta AI-svaret. Kontrollera de uppladdade bilderna och försök igen."
 
 #: wine_cellar/apps/wine/templates/forms/form_field.html:8
 #: wine_cellar/templates/allauth/elements/field.html:9
 msgid "This field is optional"
-msgstr ""
+msgstr "Det här fältet är valfritt"
 
 #: wine_cellar/apps/wine/templates/forms/form_field.html:8
 #: wine_cellar/templates/allauth/elements/field.html:9
 msgid "(Optional)"
-msgstr ""
+msgstr "(Valfritt)"
 
 #: wine_cellar/apps/wine/templates/homepage.html:4
 msgid "My Wine Cellar"
-msgstr ""
+msgstr "Min vinkällare"
 
 #: wine_cellar/apps/wine/templates/homepage.html:38
 msgctxt "stats"
 msgid "Country"
 msgid_plural "Countries"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Land"
+msgstr[1] "Länder"
 
 #: wine_cellar/apps/wine/templates/homepage.html:46
 msgid "Total Value in Stock"
-msgstr ""
+msgstr "Totalt värde i lager"
 
 #: wine_cellar/apps/wine/templates/homepage.html:53
 msgid "Oldest Wine"
-msgstr ""
+msgstr "Äldsta vinet"
 
 #: wine_cellar/apps/wine/templates/homepage.html:60
 msgid "Youngest Wine"
-msgstr ""
+msgstr "Yngsta vinet"
 
 #: wine_cellar/apps/wine/templates/includes/pagination.html:15
 msgid "(current)"
-msgstr ""
+msgstr "(aktuell)"
 
 #: wine_cellar/apps/wine/templates/wine_card.html:9
 #, python-format
 msgid "Image of a glass of %(type)s wine"
-msgstr ""
+msgstr "Bild av ett glas %(type)s vin"
 
 #: wine_cellar/apps/wine/templates/wine_card.html:31
 #, python-format
 msgid "Rating: %(rating)s out of 10"
-msgstr ""
+msgstr "Betyg: %(rating)s av 10"
 
 #: wine_cellar/apps/wine/templates/wine_card.html:38
 msgid "Stock:"
-msgstr ""
+msgstr "Lager:"
 
 #: wine_cellar/apps/wine/templates/wine_choose_action.html:4
 msgid "Choose how to add a wine"
-msgstr ""
+msgstr "Välj hur du vill lägga till ett vin"
 
 #: wine_cellar/apps/wine/templates/wine_choose_action.html:12
 msgid "Add Manually"
-msgstr ""
+msgstr "Lägg till manuellt"
 
 #: wine_cellar/apps/wine/templates/wine_choose_action.html:13
 msgid "Fill in all details yourself using the step-by-step form."
-msgstr ""
+msgstr "Fyll i alla uppgifter själv med hjälp av det stegvisa formuläret."
 
 #: wine_cellar/apps/wine/templates/wine_confirm_delete.html:17
 #, python-format
 msgid ""
 "Do you really want to permanently delete the wine \"%(name)s\"? This action "
 "cannot be undone."
-msgstr ""
+msgstr "Vill du verkligen ta bort vinet \"%(name)s\" permanent? Denna åtgärd kan inte ångras."
 
 #: wine_cellar/apps/wine/templates/wine_create.html:19
 #: wine_cellar/templates/base.html:44 wine_cellar/templates/base.html:82
 msgid "Add Wine"
-msgstr ""
+msgstr "Lägg till vin"
 
 #: wine_cellar/apps/wine/templates/wine_create.html:37
 #: wine_cellar/apps/wine/templates/wine_detail.html:55
 msgid "Details"
-msgstr ""
+msgstr "Detaljer"
 
 #: wine_cellar/apps/wine/templates/wine_create.html:48
 msgid "Characteristics"
-msgstr ""
+msgstr "Egenskaper"
 
 #: wine_cellar/apps/wine/templates/wine_create.html:60
 #: wine_cellar/apps/wine/templates/wine_detail.html:182
 msgid "Origin"
-msgstr ""
+msgstr "Ursprung"
 
 #: wine_cellar/apps/wine/templates/wine_create.html:71
 msgid "Purchase"
-msgstr ""
+msgstr "Köp"
 
 #: wine_cellar/apps/wine/templates/wine_create.html:84
 msgid "Personal Notes"
-msgstr ""
+msgstr "Personliga anteckningar"
 
 #: wine_cellar/apps/wine/templates/wine_create.html:95
 msgid "Image"
-msgstr ""
+msgstr "Bild"
 
 #: wine_cellar/apps/wine/templates/wine_create.html:102
 #: wine_cellar/apps/wine/templates/wine_create.html:112
 #, python-format
 msgid "Photo \"%(name)s\" will be used"
-msgstr ""
+msgstr "Foto \"%(name)s\" kommer att användas"
 
 #: wine_cellar/apps/wine/templates/wine_create.html:135
 msgid "Continue"
-msgstr ""
+msgstr "Fortsätt"
 
 #: wine_cellar/apps/wine/templates/wine_create.html:140
 msgid "Save and Finish"
-msgstr ""
+msgstr "Spara och avsluta"
 
 #: wine_cellar/apps/wine/templates/wine_detail.html:32
 msgid "Picture of a wine bottle"
-msgstr ""
+msgstr "Bild av en vinflaska"
 
 #: wine_cellar/apps/wine/templates/wine_detail.html:38
 msgid "Image carousel controls"
-msgstr ""
+msgstr "Bildkarusellens kontroller"
 
 #: wine_cellar/apps/wine/templates/wine_detail.html:41
 #: wine_cellar/apps/wine/templates/wine_detail.html:43
 msgid "Previous image"
-msgstr ""
+msgstr "Föregående bild"
 
 #: wine_cellar/apps/wine/templates/wine_detail.html:46
 #: wine_cellar/apps/wine/templates/wine_detail.html:47
 msgid "Next image"
-msgstr ""
+msgstr "Nästa bild"
 
 #: wine_cellar/apps/wine/templates/wine_detail.html:70
 msgid "Type"
-msgstr ""
+msgstr "Typ"
 
 #: wine_cellar/apps/wine/templates/wine_detail.html:75
 msgid "Rating"
-msgstr ""
+msgstr "Betyg"
 
 #: wine_cellar/apps/wine/templates/wine_detail.html:81
 msgid "Price"
-msgstr ""
+msgstr "Pris"
 
 #: wine_cellar/apps/wine/templates/wine_detail.html:88
 msgctxt "Singular"
 msgid "Country"
-msgstr ""
+msgstr "Land"
 
 #: wine_cellar/apps/wine/templates/wine_detail.html:121
 msgid "ABV"
-msgstr ""
+msgstr "Alkoholhalt"
 
 #: wine_cellar/apps/wine/templates/wine_detail.html:151
 msgid "Sources"
-msgstr ""
+msgstr "Källor"
 
 #: wine_cellar/apps/wine/templates/wine_detail.html:163
 msgid "Average Price"
-msgstr ""
+msgstr "Genomsnittligt pris"
 
 #: wine_cellar/apps/wine/templates/wine_detail.html:171
 msgid "Comment"
-msgstr ""
+msgstr "Kommentar"
 
 #: wine_cellar/apps/wine/templates/wine_detail.html:195
 #, python-format
@@ -846,168 +846,168 @@ msgid_plural ""
 "\n"
 "                                %(counter)s bottles\n"
 "                            "
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "\n                    %(counter)s flaska"
+msgstr[1] "\n                    %(counter)s flaskor"
 
 #: wine_cellar/apps/wine/templates/wine_detail.html:202
 msgid "Add"
-msgstr ""
+msgstr "Lägg till"
 
 #: wine_cellar/apps/wine/templates/wine_edit.html:16
 #: wine_cellar/apps/wine/templates/wine_edit.html:19
 msgid "Edit Wine"
-msgstr ""
+msgstr "Redigera vin"
 
 #: wine_cellar/apps/wine/templates/wine_list.html:9
 msgid "Wine List"
-msgstr ""
+msgstr "Vinlista"
 
 #: wine_cellar/apps/wine/templates/wine_list.html:19
 #: wine_cellar/apps/wine/templates/wine_list.html:49
 msgid "Filter & Sorting"
-msgstr ""
+msgstr "Filter & sortering"
 
 #: wine_cellar/apps/wine/templates/wine_list.html:26
 msgid "Narrow Your Selection"
-msgstr ""
+msgstr "Begränsa ditt urval"
 
 #: wine_cellar/apps/wine/templates/wine_list.html:34
 #: wine_cellar/apps/wine/templates/wine_list.html:59
 msgid "Clear all filters and reset the form"
-msgstr ""
+msgstr "Rensa alla filter och återställ formuläret"
 
 #: wine_cellar/apps/wine/templates/wine_list.html:35
 #: wine_cellar/apps/wine/templates/wine_list.html:59
 msgid "Clear"
-msgstr ""
+msgstr "Rensa"
 
 #: wine_cellar/apps/wine/templates/wine_list.html:37
 #: wine_cellar/apps/wine/templates/wine_list.html:60
 msgid "Filter"
-msgstr ""
+msgstr "Filtrera"
 
 #: wine_cellar/apps/wine/templates/wine_list.html:70
 msgid "There are no wines yet."
-msgstr ""
+msgstr "Det finns inga viner än."
 
 #: wine_cellar/apps/wine/templates/wine_map.html:5
 msgid "Map of your wines"
-msgstr ""
+msgstr "Karta över dina viner"
 
 #: wine_cellar/apps/wine/templates/wine_scan.html:5
 msgid "Scan Barcode"
-msgstr ""
+msgstr "Skanna streckkod"
 
 #: wine_cellar/apps/wine/templates/wine_scan.html:12
 msgid ""
 "Scan the barcode of a bottle to quickly add or remove a wine from your "
 "cellar."
-msgstr ""
+msgstr "Skanna streckkoden på en flaska för att snabbt lägga till eller ta bort ett vin från din källare."
 
 #: wine_cellar/apps/wine/templates/wine_scanned.html:4
 msgid "No wine found"
-msgstr ""
+msgstr "Inget vin hittades"
 
 #: wine_cellar/apps/wine/templates/wine_scanned.html:11
 #, python-format
 msgid "No wine with barcode <strong>%(code)s</strong> found."
-msgstr ""
+msgstr "Inget vin med streckkoden <strong>%(code)s</strong> hittades."
 
 #: wine_cellar/apps/wine/templates/wine_scanned.html:13
 msgid "Would you like to add a new wine with that barcode?"
-msgstr ""
+msgstr "Vill du lägga till ett nytt vin med den streckkoden?"
 
 #: wine_cellar/apps/wine/templates/wine_scanned.html:18
 msgid "Add new wine"
-msgstr ""
+msgstr "Lägg till nytt vin"
 
 #: wine_cellar/apps/wine/templates/wine_upload_ai.html:18
 msgid "Create Wine from Image"
-msgstr ""
+msgstr "Skapa vin från bild"
 
 #: wine_cellar/apps/wine/templates/wine_upload_ai.html:25
 msgid ""
 "To use ai-based wine creation a valid ai model and api key need to be "
 "configured. See <a href=\"https://the-broke-sommeliers.github.io/wine-"
 "cellar/setup/deployment/#ai-setup\">the docs</a> for more information."
-msgstr ""
+msgstr "För att använda AI-baserad vinskapande måste en giltig AI-modell och API-nyckel konfigureras. Se <a href=\"https://the-broke-sommeliers.github.io/wine-cellar/setup/deployment/#ai-setup\">dokumentationen</a> för mer information."
 
 #: wine_cellar/apps/wine/templates/wine_upload_ai.html:49
 msgid "Upload"
-msgstr ""
+msgstr "Ladda upp"
 
 #: wine_cellar/apps/wine/templates/wine_upload_ai.html:56
 msgid "Uploading your photos…"
-msgstr ""
+msgstr "Dina foton laddas upp…"
 
 #: wine_cellar/apps/wine/templates/wine_upload_ai.html:67
 msgid "Try again"
-msgstr ""
+msgstr "Försök igen"
 
 #: wine_cellar/apps/wine/views.py:283 wine_cellar/apps/wine/views.py:316
 msgid "A wine with these details already exists in your cellar."
-msgstr ""
+msgstr "Ett vin med dessa uppgifter finns redan i din källare."
 
 #: wine_cellar/apps/wine/views.py:472
 msgid "This AI request has expired."
-msgstr ""
+msgstr "Den här AI-förfrågan har gått ut."
 
 #: wine_cellar/conf/settings.py:155
 msgid "German"
-msgstr ""
+msgstr "Tyska"
 
 #: wine_cellar/conf/settings.py:156
 msgid "French"
-msgstr ""
+msgstr "Franska"
 
 #: wine_cellar/conf/settings.py:157
 msgid "British English"
-msgstr ""
+msgstr "Brittisk engelska"
 
 #: wine_cellar/conf/settings.py:163
 msgid "Euro"
-msgstr ""
+msgstr "Euro"
 
 #: wine_cellar/conf/settings.py:164
 msgid "Dollar"
-msgstr ""
+msgstr "Dollar"
 
 #: wine_cellar/conf/settings.py:165
 msgid "Pound Sterling"
-msgstr ""
+msgstr "Brittiskt pund"
 
 #: wine_cellar/templates/base.html:41 wine_cellar/templates/base.html:79
 msgid "Wines"
-msgstr ""
+msgstr "Viner"
 
 #: wine_cellar/templates/base.html:47 wine_cellar/templates/base.html:85
 msgid "Scan Wine"
-msgstr ""
+msgstr "Skanna vin"
 
 #: wine_cellar/templates/base.html:50 wine_cellar/templates/base.html:88
 msgid "Map"
-msgstr ""
+msgstr "Karta"
 
 #: wine_cellar/templates/base.html:61 wine_cellar/templates/base.html:99
 msgid "Logout"
-msgstr ""
+msgstr "Logga ut"
 
 #: wine_cellar/templates/base.html:66 wine_cellar/templates/base.html:104
 msgid "Login"
-msgstr ""
+msgstr "Logga in"
 
 #: wine_cellar/templates/base.html:123
 msgid "Version"
-msgstr ""
+msgstr "Version"
 
 #: wine_cellar/templates/includes/settings_sidebar.html:9
 msgid "Email Addresses"
-msgstr ""
+msgstr "E-postadresser"
 
 #: wine_cellar/templates/includes/settings_sidebar.html:12
 msgid "Change Password"
-msgstr ""
+msgstr "Ändra lösenord"
 
 #: wine_cellar/templates/includes/settings_sidebar.html:15
 msgid "Social Accounts"
-msgstr ""
+msgstr "Sociala konton"
