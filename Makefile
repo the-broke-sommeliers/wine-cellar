@@ -65,6 +65,15 @@ pytest-clean:
 coverage:
 	$(VIRTUAL_ENV)/bin/py.test --reuse-db --cov --cov-report=html
 
+.PHONY: e2e
+e2e:
+	$(VIRTUAL_ENV)/bin/playwright install chromium
+	# Playwright's sync API marks the calling thread as having a running asyncio
+	# event loop (playwright/_impl/_sync_base.py) and never clears it, which makes
+	# Django's async-safety check (SynchronousOnlyOperation) misfire on ORM calls
+	# during test-db setup even though nothing here is actually async.
+	DJANGO_ALLOW_ASYNC_UNSAFE=1 $(VIRTUAL_ENV)/bin/py.test -m e2e --reuse-db
+
 .PHONY: lint
 lint:
 	EXIT_STATUS=0; \
