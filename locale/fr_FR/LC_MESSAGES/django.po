@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-08 15:57+0200\n"
+"POT-Creation-Date: 2026-08-08 16:10+0200\n"
 "PO-Revision-Date: 2025-10-14 19:37+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1096,18 +1096,22 @@ msgid "French"
 msgstr "Français"
 
 #: wine_cellar/conf/settings.py:157
+msgid "Swedish"
+msgstr ""
+
+#: wine_cellar/conf/settings.py:158
 msgid "British English"
 msgstr "Englais (U.K.)"
 
-#: wine_cellar/conf/settings.py:163
+#: wine_cellar/conf/settings.py:164
 msgid "Euro"
 msgstr "Euro"
 
-#: wine_cellar/conf/settings.py:164
+#: wine_cellar/conf/settings.py:165
 msgid "Dollar"
 msgstr "Dollar"
 
-#: wine_cellar/conf/settings.py:165
+#: wine_cellar/conf/settings.py:166
 msgid "Pound Sterling"
 msgstr "Livre Sterling"
 

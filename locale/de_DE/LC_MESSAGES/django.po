@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-08 15:57+0200\n"
+"POT-Creation-Date: 2026-08-08 16:10+0200\n"
 "PO-Revision-Date: 2026-02-17 16:42+0000\n"
 "Last-Translator: goa punk <goapunk@riseup.net>, 2026\n"
 "Language-Team: German (Germany) (https://app.transifex.com/the-broke-"
@@ -999,18 +999,22 @@ msgid "French"
 msgstr "Französisch"
 
 #: wine_cellar/conf/settings.py:157
+msgid "Swedish"
+msgstr ""
+
+#: wine_cellar/conf/settings.py:158
 msgid "British English"
 msgstr "Britisches Englisch"
 
-#: wine_cellar/conf/settings.py:163
+#: wine_cellar/conf/settings.py:164
 msgid "Euro"
 msgstr "Euro"
 
-#: wine_cellar/conf/settings.py:164
+#: wine_cellar/conf/settings.py:165
 msgid "Dollar"
 msgstr "Dollar"
 
-#: wine_cellar/conf/settings.py:165
+#: wine_cellar/conf/settings.py:166
 msgid "Pound Sterling"
 msgstr "Pfund Sterling"
 
