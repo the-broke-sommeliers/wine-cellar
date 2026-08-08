@@ -113,7 +113,9 @@
   color: var(--text-color-gray);
   text-decoration: none;
   border-radius: 4px;
-  transition: background-color 0.15s, color 0.15s;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
 }
 
 .card__action-btn:hover {
@@ -292,7 +294,9 @@
     color: var(--text-color-gray);
     text-decoration: none;
     border-radius: 4px;
-    transition: background-color 0.15s, color 0.15s;
+    transition:
+      background-color 0.15s,
+      color 0.15s;
   }
 
   a:hover {
