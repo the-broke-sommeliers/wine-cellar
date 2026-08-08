@@ -29,40 +29,40 @@ msgstr "Restaurer l'image"
 
 #: wine_cellar/assets/js/wine_upload_ai.ts:35
 msgid "Uploading your photos…"
-msgstr ""
+msgstr "Téléchargement de vos photos…"
 
 #: wine_cellar/assets/js/wine_upload_ai.ts:37
 msgid "Analyzing your label with AI… this can take up to a minute."
-msgstr ""
+msgstr "Analyse de votre étiquette par IA… cela peut prendre jusqu'à une minute."
 
 #: wine_cellar/assets/js/wine_upload_ai.ts:88
 msgid "Wine identified — now refining its location…"
-msgstr ""
+msgstr "Vin identifié — affinement de sa localisation en cours…"
 
 #: wine_cellar/assets/js/wine_upload_ai.ts:89
 msgid "Wine identified — now confirming its country of origin…"
-msgstr ""
+msgstr "Vin identifié — confirmation de son pays d'origine en cours…"
 
 #: wine_cellar/assets/js/wine_upload_ai.ts:90
 msgid "Wine identified — now confirming its type…"
-msgstr ""
+msgstr "Vin identifié — confirmation de son type en cours…"
 
 #: wine_cellar/assets/js/wine_upload_ai.ts:91
 msgid "Wine identified — now confirming its sweetness…"
-msgstr ""
+msgstr "Vin identifié — confirmation de son niveau de sucre en cours…"
 
 #: wine_cellar/assets/js/wine_upload_ai.ts:119
 msgid "The AI request failed."
-msgstr ""
+msgstr "La requête IA a échoué."
 
 #: wine_cellar/assets/js/wine_upload_ai.ts:131
 msgid "This is taking longer than expected. Please try again in a few minutes."
-msgstr ""
+msgstr "Cela prend plus de temps que prévu. Veuillez réessayer dans quelques minutes."
 
 #: wine_cellar/assets/js/wine_upload_ai.ts:168
 #: wine_cellar/assets/js/wine_upload_ai.ts:174
 msgid "Could not upload the images. Please try again."
-msgstr ""
+msgstr "Impossible de télécharger les images. Veuillez réessayer."
 
 #: wine_cellar/react/maps/ItemPopup.tsx:5
 msgctxt "Singular"

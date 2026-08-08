@@ -53,23 +53,23 @@ msgstr "Anzahl an Spalten"
 msgid ""
 "Group the storage view by column instead of row, e.g. if you organize by "
 "column rather than by shelf."
-msgstr ""
+msgstr "Gruppiere die Lageransicht nach Spalte statt nach Zeile, z. B. wenn du eher nach Spalte als nach Fach organisierst."
 
 #: wine_cellar/apps/storage/forms.py:48
 msgid "Show Row Labels"
-msgstr ""
+msgstr "Zeilenbeschriftungen anzeigen"
 
 #: wine_cellar/apps/storage/forms.py:49
 msgid "Display and allow naming individual rows (e.g. \"Top Shelf\")."
-msgstr ""
+msgstr "Zeigt einzelne Zeilen an und erlaubt es, sie zu benennen (z. B. \"Oberes Fach\")."
 
 #: wine_cellar/apps/storage/forms.py:54
 msgid "Show Column Labels"
-msgstr ""
+msgstr "Spaltenbeschriftungen anzeigen"
 
 #: wine_cellar/apps/storage/forms.py:55
 msgid "Display and allow naming individual columns (e.g. \"Left Bin\")."
-msgstr ""
+msgstr "Zeigt einzelne Spalten an und erlaubt es, sie zu benennen (z. B. \"Linkes Fach\")."
 
 #: wine_cellar/apps/storage/forms.py:72 wine_cellar/apps/wine/forms.py:192
 #, python-format
@@ -140,7 +140,7 @@ msgstr "Zeile"
 #: wine_cellar/apps/storage/templates/storage_detail.html:76
 #: wine_cellar/apps/storage/templates/storage_labels.html:32
 msgid "Column"
-msgstr ""
+msgstr "Spalte"
 
 #: wine_cellar/apps/storage/templates/stock_add.html:10
 #: wine_cellar/apps/storage/templates/stock_add.html:13
@@ -554,13 +554,13 @@ msgstr "Lade ein Foto des Etiketts auf der Rückseite der Flasche hoch."
 
 #: wine_cellar/apps/wine/forms.py:471
 msgid "Use these images as the wine's front and back photos"
-msgstr ""
+msgstr "Diese Bilder als Vorder- und Rückseitenfotos des Weins verwenden"
 
 #: wine_cellar/apps/wine/forms.py:473
 msgid ""
 "If checked, the images uploaded above will be attached to the new wine as "
 "its front and back photos."
-msgstr ""
+msgstr "Wenn aktiviert, werden die oben hochgeladenen Bilder dem neuen Wein als Vorder- und Rückseitenfoto zugeordnet."
 
 #: wine_cellar/apps/wine/forms.py:484
 msgid "At least one image (front or back) must be uploaded."
@@ -803,7 +803,7 @@ msgstr "Bild"
 #: wine_cellar/apps/wine/templates/wine_create.html:112
 #, python-format
 msgid "Photo \"%(name)s\" will be used"
-msgstr ""
+msgstr "Foto \"%(name)s\" wird verwendet"
 
 #: wine_cellar/apps/wine/templates/wine_create.html:135
 msgid "Continue"
@@ -976,11 +976,11 @@ msgstr "Hochladen"
 
 #: wine_cellar/apps/wine/templates/wine_upload_ai.html:56
 msgid "Uploading your photos…"
-msgstr ""
+msgstr "Deine Fotos werden hochgeladen…"
 
 #: wine_cellar/apps/wine/templates/wine_upload_ai.html:67
 msgid "Try again"
-msgstr ""
+msgstr "Erneut versuchen"
 
 #: wine_cellar/apps/wine/views.py:283 wine_cellar/apps/wine/views.py:316
 msgid "A wine with these details already exists in your cellar."
@@ -988,7 +988,7 @@ msgstr "Ein Wein mit diesen Daten existiert bereits in deinem Keller."
 
 #: wine_cellar/apps/wine/views.py:472
 msgid "This AI request has expired."
-msgstr ""
+msgstr "Diese KI-Anfrage ist abgelaufen."
 
 #: wine_cellar/conf/settings.py:155
 msgid "German"
@@ -1000,7 +1000,7 @@ msgstr "Französisch"
 
 #: wine_cellar/conf/settings.py:157
 msgid "Swedish"
-msgstr ""
+msgstr "Schwedisch"
 
 #: wine_cellar/conf/settings.py:158
 msgid "British English"
