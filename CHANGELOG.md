@@ -3,9 +3,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.10.0-rc.4 (2026-08-07)
+## 0.10.0-rc.5 (2026-08-08)
 
 ### feat
+
+- improve storage view with new features
+    
+    - add option to swap row and column in storage detail view
+    - add option to name rows and columns (e.g. by Spain, 2012)
 
 - improve AI workflow
     
@@ -22,6 +27,20 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 
 ### fix
+
+- multiple ui issues
+    
+    - Editing a stock item now returns to the previous view on save (i.e.
+      storage or wine detail view) instead of always returning to the wine
+      detail view.
+    - Non-form field errors are now correctly shown on wine create and edit
+      (e.g. when adding a duplicate wine). Previously no error was shown but
+      saving failed.
+    - Remember the added size when navigating back/forth in the wine adding
+      form.
+    - Remove the left over stock field from the wine create form.
+
+- make slow litellm import local
 
 - docker dev setup
 
