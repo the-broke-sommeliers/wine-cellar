@@ -2,10 +2,10 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
+# 
 # Translators:
 # goa punk <goapunk@riseup.net>, 2026
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -13,12 +13,11 @@ msgstr ""
 "POT-Creation-Date: 2026-06-29 14:01+0200\n"
 "PO-Revision-Date: 2026-02-17 16:42+0000\n"
 "Last-Translator: goa punk <goapunk@riseup.net>, 2026\n"
-"Language-Team: German (Germany) (https://app.transifex.com/the-broke-"
-"sommeliers/teams/304909/de_DE/)\n"
-"Language: de_DE\n"
+"Language-Team: German (Germany) (https://app.transifex.com/the-broke-sommeliers/teams/304909/de_DE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: de_DE\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: wine_cellar/apps/storage/forms.py:17
@@ -89,19 +88,19 @@ msgstr ""
 #: wine_cellar/apps/storage/forms.py:145
 #: wine_cellar/apps/storage/templates/storage_item_history.html:22
 msgid "Note"
-msgstr "Notiz"
+msgstr ""
 
 #: wine_cellar/apps/storage/forms.py:148
 msgid "Why are you opening this bottle? (e.g. birthday dinner)"
-msgstr "Warum öffnest du diese Flasche? (z. B. Geburtstagsessen)"
+msgstr ""
 
 #: wine_cellar/apps/storage/forms.py:151
 msgid "Drink Reminder"
-msgstr "Trinkerinnerung"
+msgstr ""
 
 #: wine_cellar/apps/storage/forms.py:155
 msgid "Send a reminder to drink the rest of this bottle by this many days."
-msgstr "Sende eine Erinnerung, den Rest dieser Flasche in so vielen Tagen zu trinken."
+msgstr ""
 
 #: wine_cellar/apps/storage/templates/stock_add.html:9
 #: wine_cellar/apps/storage/templates/stock_add.html:12
@@ -138,7 +137,7 @@ msgstr "Abbrechen"
 #: wine_cellar/apps/storage/templates/storage_detail.html:96
 #: wine_cellar/apps/wine/templates/wine_detail.html:229
 msgid "Undo Opening"
-msgstr "Öffnung rückgängig machen"
+msgstr ""
 
 #: wine_cellar/apps/storage/templates/stock_undo_open.html:17
 #, python-format
@@ -146,8 +145,6 @@ msgid ""
 "Mark \"%(name)s\" as sealed again? This will clear the drink reminder and "
 "opening note."
 msgstr ""
-"\"%(name)s\" wieder als versiegelt markieren? Damit werden die "
-"Trinkerinnerung und die Öffnungsnotiz gelöscht."
 
 #: wine_cellar/apps/storage/templates/storage_confirm_delete.html:4
 #: wine_cellar/apps/storage/templates/storage_confirm_delete.html:7
@@ -160,8 +157,8 @@ msgid ""
 "Do you really want to permanently delete the storage \"%(name)s\"? This "
 "action cannot be undone."
 msgstr ""
-"Willst du den Lagerort \"%(name)s\" wirklich endgültig löschen? Diese Aktion "
-"kann nicht rückgängig gemacht werden."
+"Willst du den Lagerort \"%(name)s\" wirklich endgültig löschen? Diese Aktion"
+" kann nicht rückgängig gemacht werden."
 
 #: wine_cellar/apps/storage/templates/storage_confirm_delete.html:31
 #: wine_cellar/apps/storage/templates/storage_item_confirm_delete.html:26
@@ -212,12 +209,12 @@ msgstr "Fach"
 #: wine_cellar/apps/wine/templates/wine_detail.html:219
 #: wine_cellar/apps/wine/templates/wine_detail.html:239
 msgid "Opened"
-msgstr "Geöffnet"
+msgstr ""
 
 #: wine_cellar/apps/storage/templates/storage_detail.html:94
 #: wine_cellar/apps/wine/templates/wine_detail.html:227
 msgid "Open"
-msgstr "Öffnen"
+msgstr ""
 
 #: wine_cellar/apps/storage/templates/storage_detail.html:111
 #: wine_cellar/apps/storage/templates/storage_item_history.html:53
@@ -235,7 +232,7 @@ msgid ""
 "Are you sure you want to take the bottle \"%(name)s\" out of "
 "\"%(storage)s\"? This will remove it from your cellar inventory."
 msgstr ""
-"Willst du die Flasche \"%(name)s\" wirklich aus \"%(storage)s\" nehmen? Dadurch "
+"Willst du die Flasche „%(name)s“ wirklich aus „%(storage)s“ nehmen? Dadurch "
 "wird sie aus deinem Kellerbestand entfernt."
 
 #: wine_cellar/apps/storage/templates/storage_item_history.html:4
@@ -244,15 +241,15 @@ msgstr "Bestandsverlauf"
 
 #: wine_cellar/apps/storage/templates/storage_item_history.html:23
 msgid "Status"
-msgstr "Status"
+msgstr ""
 
 #: wine_cellar/apps/storage/templates/storage_item_history.html:24
 msgid "Date"
-msgstr "Datum"
+msgstr ""
 
 #: wine_cellar/apps/storage/templates/storage_item_history.html:39
 msgid "Consumed"
-msgstr "Verbraucht"
+msgstr ""
 
 #: wine_cellar/apps/storage/templates/storage_item_history.html:41
 msgid "Removed"
@@ -432,8 +429,8 @@ msgstr "Größe"
 #: wine_cellar/apps/wine/forms.py:287
 msgid "Please enter the volume of bottle or box ect. in liters, e.g. 0.75."
 msgstr ""
-"Bitte gib das Volumen der Flasche oder des Kartons usw. in Litern ein, z. B. "
-"0,75."
+"Bitte gib das Volumen der Flasche oder des Kartons usw. in Litern ein, z. B."
+" 0,75."
 
 #: wine_cellar/apps/wine/forms.py:297
 msgid ""
@@ -448,8 +445,8 @@ msgid ""
 "Enter the year the grapes were harvested to produce the wine. Typically, "
 "vintage years are prominently displayed on wine labels."
 msgstr ""
-"Gib das Jahr ein, in dem die Trauben für den Wein geerntet wurden. Jahrgänge "
-"stehen normalerweise gut sichtbar auf dem Weinetikett."
+"Gib das Jahr ein, in dem die Trauben für den Wein geerntet wurden. Jahrgänge"
+" stehen normalerweise gut sichtbar auf dem Weinetikett."
 
 #: wine_cellar/apps/wine/forms.py:327
 msgid ""
@@ -862,13 +859,13 @@ msgstr "Wein per Bild erfassen"
 #: wine_cellar/apps/wine/templates/wine_upload_ai.html:23
 msgid ""
 "To use ai-based wine creation a valid ai model and api key need to be "
-"configured. See <a href=\"https://the-broke-sommeliers.github.io/wine-cellar/"
-"setup/deployment/#ai-setup\">the docs</a> for more information."
+"configured. See <a href=\"https://the-broke-sommeliers.github.io/wine-"
+"cellar/setup/deployment/#ai-setup\">the docs</a> for more information."
 msgstr ""
 "Um die KI-basierte Weinerfassung zu nutzen, müssen ein gültiges KI-Modell "
 "und ein API-Schlüssel konfiguriert werden. Weitere Informationen findest du "
-"in der <a href=\"https://the-broke-sommeliers.github.io/wine-cellar/setup/"
-"deployment/#ai-setup\">Dokumentation</a>."
+"in der <a href=\"https://the-broke-sommeliers.github.io/wine-"
+"cellar/setup/deployment/#ai-setup\">Dokumentation</a>."
 
 #: wine_cellar/apps/wine/templates/wine_upload_ai.html:45
 msgid "Upload"
@@ -876,45 +873,35 @@ msgstr "Hochladen"
 
 #: wine_cellar/apps/wine/views.py:211 wine_cellar/apps/wine/views.py:242
 msgid "A wine with these details already exists in your cellar."
-msgstr "Ein Wein mit diesen Daten existiert bereits in deinem Keller."
+msgstr ""
 
 #: wine_cellar/apps/wine/views.py:379
 msgid "AI request failed: invalid API key. Please check your configuration."
 msgstr ""
-"KI-Anfrage fehlgeschlagen: ungültiger API-Schlüssel. Bitte überprüfe deine "
-"Konfiguration."
 
 #: wine_cellar/apps/wine/views.py:388
 msgid ""
 "AI request failed: rate limit reached. Please wait a moment and try again."
 msgstr ""
-"KI-Anfrage fehlgeschlagen: Rate-Limit erreicht. Bitte warte einen Moment und "
-"versuche es erneut."
 
 #: wine_cellar/apps/wine/views.py:401
 msgid ""
 "AI service is temporarily unavailable. Please try again in a few minutes."
 msgstr ""
-"KI-Dienst vorübergehend nicht verfügbar. Bitte versuche es in einigen Minuten "
-"erneut."
 
 #: wine_cellar/apps/wine/views.py:409
 msgid "AI request timed out. Please try again."
-msgstr "KI-Anfrage hat das Zeitlimit überschritten. Bitte versuche es erneut."
+msgstr ""
 
 #: wine_cellar/apps/wine/views.py:416
 msgid ""
 "Could not connect to the AI service. Please check your network and "
 "configuration."
 msgstr ""
-"Verbindung zum KI-Dienst fehlgeschlagen. Bitte überprüfe dein Netzwerk und "
-"deine Konfiguration."
 
 #: wine_cellar/apps/wine/views.py:424
 msgid "AI request failed. Please try again or check your configuration."
 msgstr ""
-"KI-Anfrage fehlgeschlagen. Bitte versuche es erneut oder überprüfe deine "
-"Konfiguration."
 
 #: wine_cellar/apps/wine/views.py:440
 msgid ""
