@@ -83,7 +83,7 @@ class StorageDetailView(DetailView, MultipleObjectMixin):
         def sort_key(x):
             r = x["row"] if isinstance(x, dict) else x.row
             c = x["column"] if isinstance(x, dict) else x.column
-            return (c or 0, r or 0) if swap_axes else (r or 0, c or 0)
+            return object.sort_key(r, c)
 
         rows.sort(key=sort_key)
 
@@ -272,6 +272,25 @@ class StorageDeleteView(DeleteView):
         return qs.filter(user=self.request.user)
 
 
+def storage_picker_payload(user, exclude_item=None):
+    """Per-storage JSON payload for the `stock_add.ts` slot picker."""
+    payload = {}
+    for storage in Storage.objects.filter(user=user):
+        if storage.is_unlimited:
+            payload[storage.pk] = {"unlimited": True}
+            continue
+        payload[storage.pk] = {
+            "unlimited": False,
+            "rows": storage.rows,
+            "columns": storage.columns,
+            "swap_axes": storage.swap_axes,
+            "row_labels": storage.row_labels,
+            "column_labels": storage.column_labels,
+            "cells": storage.grid_cells(exclude_item=exclude_item),
+        }
+    return payload
+
+
 class StorageItemAddView(FormView):
     template_name = "stock_add.html"
     form_class = StockForm
@@ -284,25 +303,8 @@ class StorageItemAddView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        user_storages = Storage.objects.filter(user=self.request.user)
-        free_cells_by_storage = {}
-        for storage in user_storages:
-            if storage.rows == 0:
-                free_cells_by_storage[storage.pk] = {}
-                continue
-            used_cells = set(
-                storage.items.filter(deleted=False).values_list("row", "column")
-            )
-            all_rows = range(1, storage.rows + 1)
-            all_columns = range(1, storage.columns + 1)
-            free_cells_by_storage[storage.pk] = {}
-            for row in all_rows:
-                free = []
-                for column in all_columns:
-                    if (row, column) not in used_cells:
-                        free.append(column)
-                free_cells_by_storage[storage.pk][row] = free
-        context["free_cells_by_storage"] = free_cells_by_storage
+        context["storage_cells_data"] = storage_picker_payload(self.request.user)
+        context["is_edit"] = False
         return context
 
     def form_valid(self, form):
@@ -314,18 +316,29 @@ class StorageItemAddView(FormView):
     @staticmethod
     def process_form_data(wine, user, cleaned_data):
         storage = cleaned_data["storage"]
-        row = cleaned_data["row"]
-        column = cleaned_data["column"]
         price = cleaned_data.get("price")
 
-        StorageItem.objects.create(
-            storage=storage,
-            wine=wine,
-            row=row,
-            column=column,
-            user=user,
-            price=price,
-        )
+        with transaction.atomic():
+            if storage.is_unlimited:
+                quantity = cleaned_data.get("quantity") or 1
+                StorageItem.objects.bulk_create(
+                    StorageItem(storage=storage, wine=wine, user=user, price=price)
+                    for _ in range(quantity)
+                )
+            else:
+                # No post_save/pre_save signal exists on StorageItem today,
+                # so bulk_create is safe here - revisit if one is ever added.
+                StorageItem.objects.bulk_create(
+                    StorageItem(
+                        storage=storage,
+                        wine=wine,
+                        row=row,
+                        column=column,
+                        user=user,
+                        price=price,
+                    )
+                    for row, column in cleaned_data["slots"]
+                )
 
 
 class StorageItemUpdateView(FormView):
@@ -350,30 +363,10 @@ class StorageItemUpdateView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        user_storages = Storage.objects.filter(user=self.request.user)
-        free_cells_by_storage = {}
-
-        for storage in user_storages:
-            if storage.rows == 0:
-                free_cells_by_storage[storage.pk] = {}
-                continue
-
-            used_cells = set(
-                storage.items.filter(deleted=False)
-                .exclude(pk=self.kwargs["pk"])
-                .values_list("row", "column")
-            )
-
-            free_cells_by_storage[storage.pk] = {}
-            for row in range(1, storage.rows + 1):
-                free_cells_by_storage[storage.pk][row] = [
-                    col
-                    for col in range(1, storage.columns + 1)
-                    if (row, col) not in used_cells
-                ]
-
-        context["free_cells_by_storage"] = free_cells_by_storage
+        context["storage_cells_data"] = storage_picker_payload(
+            self.request.user, exclude_item=self.storage_item
+        )
+        context["is_edit"] = True
         return context
 
     def get_success_url(self):
@@ -395,9 +388,11 @@ class StorageItemUpdateView(FormView):
 
     @staticmethod
     def process_form_data(storage_item, user, cleaned_data):
+        slots = cleaned_data["slots"]
+        row, column = slots[0] if slots else (None, None)
         storage_item.storage = cleaned_data["storage"]
-        storage_item.row = cleaned_data["row"]
-        storage_item.column = cleaned_data["column"]
+        storage_item.row = row
+        storage_item.column = column
         storage_item.price = cleaned_data.get("price")
         storage_item.user = user
         storage_item.save()

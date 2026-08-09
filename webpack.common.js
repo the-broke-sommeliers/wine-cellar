@@ -28,7 +28,10 @@ module.exports = {
       import: ['./wine_cellar/assets/js/init_tom_select.ts'],
     },
     stock_add: {
-      import: ['./wine_cellar/assets/js/stock_add.ts'],
+      import: [
+        './wine_cellar/assets/css/stock_picker.css',
+        './wine_cellar/assets/js/stock_add.ts',
+      ],
     },
     barcode_scanner: {
       import: ['./wine_cellar/react/react_bar_code.tsx'],

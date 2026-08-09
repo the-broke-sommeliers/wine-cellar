@@ -1,3 +1,5 @@
+import json
+
 from django import forms
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
@@ -76,18 +78,14 @@ class StockForm(forms.Form):
         queryset=Storage.objects.none(),
         help_text=_("Enter the name of the storage."),
     )
-    row = forms.IntegerField(
+    quantity = forms.IntegerField(
         required=False,
-        min_value=0,
-        help_text=_("Enter the number of rows in the storage."),
-        widget=forms.Select(),
+        min_value=1,
+        initial=1,
+        label=_("Quantity"),
+        help_text=_("How many bottles to add."),
     )
-    column = forms.IntegerField(
-        required=False,
-        min_value=0,
-        help_text=_("Enter the number of columns in the storage."),
-        widget=forms.Select(),
-    )
+    slots = forms.CharField(required=False, widget=forms.HiddenInput())
     price = forms.DecimalField(
         required=False,
         max_digits=6,
@@ -95,68 +93,79 @@ class StockForm(forms.Form):
         localize=True,
     )
 
-    def clean_row(self):
-        row = self.cleaned_data.get("row")
-        storage = self.cleaned_data.get("storage")
-        if storage and row:
-            if storage.rows == 0:
-                raise forms.ValidationError(
-                    _("The selected storage has no rows."), code="redundant_row"
-                )
-            if row > storage.rows:
-                raise forms.ValidationError(
-                    _("The selected row exceeds the number of rows in the storage."),
-                    code="row_exceeds",
-                )
-        return row
-
-    def clean_column(self):
-        column = self.cleaned_data.get("column")
-        storage = self.cleaned_data.get("storage")
-        if storage and column:
-            if storage.columns == 0:
-                raise forms.ValidationError(
-                    _("The selected storage has no columns."), code="redundant_column"
-                )
-            if column > storage.columns:
-                raise forms.ValidationError(
-                    _(
-                        "The selected column exceeds the number of columns in the"
-                        " storage."
-                    ),
-                    code="column_exceeds",
-                )
-        return column
+    def clean_slots(self):
+        raw_slots = self.cleaned_data.get("slots")
+        try:
+            slots = json.loads(raw_slots) if raw_slots else []
+        except (TypeError, ValueError):
+            raise forms.ValidationError(
+                _("Invalid slot selection."), code="invalid_slots"
+            )
+        if not isinstance(slots, list) or not all(
+            isinstance(pair, list)
+            and len(pair) == 2
+            and all(isinstance(value, int) for value in pair)
+            for pair in slots
+        ):
+            raise forms.ValidationError(
+                _("Invalid slot selection."), code="invalid_slots"
+            )
+        pairs = [tuple(pair) for pair in slots]
+        if len(pairs) != len(set(pairs)):
+            raise forms.ValidationError(
+                _("The same slot was selected more than once."),
+                code="duplicate_slot",
+            )
+        return pairs
 
     def clean(self):
         cleaned_data = super().clean()
-        row = cleaned_data.get("row")
-        column = cleaned_data.get("column")
         storage = cleaned_data.get("storage")
-        if storage:
-            if storage.rows > 0 and storage.columns > 0:
-                if not row or not column:
+        slots = cleaned_data.get("slots")
+        if not storage or slots is None:
+            return cleaned_data
+
+        if self.storage_item is None:
+            # Adding one or more new bottles.
+            if storage.is_unlimited:
+                # Defaults to a single bottle if left blank.
+                cleaned_data["quantity"] = cleaned_data.get("quantity") or 1
+            elif not slots:
+                raise forms.ValidationError(
+                    _("Select at least one slot."), code="no_slots_selected"
+                )
+            elif not set(slots) <= set(storage.free_slots()):
+                raise forms.ValidationError(
+                    _(
+                        "One or more of the selected slots are no longer free."
+                        " Please reselect."
+                    ),
+                    code="slot_occupied",
+                )
+        else:
+            # Moving/editing an existing bottle.
+            if storage.is_unlimited:
+                if slots:
                     raise forms.ValidationError(
-                        _(
-                            "Both row and column must be specified for the selected"
-                            " storage."
-                        ),
-                        code="row_column_required",
+                        _("The selected storage has no rows or columns."),
+                        code="redundant_slot",
                     )
-                if storage.is_slot_occupied(row, column) and not (
-                    self.storage_item
-                    and self.storage_item.row == row
-                    and self.storage_item.column == column
-                    and self.storage_item.storage == storage
-                ):
-                    raise forms.ValidationError(
-                        _(
-                            "The selected slot (row: %(row)s, column: %(column)s)"
-                            " is already occupied in the storage."
-                        ),
-                        code="slot_occupied",
-                        params={"row": row, "column": column},
-                    )
+            elif len(slots) != 1:
+                raise forms.ValidationError(
+                    _("Select a slot for this bottle."), code="no_slots_selected"
+                )
+            elif not set(slots) <= set(
+                storage.free_slots(exclude_item=self.storage_item)
+            ):
+                row, column = slots[0]
+                raise forms.ValidationError(
+                    _(
+                        "The selected slot (row: %(row)s, column: %(column)s)"
+                        " is already occupied in the storage."
+                    ),
+                    code="slot_occupied",
+                    params={"row": row, "column": column},
+                )
         return cleaned_data
 
 
