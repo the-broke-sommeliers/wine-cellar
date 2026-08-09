@@ -1,3 +1,4 @@
+import json
 from decimal import Decimal
 from http import HTTPStatus
 
@@ -40,6 +41,26 @@ def test_user_can_add_stock(client, user, wine_factory):
     )
     assert storage.used_slots == 1
     assert storage.items.first().wine == wine
+
+
+@pytest.mark.django_db
+def test_user_can_add_multiple_bottles_to_unlimited_shelf(client, user, wine_factory):
+    client.force_login(user)
+    storage = Storage.objects.first()
+    wine = wine_factory(user=user)
+    data = {
+        "storage": storage.pk,
+        "quantity": 3,
+    }
+    r = client.post(
+        reverse("stock-add", kwargs={"pk": wine.pk}), data=data, follow=True
+    )
+    assert r.status_code == HTTPStatus.OK
+    assertRedirects(
+        response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
+    )
+    assert storage.used_slots == 3
+    assert all(item.wine == wine for item in storage.items.all())
 
 
 @pytest.mark.django_db
@@ -125,14 +146,15 @@ def test_user_cant_add_to_full_slot(
     storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
     data = {
         "storage": storage.pk,
-        "row": 1,
-        "column": 1,
+        "slots": json.dumps([[1, 1]]),
     }
     r = client.post(
         reverse("stock-add", kwargs={"pk": wine.pk}), data=data, follow=True
     )
     assert r.status_code == HTTPStatus.OK
     assert r.context["form"].errors
+    # Only the pre-existing occupant - the rejected submission created nothing.
+    assert StorageItem.objects.filter(wine=wine).count() == 1
 
 
 @pytest.mark.django_db
@@ -142,8 +164,7 @@ def test_user_can_add_to_specific_slot(client, user, storage_factory, wine_facto
     wine = wine_factory(user=user)
     data = {
         "storage": storage.pk,
-        "row": 2,
-        "column": 1,
+        "slots": json.dumps([[2, 1]]),
     }
     r = client.post(
         reverse("stock-add", kwargs={"pk": wine.pk}), data=data, follow=True
@@ -159,14 +180,95 @@ def test_user_can_add_to_specific_slot(client, user, storage_factory, wine_facto
 
 
 @pytest.mark.django_db
+def test_user_can_add_multiple_slots_at_once(
+    client, user, storage_factory, wine_factory
+):
+    storage = storage_factory(user=user, rows=2, columns=2)
+    client.force_login(user)
+    wine = wine_factory(user=user)
+    data = {
+        "storage": storage.pk,
+        "slots": json.dumps([[1, 1], [1, 2], [2, 1]]),
+    }
+    r = client.post(
+        reverse("stock-add", kwargs={"pk": wine.pk}), data=data, follow=True
+    )
+    assert r.status_code == HTTPStatus.OK
+    assertRedirects(
+        response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
+    )
+    assert storage.used_slots == 3
+    coords = set(storage.items.values_list("row", "column"))
+    assert coords == {(1, 1), (1, 2), (2, 1)}
+
+
+@pytest.mark.django_db
+def test_user_cant_add_duplicate_slot(client, user, storage_factory, wine_factory):
+    storage = storage_factory(user=user, rows=2, columns=2)
+    client.force_login(user)
+    wine = wine_factory(user=user)
+    data = {
+        "storage": storage.pk,
+        "slots": json.dumps([[1, 1], [1, 1]]),
+    }
+    r = client.post(
+        reverse("stock-add", kwargs={"pk": wine.pk}), data=data, follow=True
+    )
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["form"].errors
+    assert StorageItem.objects.count() == 0
+
+
+@pytest.mark.django_db
+def test_user_cant_add_with_no_slots_selected(
+    client, user, storage_factory, wine_factory
+):
+    storage = storage_factory(user=user, rows=2, columns=2)
+    client.force_login(user)
+    wine = wine_factory(user=user)
+    data = {
+        "storage": storage.pk,
+        "slots": json.dumps([]),
+    }
+    r = client.post(
+        reverse("stock-add", kwargs={"pk": wine.pk}), data=data, follow=True
+    )
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["form"].errors
+    assert StorageItem.objects.count() == 0
+
+
+@pytest.mark.django_db
+def test_partial_over_capacity_add_creates_nothing(
+    client, user, storage_factory, storage_item_factory, wine_factory
+):
+    """One free slot requested alongside one that's already occupied - the
+    whole submission is rejected, not partially fulfilled."""
+    storage = storage_factory(user=user, rows=1, columns=2)
+    client.force_login(user)
+    occupant = wine_factory(user=user)
+    storage_item_factory(storage=storage, wine=occupant, row=1, column=1, user=user)
+    wine = wine_factory(user=user)
+    data = {
+        "storage": storage.pk,
+        "slots": json.dumps([[1, 1], [1, 2]]),
+    }
+    r = client.post(
+        reverse("stock-add", kwargs={"pk": wine.pk}), data=data, follow=True
+    )
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["form"].errors
+    assert StorageItem.objects.filter(wine=wine).count() == 0
+
+
+@pytest.mark.django_db
 def test_user_cant_add_to_invalid_slot(client, user, storage_factory, wine_factory):
     storage = storage_factory(user=user, rows=2, columns=2)
     client.force_login(user)
     wine = wine_factory(user=user)
     data = {
         "storage": storage.pk,
-        "row": 3,
-        "column": 1,
+        "slots": json.dumps([[3, 1]]),
     }
     r = client.post(
         reverse("stock-add", kwargs={"pk": wine.pk}), data=data, follow=True
@@ -176,7 +278,7 @@ def test_user_cant_add_to_invalid_slot(client, user, storage_factory, wine_facto
 
 
 @pytest.mark.django_db
-def test_form_context_has_empty_slots(
+def test_form_context_has_grid_cells(
     client, user, storage_factory, storage_item_factory, wine_factory
 ):
     storage = storage_factory(user=user, rows=2, columns=2)
@@ -184,17 +286,73 @@ def test_form_context_has_empty_slots(
     wine = wine_factory(user=user)
     r = client.get(reverse("stock-add", kwargs={"pk": wine.pk}))
     assert r.status_code == HTTPStatus.OK
-    assert r.context["free_cells_by_storage"][storage.pk] == {
-        1: [1, 2],
-        2: [1, 2],
+    payload = r.context["storage_cells_data"][storage.pk]
+    assert payload["unlimited"] is False
+    assert {(c["row"], c["column"]): c["state"] for c in payload["cells"]} == {
+        (1, 1): "free",
+        (1, 2): "free",
+        (2, 1): "free",
+        (2, 2): "free",
     }
     storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
     storage_item_factory(storage=storage, wine=wine, row=2, column=2, user=user)
     r = client.get(reverse("stock-add", kwargs={"pk": wine.pk}))
     assert r.status_code == HTTPStatus.OK
-    assert r.context["free_cells_by_storage"][storage.pk] == {
-        1: [2],
-        2: [1],
+    payload = r.context["storage_cells_data"][storage.pk]
+    assert {(c["row"], c["column"]): c["state"] for c in payload["cells"]} == {
+        (1, 1): "occupied",
+        (1, 2): "free",
+        (2, 1): "free",
+        (2, 2): "occupied",
+    }
+
+
+@pytest.mark.django_db
+def test_form_context_marks_unlimited_shelf(client, user, wine_factory):
+    client.force_login(user)
+    storage = Storage.objects.filter(user=user).first()
+    wine = wine_factory(user=user)
+    r = client.get(reverse("stock-add", kwargs={"pk": wine.pk}))
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["storage_cells_data"][storage.pk] == {"unlimited": True}
+
+
+@pytest.mark.django_db
+def test_edit_form_context_marks_current_slot(
+    client, user, storage_factory, storage_item_factory, wine_factory
+):
+    storage = storage_factory(user=user, rows=2, columns=2)
+    client.force_login(user)
+    wine = wine_factory(user=user)
+    item = storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
+    r = client.get(reverse("stock-edit", kwargs={"pk": item.pk}))
+    assert r.status_code == HTTPStatus.OK
+    payload = r.context["storage_cells_data"][storage.pk]
+    assert {(c["row"], c["column"]): c["state"] for c in payload["cells"]} == {
+        (1, 1): "current",
+        (1, 2): "free",
+        (2, 1): "free",
+        (2, 2): "free",
+    }
+
+
+@pytest.mark.django_db
+def test_edit_form_context_only_marks_current_for_its_own_storage(
+    client, user, storage_factory, storage_item_factory, wine_factory
+):
+    """A different storage that happens to share the same coordinates as
+    the item's current slot must not have that cell marked "current" too -
+    only the storage the item actually lives in gets that treatment."""
+    storage = storage_factory(user=user, rows=1, columns=1)
+    other_storage = storage_factory(user=user, rows=1, columns=1)
+    client.force_login(user)
+    wine = wine_factory(user=user)
+    item = storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
+    r = client.get(reverse("stock-edit", kwargs={"pk": item.pk}))
+    assert r.status_code == HTTPStatus.OK
+    other_payload = r.context["storage_cells_data"][other_storage.pk]
+    assert {(c["row"], c["column"]): c["state"] for c in other_payload["cells"]} == {
+        (1, 1): "free",
     }
 
 
@@ -211,8 +369,7 @@ def test_used_slot_is_free_after_delete(
     client.force_login(user)
     data = {
         "storage": storage.pk,
-        "row": 1,
-        "column": 1,
+        "slots": json.dumps([[1, 1]]),
     }
     r = client.post(
         reverse("stock-add", kwargs={"pk": wine_new.pk}), data=data, follow=True
@@ -238,8 +395,7 @@ def test_user_can_edit_existing_item_new_slot(
     item = storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
     data = {
         "storage": storage.pk,
-        "row": 2,
-        "column": 1,
+        "slots": json.dumps([[2, 1]]),
     }
     r = client.post(
         reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
@@ -257,6 +413,32 @@ def test_user_can_edit_existing_item_new_slot(
 
 
 @pytest.mark.django_db
+def test_user_can_edit_existing_item_keeping_same_slot(
+    client, user, storage_factory, wine_factory, storage_item_factory
+):
+    """Submitting the bottle's own current slot (the "current" cell, not
+    "free") is a no-op move and must still be accepted."""
+    storage = storage_factory(user=user, rows=2, columns=2)
+    client.force_login(user)
+    wine = wine_factory(user=user)
+    item = storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
+    data = {
+        "storage": storage.pk,
+        "slots": json.dumps([[1, 1]]),
+    }
+    r = client.post(
+        reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
+    )
+    assert r.status_code == HTTPStatus.OK
+    assertRedirects(
+        response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
+    )
+    item.refresh_from_db()
+    assert item.row == 1
+    assert item.column == 1
+
+
+@pytest.mark.django_db
 def test_user_can_edit_existing_item_new_price(
     client, user, storage_factory, wine_factory, storage_item_factory
 ):
@@ -268,8 +450,7 @@ def test_user_can_edit_existing_item_new_price(
     )
     data = {
         "storage": storage.pk,
-        "row": 1,
-        "column": 1,
+        "slots": json.dumps([[1, 1]]),
         "price": 15.0,
     }
     r = client.post(
@@ -301,14 +482,83 @@ def test_user_cant_edit_to_occupied_slot(
     )
     data = {
         "storage": storage.pk,
-        "row": 2,
-        "column": 1,
+        "slots": json.dumps([[2, 1]]),
     }
     r = client.post(
         reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
     )
     assert r.status_code == HTTPStatus.OK
     assert r.context["form"].errors
+
+
+@pytest.mark.django_db
+def test_user_cant_edit_grid_slot_with_no_slot_selected(
+    client, user, storage_factory, wine_factory, storage_item_factory
+):
+    storage = storage_factory(user=user, rows=2, columns=2)
+    client.force_login(user)
+    wine = wine_factory(user=user)
+    item = storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
+    data = {
+        "storage": storage.pk,
+        "slots": json.dumps([]),
+    }
+    r = client.post(
+        reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
+    )
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["form"].errors
+    item.refresh_from_db()
+    assert item.row == 1
+    assert item.column == 1
+
+
+@pytest.mark.django_db
+def test_user_can_edit_item_to_unlimited_shelf(
+    client, user, storage_factory, wine_factory, storage_item_factory
+):
+    storage = storage_factory(user=user, rows=2, columns=2)
+    unlimited_storage = Storage.objects.filter(user=user).first()
+    client.force_login(user)
+    wine = wine_factory(user=user)
+    item = storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
+    data = {
+        "storage": unlimited_storage.pk,
+        "slots": json.dumps([]),
+    }
+    r = client.post(
+        reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
+    )
+    assert r.status_code == HTTPStatus.OK
+    assertRedirects(
+        response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
+    )
+    item.refresh_from_db()
+    assert item.storage == unlimited_storage
+    assert item.row is None
+    assert item.column is None
+
+
+@pytest.mark.django_db
+def test_user_cant_edit_item_to_unlimited_shelf_with_stale_slot(
+    client, user, storage_factory, wine_factory, storage_item_factory
+):
+    storage = storage_factory(user=user, rows=2, columns=2)
+    unlimited_storage = Storage.objects.filter(user=user).first()
+    client.force_login(user)
+    wine = wine_factory(user=user)
+    item = storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
+    data = {
+        "storage": unlimited_storage.pk,
+        "slots": json.dumps([[1, 1]]),
+    }
+    r = client.post(
+        reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
+    )
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["form"].errors
+    item.refresh_from_db()
+    assert item.storage == storage
 
 
 @pytest.mark.django_db

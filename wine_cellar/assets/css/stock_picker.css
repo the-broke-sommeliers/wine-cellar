@@ -1,0 +1,79 @@
+.grid-picker {
+  /* Lets this grid item shrink below its content's intrinsic width. */
+  min-width: 0;
+  max-width: 100%;
+  margin: 0.5rem 0 1rem;
+}
+
+.grid-picker__controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.grid-picker__count {
+  color: var(--text-color-gray);
+  font-size: var(--font-xs);
+}
+
+.grid-picker__scroll {
+  overflow: auto;
+  max-height: 60vh;
+  border: 1px solid var(--border-color-light);
+  border-radius: var(--border-radius);
+}
+
+.grid-picker__table {
+  width: auto;
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 4px;
+}
+
+.grid-picker__table th {
+  position: sticky;
+  background: white;
+  font-size: var(--font-xs);
+  color: var(--text-color-gray);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+  padding: 4px 8px;
+  z-index: 1;
+}
+
+.grid-picker__table thead th {
+  top: 0;
+}
+
+.grid-picker__table tbody th {
+  left: 0;
+  text-align: right;
+}
+
+.grid-picker__cell {
+  display: block;
+  min-width: 40px;
+  min-height: 40px;
+  border: 1px solid var(--border-color-light);
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  font-size: var(--font-xs);
+  color: var(--text-color-gray);
+}
+
+.grid-picker__cell--occupied {
+  background: var(--border-color-lighter);
+  color: #bbb;
+  cursor: not-allowed;
+}
+
+.grid-picker__cell--selected {
+  background: var(--green-tint);
+  border-color: var(--dark-green);
+  outline: 2px solid var(--dark-green);
+  outline-offset: -2px;
+  color: var(--dark-green);
+}

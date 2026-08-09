@@ -40,8 +40,53 @@ class Storage(UserContentModel):
     def is_full(self):
         return self.used_slots >= self.total_slots
 
+    @property
+    def is_unlimited(self):
+        return self.rows == 0 or self.columns == 0
+
     def is_slot_occupied(self, row, column):
         return self.items.filter(row=row, column=column, deleted=False).exists()
+
+    def sort_key(self, row, column):
+        return (column or 0, row or 0) if self.swap_axes else (row or 0, column or 0)
+
+    def grid_cells(self, exclude_item=None):
+        """All cells of a gridded storage, tagged occupied/free/current.
+        Empty list for unlimited storages."""
+        if self.is_unlimited:
+            return []
+        items = self.items.filter(deleted=False, row__isnull=False)
+        if exclude_item is not None:
+            items = items.exclude(pk=exclude_item.pk)
+        used = set(items.values_list("row", "column"))
+        current = None
+        if (
+            exclude_item is not None
+            and exclude_item.storage_id == self.pk
+            and exclude_item.row
+            and exclude_item.column
+        ):
+            current = (exclude_item.row, exclude_item.column)
+        cells = []
+        for row in range(1, self.rows + 1):
+            for column in range(1, self.columns + 1):
+                if (row, column) == current:
+                    state = "current"
+                elif (row, column) in used:
+                    state = "occupied"
+                else:
+                    state = "free"
+                cells.append({"row": row, "column": column, "state": state})
+        cells.sort(key=lambda cell: self.sort_key(cell["row"], cell["column"]))
+        return cells
+
+    def free_slots(self, exclude_item=None):
+        """(row, column) pairs a caller may validly select."""
+        return [
+            (cell["row"], cell["column"])
+            for cell in self.grid_cells(exclude_item)
+            if cell["state"] != "occupied"
+        ]
 
     @property
     def get_wines(self):

@@ -12,3 +12,8 @@ declare function npgettext(
   plural: string,
   count: number
 ): string
+declare function interpolate(
+  fmt: string,
+  obj: unknown[] | Record<string, unknown>,
+  named?: boolean
+): string
