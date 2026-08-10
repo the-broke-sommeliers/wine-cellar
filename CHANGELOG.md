@@ -3,9 +3,17 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.10.0-rc.5 (2026-08-08)
+## 0.10.0-rc.6 (2026-08-10)
 
 ### feat
+
+- show button to django admin to staff/superusers
+
+- add real event loggign (wine add/remove, bottle open/consume/remove):
+
+- add option to add multiple bottles at once, add visual slot picker for shelves
+
+- add initial swedish translation
 
 - improve storage view with new features
     
@@ -27,6 +35,16 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 
 ### fix
+
+- possible race condition when adding/swapping a storage item
+
+- **deps**: update turf monorepo to v7.4.0
+- **deps**: update dependency litellm to v1.95.0
+- uv.lock version
+
+- update translations
+
+- some biome linting errors
 
 - multiple ui issues
     
