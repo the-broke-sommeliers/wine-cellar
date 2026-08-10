@@ -52,6 +52,11 @@
                                     <li class="pure-menu-item">
                                         <a href="{% url 'storage-list' %}" class="pure-menu-link">{% translate "Storage" %}</a>
                                     </li>
+                                    {% if user.is_staff %}
+                                        <li class="pure-menu-item">
+                                            <a href="{% url 'admin:index' %}" class="pure-menu-link">{% translate "Django Admin" %}</a>
+                                        </li>
+                                    {% endif %}
                                     <li class="pure-menu-item">
                                         <a href="{% url 'user-settings' %}" class="pure-menu-link">{% translate "Settings" %}</a>
                                     </li>
@@ -90,6 +95,11 @@
                                     <li class="pure-menu-item">
                                         <a href="{% url 'storage-list' %}" class="pure-menu-link">{% translate "Storage" %}</a>
                                     </li>
+                                    {% if user.is_staff %}
+                                        <li class="pure-menu-item">
+                                            <a href="{% url 'admin:index' %}" class="pure-menu-link">{% translate "Django Admin" %}</a>
+                                        </li>
+                                    {% endif %}
                                     <li class="pure-menu-item">
                                         <a href="{% url 'user-settings' %}" class="pure-menu-link">{% translate "Settings" %}</a>
                                     </li>
