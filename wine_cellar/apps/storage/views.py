@@ -2,7 +2,6 @@ from datetime import timedelta
 
 from django.core.paginator import Paginator
 from django.db import models, transaction
-from django.db.models import Q
 from django.forms import model_to_dict
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -17,6 +16,8 @@ from wine_cellar.apps.storage.forms import StockForm, StockOpenForm, StorageForm
 from wine_cellar.apps.storage.models import (
     Storage,
     StorageItem,
+    StorageItemEvent,
+    StorageItemEventType,
     StorageLabel,
     StorageLabelAxis,
 )
@@ -321,14 +322,16 @@ class StorageItemAddView(FormView):
         with transaction.atomic():
             if storage.is_unlimited:
                 quantity = cleaned_data.get("quantity") or 1
-                StorageItem.objects.bulk_create(
+                items = StorageItem.objects.bulk_create(
                     StorageItem(storage=storage, wine=wine, user=user, price=price)
                     for _ in range(quantity)
                 )
             else:
-                # No post_save/pre_save signal exists on StorageItem today,
-                # so bulk_create is safe here - revisit if one is ever added.
-                StorageItem.objects.bulk_create(
+                requested = set(cleaned_data["slots"])
+                if not requested <= set(storage.free_slots()):
+                    raise SlotConflictError
+                # ADDED events are created explicitly below - no save signal.
+                items = StorageItem.objects.bulk_create(
                     StorageItem(
                         storage=storage,
                         wine=wine,
@@ -339,6 +342,16 @@ class StorageItemAddView(FormView):
                     )
                     for row, column in cleaned_data["slots"]
                 )
+            StorageItemEvent.objects.bulk_create(
+                StorageItemEvent(
+                    storage_item=item,
+                    wine=wine,
+                    wine_name=wine.name,
+                    user=user,
+                    event_type=StorageItemEventType.ADDED,
+                )
+                for item in items
+            )
 
 
 class StorageItemUpdateView(FormView):
@@ -414,8 +427,16 @@ class StorageItemDeleteView(DeleteView):
 
     def form_valid(self, form):
         self.object = self.get_object()
-        self.object.deleted = True
-        self.object.save(update_fields=["deleted"])
+        with transaction.atomic():
+            self.object.deleted = True
+            self.object.save(update_fields=["deleted"])
+            StorageItemEvent.objects.create(
+                storage_item=self.object,
+                wine=self.object.wine,
+                wine_name=self.object.wine.name,
+                user=self.request.user,
+                event_type=StorageItemEventType.REMOVED,
+            )
         return redirect(self.get_success_url())
 
 
@@ -446,13 +467,22 @@ class StorageItemOpenView(FormView):
     def form_valid(self, form):
         self.object = self.get_object()
         with transaction.atomic():
+            note = form.cleaned_data.get("note") or None
             self.object.opened = True
-            self.object.opened_note = form.cleaned_data.get("note") or None
+            self.object.opened_note = note
             if form.cleaned_data.get("drink_in_days"):
                 self.object.drink_by = timezone.now().date() + timedelta(
                     days=form.cleaned_data["drink_in_days"]
                 )
             self.object.save(update_fields=["opened", "opened_note", "drink_by"])
+            StorageItemEvent.objects.create(
+                storage_item=self.object,
+                wine=self.object.wine,
+                wine_name=self.object.wine.name,
+                user=self.request.user,
+                event_type=StorageItemEventType.OPENED,
+                note=note,
+            )
         return redirect(self.get_success_url())
 
 
@@ -471,9 +501,17 @@ class StorageItemConsumeView(DeleteView):
 
     def form_valid(self, form):
         self.object = self.get_object()
-        self.object.opened = True
-        self.object.deleted = True
-        self.object.save(update_fields=["opened", "deleted"])
+        with transaction.atomic():
+            self.object.opened = True
+            self.object.deleted = True
+            self.object.save(update_fields=["opened", "deleted"])
+            StorageItemEvent.objects.create(
+                storage_item=self.object,
+                wine=self.object.wine,
+                wine_name=self.object.wine.name,
+                user=self.request.user,
+                event_type=StorageItemEventType.CONSUMED,
+            )
         return redirect(self.get_success_url())
 
 
@@ -496,25 +534,33 @@ class StorageItemUndoOpenView(DeleteView):
 
     def form_valid(self, form):
         self.object = self.get_object()
-        self.object.opened = False
-        self.object.opened_note = None
-        self.object.drink_by = None
-        self.object.save(update_fields=["opened", "opened_note", "drink_by"])
+        with transaction.atomic():
+            self.object.opened = False
+            self.object.opened_note = None
+            self.object.drink_by = None
+            self.object.save(update_fields=["opened", "opened_note", "drink_by"])
+            StorageItemEvent.objects.create(
+                storage_item=self.object,
+                wine=self.object.wine,
+                wine_name=self.object.wine.name,
+                user=self.request.user,
+                event_type=StorageItemEventType.UNDO_OPEN,
+            )
         return redirect(self.get_success_url())
 
 
 class StorageItemHistoryView(ListView):
-    model = StorageItem
+    model = StorageItemEvent
     template_name = "storage_item_history.html"
-    context_object_name = "storage_items"
+    context_object_name = "events"
     paginate_by = 10
 
     def get_queryset(self):
         qs = super().get_queryset()
         return (
             qs.filter(user=self.request.user)
-            .filter(Q(deleted=True) | Q(opened=True))
-            .order_by("-modified")
+            .select_related("storage_item__storage", "wine")
+            .order_by("-created")
         )
 
 

@@ -17,7 +17,11 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import DeleteView, DetailView, FormView, TemplateView, View
 from django_filters.views import FilterView
 
-from wine_cellar.apps.storage.models import StorageItem
+from wine_cellar.apps.storage.models import (
+    StorageItem,
+    StorageItemEvent,
+    StorageItemEventType,
+)
 from wine_cellar.apps.user.views import get_user_settings
 from wine_cellar.apps.wine.fields import OpenChoiceModelFormViewMixin
 from wine_cellar.apps.wine.filters import WineFilter
@@ -275,8 +279,14 @@ class WineCreateView(WineBaseView):
                 self._apply_ai_images(form, prefill_data["images"])
             try:
                 with transaction.atomic():
-                    self.update_wine_from_cleaned_data(
+                    wine = self.update_wine_from_cleaned_data(
                         form=form, wine=self.get_wine_instance()
+                    )
+                    StorageItemEvent.objects.create(
+                        wine=wine,
+                        wine_name=wine.name,
+                        user=self.request.user,
+                        event_type=StorageItemEventType.WINE_ADDED,
                     )
             except IntegrityError:
                 form.add_error(
@@ -373,6 +383,33 @@ class WineDeleteView(DeleteView):
     def get_queryset(self):
         qs = super().get_queryset()
         return qs.filter(user=self.request.user)
+
+    def form_valid(self, form):
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        with transaction.atomic():
+            # Log before the cascade delete removes the StorageItems, so any
+            # still-active bottle gets its own REMOVED event first.
+            active_items = list(self.object.storageitem_set.filter(deleted=False))
+            StorageItemEvent.objects.bulk_create(
+                StorageItemEvent(
+                    storage_item=item,
+                    wine=self.object,
+                    wine_name=self.object.name,
+                    user=self.request.user,
+                    event_type=StorageItemEventType.REMOVED,
+                    note=_("Removed automatically because the wine was deleted."),
+                )
+                for item in active_items
+            )
+            StorageItemEvent.objects.create(
+                wine=self.object,
+                wine_name=self.object.name,
+                user=self.request.user,
+                event_type=StorageItemEventType.WINE_REMOVED,
+            )
+            self.object.delete()
+        return redirect(success_url)
 
 
 class WineMapView(TemplateView):

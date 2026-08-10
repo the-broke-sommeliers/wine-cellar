@@ -4,7 +4,7 @@ import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects
 
-from wine_cellar.apps.storage.models import StorageItem  # noqa: F401
+from wine_cellar.apps.storage.models import StorageItemEvent, StorageItemEventType
 
 
 @pytest.mark.django_db
@@ -48,6 +48,8 @@ def test_undo_open_clears_opened_and_reminder(
     assert item.opened is False
     assert item.opened_note is None
     assert item.drink_by is None
+    event = StorageItemEvent.objects.get(storage_item=item)
+    assert event.event_type == StorageItemEventType.UNDO_OPEN
 
 
 @pytest.mark.django_db

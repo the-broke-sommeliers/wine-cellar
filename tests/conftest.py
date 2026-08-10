@@ -8,6 +8,7 @@ from pytest_factoryboy import register
 
 from wine_cellar.apps.storage.tests.factories import (
     StorageFactory,
+    StorageItemEventFactory,
     StorageItemFactory,
     StorageLabelFactory,
 )
@@ -36,6 +37,7 @@ register(SizeFactory)
 register(SourceFactory)
 register(StorageFactory)
 register(StorageItemFactory)
+register(StorageItemEventFactory)
 register(StorageLabelFactory)
 register(RegionFactory)
 register(AppellationFactory)

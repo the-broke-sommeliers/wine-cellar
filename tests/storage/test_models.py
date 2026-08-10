@@ -1,6 +1,10 @@
 import pytest
 
-from wine_cellar.apps.storage.models import StorageItem
+from wine_cellar.apps.storage.models import (
+    StorageItem,
+    StorageItemEvent,
+    StorageItemEventType,
+)
 
 
 @pytest.mark.django_db
@@ -95,3 +99,43 @@ def test_labels_empty_by_default(user, storage_factory):
     storage = storage_factory(user=user, rows=2, columns=2)
     assert storage.row_labels == {}
     assert storage.column_labels == {}
+
+
+@pytest.mark.parametrize(
+    "event_type,expected_icon",
+    [
+        (StorageItemEventType.ADDED, "fa-regular fa-plus"),
+        (StorageItemEventType.OPENED, "fa-solid fa-bottle-droplet"),
+        (StorageItemEventType.CONSUMED, "fa-solid fa-wine-glass-empty"),
+        (StorageItemEventType.REMOVED, "fa-regular fa-trash-can"),
+        (StorageItemEventType.UNDO_OPEN, "fa-solid fa-rotate-left"),
+        (StorageItemEventType.WINE_ADDED, "fa-regular fa-plus"),
+        (StorageItemEventType.WINE_REMOVED, "fa-regular fa-trash-can"),
+    ],
+)
+@pytest.mark.django_db
+def test_icon_class_per_event_type(event_type, expected_icon):
+    event = StorageItemEvent(event_type=event_type, wine_name="Test Wine")
+    assert event.icon_class == expected_icon
+
+
+@pytest.mark.django_db
+def test_icon_class_falls_back_to_default_for_unknown_event_type():
+    """An unmapped event type falls back to the default icon."""
+    event = StorageItemEvent(event_type="shared_via_link", wine_name="Test Wine")
+    assert event.icon_class == "fa-solid fa-circle-info"
+
+
+@pytest.mark.parametrize(
+    "event_type,expected_modifier",
+    [
+        (StorageItemEventType.ADDED, "added"),
+        (StorageItemEventType.UNDO_OPEN, "undo-open"),
+        (StorageItemEventType.WINE_ADDED, "wine-added"),
+        ("shared_via_link", "shared-via-link"),
+    ],
+)
+@pytest.mark.django_db
+def test_css_modifier_replaces_underscores_with_hyphens(event_type, expected_modifier):
+    event = StorageItemEvent(event_type=event_type, wine_name="Test Wine")
+    assert event.css_modifier == expected_modifier

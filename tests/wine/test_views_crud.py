@@ -4,6 +4,11 @@ import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects, assertTemplateUsed
 
+from wine_cellar.apps.storage.models import (
+    StorageItem,
+    StorageItemEvent,
+    StorageItemEventType,
+)
 from wine_cellar.apps.wine.models import Size, Wine
 
 
@@ -141,6 +146,82 @@ def test_wine_delete(client, user, wine_factory):
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
     assert not Wine.objects.exists()
+
+
+@pytest.mark.django_db
+def test_wine_delete_logs_removed_event(client, user, wine_factory):
+    wine = wine_factory(user=user)
+    client.force_login(user)
+    client.post(reverse("wine-delete", kwargs={"pk": wine.pk}))
+    event = StorageItemEvent.objects.get(event_type=StorageItemEventType.WINE_REMOVED)
+    assert event.wine_name == wine.name
+    # The wine itself is gone, so its FK is nulled out - only the name lives on.
+    assert event.wine is None
+
+
+@pytest.mark.django_db
+def test_wine_delete_preserves_bottle_history(
+    client, user, wine_factory, storage_item_factory
+):
+    """A bottle's history must survive the cascade delete of its wine."""
+    wine = wine_factory(user=user, name="Chablis 2019")
+    item = storage_item_factory(storage__user=user, wine=wine, user=user)
+    client.force_login(user)
+    client.post(reverse("stock-open", kwargs={"pk": item.pk}), data={"note": "party"})
+
+    events_before = StorageItemEvent.objects.filter(wine_name=wine.name).count()
+    assert events_before == 1  # the OPENED event
+
+    client.post(reverse("wine-delete", kwargs={"pk": wine.pk}))
+
+    assert not Wine.objects.exists()
+    assert not StorageItem.objects.exists()
+    events = StorageItemEvent.objects.filter(wine_name=wine.name).order_by("created")
+    assert [e.event_type for e in events] == [
+        StorageItemEventType.OPENED,
+        StorageItemEventType.REMOVED,
+        StorageItemEventType.WINE_REMOVED,
+    ]
+    opened_event = events[0]
+    assert opened_event.storage_item is None
+    assert opened_event.wine is None
+    assert opened_event.wine_name == "Chablis 2019"
+    assert opened_event.note == "party"
+
+
+@pytest.mark.django_db
+def test_wine_delete_logs_removed_event_for_active_bottles(
+    client, user, wine_factory, storage_item_factory
+):
+    """Every still-active bottle gets its own REMOVED event on wine delete."""
+    wine = wine_factory(user=user)
+    storage_item_factory(storage__user=user, wine=wine, user=user)
+    storage_item_factory(storage__user=user, wine=wine, user=user, opened=True)
+    already_consumed = storage_item_factory(
+        storage__user=user, wine=wine, user=user, opened=True, deleted=True
+    )
+    consumed_event = StorageItemEvent.objects.create(
+        storage_item=already_consumed,
+        wine=wine,
+        wine_name=wine.name,
+        user=user,
+        event_type=StorageItemEventType.CONSUMED,
+    )
+    client.force_login(user)
+
+    client.post(reverse("wine-delete", kwargs={"pk": wine.pk}))
+
+    removed_events = StorageItemEvent.objects.filter(
+        wine_name=wine.name, event_type=StorageItemEventType.REMOVED
+    )
+    # Only the two still-active bottles, not the already-consumed one.
+    assert removed_events.count() == 2
+    for event in removed_events:
+        assert event.note == "Removed automatically because the wine was deleted."
+        assert event.storage_item is None
+
+    consumed_event.refresh_from_db()
+    assert consumed_event.event_type == StorageItemEventType.CONSUMED
 
 
 @pytest.mark.django_db

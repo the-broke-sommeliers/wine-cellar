@@ -1,53 +1,47 @@
 {% extends 'base.html' %}
 {% load static i18n %}
 {% block header %}
-    <h1 class="header__title">{% translate "Stock History" %}</h1>
+    <h1 class="header__title">{% translate "History" %}</h1>
 {% endblock header %}
 {% block content %}
     <div class="pure-g">
         <div class="pure-u-1 pure-u-lg-2-3 m-auto">
             <div class="card">
                 <div class="card__header">
-                    <h3>{% translate "Bottle History" %}</h3>
+                    <h3>{% translate "History" %}</h3>
                     <a href="{% url 'storage-list' %}" class="pure-button button__neutral"><i class="fa-solid fa-arrow-left"></i> <span>{% translate "Back to Storages" %}</span></a>
                 </div>
-                {% if storage_items %}
-                    <table class="card__table">
-                        <thead>
-                            <tr>
-                                <th>{% translate "Wine" %}</th>
-                                <th>{% translate "Location" %}</th>
-                                <th>{% translate "Row" %}</th>
-                                <th>{% translate "Cell" %}</th>
-                                <th>{% translate "Note" %}</th>
-                                <th>{% translate "Status" %}</th>
-                                <th>{% translate "Date" %}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in storage_items %}
-                                <tr>
-                                    <td>
-                                        <a href="{% url 'wine-detail' item.wine.pk %}">{{ item.wine.name }}</a>
-                                    </td>
-                                    <td>{{ item.storage.name }}</td>
-                                    <td>{{ item.row|default_if_none:"—" }}</td>
-                                    <td>{{ item.column|default_if_none:"—" }}</td>
-                                    <td>{{ item.opened_note|default:"—" }}</td>
-                                    <td>
-                                        {% if item.opened and item.deleted %}
-                                            {% translate "Consumed" %}
-                                        {% elif item.deleted %}
-                                            {% translate "Removed" %}
+                {% if events %}
+                    <ul class="timeline">
+                        {% for event in events %}
+                            <li class="timeline__item">
+                                <span class="timeline__icon timeline__icon--{{ event.css_modifier }}">
+                                    <i class="{{ event.icon_class }}" aria-hidden="true"></i>
+                                </span>
+                                <div class="timeline__body">
+                                    <p class="timeline__title">
+                                        {% if event.wine %}
+                                            <a href="{% url 'wine-detail' event.wine.pk %}">{{ event.wine_name }}</a>
                                         {% else %}
-                                            {% translate "Opened" %}
+                                            {{ event.wine_name }}
                                         {% endif %}
-                                    </td>
-                                    <td>{{ item.modified|date }}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                                        — {{ event.get_event_type_display }}
+                                    </p>
+                                    {% if event.note or event.storage_item %}
+                                        <p class="timeline__meta">
+                                            {% if event.note %}“{{ event.note }}”{% endif %}
+                                            {% if event.note and event.storage_item %} · {% endif %}
+                                            {% if event.storage_item %}
+                                                {{ event.storage_item.storage.name }}
+                                                {% if event.storage_item.row %}, {% translate "Row" %} {{ event.storage_item.row }}, {% translate "Cell" %} {{ event.storage_item.column }}{% endif %}
+                                            {% endif %}
+                                        </p>
+                                    {% endif %}
+                                </div>
+                                <time class="timeline__timestamp" datetime="{{ event.created|date:'c' }}">{{ event.created|date }}</time>
+                            </li>
+                        {% endfor %}
+                    </ul>
                     {% include "includes/pagination.html" %}
                 {% else %}
                     <p class="text--gray">{% translate "No wines here yet." %}</p>
