@@ -10,6 +10,7 @@ from django.urls import reverse
 from pytest_django.asserts import assertRedirects, assertTemplateUsed
 
 from tests.helpers import random_png
+from wine_cellar.apps.storage.models import StorageItemEvent, StorageItemEventType
 from wine_cellar.apps.wine.models import ImageType, Size, Wine, WineImage
 
 
@@ -333,6 +334,27 @@ def test_wine_create_post_valid(client, user):
     assert wine.abv == data["abv"]
     assert wine.size == size
     assert wine.vintage == data["vintage"]
+    event = StorageItemEvent.objects.get(wine=wine)
+    assert event.event_type == StorageItemEventType.WINE_ADDED
+    assert event.wine_name == wine.name
+
+
+@pytest.mark.django_db
+def test_wine_update_does_not_log_wine_added(client, user, wine):
+    """Editing an existing wine reuses the same create-flow form_valid logic
+    as WineCreateView - it must not log a second WINE_ADDED event."""
+    client.force_login(user)
+    data = {
+        "name": wine.name,
+        "wine_type": wine.wine_type,
+        "category": "DR",
+        "size": Size.objects.get(name=0.75).pk,
+        "country": wine.country,
+    }
+    client.post(reverse("wine-edit", kwargs={"pk": wine.pk}), data, follow=True)
+    assert not StorageItemEvent.objects.filter(
+        event_type=StorageItemEventType.WINE_ADDED
+    ).exists()
 
 
 @pytest.mark.django_db

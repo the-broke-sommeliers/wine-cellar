@@ -6,7 +6,12 @@ import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects, assertTemplateUsed
 
-from wine_cellar.apps.storage.models import Storage, StorageItem
+from wine_cellar.apps.storage.models import (
+    Storage,
+    StorageItem,
+    StorageItemEvent,
+    StorageItemEventType,
+)
 
 
 @pytest.mark.django_db
@@ -40,7 +45,10 @@ def test_user_can_add_stock(client, user, wine_factory):
         response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
     )
     assert storage.used_slots == 1
-    assert storage.items.first().wine == wine
+    item = storage.items.first()
+    assert item.wine == wine
+    event = StorageItemEvent.objects.get(storage_item=item)
+    assert event.event_type == StorageItemEventType.ADDED
 
 
 @pytest.mark.django_db
@@ -61,6 +69,12 @@ def test_user_can_add_multiple_bottles_to_unlimited_shelf(client, user, wine_fac
     )
     assert storage.used_slots == 3
     assert all(item.wine == wine for item in storage.items.all())
+    assert (
+        StorageItemEvent.objects.filter(
+            storage_item__in=storage.items.all(), event_type=StorageItemEventType.ADDED
+        ).count()
+        == 3
+    )
 
 
 @pytest.mark.django_db
@@ -116,6 +130,8 @@ def test_user_can_delete_stock(client, user, wine_factory, storage_item_factory)
     assert StorageItem.objects.count() == 1
     item.refresh_from_db()
     assert item.deleted is True
+    event = StorageItemEvent.objects.get(storage_item=item)
+    assert event.event_type == StorageItemEventType.REMOVED
 
 
 @pytest.mark.django_db
@@ -200,6 +216,12 @@ def test_user_can_add_multiple_slots_at_once(
     assert storage.used_slots == 3
     coords = set(storage.items.values_list("row", "column"))
     assert coords == {(1, 1), (1, 2), (2, 1)}
+    assert (
+        StorageItemEvent.objects.filter(
+            storage_item__in=storage.items.all(), event_type=StorageItemEventType.ADDED
+        ).count()
+        == 3
+    )
 
 
 @pytest.mark.django_db

@@ -16,6 +16,7 @@ module.exports = {
         './wine_cellar/assets/css/detail.css',
         './wine_cellar/assets/css/utility.css',
         './wine_cellar/assets/css/card.css',
+        './wine_cellar/assets/css/timeline.css',
         './wine_cellar/assets/css/forms.css',
         './wine_cellar/assets/css/styles.css',
         './wine_cellar/assets/css/page-layout.css',

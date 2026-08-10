@@ -116,6 +116,61 @@ class StorageItem(UserContentModel):
     drink_by = models.DateField(blank=True, null=True)
 
 
+class StorageItemEventType(models.TextChoices):
+    ADDED = "added", _("Added")
+    OPENED = "opened", _("Opened")
+    CONSUMED = "consumed", _("Consumed")
+    REMOVED = "removed", _("Removed")
+    UNDO_OPEN = "undo_open", _("Opening Undone")
+    WINE_ADDED = "wine_added", _("Wine Added")
+    WINE_REMOVED = "wine_removed", _("Wine Removed")
+
+
+class StorageItemEvent(UserContentModel):
+    """Immutable per-action history row. `wine_name` is snapshotted so the
+    trail survives a hard-deleted wine/bottle."""
+
+    storage_item = models.ForeignKey(
+        StorageItem,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="events",
+    )
+    wine = models.ForeignKey(
+        Wine, on_delete=models.SET_NULL, null=True, blank=True, related_name="events"
+    )
+    wine_name = models.CharField(max_length=100)
+    event_type = models.CharField(max_length=12, choices=StorageItemEventType.choices)
+    note = models.TextField(blank=True, null=True)
+
+    # Icon per event type - unmapped types fall back to _DEFAULT_ICON.
+    _EVENT_ICONS = {
+        StorageItemEventType.ADDED: "fa-regular fa-plus",
+        StorageItemEventType.OPENED: "fa-solid fa-bottle-droplet",
+        StorageItemEventType.CONSUMED: "fa-solid fa-wine-glass-empty",
+        StorageItemEventType.REMOVED: "fa-regular fa-trash-can",
+        StorageItemEventType.UNDO_OPEN: "fa-solid fa-rotate-left",
+        StorageItemEventType.WINE_ADDED: "fa-regular fa-plus",
+        StorageItemEventType.WINE_REMOVED: "fa-regular fa-trash-can",
+    }
+    _DEFAULT_ICON = "fa-solid fa-circle-info"
+
+    class Meta:
+        ordering = ("-created",)
+
+    def __str__(self):
+        return f"{self.wine_name} {self.event_type} @ {self.created:%Y-%m-%d}"
+
+    @property
+    def icon_class(self):
+        return self._EVENT_ICONS.get(self.event_type, self._DEFAULT_ICON)
+
+    @property
+    def css_modifier(self):
+        return self.event_type.replace("_", "-")
+
+
 class StorageLabel(UserContentModel):
     storage = models.ForeignKey(
         Storage, on_delete=models.CASCADE, related_name="labels"

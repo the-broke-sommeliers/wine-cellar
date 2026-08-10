@@ -1,0 +1,100 @@
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.timeline__item {
+  display: grid;
+  grid-template-columns: 2rem 1fr auto;
+  column-gap: 0.75rem;
+  row-gap: 0.15rem;
+  align-items: start;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border-color-lighter);
+}
+
+.timeline__item:last-child {
+  border-bottom: none;
+}
+
+.timeline__icon {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--border-color-light);
+  color: var(--text-color-gray);
+  font-size: var(--font-xs);
+}
+
+/* Unmapped future event types keep the neutral default above. */
+.timeline__icon--added,
+.timeline__icon--wine-added {
+  background: var(--green-tint);
+  color: var(--dark-green);
+}
+
+.timeline__icon--opened {
+  background: var(--gray-green);
+  color: var(--darker-green);
+}
+
+.timeline__icon--consumed {
+  background: rgba(77, 20, 69, 0.12);
+  color: var(--dark-purple);
+}
+
+.timeline__icon--removed,
+.timeline__icon--wine-removed {
+  background: var(--danger-tint);
+  color: var(--red);
+}
+
+.timeline__icon--undo-open {
+  background: rgba(212, 117, 0, 0.12);
+  color: var(--warning);
+}
+
+.timeline__title {
+  grid-column: 2;
+  grid-row: 1;
+  margin: 0;
+  font-size: var(--font-sm);
+}
+
+.timeline__title a {
+  color: inherit;
+}
+
+.timeline__meta {
+  grid-column: 2;
+  grid-row: 2;
+  margin: 0;
+  font-size: var(--font-xs);
+  color: var(--text-color-gray);
+}
+
+.timeline__timestamp {
+  grid-column: 3;
+  grid-row: 1;
+  font-size: var(--font-xs);
+  color: var(--text-color-gray);
+  white-space: nowrap;
+}
+
+@media (max-width: 30em) {
+  .timeline__item {
+    grid-template-columns: 2rem 1fr;
+  }
+
+  .timeline__timestamp {
+    grid-column: 2;
+    grid-row: 3;
+    justify-self: start;
+  }
+}

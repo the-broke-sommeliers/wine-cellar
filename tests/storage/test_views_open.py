@@ -5,7 +5,7 @@ import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects
 
-from wine_cellar.apps.storage.models import StorageItem  # noqa: F401
+from wine_cellar.apps.storage.models import StorageItemEvent, StorageItemEventType
 
 
 @pytest.mark.django_db
@@ -43,6 +43,9 @@ def test_user_can_open_stock_from_wine_detail(
     assert item.opened is True
     assert item.deleted is False
     assert item.opened_note == "birthday dinner"
+    event = StorageItemEvent.objects.get(storage_item=item)
+    assert event.event_type == StorageItemEventType.OPENED
+    assert event.note == "birthday dinner"
 
 
 @pytest.mark.django_db
@@ -122,7 +125,12 @@ def test_user_cant_open_already_opened_stock(
 
 @pytest.mark.django_db
 def test_history_shows_opened_and_deleted_items(
-    client, user, storage_factory, wine_factory, storage_item_factory
+    client,
+    user,
+    storage_factory,
+    wine_factory,
+    storage_item_factory,
+    storage_item_event_factory,
 ):
     client.force_login(user)
     storage = storage_factory(user=user)
@@ -130,14 +138,20 @@ def test_history_shows_opened_and_deleted_items(
     deleted_item = storage_item_factory(
         storage=storage, wine=wine, user=user, deleted=True
     )
+    removed_event = storage_item_event_factory(
+        storage_item=deleted_item, user=user, event_type=StorageItemEventType.REMOVED
+    )
     opened_item = storage_item_factory(
         storage=storage, wine=wine, user=user, opened=True
     )
-    active_item = storage_item_factory(storage=storage, wine=wine, user=user)
+    opened_event = storage_item_event_factory(
+        storage_item=opened_item, user=user, event_type=StorageItemEventType.OPENED
+    )
+    # An item with no events at all (e.g. never touched) has nothing to show.
+    storage_item_factory(storage=storage, wine=wine, user=user)
     r = client.get(reverse("stock-history"))
     assert r.status_code == HTTPStatus.OK
-    items = list(r.context["storage_items"])
-    pks = [i.pk for i in items]
-    assert deleted_item.pk in pks
-    assert opened_item.pk in pks
-    assert active_item.pk not in pks
+    events = list(r.context["events"])
+    pks = [e.pk for e in events]
+    assert removed_event.pk in pks
+    assert opened_event.pk in pks
