@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
 from wine_cellar.apps.wine.models import UserContentModel, Wine
@@ -114,6 +115,18 @@ class StorageItem(UserContentModel):
     opened = models.BooleanField(default=False)
     opened_note = models.TextField(blank=True, null=True)
     drink_by = models.DateField(blank=True, null=True)
+
+    class Meta:
+        constraints = [
+            # Backstop for the locking in the storage views - immediate, not
+            # deferred, since writers must vacate (row=column=None) before
+            # reusing a cell anyway (see _shift_toward).
+            models.UniqueConstraint(
+                fields=["storage", "row", "column"],
+                condition=Q(deleted=False, row__isnull=False, column__isnull=False),
+                name="unique_active_slot_per_storage",
+            )
+        ]
 
 
 class StorageItemEventType(models.TextChoices):
