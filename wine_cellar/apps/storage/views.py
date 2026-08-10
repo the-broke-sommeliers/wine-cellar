@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 from django.core.paginator import Paginator
-from django.db import models, transaction
+from django.db import IntegrityError, models, transaction
 from django.forms import model_to_dict
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -22,6 +22,10 @@ from wine_cellar.apps.storage.models import (
     StorageLabelAxis,
 )
 from wine_cellar.apps.wine.models import Wine
+
+
+class SlotConflictError(Exception):
+    """Raised when a slot is no longer free once the lock is acquired."""
 
 
 class StorageListView(ListView):
@@ -310,7 +314,17 @@ class StorageItemAddView(FormView):
 
     def form_valid(self, form):
         wine = get_object_or_404(Wine, pk=self.kwargs["pk"], user=self.request.user)
-        self.process_form_data(wine, self.request.user, form.cleaned_data)
+        try:
+            self.process_form_data(wine, self.request.user, form.cleaned_data)
+        except (SlotConflictError, IntegrityError):
+            form.add_error(
+                None,
+                _(
+                    "One or more of the selected slots are no longer free."
+                    " Please reselect."
+                ),
+            )
+            return self.form_invalid(form)
         self.success_url = reverse_lazy("wine-detail", kwargs={"pk": wine.pk})
         return super().form_valid(form)
 
@@ -320,6 +334,8 @@ class StorageItemAddView(FormView):
         price = cleaned_data.get("price")
 
         with transaction.atomic():
+            # Re-validate under lock - see SlotConflictError.
+            storage = Storage.objects.select_for_update().get(pk=storage.pk)
             if storage.is_unlimited:
                 quantity = cleaned_data.get("quantity") or 1
                 items = StorageItem.objects.bulk_create(
@@ -391,11 +407,18 @@ class StorageItemUpdateView(FormView):
         return reverse_lazy("wine-detail", kwargs={"pk": self.storage_item.wine.pk})
 
     def form_valid(self, form):
-        self.process_form_data(
-            self.storage_item,
-            self.request.user,
-            form.cleaned_data,
-        )
+        try:
+            self.process_form_data(
+                self.storage_item,
+                self.request.user,
+                form.cleaned_data,
+            )
+        except (SlotConflictError, IntegrityError):
+            form.add_error(
+                None,
+                _("The selected slot is no longer free. Please reselect."),
+            )
+            return self.form_invalid(form)
         self.success_url = self.get_success_url()
         return super().form_valid(form)
 
@@ -403,12 +426,21 @@ class StorageItemUpdateView(FormView):
     def process_form_data(storage_item, user, cleaned_data):
         slots = cleaned_data["slots"]
         row, column = slots[0] if slots else (None, None)
-        storage_item.storage = cleaned_data["storage"]
-        storage_item.row = row
-        storage_item.column = column
-        storage_item.price = cleaned_data.get("price")
-        storage_item.user = user
-        storage_item.save()
+        storage = cleaned_data["storage"]
+
+        with transaction.atomic():
+            # Re-validate under lock - see SlotConflictError.
+            storage = Storage.objects.select_for_update().get(pk=storage.pk)
+            if row is not None and (row, column) not in set(
+                storage.free_slots(exclude_item=storage_item)
+            ):
+                raise SlotConflictError
+            storage_item.storage = storage
+            storage_item.row = row
+            storage_item.column = column
+            storage_item.price = cleaned_data.get("price")
+            storage_item.user = user
+            storage_item.save()
 
 
 class StorageItemDeleteView(DeleteView):
@@ -622,13 +654,26 @@ def _shift_toward(storage, start_row, start_col, end_row, end_col, *, forward):
     if not forward:
         items.reverse()
 
+    destinations = []
     for item in items:
         if forward:
-            item.row, item.column = _next_cell(item.row, item.column, max_cols)
+            destinations.append(_next_cell(item.row, item.column, max_cols))
         else:
-            item.row -= 1 if item.column == 1 else 0
-            item.column = max_cols if item.column == 1 else item.column - 1
-        item.save(update_fields=["row", "column"])
+            new_row = item.row - 1 if item.column == 1 else item.row
+            new_col = max_cols if item.column == 1 else item.column - 1
+            destinations.append((new_row, new_col))
+
+    # Vacate everyone first so no write lands on a cell another shifted item
+    # still occupies (would trip the unique constraint).
+    for item in items:
+        item.row = None
+        item.column = None
+    StorageItem.objects.bulk_update(items, ["row", "column"])
+
+    for item, (new_row, new_col) in zip(items, destinations):
+        item.row = new_row
+        item.column = new_col
+    StorageItem.objects.bulk_update(items, ["row", "column"])
 
 
 class StorageItemSwapView(View):
@@ -637,10 +682,8 @@ class StorageItemSwapView(View):
             StorageItem, pk=request.POST.get("item1"), user=request.user, deleted=False
         )
 
-        old_row = source.row
-        old_col = source.column
-
         target_id = request.POST.get("item2")
+        target = None
         if target_id:
             target = get_object_or_404(
                 StorageItem, pk=target_id, user=request.user, deleted=False
@@ -650,8 +693,6 @@ class StorageItemSwapView(View):
                     {"ok": False, "error": "Cannot move between different storages."},
                     status=400,
                 )
-            new_row = target.row
-            new_col = target.column
         else:
             new_row = int(request.POST.get("row", 0))
             new_col = int(request.POST.get("column", 0))
@@ -660,53 +701,64 @@ class StorageItemSwapView(View):
                     {"ok": False, "error": "Cannot move between different storages."},
                     status=400,
                 )
-            if source.storage.columns > 0:
-                if (
-                    new_row < 1
-                    or new_row > source.storage.rows
-                    or new_col < 1
-                    or new_col > source.storage.columns
-                ):
-                    return JsonResponse(
-                        {"ok": False, "error": "Invalid slot."}, status=400
-                    )
-                if source.storage.is_slot_occupied(new_row, new_col):
-                    return JsonResponse(
-                        {"ok": False, "error": "Slot is occupied."}, status=400
-                    )
-
-        with transaction.atomic():
-            if (
-                target_id
-                and old_row is not None
-                and new_row is not None
-                and source.storage.columns > 0
-                and _adjacent(
-                    old_row, old_col, new_row, new_col, source.storage.columns
-                )
+            if source.storage.columns > 0 and (
+                new_row < 1
+                or new_row > source.storage.rows
+                or new_col < 1
+                or new_col > source.storage.columns
             ):
-                # Adjacent cells: just swap positions
-                target.row = old_row
-                target.column = old_col
-                target.save(update_fields=["row", "column"])
-                source.row = new_row
-                source.column = new_col
-                source.save(update_fields=["row", "column"])
-            else:
-                source.row = None
-                source.column = None
-                source.save(update_fields=["row", "column"])
+                return JsonResponse({"ok": False, "error": "Invalid slot."}, status=400)
+
+        try:
+            with transaction.atomic():
+                # Lock the storage, then re-read fresh - see SlotConflictError.
+                storage = Storage.objects.select_for_update().get(
+                    pk=source.storage_id
+                )
+                source.refresh_from_db()
+                if source.deleted:
+                    raise SlotConflictError
+                old_row, old_col = source.row, source.column
+
+                if target is not None:
+                    target.refresh_from_db()
+                    if target.deleted or target.storage_id != storage.pk:
+                        raise SlotConflictError
+                    new_row, new_col = target.row, target.column
+                elif storage.columns > 0 and storage.is_slot_occupied(
+                    new_row, new_col
+                ):
+                    raise SlotConflictError
 
                 if (
-                    target_id
+                    target is not None
                     and old_row is not None
                     and new_row is not None
-                    and source.storage.columns > 0
+                    and storage.columns > 0
+                    and _adjacent(old_row, old_col, new_row, new_col, storage.columns)
                 ):
-                    _move_gap(source.storage, old_row, old_col, new_row, new_col)
+                    # Adjacent cells: swap positions, vacating source first.
+                    source.row, source.column = None, None
+                    source.save(update_fields=["row", "column"])
+                    target.row, target.column = old_row, old_col
+                    target.save(update_fields=["row", "column"])
+                    source.row, source.column = new_row, new_col
+                    source.save(update_fields=["row", "column"])
+                else:
+                    source.row, source.column = None, None
+                    source.save(update_fields=["row", "column"])
 
-                source.row = new_row
-                source.column = new_col
-                source.save(update_fields=["row", "column"])
+                    if (
+                        target is not None
+                        and old_row is not None
+                        and new_row is not None
+                        and storage.columns > 0
+                    ):
+                        _move_gap(storage, old_row, old_col, new_row, new_col)
+
+                    source.row, source.column = new_row, new_col
+                    source.save(update_fields=["row", "column"])
+        except (SlotConflictError, IntegrityError):
+            return JsonResponse({"ok": False, "error": "Slot is occupied."}, status=400)
 
         return JsonResponse({"ok": True})

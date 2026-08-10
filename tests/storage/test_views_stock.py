@@ -12,6 +12,11 @@ from wine_cellar.apps.storage.models import (
     StorageItemEvent,
     StorageItemEventType,
 )
+from wine_cellar.apps.storage.views import (
+    SlotConflictError,
+    StorageItemAddView,
+    StorageItemUpdateView,
+)
 
 
 @pytest.mark.django_db
@@ -171,6 +176,26 @@ def test_user_cant_add_to_full_slot(
     assert r.context["form"].errors
     # Only the pre-existing occupant - the rejected submission created nothing.
     assert StorageItem.objects.filter(wine=wine).count() == 1
+
+
+@pytest.mark.django_db
+def test_add_stock_race_rechecks_under_lock(user, storage_factory, wine_factory):
+    """Two requests both saw slot (1, 1) as free - the second write must be
+    rejected by the lock+recheck, not double-occupy the slot."""
+    storage = storage_factory(user=user, rows=1, columns=1)
+    wine1 = wine_factory(user=user)
+    wine2 = wine_factory(user=user)
+    cleaned_data = {"storage": storage, "price": None, "slots": [(1, 1)]}
+
+    StorageItemAddView.process_form_data(wine1, user, cleaned_data)
+    assert StorageItem.objects.filter(storage=storage, deleted=False).count() == 1
+
+    with pytest.raises(SlotConflictError):
+        StorageItemAddView.process_form_data(wine2, user, cleaned_data)
+
+    # No partial/duplicate write from the rejected second call.
+    assert StorageItem.objects.filter(storage=storage, deleted=False).count() == 1
+    assert StorageItem.objects.filter(wine=wine2).count() == 0
 
 
 @pytest.mark.django_db
@@ -511,6 +536,28 @@ def test_user_cant_edit_to_occupied_slot(
     )
     assert r.status_code == HTTPStatus.OK
     assert r.context["form"].errors
+
+
+@pytest.mark.django_db
+def test_edit_stock_race_rechecks_under_lock(
+    user, storage_factory, wine_factory, storage_item_factory
+):
+    """A slot taken between validation and write must be rejected."""
+    storage = storage_factory(user=user, rows=1, columns=2)
+    wine = wine_factory(user=user)
+    item_to_move = storage_item_factory(
+        storage=storage, wine=wine, row=1, column=1, user=user
+    )
+    storage_item_factory(
+        storage=storage, wine=wine_factory(user=user), row=1, column=2, user=user
+    )
+    cleaned_data = {"storage": storage, "price": None, "slots": [(1, 2)]}
+
+    with pytest.raises(SlotConflictError):
+        StorageItemUpdateView.process_form_data(item_to_move, user, cleaned_data)
+
+    item_to_move.refresh_from_db()
+    assert (item_to_move.row, item_to_move.column) == (1, 1)
 
 
 @pytest.mark.django_db

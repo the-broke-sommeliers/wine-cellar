@@ -1,6 +1,8 @@
 import pytest
+from django.db import IntegrityError, transaction
 
 from wine_cellar.apps.storage.models import (
+    Storage,
     StorageItem,
     StorageItemEvent,
     StorageItemEventType,
@@ -75,6 +77,50 @@ def test_get_wines_excludes_deleted(
     wines = list(storage.get_wines)
     assert len(wines) == 1
     assert wines[0] == active_item
+
+
+@pytest.mark.django_db
+def test_unique_active_slot_constraint_rejects_duplicate(
+    user, wine_factory, storage_factory, storage_item_factory
+):
+    """DB backstop for the (storage, row, column) race - see the views' locking."""
+    storage = storage_factory(user=user, rows=1, columns=1)
+    wine = wine_factory(user=user)
+    storage_item_factory(storage=storage, wine=wine, user=user, row=1, column=1)
+    with pytest.raises(IntegrityError), transaction.atomic():
+        storage_item_factory(storage=storage, wine=wine, user=user, row=1, column=1)
+    assert StorageItem.objects.filter(storage=storage, deleted=False).count() == 1
+
+
+@pytest.mark.django_db
+def test_unique_active_slot_constraint_ignores_deleted_items(
+    user, wine_factory, storage_factory, storage_item_factory
+):
+    """A soft-deleted item keeps its old (row, column) - the constraint must
+    not block a new item from taking that now-vacant slot."""
+    storage = storage_factory(user=user, rows=1, columns=1)
+    wine = wine_factory(user=user)
+    storage_item_factory(
+        storage=storage, wine=wine, user=user, row=1, column=1, deleted=True
+    )
+    # Should not raise.
+    storage_item_factory(storage=storage, wine=wine, user=user, row=1, column=1)
+    assert StorageItem.objects.filter(storage=storage, deleted=False).count() == 1
+
+
+@pytest.mark.django_db
+def test_unique_active_slot_constraint_ignores_unlimited_storages(
+    user, wine_factory, storage_item_factory
+):
+    """Unlimited storages store row=column=None for every item - multiple
+    NULLs in those columns must not collide under the constraint."""
+    storage = Storage.objects.filter(user=user).first()
+    assert storage.is_unlimited
+    wine = wine_factory(user=user)
+    # Should not raise, even though both items share (storage, None, None).
+    storage_item_factory(storage=storage, wine=wine, user=user)
+    storage_item_factory(storage=storage, wine=wine, user=user)
+    assert StorageItem.objects.filter(storage=storage, deleted=False).count() == 2
 
 
 @pytest.mark.django_db
