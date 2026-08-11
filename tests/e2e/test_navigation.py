@@ -66,6 +66,26 @@ def test_footer_shows_version(live_server, page, login, user):
 
 
 @pytest.mark.django_db
+def test_admin_link_visible_to_staff_and_hidden_from_regular_users(
+    live_server, page, login, user
+):
+    login(user)
+    page.goto(live_server.url)
+    nav = page.locator("nav.menu__md")
+    assert nav.get_by_role("link", name="Django Admin").count() == 0
+
+    user.is_staff = True
+    user.save(update_fields=["is_staff"])
+    login(user)
+    page.goto(live_server.url)
+    nav = page.locator("nav.menu__md")
+    admin_link = nav.get_by_role("link", name="Django Admin")
+    assert admin_link.count() == 1
+    admin_link.click()
+    page.wait_for_url("**/admin/**")
+
+
+@pytest.mark.django_db
 def test_nav_shows_login_link_when_logged_out_and_full_menu_when_logged_in(
     live_server, page, login, user
 ):

@@ -1,11 +1,13 @@
 import json
 from decimal import Decimal
 from http import HTTPStatus
+from unittest.mock import patch
 
 import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects, assertTemplateUsed
 
+from wine_cellar.apps.storage.forms import StockForm
 from wine_cellar.apps.storage.models import (
     Storage,
     StorageItem,
@@ -199,6 +201,29 @@ def test_add_stock_race_rechecks_under_lock(user, storage_factory, wine_factory)
 
 
 @pytest.mark.django_db
+def test_add_stock_slot_conflict_shows_friendly_form_error(
+    client, user, storage_factory, wine_factory
+):
+    """The view's own `except SlotConflictError` branch in `form_valid`
+    (distinct from `process_form_data` itself, exercised above) must
+    re-render the form with a friendly error, not a 500."""
+    storage = storage_factory(user=user, rows=1, columns=1)
+    client.force_login(user)
+    wine = wine_factory(user=user)
+    data = {"storage": storage.pk, "slots": json.dumps([[1, 1]])}
+    with patch.object(
+        StorageItemAddView, "process_form_data", side_effect=SlotConflictError
+    ):
+        r = client.post(
+            reverse("stock-add", kwargs={"pk": wine.pk}), data=data, follow=True
+        )
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["form"].errors
+    assert "no longer free" in str(r.context["form"].errors)
+    assert StorageItem.objects.count() == 0
+
+
+@pytest.mark.django_db
 def test_user_can_add_to_specific_slot(client, user, storage_factory, wine_factory):
     storage = storage_factory(user=user, rows=2, columns=2)
     client.force_login(user)
@@ -283,6 +308,27 @@ def test_user_cant_add_with_no_slots_selected(
     assert r.status_code == HTTPStatus.OK
     assert r.context["form"].errors
     assert StorageItem.objects.count() == 0
+
+
+@pytest.mark.django_db
+def test_slots_invalid_json_rejected(user, storage_factory):
+    storage = storage_factory(user=user, rows=1, columns=1)
+    form = StockForm(data={"storage": storage.pk, "slots": "not-json"}, user=user)
+    assert not form.is_valid()
+    assert "Invalid slot selection" in str(form.errors["slots"])
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "raw_slots",
+    ["[[1]]", '[["a", "b"]]', '[{"row": 1, "column": 1}]'],
+    ids=["wrong-pair-length", "non-int-values", "not-a-list-of-pairs"],
+)
+def test_slots_wrong_shape_rejected(user, storage_factory, raw_slots):
+    storage = storage_factory(user=user, rows=2, columns=2)
+    form = StockForm(data={"storage": storage.pk, "slots": raw_slots}, user=user)
+    assert not form.is_valid()
+    assert "Invalid slot selection" in str(form.errors["slots"])
 
 
 @pytest.mark.django_db
@@ -558,6 +604,31 @@ def test_edit_stock_race_rechecks_under_lock(
 
     item_to_move.refresh_from_db()
     assert (item_to_move.row, item_to_move.column) == (1, 1)
+
+
+@pytest.mark.django_db
+def test_edit_stock_slot_conflict_shows_friendly_form_error(
+    client, user, storage_factory, wine_factory, storage_item_factory
+):
+    """The view's own `except SlotConflictError` branch in `form_valid`
+    (distinct from `process_form_data` itself, exercised above) must
+    re-render the form with a friendly error, not a 500."""
+    storage = storage_factory(user=user, rows=1, columns=2)
+    client.force_login(user)
+    wine = wine_factory(user=user)
+    item = storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
+    data = {"storage": storage.pk, "slots": json.dumps([[1, 2]])}
+    with patch.object(
+        StorageItemUpdateView, "process_form_data", side_effect=SlotConflictError
+    ):
+        r = client.post(
+            reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
+        )
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["form"].errors
+    assert "no longer free" in str(r.context["form"].errors)
+    item.refresh_from_db()
+    assert (item.row, item.column) == (1, 1)
 
 
 @pytest.mark.django_db

@@ -44,6 +44,59 @@ def test_wine_detail_other_user_returns_404(client, user, user_factory, wine_fac
 
 
 @pytest.mark.django_db
+def test_wine_detail_with_location_renders_map_tag(
+    client, user, wine_factory, geojson_point_dict
+):
+    """`{% react_detail_map wine %}` is only rendered when `wine.location`
+    is set - assert that branch actually runs, not just the no-location
+    default path every other detail-view test exercises."""
+    wine = wine_factory(user=user, location=geojson_point_dict)
+    client.force_login(user)
+    r = client.get(reverse("wine-detail", kwargs={"pk": wine.pk}))
+    assert r.status_code == HTTPStatus.OK
+    assert 'id="wine_map"' in r.content.decode()
+
+
+@pytest.mark.django_db
+def test_wine_update_other_user_returns_404(client, user, user_factory, wine_factory):
+    other_user = user_factory()
+    wine = wine_factory(user=other_user)
+    client.force_login(user)
+    r = client.get(reverse("wine-edit", kwargs={"pk": wine.pk}))
+    assert r.status_code == HTTPStatus.NOT_FOUND
+
+
+@pytest.mark.django_db
+def test_wine_update_post_other_user_returns_404(
+    client, user, user_factory, wine_factory
+):
+    other_user = user_factory()
+    wine = wine_factory(user=other_user)
+    client.force_login(user)
+    size = Size.objects.get(name=0.75)
+    data = {
+        "name": "Hacked",
+        "wine_type": "RE",
+        "category": "DR",
+        "abv": 13.0,
+        "size": size.pk,
+        "vintage": 2002,
+        "country": "DE",
+    }
+    r = client.post(reverse("wine-edit", kwargs={"pk": wine.pk}), data)
+    assert r.status_code == HTTPStatus.NOT_FOUND
+    wine.refresh_from_db()
+    assert wine.name != "Hacked"
+
+
+@pytest.mark.django_db
+def test_wine_update_nonexistent_pk_returns_404(client, user):
+    client.force_login(user)
+    r = client.get(reverse("wine-edit", kwargs={"pk": 999999}))
+    assert r.status_code == HTTPStatus.NOT_FOUND
+
+
+@pytest.mark.django_db
 def test_wine_update_duplicate(client, user, wine_factory):
     size = Size.objects.get(name=0.75)
     wine1 = wine_factory(

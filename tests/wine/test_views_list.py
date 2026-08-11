@@ -64,6 +64,16 @@ def test_wine_filter_in_stock(client, user, wine_factory, storage_item_factory):
     assertTemplateUsed(response=r, template_name="wine_list.html")
     assert list(r.context_data["wines"]) == [wine_in_stock]
 
+    # Any non-"1" value (django-filter still invokes the method since the
+    # value itself isn't empty) leaves the queryset unfiltered.
+    r = client.get(reverse("wine-list") + "?stock=0")
+    assert r.status_code == HTTPStatus.OK
+    assert set(r.context_data["wines"]) == {
+        wine_in_stock,
+        wine_not_in_stock,
+        wine_was_in_stock,
+    }
+
 
 @pytest.mark.django_db
 def test_wine_filter_price(client, user, wine_factory, storage_item_factory):

@@ -340,6 +340,34 @@ def test_wine_create_post_valid(client, user):
 
 
 @pytest.mark.django_db
+def test_wine_create_save_finish_commits_early(client, user):
+    """The "Save & Finish" button lets the user commit from any wizard
+    step - `"save_finish" in self.request.POST` short-circuits the normal
+    `form_step == 5` requirement. Every other wizard test drives `form_step`
+    up to 5 naturally; this pins the shortcut itself."""
+    client.force_login(user)
+    size = Size.objects.get(name=0.75)
+    data = {
+        "name": "Merlot",
+        "wine_type": "RE",
+        "category": "DR",
+        "abv": 13.0,
+        "size": size.pk,
+        "vintage": 2002,
+        "country": "DE",
+        "form_step": 0,
+        "save_finish": "1",
+    }
+    assert not Wine.objects.exists()
+    r = client.post(reverse("wine-add"), data, follow=True)
+    assert r.status_code == HTTPStatus.OK
+    assertRedirects(response=r, expected_url=reverse("wine-list"))
+    assert Wine.objects.exists()
+    wine = Wine.objects.first()
+    assert wine.name == "Merlot"
+
+
+@pytest.mark.django_db
 def test_wine_update_does_not_log_wine_added(client, user, wine):
     """Editing an existing wine reuses the same create-flow form_valid logic
     as WineCreateView - it must not log a second WINE_ADDED event."""
