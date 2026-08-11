@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.10.0-rc.6 (2026-08-10)
+## 0.10.0-rc.7 (2026-08-11)
 
 ### feat
 
@@ -35,6 +35,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 
 ### fix
+
+- **deps**: update dependency django to v6.0.8
+- enable renovate for docker dependencies
 
 - possible race condition when adding/swapping a storage item
 
