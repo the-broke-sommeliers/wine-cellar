@@ -5,6 +5,8 @@ all (StorageItemHistoryView, storage_item_history.html)."""
 import pytest
 from django.urls import reverse
 
+from wine_cellar.apps.storage.models import StorageItemEventType
+
 pytestmark = pytest.mark.e2e
 
 
@@ -131,23 +133,56 @@ def test_actions_from_storage_grid_return_to_storage_detail(
 
 @pytest.mark.django_db
 def test_history_page_shows_correct_status_per_item(
-    live_server, page, login, user, wine_factory, storage_factory, storage_item_factory
+    live_server,
+    page,
+    login,
+    user,
+    wine_factory,
+    storage_factory,
+    storage_item_factory,
+    storage_item_event_factory,
 ):
+    """The history page (`StorageItemHistoryView`) lists `StorageItemEvent`
+    rows, not `StorageItem`s directly - building items via the factory
+    alone (as this test used to) leaves nothing for the page to show, since
+    nothing but the real add/open/consume/delete views logs an event."""
     storage = storage_factory(user=user, rows=0, columns=0)
     opened_wine = wine_factory(user=user, name="History Opened")
     consumed_wine = wine_factory(user=user, name="History Consumed")
     removed_wine = wine_factory(user=user, name="History Removed")
-    storage_item_factory(storage=storage, wine=opened_wine, user=user, opened=True)
-    storage_item_factory(
+    opened_item = storage_item_factory(
+        storage=storage, wine=opened_wine, user=user, opened=True
+    )
+    consumed_item = storage_item_factory(
         storage=storage, wine=consumed_wine, user=user, opened=True, deleted=True
     )
-    storage_item_factory(
+    removed_item = storage_item_factory(
         storage=storage, wine=removed_wine, user=user, opened=False, deleted=True
+    )
+    storage_item_event_factory(
+        storage_item=opened_item,
+        wine=opened_wine,
+        user=user,
+        event_type=StorageItemEventType.OPENED,
+    )
+    storage_item_event_factory(
+        storage_item=consumed_item,
+        wine=consumed_wine,
+        user=user,
+        event_type=StorageItemEventType.CONSUMED,
+    )
+    storage_item_event_factory(
+        storage_item=removed_item,
+        wine=removed_wine,
+        user=user,
+        event_type=StorageItemEventType.REMOVED,
     )
     login(user)
     page.goto(f"{live_server.url}{reverse('stock-history')}")
 
-    rows_text = page.locator("table.card__table tbody tr").all_inner_texts()
+    # The history page is a timeline/activity feed (storage_item_history.html),
+    # not a table.
+    rows_text = page.locator("ul.timeline li.timeline__item").all_inner_texts()
     combined = " | ".join(rows_text)
     assert "History Opened" in combined and "Opened" in combined
     assert "History Consumed" in combined and "Consumed" in combined
@@ -156,14 +191,27 @@ def test_history_page_shows_correct_status_per_item(
 
 @pytest.mark.django_db
 def test_history_pagination(
-    live_server, page, login, user, wine_factory, storage_factory, storage_item_factory
+    live_server,
+    page,
+    login,
+    user,
+    wine_factory,
+    storage_factory,
+    storage_item_factory,
+    storage_item_event_factory,
 ):
     storage = storage_factory(user=user, rows=0, columns=0)
     for i in range(11):
         wine = wine_factory(user=user, name=f"History Wine {i:02d}")
-        storage_item_factory(storage=storage, wine=wine, user=user, opened=True)
+        item = storage_item_factory(storage=storage, wine=wine, user=user, opened=True)
+        storage_item_event_factory(
+            storage_item=item,
+            wine=wine,
+            user=user,
+            event_type=StorageItemEventType.OPENED,
+        )
     login(user)
     page.goto(f"{live_server.url}{reverse('stock-history')}")
 
-    assert page.locator("table.card__table tbody tr").count() == 10
+    assert page.locator("ul.timeline li.timeline__item").count() == 10
     assert page.locator("ul.pagination li", has_text="2").count() == 1

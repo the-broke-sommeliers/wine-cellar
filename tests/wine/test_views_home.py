@@ -29,6 +29,24 @@ def test_homepage(client, user):
 
 
 @pytest.mark.django_db
+def test_admin_link_hidden_from_regular_user(client, user):
+    client.force_login(user)
+    r = client.get(reverse("homepage"))
+    assert r.status_code == HTTPStatus.OK
+    assert reverse("admin:index") not in r.content.decode()
+
+
+@pytest.mark.django_db
+def test_admin_link_visible_to_staff_user(client, user):
+    user.is_staff = True
+    user.save(update_fields=["is_staff"])
+    client.force_login(user)
+    r = client.get(reverse("homepage"))
+    assert r.status_code == HTTPStatus.OK
+    assert reverse("admin:index") in r.content.decode()
+
+
+@pytest.mark.django_db
 def test_homepage_stats(client, user, wine_factory, storage_item_factory):
     wine = wine_factory(user=user, vintage=2020)
     storage = user.storage_set.first()

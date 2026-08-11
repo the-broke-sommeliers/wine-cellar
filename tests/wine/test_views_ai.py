@@ -60,6 +60,27 @@ def test_wine_choose_action_ai_enabled(client, user):
 
 
 @pytest.mark.django_db
+def test_wine_upload_ai_page_ai_disabled_by_default(client, user):
+    """`WineUploadAIView.get_context_data` computes its own `ai_enabled`
+    flag independently of `WineChooseActionView`'s (different `hasattr`-
+    based implementation) - assert it directly rather than relying on the
+    other view's test to catch a regression here."""
+    client.force_login(user)
+    r = client.get(reverse("wine-ai-upload"))
+    assert r.status_code == HTTPStatus.OK
+    assert r.context_data["ai_enabled"] is False
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+def test_wine_upload_ai_page_ai_enabled_with_settings(client, user):
+    client.force_login(user)
+    r = client.get(reverse("wine-ai-upload"))
+    assert r.status_code == HTTPStatus.OK
+    assert r.context_data["ai_enabled"] is True
+
+
+@pytest.mark.django_db
 def test_wine_choose_action_with_barcode(client, user):
     client.force_login(user)
     r = client.get(reverse("wine-add-choose") + "?barcode=9780201633610")
@@ -97,6 +118,58 @@ def test_ai_upload_success_returns_poll_url_and_then_create(
     assert poll["status"] == "done"
     assert reverse("wine-add") in poll["redirect"]
     assert "prefill_token" in poll["redirect"]
+
+
+@pytest.mark.django_db
+def test_ai_upload_poll_unknown_token_returns_expired_error(client, user):
+    """Every other poll test only polls *after* `CELERY_TASK_ALWAYS_EAGER`
+    has already driven the task to a final state - nobody polls a token
+    that was never created (or already expired from the cache)."""
+    client.force_login(user)
+    r = client.get(reverse("wine-ai-upload-poll", kwargs={"token": "bogus-token"}))
+    assert r.status_code == HTTPStatus.OK
+    body = r.json()
+    assert body["status"] == "error"
+    assert body["message"]
+
+
+@pytest.mark.django_db
+def test_ai_upload_poll_other_users_token_returns_expired_error(
+    client, user, user_factory
+):
+    token = "shared-token"
+    wine_prefill_cache.set(
+        f"wine_prefill_{token}",
+        {
+            "status": "done",
+            "initial": {"name": "Secret Wine"},
+            "images": {},
+            "user_id": user.pk,
+        },
+        timeout=60,
+    )
+    other_user = user_factory()
+    client.force_login(other_user)
+    r = client.get(reverse("wine-ai-upload-poll", kwargs={"token": token}))
+    assert r.status_code == HTTPStatus.OK
+    assert r.json()["status"] == "error"
+
+
+@pytest.mark.django_db
+def test_ai_upload_poll_pending_status(client, user):
+    """No mocked litellm call needed - write a "pending" entry directly
+    into the cache to observe the poll view's in-progress branch, which
+    `CELERY_TASK_ALWAYS_EAGER` otherwise never leaves time to observe."""
+    token = "pending-token"
+    wine_prefill_cache.set(
+        f"wine_prefill_{token}",
+        {"status": "pending", "stage": "reprompt_country", "user_id": user.pk},
+        timeout=60,
+    )
+    client.force_login(user)
+    r = client.get(reverse("wine-ai-upload-poll", kwargs={"token": token}))
+    assert r.status_code == HTTPStatus.OK
+    assert r.json() == {"status": "pending", "stage": "reprompt_country"}
 
 
 @pytest.mark.django_db

@@ -1,7 +1,7 @@
 import pytest
 
 from wine_cellar.apps.wine.models import Grape, Region, Size
-from wine_cellar.apps.wine.serializers import WineAiSerializer
+from wine_cellar.apps.wine.serializers import WineAiSerializer, _normalize_size_liters
 
 
 @pytest.mark.django_db
@@ -88,6 +88,46 @@ def test_serialize_relation_raises_type_error_on_invalid_multi():
 
     with pytest.raises(TypeError):
         serializer.serialize_relation(["Region 1", "Region 2"], Region, multi=False)
+
+
+@pytest.mark.django_db
+def test_serialize_relation_scalar_for_multi_wrapped_in_list(grape_factory):
+    """The AI can return a bare string where a list was expected (e.g. a
+    single grape instead of a list of grapes) - it must be wrapped, not
+    rejected."""
+    serializer = WineAiSerializer()
+    grape = grape_factory(name="Merlot")
+
+    result = serializer.serialize_relation("Merlot", Grape, multi=True)
+
+    assert result == [grape.pk]
+
+
+@pytest.mark.django_db
+def test_deserialize_relation_scalar_for_multi_wrapped_in_list(grape_factory):
+    serializer = WineAiSerializer()
+    grape = grape_factory(name="Merlot")
+
+    result = serializer.deserialize_relation(grape.pk, Grape, multi=True)
+
+    assert result == [grape]
+
+
+@pytest.mark.django_db
+def test_deserialize_relation_raises_type_error_on_invalid_multi():
+    serializer = WineAiSerializer()
+
+    with pytest.raises(TypeError):
+        serializer.deserialize_relation([1, 2], Grape, multi=False)
+
+
+def test_normalize_size_liters_unparseable_string_returns_none():
+    assert _normalize_size_liters("large") is None
+
+
+def test_normalize_size_liters_malformed_number_returns_none():
+    # Matches the regex's `[\d.]+` number group but isn't a valid float.
+    assert _normalize_size_liters("1.2.3") is None
 
 
 @pytest.mark.django_db

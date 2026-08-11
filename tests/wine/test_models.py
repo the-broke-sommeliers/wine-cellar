@@ -4,10 +4,13 @@ from pathlib import Path
 
 import pytest
 from django.conf import settings
+from django.db.models.signals import post_save
 from django.templatetags.static import static
 from django.utils.formats import number_format
 
 from wine_cellar.apps.user.models import UserSettings
+from wine_cellar.apps.wine.models import ImageType, WineImage
+from wine_cellar.apps.wine.signals import generate_thumbnail
 
 
 @pytest.mark.django_db
@@ -16,6 +19,46 @@ def test_wine_model(user, wine_factory, grape_factory):
     wine = wine_factory(user=user, grapes=[grape])
     assert wine.get_grapes == grape.name
     assert wine.image == static("images/bottle.svg")
+
+
+@pytest.mark.django_db
+def test_wine_image_thumbnail_falls_back_to_full_image_when_no_thumbnail(
+    clear_image_folder, user, wine_factory, wine_image_factory
+):
+    """`generate_thumbnail` normally fills `thumbnail` on every save - to
+    observe the pre-signal/signal-skipped fallback, create the front image
+    with the signal disconnected."""
+    wine = wine_factory(user=user)
+    post_save.disconnect(generate_thumbnail, sender=WineImage)
+    try:
+        front = wine_image_factory(
+            user=user, wine=wine, image_type=ImageType.FRONT
+        )
+    finally:
+        post_save.connect(generate_thumbnail, sender=WineImage)
+    assert not front.thumbnail
+    assert wine.image_thumbnail == front.image.url
+
+
+@pytest.mark.django_db
+def test_wine_image_thumbnails_returns_ordered_by_type(
+    clear_image_folder, user, wine_factory, wine_image_factory
+):
+    wine = wine_factory(user=user)
+    # Created out of order, and skipping LABEL_FRONT entirely.
+    label_back = wine_image_factory(
+        user=user, wine=wine, image_type=ImageType.LABEL_BACK
+    )
+    front = wine_image_factory(user=user, wine=wine, image_type=ImageType.FRONT)
+    back = wine_image_factory(user=user, wine=wine, image_type=ImageType.BACK)
+    front.refresh_from_db()
+    back.refresh_from_db()
+    label_back.refresh_from_db()
+    assert wine.image_thumbnails == [
+        front.thumbnail.url,
+        back.thumbnail.url,
+        label_back.thumbnail.url,
+    ]
 
 
 @pytest.mark.django_db
