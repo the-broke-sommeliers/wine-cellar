@@ -17,6 +17,14 @@
       "description": "Lock Python to 3.13 line for Docker and GitHub Actions",
       "matchPackageNames": ["python", "docker.io/library/python"],
       "allowedVersions": "< 3.14.0"
+    },
+    {
+      "description": "Allow digest updates for third-party service images pinned in docker-compose files",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["postgres", "redis", "caddy"],
+      "digest": {
+        "enabled": true
+      }
     }
   ],
   "digest": {
