@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 from django.utils.csp import CSP
@@ -26,10 +27,10 @@ VERSION = __version__
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-9_c29b95eghgc@yx6lyuiz3*h#oy7*zh8*vb36d1cwe)b4%v0d"
+SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-9_c29b95eghgc@yx6lyuiz3*h#oy7*zh8*vb36d1cwe)b4%v0d")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "True").lower() in ("true", "1", "yes")
 
 
 ALLOWED_HOSTS = []
