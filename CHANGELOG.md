@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.10.0-rc.7 (2026-08-11)
+## 0.10.0-rc.8 (2026-08-13)
 
 ### feat
 
@@ -36,6 +36,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### fix
 
+- force tls for oauth callback urls, add option to pass a domain to the form action csp
+
+- **deps**: update dependency django-allauth to v65.19.0
 - **deps**: update dependency django to v6.0.8
 - enable renovate for docker dependencies
 
