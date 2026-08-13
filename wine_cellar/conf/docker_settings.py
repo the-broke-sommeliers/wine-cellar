@@ -49,8 +49,23 @@ EMAIL_USE_TLS = os.environ.get("DJANGO_EMAIL_USE_TLS", "True") == "True"
 EMAIL_USE_SSL = os.environ.get("DJANGO_EMAIL_USE_SSL", "False") == "True"
 DEFAULT_FROM_EMAIL = os.environ.get("DJANGO_DEFAULT_FROM_EMAIL")
 
-if EMAIL_HOST:
-    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+MAILERS = {
+    "default": {
+        "BACKEND": (
+            "django.core.mail.backends.smtp.EmailBackend"
+            if EMAIL_HOST
+            else "django.core.mail.backends.console.EmailBackend"
+        ),
+        "OPTIONS": {
+            "host": EMAIL_HOST,
+            "port": int(EMAIL_PORT) if EMAIL_PORT else None,
+            "username": EMAIL_HOST_USER,
+            "password": EMAIL_HOST_PASSWORD,
+            "use_tls": EMAIL_USE_TLS,
+            "use_ssl": EMAIL_USE_SSL,
+        },
+    },
+}
 
 CELERY_BROKER_URL = os.environ.get(
     "REDIS_URL",

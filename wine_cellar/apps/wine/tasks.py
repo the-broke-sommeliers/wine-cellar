@@ -5,6 +5,7 @@ import pycountry
 from celery import shared_task
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.db.models import FETCH_RAISE
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -73,8 +74,12 @@ def opened_bottle_reminder():
     )
     today = timezone.now().date()
     for user in users:
-        items = StorageItem.objects.filter(
-            user=user, opened=True, deleted=False, drink_by=today
+        items = (
+            StorageItem.objects.filter(
+                user=user, opened=True, deleted=False, drink_by=today
+            )
+            .select_related("wine")
+            .fetch_mode(FETCH_RAISE)
         )
         if items.exists():
             send_opened_bottle_reminder(user, items)

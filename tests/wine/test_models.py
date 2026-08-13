@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 from django.conf import settings
+from django.db.models import FETCH_RAISE
 from django.db.models.signals import post_save
 from django.templatetags.static import static
 from django.utils.formats import number_format
@@ -199,6 +200,20 @@ def test_get_stock_ordering(user, wine_factory, storage_factory, storage_item_fa
     stock = list(wine.get_stock)
     assert stock[0] == item_a
     assert stock[1] == item_b
+
+
+@pytest.mark.django_db
+def test_get_stock_prefetches_storage(
+    user, wine_factory, storage_factory, storage_item_factory
+):
+    """Regression guard: wine_detail.html accesses `item.storage` per row,
+    so get_stock must select_related it - fetch_mode(FETCH_RAISE) fails loudly
+    if that's ever dropped instead of silently reintroducing an N+1."""
+    wine = wine_factory(user=user)
+    storage = storage_factory(user=user, rows=1, columns=1)
+    storage_item_factory(wine=wine, storage=storage, row=1, column=1)
+    stock = list(wine.get_stock.fetch_mode(FETCH_RAISE))
+    assert [str(item.storage) for item in stock] == [str(storage)]
 
 
 @pytest.mark.django_db

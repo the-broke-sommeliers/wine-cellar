@@ -1,5 +1,6 @@
 import pytest
 from django.db import IntegrityError, transaction
+from django.db.models import FETCH_RAISE
 
 from wine_cellar.apps.storage.models import (
     Storage,
@@ -77,6 +78,20 @@ def test_get_wines_excludes_deleted(
     wines = list(storage.get_wines)
     assert len(wines) == 1
     assert wines[0] == active_item
+
+
+@pytest.mark.django_db
+def test_get_wines_prefetches_wine(
+    user, wine_factory, storage_factory, storage_item_factory
+):
+    """Regression guard: storage_detail.html accesses `entry.wine` per row,
+    so get_wines must select_related it - fetch_mode(FETCH_RAISE) fails loudly
+    if that's ever dropped instead of silently reintroducing an N+1."""
+    storage = storage_factory(user=user, rows=1, columns=1)
+    wine = wine_factory(user=user)
+    storage_item_factory(storage=storage, wine=wine, row=1, column=1)
+    entries = list(storage.get_wines.fetch_mode(FETCH_RAISE))
+    assert [entry.wine.name for entry in entries] == [wine.name]
 
 
 @pytest.mark.django_db

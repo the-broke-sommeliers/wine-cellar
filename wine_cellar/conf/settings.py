@@ -198,7 +198,11 @@ MEDIA_URL = "media/"
 
 MAP_BASEURL = "https://tiles.openfreemap.org/styles/liberty"
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+MAILERS = {
+    "default": {
+        "BACKEND": "django.core.mail.backends.console.EmailBackend",
+    },
+}
 SITE_URL = "http://127.0.0.1:8003"
 ACCOUNT_ADAPTER = (
     "wine_cellar.apps.user.signup_adapter.ConfigurableSignupAccountAdapter"

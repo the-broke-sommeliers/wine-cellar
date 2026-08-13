@@ -91,7 +91,11 @@ class Storage(UserContentModel):
 
     @property
     def get_wines(self):
-        return self.items.filter(deleted=False).order_by("row", "column")
+        return (
+            self.items.filter(deleted=False)
+            .select_related("wine")
+            .order_by("row", "column")
+        )
 
     def _labels(self, axis):
         return {label.index: label.name for label in self.labels.filter(axis=axis)}
