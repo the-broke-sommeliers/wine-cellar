@@ -22,6 +22,10 @@ DATABASES = {
 
 CSRF_TRUSTED_ORIGINS = os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS").split(" ")
 
+CSP_FORM_ACTION_EXTRA = os.environ.get("DJANGO_CSP_FORM_ACTION_EXTRA", "")
+if CSP_FORM_ACTION_EXTRA:
+    SECURE_CSP["form-action"] += CSP_FORM_ACTION_EXTRA.split(" ")  # noqa: F405
+
 MEDIA_ROOT = "mediafiles"
 STATIC_ROOT = "staticfiles"
 
