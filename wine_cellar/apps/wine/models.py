@@ -278,8 +278,10 @@ class Wine(UserContentModel):
 
     @property
     def get_stock(self):
-        return self.storageitem_set.filter(deleted=False).order_by(
-            "storage", "row", "column"
+        return (
+            self.storageitem_set.filter(deleted=False)
+            .select_related("storage")
+            .order_by("storage", "row", "column")
         )
 
     @property
