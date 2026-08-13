@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.10.0-rc.8 (2026-08-13)
+## 0.10.0-rc.9 (2026-08-13)
 
 ### feat
 
@@ -35,6 +35,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 
 ### fix
+
+- remove SECURE_SSL_REDIRECT again as it may cause an endless redirect with a reverse proxy
 
 - force tls for oauth callback urls, add option to pass a domain to the form action csp
 
