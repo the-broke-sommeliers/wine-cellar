@@ -39,7 +39,7 @@ dev = [
     "isort==8.0.1",
     "playwright==1.62.0",
     "pytest-cov==7.1.0",
-    "pytest-django==4.12.0",
+    "pytest-django==4.13.0",
     "pytest-factoryboy==2.8.1",
     "pytest-playwright==0.8.0",
     "pytest==9.1.1",
