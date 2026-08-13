@@ -32,6 +32,14 @@ allauth will automatically discover the provider's endpoints via the `/.well-kno
 
 5. Assign the application to the appropriate **Sites** and click **Save**.
 
+!!! Note
+
+    If login is blocked by the app's Content Security Policy (the browser console shows a `form-action` violation), add your identity provider's domain to `DJANGO_CSP_FORM_ACTION_EXTRA` (space-separated if you have more than one provider), e.g.:
+
+    ```
+    DJANGO_CSP_FORM_ACTION_EXTRA=https://your-idp.example.com
+    ```
+
 ## Callback URL
 
 When registering the application with your identity provider, set the callback (redirect) URL to:
