@@ -9,6 +9,7 @@ from django.db import models
 from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.formats import number_format
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from wine_cellar.apps.user.views import get_user_settings
@@ -218,19 +219,19 @@ class Wine(UserContentModel):
     def get_absolute_url(self):
         return reverse("wine-detail", kwargs={"pk": self.pk})
 
-    @property
+    @cached_property
     def get_vineyards(self):
         return "\n".join([str(vineyard) for vineyard in self.vineyard.all()])
 
-    @property
+    @cached_property
     def get_grapes(self):
         return ", ".join([str(grape) for grape in self.grapes.all()])
 
-    @property
+    @cached_property
     def get_sources(self):
         return ", ".join([str(s) for s in self.source.all()])
 
-    @property
+    @cached_property
     def get_attributes(self):
         return "\n".join([str(attribute) for attribute in self.attributes.all()])
 
@@ -243,7 +244,7 @@ class Wine(UserContentModel):
         formatted_price = number_format(self.price, use_l10n=True)
         return f"{formatted_price}{currency}"
 
-    @property
+    @cached_property
     def get_average_price_with_currency(self):
         user_settings = get_user_settings(self.user)
         currency = settings.CURRENCY_SYMBOLS.get(
@@ -259,7 +260,7 @@ class Wine(UserContentModel):
         formatted_price = number_format(avg_price, use_l10n=True)
         return f"{formatted_price}{currency}"
 
-    @property
+    @cached_property
     def get_food_pairings(self):
         return "\n".join([str(pairing) for pairing in self.food_pairings.all()])
 
@@ -274,6 +275,12 @@ class Wine(UserContentModel):
 
     @property
     def total_stock(self):
+        # Prefer the annotation added by WineListView.get_queryset() to avoid
+        # a per-row COUNT query; fall back to a live count when unannotated
+        # (e.g. wine_detail.html, which doesn't go through that queryset).
+        annotated = getattr(self, "total_stock_count", None)
+        if annotated is not None:
+            return annotated
         return self.storageitem_set.filter(deleted=False).count()
 
     @property
@@ -291,18 +298,29 @@ class Wine(UserContentModel):
             return static("images/bottle.svg")
         return i.image.url
 
-    @property
+    @cached_property
     def image_thumbnail(self):
-        i = self.wineimage_set.filter(image_type=ImageType.FRONT)
-        if not i:
+        # Prefer the Prefetch cache populated by WineListView.get_queryset()
+        # over a fresh per-row query; falls back to a live lookup for views
+        # (e.g. wine_detail.html) that don't prefetch it. hasattr, not
+        # getattr(..., None): an empty prefetch result ([], falsy but real)
+        # must not be mistaken for "wasn't prefetched at all".
+        if hasattr(self, "_prefetched_front_images"):
+            front = (
+                self._prefetched_front_images[0]
+                if self._prefetched_front_images
+                else None
+            )
+        else:
+            front = self.wineimage_set.filter(image_type=ImageType.FRONT).first()
+        if not front:
             return static("images/bottle.svg")
-        front = i.first()
         if front.thumbnail:
             return front.thumbnail.url
         # return normal image as fallback
         return front.image.url
 
-    @property
+    @cached_property
     def image_thumbnails(self):
         images = {img.image_type: img for img in self.wineimage_set.all()}
         order = [

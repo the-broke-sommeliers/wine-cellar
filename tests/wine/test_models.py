@@ -38,13 +38,11 @@ def test_wine_image_thumbnail_falls_back_to_full_image_when_no_thumbnail(
     wine = wine_factory(user=user)
     post_save.disconnect(generate_thumbnail, sender=WineImage)
     try:
-        front = wine_image_factory(
-            user=user, wine=wine, image_type=ImageType.FRONT
-        )
+        front = wine_image_factory(user=user, wine=wine, image_type=ImageType.FRONT)
     finally:
         post_save.connect(generate_thumbnail, sender=WineImage)
     assert not front.thumbnail
-    with django_assert_num_queries(2):
+    with django_assert_num_queries(1):
         assert wine.image_thumbnail == front.image.url
 
 

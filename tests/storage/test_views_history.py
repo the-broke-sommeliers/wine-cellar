@@ -96,7 +96,7 @@ def test_history_shows_wine_added_and_removed_end_to_end(
         "vintage": 2019,
         "country": "FR",
     }
-    with django_assert_num_queries(13):
+    with django_assert_num_queries(8):
         client.post(reverse("wine-add"), data)
     wine = Wine.objects.get(name="Chablis 2019")
     with django_assert_num_queries(17):

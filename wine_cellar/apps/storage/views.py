@@ -279,8 +279,24 @@ class StorageDeleteView(DeleteView):
 
 def storage_picker_payload(user, exclude_item=None):
     """Per-storage JSON payload for the `stock_add.ts` slot picker."""
+    storages = list(Storage.objects.filter(user=user))
+    gridded = [storage for storage in storages if not storage.is_unlimited]
+    if gridded:
+        # Two queries total for however many gridded storages the user has,
+        # instead of grid_cells()/row_labels/column_labels each re-querying
+        # per storage - skipped entirely for unlimited-only storages.
+        models.prefetch_related_objects(
+            gridded,
+            models.Prefetch(
+                "items",
+                queryset=StorageItem.objects.filter(deleted=False, row__isnull=False),
+                to_attr="_prefetched_grid_items",
+            ),
+            models.Prefetch("labels", to_attr="_prefetched_labels"),
+        )
+
     payload = {}
-    for storage in Storage.objects.filter(user=user):
+    for storage in storages:
         if storage.is_unlimited:
             payload[storage.pk] = {"unlimited": True}
             continue
@@ -712,9 +728,7 @@ class StorageItemSwapView(View):
         try:
             with transaction.atomic():
                 # Lock the storage, then re-read fresh - see SlotConflictError.
-                storage = Storage.objects.select_for_update().get(
-                    pk=source.storage_id
-                )
+                storage = Storage.objects.select_for_update().get(pk=source.storage_id)
                 source.refresh_from_db()
                 if source.deleted:
                     raise SlotConflictError
@@ -725,9 +739,7 @@ class StorageItemSwapView(View):
                     if target.deleted or target.storage_id != storage.pk:
                         raise SlotConflictError
                     new_row, new_col = target.row, target.column
-                elif storage.columns > 0 and storage.is_slot_occupied(
-                    new_row, new_col
-                ):
+                elif storage.columns > 0 and storage.is_slot_occupied(new_row, new_col):
                     raise SlotConflictError
 
                 if (

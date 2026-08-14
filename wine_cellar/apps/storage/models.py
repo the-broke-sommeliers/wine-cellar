@@ -56,10 +56,19 @@ class Storage(UserContentModel):
         Empty list for unlimited storages."""
         if self.is_unlimited:
             return []
-        items = self.items.filter(deleted=False, row__isnull=False)
-        if exclude_item is not None:
-            items = items.exclude(pk=exclude_item.pk)
-        used = set(items.values_list("row", "column"))
+        # Prefer the Prefetch cache populated by storage_picker_payload() for
+        # the multi-storage picker over a fresh per-storage query.
+        prefetched = getattr(self, "_prefetched_grid_items", None)
+        if prefetched is not None:
+            items = prefetched
+            if exclude_item is not None:
+                items = [item for item in items if item.pk != exclude_item.pk]
+            used = {(item.row, item.column) for item in items}
+        else:
+            items = self.items.filter(deleted=False, row__isnull=False)
+            if exclude_item is not None:
+                items = items.exclude(pk=exclude_item.pk)
+            used = set(items.values_list("row", "column"))
         current = None
         if (
             exclude_item is not None
@@ -98,6 +107,11 @@ class Storage(UserContentModel):
         )
 
     def _labels(self, axis):
+        prefetched = getattr(self, "_prefetched_labels", None)
+        if prefetched is not None:
+            return {
+                label.index: label.name for label in prefetched if label.axis == axis
+            }
         return {label.index: label.name for label in self.labels.filter(axis=axis)}
 
     @property

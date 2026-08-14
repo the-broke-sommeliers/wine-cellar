@@ -18,7 +18,7 @@ def test_wine_detail_authenticated(
 ):
     wine = wine_factory(user=user)
     client.force_login(user)
-    with django_assert_num_queries(19):
+    with django_assert_num_queries(14):
         r = client.get(reverse("wine-detail", kwargs={"pk": wine.pk}))
     assert r.status_code == HTTPStatus.OK
     assertTemplateUsed(response=r, template_name="wine_detail.html")
@@ -61,7 +61,7 @@ def test_wine_detail_with_location_renders_map_tag(
     default path every other detail-view test exercises."""
     wine = wine_factory(user=user, location=geojson_point_dict)
     client.force_login(user)
-    with django_assert_num_queries(20):
+    with django_assert_num_queries(14):
         r = client.get(reverse("wine-detail", kwargs={"pk": wine.pk}))
     assert r.status_code == HTTPStatus.OK
     assert 'id="wine_map"' in r.content.decode()
@@ -144,7 +144,7 @@ def test_wine_update_duplicate(client, user, wine_factory, django_assert_num_que
         "vintage": wine1.vintage,
         "country": wine1.country,
     }
-    with django_assert_num_queries(27):
+    with django_assert_num_queries(23):
         r = client.post(reverse("wine-edit", kwargs={"pk": wine2.pk}), data)
     assert r.status_code == HTTPStatus.OK
     assert r.context_data["form"].errors
@@ -186,7 +186,7 @@ def test_wine_update_valid_fields(
         "attributes": attribute.pk,
         "country": "DE",
     }
-    with django_assert_num_queries(58):
+    with django_assert_num_queries(44):
         r = client.post(reverse("wine-edit", kwargs={"pk": wine.pk}), data, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(
@@ -215,7 +215,7 @@ def test_wine_update_valid_fields(
 def test_wine_delete(client, user, wine_factory, django_assert_num_queries):
     wine = wine_factory(user=user)
     client.force_login(user)
-    with django_assert_num_queries(34):
+    with django_assert_num_queries(27):
         r = client.post(reverse("wine-delete", kwargs={"pk": wine.pk}), follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))

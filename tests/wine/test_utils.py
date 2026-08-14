@@ -46,7 +46,7 @@ def test_wine_to_json_none(wine_factory, geojson_point, django_assert_num_querie
         "location": geojson_point,
         "url": wine.get_absolute_url(),
     }
-    with django_assert_num_queries(1):
+    with django_assert_num_queries(0):
         assert wine_to_json(wine) == expected
 
 
@@ -91,7 +91,7 @@ def test_get_map_attributes_with_wine(
             }
         ],
     }
-    with django_assert_num_queries(1):
+    with django_assert_num_queries(0):
         assert get_map_attributes([wine]) == expected
 
 
