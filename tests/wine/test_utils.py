@@ -34,7 +34,7 @@ def _half_split_jpeg(orientation=None):
 
 
 @pytest.mark.django_db
-def test_wine_to_json_none(wine_factory, geojson_point):
+def test_wine_to_json_none(wine_factory, geojson_point, django_assert_num_queries):
     wine = wine_factory(name="Test Wine", location=geojson_point)
     expected = {
         "name": "Test Wine",
@@ -46,7 +46,8 @@ def test_wine_to_json_none(wine_factory, geojson_point):
         "location": geojson_point,
         "url": wine.get_absolute_url(),
     }
-    assert wine_to_json(wine) == expected
+    with django_assert_num_queries(1):
+        assert wine_to_json(wine) == expected
 
 
 def test_get_map_attributes(wine_factory):
@@ -64,7 +65,9 @@ def test_get_map_attributes(wine_factory):
 
 
 @pytest.mark.django_db
-def test_get_map_attributes_with_wine(wine_factory, geojson_point):
+def test_get_map_attributes_with_wine(
+    wine_factory, geojson_point, django_assert_num_queries
+):
     wine = wine_factory(name="Test Wine", location=geojson_point)
     expected = {
         "map": {
@@ -88,7 +91,8 @@ def test_get_map_attributes_with_wine(wine_factory, geojson_point):
             }
         ],
     }
-    assert get_map_attributes([wine]) == expected
+    with django_assert_num_queries(1):
+        assert get_map_attributes([wine]) == expected
 
 
 def test_get_map_attributes_with_point_height(geojson_point):
@@ -148,19 +152,24 @@ def test_wine_to_json_none_returns_none():
 
 @pytest.mark.django_db
 def test_make_thumbnail_no_exif_falls_back(
-    clear_image_folder, user, wine_factory, wine_image_factory
+    clear_image_folder,
+    user,
+    wine_factory,
+    wine_image_factory,
+    django_assert_num_queries,
 ):
     """No EXIF at all - the plain fallback path, made explicit rather than
     only exercised incidentally by other tests via the factory's default
     (EXIF-less) image."""
     wine = wine_factory(user=user)
-    wine_image = wine_image_factory(
-        user=user,
-        wine=wine,
-        image=SimpleUploadedFile(
-            "no_exif.jpg", _half_split_jpeg(), content_type="image/jpeg"
-        ),
-    )
+    with django_assert_num_queries(2):
+        wine_image = wine_image_factory(
+            user=user,
+            wine=wine,
+            image=SimpleUploadedFile(
+                "no_exif.jpg", _half_split_jpeg(), content_type="image/jpeg"
+            ),
+        )
     thumb = Image.open(wine_image.thumbnail.path)
     assert thumb.size == (40, 20)
     assert thumb.getpixel((2, 2)) == (254, 0, 0)  # still red on the left
@@ -169,7 +178,11 @@ def test_make_thumbnail_no_exif_falls_back(
 
 @pytest.mark.django_db
 def test_make_thumbnail_corrupt_exif_falls_back(
-    clear_image_folder, user, wine_factory, wine_image_factory
+    clear_image_folder,
+    user,
+    wine_factory,
+    wine_image_factory,
+    django_assert_num_queries,
 ):
     """A real-world quirk (truncated file, unsupported backend, ...) can
     make `Image._getexif()` itself raise - the `except (AttributeError,
@@ -177,13 +190,14 @@ def test_make_thumbnail_corrupt_exif_falls_back(
     thumbnail instead of propagating the error to the caller."""
     wine = wine_factory(user=user)
     with patch.object(JpegImageFile, "_getexif", side_effect=AttributeError):
-        wine_image = wine_image_factory(
-            user=user,
-            wine=wine,
-            image=SimpleUploadedFile(
-                "corrupt_exif.jpg", _half_split_jpeg(), content_type="image/jpeg"
-            ),
-        )
+        with django_assert_num_queries(2):
+            wine_image = wine_image_factory(
+                user=user,
+                wine=wine,
+                image=SimpleUploadedFile(
+                    "corrupt_exif.jpg", _half_split_jpeg(), content_type="image/jpeg"
+                ),
+            )
     thumb = Image.open(wine_image.thumbnail.path)
     assert thumb.size == (40, 20)
     assert thumb.getpixel((2, 2)) == (254, 0, 0)
@@ -206,6 +220,7 @@ def test_make_thumbnail_rotates_by_exif_orientation(
     user,
     wine_factory,
     wine_image_factory,
+    django_assert_num_queries,
     orientation,
     expected_size,
     top_left,
@@ -216,15 +231,16 @@ def test_make_thumbnail_rotates_by_exif_orientation(
     """Phone photos routinely carry an EXIF orientation tag - the thumbnail
     must be rotated to match, not saved sideways/upside-down."""
     wine = wine_factory(user=user)
-    wine_image = wine_image_factory(
-        user=user,
-        wine=wine,
-        image=SimpleUploadedFile(
-            f"exif_{orientation}.jpg",
-            _half_split_jpeg(orientation),
-            content_type="image/jpeg",
-        ),
-    )
+    with django_assert_num_queries(2):
+        wine_image = wine_image_factory(
+            user=user,
+            wine=wine,
+            image=SimpleUploadedFile(
+                f"exif_{orientation}.jpg",
+                _half_split_jpeg(orientation),
+                content_type="image/jpeg",
+            ),
+        )
     thumb = Image.open(wine_image.thumbnail.path)
     assert thumb.size == expected_size
     w, h = thumb.size

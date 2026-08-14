@@ -503,7 +503,7 @@ class StorageItemOpenView(FormView):
             self.object.opened = True
             self.object.opened_note = note
             if form.cleaned_data.get("drink_in_days"):
-                self.object.drink_by = timezone.now().date() + timedelta(
+                self.object.drink_by = timezone.localdate() + timedelta(
                     days=form.cleaned_data["drink_in_days"]
                 )
             self.object.save(update_fields=["opened", "opened_note", "drink_by"])

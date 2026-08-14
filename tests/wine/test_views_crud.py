@@ -13,18 +13,24 @@ from wine_cellar.apps.wine.models import Size, Wine
 
 
 @pytest.mark.django_db
-def test_wine_detail_authenticated(client, user, wine_factory):
+def test_wine_detail_authenticated(
+    client, user, wine_factory, django_assert_num_queries
+):
     wine = wine_factory(user=user)
     client.force_login(user)
-    r = client.get(reverse("wine-detail", kwargs={"pk": wine.pk}))
+    with django_assert_num_queries(19):
+        r = client.get(reverse("wine-detail", kwargs={"pk": wine.pk}))
     assert r.status_code == HTTPStatus.OK
     assertTemplateUsed(response=r, template_name="wine_detail.html")
 
 
 @pytest.mark.django_db
-def test_wine_detail_unauthenticated(client, user, wine_factory):
+def test_wine_detail_unauthenticated(
+    client, user, wine_factory, django_assert_num_queries
+):
     wine = wine_factory(user=user)
-    r = client.get(reverse("wine-detail", kwargs={"pk": wine.pk}), follow=True)
+    with django_assert_num_queries(1):
+        r = client.get(reverse("wine-detail", kwargs={"pk": wine.pk}), follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(
         response=r,
@@ -35,40 +41,47 @@ def test_wine_detail_unauthenticated(client, user, wine_factory):
 
 
 @pytest.mark.django_db
-def test_wine_detail_other_user_returns_404(client, user, user_factory, wine_factory):
+def test_wine_detail_other_user_returns_404(
+    client, user, user_factory, wine_factory, django_assert_num_queries
+):
     other_user = user_factory()
     wine = wine_factory(user=other_user)
     client.force_login(user)
-    r = client.get(reverse("wine-detail", kwargs={"pk": wine.pk}))
+    with django_assert_num_queries(3):
+        r = client.get(reverse("wine-detail", kwargs={"pk": wine.pk}))
     assert r.status_code == HTTPStatus.NOT_FOUND
 
 
 @pytest.mark.django_db
 def test_wine_detail_with_location_renders_map_tag(
-    client, user, wine_factory, geojson_point_dict
+    client, user, wine_factory, geojson_point_dict, django_assert_num_queries
 ):
     """`{% react_detail_map wine %}` is only rendered when `wine.location`
     is set - assert that branch actually runs, not just the no-location
     default path every other detail-view test exercises."""
     wine = wine_factory(user=user, location=geojson_point_dict)
     client.force_login(user)
-    r = client.get(reverse("wine-detail", kwargs={"pk": wine.pk}))
+    with django_assert_num_queries(20):
+        r = client.get(reverse("wine-detail", kwargs={"pk": wine.pk}))
     assert r.status_code == HTTPStatus.OK
     assert 'id="wine_map"' in r.content.decode()
 
 
 @pytest.mark.django_db
-def test_wine_update_other_user_returns_404(client, user, user_factory, wine_factory):
+def test_wine_update_other_user_returns_404(
+    client, user, user_factory, wine_factory, django_assert_num_queries
+):
     other_user = user_factory()
     wine = wine_factory(user=other_user)
     client.force_login(user)
-    r = client.get(reverse("wine-edit", kwargs={"pk": wine.pk}))
+    with django_assert_num_queries(3):
+        r = client.get(reverse("wine-edit", kwargs={"pk": wine.pk}))
     assert r.status_code == HTTPStatus.NOT_FOUND
 
 
 @pytest.mark.django_db
 def test_wine_update_post_other_user_returns_404(
-    client, user, user_factory, wine_factory
+    client, user, user_factory, wine_factory, django_assert_num_queries
 ):
     other_user = user_factory()
     wine = wine_factory(user=other_user)
@@ -83,21 +96,25 @@ def test_wine_update_post_other_user_returns_404(
         "vintage": 2002,
         "country": "DE",
     }
-    r = client.post(reverse("wine-edit", kwargs={"pk": wine.pk}), data)
+    with django_assert_num_queries(3):
+        r = client.post(reverse("wine-edit", kwargs={"pk": wine.pk}), data)
     assert r.status_code == HTTPStatus.NOT_FOUND
     wine.refresh_from_db()
     assert wine.name != "Hacked"
 
 
 @pytest.mark.django_db
-def test_wine_update_nonexistent_pk_returns_404(client, user):
+def test_wine_update_nonexistent_pk_returns_404(
+    client, user, django_assert_num_queries
+):
     client.force_login(user)
-    r = client.get(reverse("wine-edit", kwargs={"pk": 999999}))
+    with django_assert_num_queries(3):
+        r = client.get(reverse("wine-edit", kwargs={"pk": 999999}))
     assert r.status_code == HTTPStatus.NOT_FOUND
 
 
 @pytest.mark.django_db
-def test_wine_update_duplicate(client, user, wine_factory):
+def test_wine_update_duplicate(client, user, wine_factory, django_assert_num_queries):
     size = Size.objects.get(name=0.75)
     wine1 = wine_factory(
         user=user,
@@ -127,7 +144,8 @@ def test_wine_update_duplicate(client, user, wine_factory):
         "vintage": wine1.vintage,
         "country": wine1.country,
     }
-    r = client.post(reverse("wine-edit", kwargs={"pk": wine2.pk}), data)
+    with django_assert_num_queries(27):
+        r = client.post(reverse("wine-edit", kwargs={"pk": wine2.pk}), data)
     assert r.status_code == HTTPStatus.OK
     assert r.context_data["form"].errors
     wine2.refresh_from_db()
@@ -144,6 +162,7 @@ def test_wine_update_valid_fields(
     source_factory,
     attribute_factory,
     vineyard_factory,
+    django_assert_num_queries,
 ):
     grape1 = grape_factory()
     grape_factory()
@@ -167,7 +186,8 @@ def test_wine_update_valid_fields(
         "attributes": attribute.pk,
         "country": "DE",
     }
-    r = client.post(reverse("wine-edit", kwargs={"pk": wine.pk}), data, follow=True)
+    with django_assert_num_queries(58):
+        r = client.post(reverse("wine-edit", kwargs={"pk": wine.pk}), data, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(
         response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
@@ -192,20 +212,24 @@ def test_wine_update_valid_fields(
 
 
 @pytest.mark.django_db
-def test_wine_delete(client, user, wine_factory):
+def test_wine_delete(client, user, wine_factory, django_assert_num_queries):
     wine = wine_factory(user=user)
     client.force_login(user)
-    r = client.post(reverse("wine-delete", kwargs={"pk": wine.pk}), follow=True)
+    with django_assert_num_queries(34):
+        r = client.post(reverse("wine-delete", kwargs={"pk": wine.pk}), follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
     assert not Wine.objects.exists()
 
 
 @pytest.mark.django_db
-def test_wine_delete_logs_removed_event(client, user, wine_factory):
+def test_wine_delete_logs_removed_event(
+    client, user, wine_factory, django_assert_num_queries
+):
     wine = wine_factory(user=user)
     client.force_login(user)
-    client.post(reverse("wine-delete", kwargs={"pk": wine.pk}))
+    with django_assert_num_queries(17):
+        client.post(reverse("wine-delete", kwargs={"pk": wine.pk}))
     event = StorageItemEvent.objects.get(event_type=StorageItemEventType.WINE_REMOVED)
     assert event.wine_name == wine.name
     # The wine itself is gone, so its FK is nulled out - only the name lives on.
@@ -214,18 +238,22 @@ def test_wine_delete_logs_removed_event(client, user, wine_factory):
 
 @pytest.mark.django_db
 def test_wine_delete_preserves_bottle_history(
-    client, user, wine_factory, storage_item_factory
+    client, user, wine_factory, storage_item_factory, django_assert_num_queries
 ):
     """A bottle's history must survive the cascade delete of its wine."""
     wine = wine_factory(user=user, name="Chablis 2019")
     item = storage_item_factory(storage__user=user, wine=wine, user=user)
     client.force_login(user)
-    client.post(reverse("stock-open", kwargs={"pk": item.pk}), data={"note": "party"})
+    with django_assert_num_queries(8):
+        client.post(
+            reverse("stock-open", kwargs={"pk": item.pk}), data={"note": "party"}
+        )
 
     events_before = StorageItemEvent.objects.filter(wine_name=wine.name).count()
     assert events_before == 1  # the OPENED event
 
-    client.post(reverse("wine-delete", kwargs={"pk": wine.pk}))
+    with django_assert_num_queries(20):
+        client.post(reverse("wine-delete", kwargs={"pk": wine.pk}))
 
     assert not Wine.objects.exists()
     assert not StorageItem.objects.exists()
@@ -244,7 +272,7 @@ def test_wine_delete_preserves_bottle_history(
 
 @pytest.mark.django_db
 def test_wine_delete_logs_removed_event_for_active_bottles(
-    client, user, wine_factory, storage_item_factory
+    client, user, wine_factory, storage_item_factory, django_assert_num_queries
 ):
     """Every still-active bottle gets its own REMOVED event on wine delete."""
     wine = wine_factory(user=user)
@@ -262,7 +290,8 @@ def test_wine_delete_logs_removed_event_for_active_bottles(
     )
     client.force_login(user)
 
-    client.post(reverse("wine-delete", kwargs={"pk": wine.pk}))
+    with django_assert_num_queries(20):
+        client.post(reverse("wine-delete", kwargs={"pk": wine.pk}))
 
     removed_events = StorageItemEvent.objects.filter(
         wine_name=wine.name, event_type=StorageItemEventType.REMOVED
@@ -278,10 +307,13 @@ def test_wine_delete_logs_removed_event_for_active_bottles(
 
 
 @pytest.mark.django_db
-def test_wine_delete_other_user_returns_404(client, user, user_factory, wine_factory):
+def test_wine_delete_other_user_returns_404(
+    client, user, user_factory, wine_factory, django_assert_num_queries
+):
     other_user = user_factory()
     wine = wine_factory(user=other_user)
     client.force_login(user)
-    r = client.post(reverse("wine-delete", kwargs={"pk": wine.pk}))
+    with django_assert_num_queries(3):
+        r = client.post(reverse("wine-delete", kwargs={"pk": wine.pk}))
     assert r.status_code == HTTPStatus.NOT_FOUND
     assert Wine.objects.count() == 1
