@@ -116,7 +116,7 @@ def test_wine_create_post_with_barcode(client, user, django_assert_num_queries):
     r = client.get(reverse("wine-add") + f"?prefill_token={token}")
     initial = r.context_data["form"].initial.copy()
     initial.update(data)
-    with django_assert_num_queries(32):
+    with django_assert_num_queries(20):
         r = client.post(reverse("wine-add"), data=initial, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
@@ -153,7 +153,7 @@ def test_wine_create_post_with_drink_by(client, user, django_assert_num_queries)
     r = client.get(reverse("wine-add") + f"?prefill_token={token}")
     initial = r.context_data["form"].initial.copy()
     initial.update(data)
-    with django_assert_num_queries(32):
+    with django_assert_num_queries(20):
         r = client.post(reverse("wine-add"), data=initial, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
@@ -279,7 +279,7 @@ def test_wine_create_post_with_steps(
     # post form step 5
     initial = r.context_data["form"].data.copy()
     assert initial["form_step"] == 5
-    with django_assert_num_queries(41):
+    with django_assert_num_queries(28):
         r = client.post(reverse("wine-add"), data=initial, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
@@ -343,7 +343,7 @@ def test_wine_create_post_valid(client, user, django_assert_num_queries):
         "country": "DE",
     }
     assert not Wine.objects.exists()
-    with django_assert_num_queries(32):
+    with django_assert_num_queries(20):
         r = client.post(reverse("wine-add"), data, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
@@ -381,7 +381,7 @@ def test_wine_create_save_finish_commits_early(client, user, django_assert_num_q
         "save_finish": "1",
     }
     assert not Wine.objects.exists()
-    with django_assert_num_queries(32):
+    with django_assert_num_queries(20):
         r = client.post(reverse("wine-add"), data, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
@@ -404,7 +404,7 @@ def test_wine_update_does_not_log_wine_added(
         "size": Size.objects.get(name=0.75).pk,
         "country": wine.country,
     }
-    with django_assert_num_queries(43):
+    with django_assert_num_queries(34):
         client.post(reverse("wine-edit", kwargs={"pk": wine.pk}), data, follow=True)
     assert not StorageItemEvent.objects.filter(
         event_type=StorageItemEventType.WINE_ADDED
@@ -430,7 +430,7 @@ def test_wine_create_post_single_grape_valid(
         "country": "DE",
     }
     assert not Wine.objects.exists()
-    with django_assert_num_queries(37):
+    with django_assert_num_queries(23):
         r = client.post(reverse("wine-add"), data, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
@@ -466,7 +466,7 @@ def test_wine_create_post_multiple_grape_valid(
         "country": "DE",
     }
     assert not Wine.objects.exists()
-    with django_assert_num_queries(37):
+    with django_assert_num_queries(23):
         r = client.post(reverse("wine-add"), data, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
@@ -500,7 +500,7 @@ def test_wine_create_post_new_grape_valid(
         "country": "DE",
     }
     assert not Wine.objects.exists()
-    with django_assert_num_queries(40):
+    with django_assert_num_queries(26):
         r = client.post(reverse("wine-add"), data, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
@@ -582,7 +582,7 @@ def test_wine_create_post_new_grape_multiple_valid(
         "country": "DE",
     }
     assert not Wine.objects.exists()
-    with django_assert_num_queries(41):
+    with django_assert_num_queries(27):
         r = client.post(reverse("wine-add"), data, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
@@ -634,7 +634,7 @@ def test_wine_create_post_all_valid_fields(
         "country": "DE",
     }
     assert not Wine.objects.exists()
-    with django_assert_num_queries(53):
+    with django_assert_num_queries(35):
         r = client.post(reverse("wine-add"), data, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
@@ -770,7 +770,7 @@ def test_wine_edit_replace_front_image(
         "size": size.pk,
     }
 
-    with django_assert_num_queries(51):
+    with django_assert_num_queries(40):
         r = client.post(
             reverse("wine-edit", kwargs={"pk": wine.pk}),
             {**base_data, "image_front": random_png("front1.png")},
@@ -782,7 +782,7 @@ def test_wine_edit_replace_front_image(
     )
     assert WineImage.objects.filter(wine=wine, image_type=ImageType.FRONT).count() == 1
 
-    with django_assert_num_queries(54):
+    with django_assert_num_queries(40):
         r = client.post(
             reverse("wine-edit", kwargs={"pk": wine.pk}),
             {**base_data, "image_front": random_png("front2.png")},
@@ -811,7 +811,7 @@ def test_wine_edit_overwrite_front_and_back_with_newer_images(
         "size": size.pk,
     }
 
-    with django_assert_num_queries(57):
+    with django_assert_num_queries(46):
         r = client.post(
             reverse("wine-edit", kwargs={"pk": wine.pk}),
             {
@@ -825,7 +825,7 @@ def test_wine_edit_overwrite_front_and_back_with_newer_images(
     assert WineImage.objects.filter(wine=wine, image_type=ImageType.FRONT).count() == 1
     assert WineImage.objects.filter(wine=wine, image_type=ImageType.BACK).count() == 1
 
-    with django_assert_num_queries(64):
+    with django_assert_num_queries(47):
         r = client.post(
             reverse("wine-edit", kwargs={"pk": wine.pk}),
             {
@@ -894,7 +894,7 @@ def test_wine_create_overwriting_ai_stashed_images_with_newer_ones(
             "image_back": random_png("newer_back.png"),
         }
     )
-    with django_assert_num_queries(45):
+    with django_assert_num_queries(32):
         r = client.post(reverse("wine-add"), data=initial, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
@@ -951,7 +951,7 @@ def test_wine_create_uses_ai_uploaded_front_image(
             "form_step": 5,
         }
     )
-    with django_assert_num_queries(39):
+    with django_assert_num_queries(26):
         r = client.post(reverse("wine-add"), data=initial, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
@@ -1009,7 +1009,7 @@ def test_wine_create_other_users_prefill_token_not_deleted_on_save(
         "form_step": 5,
         "prefill_token": token,
     }
-    with django_assert_num_queries(32):
+    with django_assert_num_queries(20):
         r = client.post(reverse("wine-add"), data=data, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
@@ -1051,7 +1051,7 @@ def test_wine_create_explicit_image_overrides_ai_stashed_image(
             "image_front": random_png("manual_front.png"),
         }
     )
-    with django_assert_num_queries(39):
+    with django_assert_num_queries(26):
         r = client.post(reverse("wine-add"), data=initial, follow=True)
     assert r.status_code == HTTPStatus.OK
     wine = Wine.objects.first()
@@ -1135,7 +1135,7 @@ def test_wine_create_clearing_ai_stashed_image_discards_it(
             "image_front-clear": "on",
         }
     )
-    with django_assert_num_queries(33):
+    with django_assert_num_queries(21):
         r = client.post(reverse("wine-add"), data=initial, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))

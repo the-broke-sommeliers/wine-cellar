@@ -216,16 +216,15 @@ class WineForm(TomSelectMixin, WineFormPostCleanMixin, forms.Form):
         if not wine_id:
             return
 
-        for field_name, image_type in image_fields_map.items():
+        # One query for all four image types instead of one filter().first()
+        # per type - setdefault keeps only the first (most recent, since
+        # ordered by -id) row per type, matching the old per-type .first().
+        images_by_type = {}
+        for image in WineImage.objects.filter(wine=wine_id).order_by("-id"):
+            images_by_type.setdefault(image.image_type, image)
 
-            image = (
-                WineImage.objects.filter(
-                    wine=wine_id,
-                    image_type=image_type,
-                )
-                .order_by("-id")
-                .first()
-            )
+        for field_name, image_type in image_fields_map.items():
+            image = images_by_type.get(image_type)
 
             if image:
                 self.initial[field_name] = image.thumbnail

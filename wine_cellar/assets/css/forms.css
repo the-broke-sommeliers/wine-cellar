@@ -173,7 +173,6 @@ p.form-hint {
   padding-left: 1rem;
 }
 
-.filter-form--lg,
 .filter-form {
   background: white;
   border-radius: var(--border-radius);
@@ -210,27 +209,19 @@ p.form-hint {
   }
 }
 
-.filter-form--lg {
-  display: none;
-}
-
 .filter-form__sm-container {
-  details > summary {
-    list-style: none;
+  .filter-form__header-toggle {
+    display: block;
   }
 
-  summary::-webkit-details-marker {
-    display: none;
-  }
-
-  summary::before {
+  .filter-form__header-toggle::before {
     content: "  +";
     font-size: 27px;
     font-weight: 400;
     vertical-align: text-bottom;
   }
 
-  details[open] summary:before {
+  .filter-toggle-checkbox:checked ~ .filter-form__header-toggle::before {
     content: "  –";
     font-size: 27px;
     font-weight: 400;
@@ -243,14 +234,34 @@ p.form-hint {
     display: inline;
     margin: 0;
   }
+
+  .filter-toggle-content {
+    display: none;
+  }
+
+  .filter-toggle-checkbox:checked ~ .filter-toggle-content {
+    display: block;
+  }
 }
 
 @media screen and (min-width: 35.5em) {
-  .filter-form--lg {
-    display: block;
-  }
+  /* Same markup as the mobile toggle, kept permanently expanded with its
+     disclosure affordance neutralized (heading text stays, +/- indicator
+     and click-to-toggle don't) - avoids rendering (and querying) the
+     filter form twice for what's otherwise identical content. */
   .filter-form__sm-container {
-    display: none;
+    .filter-form__header-toggle {
+      cursor: default;
+      pointer-events: none;
+    }
+
+    .filter-form__header-toggle::before {
+      content: none;
+    }
+
+    .filter-toggle-content {
+      display: block;
+    }
   }
 }
 

@@ -14,7 +14,7 @@ def test_wine_scanned_existing(
 ):
     wine = wine_factory(user=user, country="DE", barcode="12345")
     client.force_login(user)
-    with django_assert_num_queries(22):
+    with django_assert_num_queries(17):
         r = client.get(
             reverse("wine-scan", kwargs={"barcode": wine.barcode}), follow=True
         )
@@ -57,7 +57,7 @@ def test_wine_filter_in_stock(
         deleted=True,
     )
     client.force_login(user)
-    with django_assert_num_queries(30):
+    with django_assert_num_queries(13):
         r = client.get(reverse("wine-list"))
     assert r.status_code == HTTPStatus.OK
     assertTemplateUsed(response=r, template_name="base.html")
@@ -67,7 +67,7 @@ def test_wine_filter_in_stock(
         wine_not_in_stock,
         wine_was_in_stock,
     }
-    with django_assert_num_queries(22):
+    with django_assert_num_queries(13):
         r = client.get(reverse("wine-list") + "?stock=1")
     assert r.status_code == HTTPStatus.OK
     assertTemplateUsed(response=r, template_name="base.html")
@@ -76,7 +76,7 @@ def test_wine_filter_in_stock(
 
     # Any non-"1" value (django-filter still invokes the method since the
     # value itself isn't empty) leaves the queryset unfiltered.
-    with django_assert_num_queries(30):
+    with django_assert_num_queries(13):
         r = client.get(reverse("wine-list") + "?stock=0")
     assert r.status_code == HTTPStatus.OK
     assert set(r.context_data["wines"]) == {
@@ -107,7 +107,7 @@ def test_wine_filter_price(
         deleted=True,
     )
     client.force_login(user)
-    with django_assert_num_queries(42):
+    with django_assert_num_queries(13):
         r = client.get(reverse("wine-list") + "?order=-effective_price", follow=True)
     assert r.status_code == HTTPStatus.OK
     assertTemplateUsed(response=r, template_name="base.html")
@@ -120,7 +120,7 @@ def test_wine_filter_price(
         wine_in_stock_cheap,
         wine_no_price,
     ]
-    with django_assert_num_queries(42):
+    with django_assert_num_queries(13):
         r = client.get(reverse("wine-list") + "?order=effective_price", follow=True)
     assert r.status_code == HTTPStatus.OK
     assertTemplateUsed(response=r, template_name="base.html")
@@ -142,7 +142,7 @@ def test_wine_filter_by_wine_type(
     wine_red = wine_factory(user=user, wine_type="RE", name="Red Wine")
     wine_white = wine_factory(user=user, wine_type="WH", name="White Wine")
     client.force_login(user)
-    with django_assert_num_queries(22):
+    with django_assert_num_queries(13):
         r = client.get(reverse("wine-list") + "?wine_type=RE")
     assert r.status_code == HTTPStatus.OK
     wines = list(r.context_data["wines"])
@@ -155,7 +155,7 @@ def test_wine_filter_by_country(client, user, wine_factory, django_assert_num_qu
     wine_de = wine_factory(user=user, country="DE", name="German Wine")
     wine_fr = wine_factory(user=user, country="FR", name="French Wine")
     client.force_login(user)
-    with django_assert_num_queries(22):
+    with django_assert_num_queries(13):
         r = client.get(reverse("wine-list") + "?country=DE")
     assert r.status_code == HTTPStatus.OK
     wines = list(r.context_data["wines"])
@@ -168,7 +168,7 @@ def test_wine_filter_by_name(client, user, wine_factory, django_assert_num_queri
     wine_merlot = wine_factory(user=user, name="Grand Merlot Reserve")
     wine_other = wine_factory(user=user, name="Chardonnay")
     client.force_login(user)
-    with django_assert_num_queries(22):
+    with django_assert_num_queries(13):
         r = client.get(reverse("wine-list") + "?name=merlot")
     assert r.status_code == HTTPStatus.OK
     wines = list(r.context_data["wines"])
@@ -193,7 +193,7 @@ def test_wine_filter_by_storage(
     storage_item_factory(storage=storage_a, wine=wine_in_a)
     storage_item_factory(storage=storage_b, wine=wine_in_b)
     client.force_login(user)
-    with django_assert_num_queries(23):
+    with django_assert_num_queries(14):
         r = client.get(reverse("wine-list") + f"?storage={storage_a.pk}")
     assert r.status_code == HTTPStatus.OK
     wines = list(r.context_data["wines"])
@@ -215,7 +215,7 @@ def test_wine_filter_by_storage_ignores_deleted_items(
     wine_removed = wine_factory(user=user, name="Removed Wine")
     storage_item_factory(storage=storage, wine=wine_removed, deleted=True)
     client.force_login(user)
-    with django_assert_num_queries(18):
+    with django_assert_num_queries(11):
         r = client.get(reverse("wine-list") + f"?storage={storage.pk}")
     assert r.status_code == HTTPStatus.OK
     assert wine_removed not in list(r.context_data["wines"])
@@ -228,7 +228,7 @@ def test_wine_filter_storage_options_scoped_to_user(
     own_storage = storage_factory(user=user)
     other_storage = storage_factory(user=user_factory())
     client.force_login(user)
-    with django_assert_num_queries(15):
+    with django_assert_num_queries(9):
         r = client.get(reverse("wine-list"))
     assert r.status_code == HTTPStatus.OK
     storage_options = r.context_data["filter"].form.fields["storage"].queryset
@@ -241,7 +241,7 @@ def test_wine_filter_by_vintage(client, user, wine_factory, django_assert_num_qu
     wine_2020 = wine_factory(user=user, vintage=2020, name="Vintage 2020")
     wine_2019 = wine_factory(user=user, vintage=2019, name="Vintage 2019")
     client.force_login(user)
-    with django_assert_num_queries(22):
+    with django_assert_num_queries(13):
         r = client.get(reverse("wine-list") + "?vintage=2020")
     assert r.status_code == HTTPStatus.OK
     wines = list(r.context_data["wines"])

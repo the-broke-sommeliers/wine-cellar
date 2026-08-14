@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
 from django.core.files.base import ContentFile
 from django.db import IntegrityError, connections, transaction
-from django.db.models import Avg, F, Q, Sum
+from django.db.models import Avg, Count, F, Prefetch, Q, Sum
 from django.db.models.functions import Coalesce
 from django.forms import model_to_dict
 from django.http import JsonResponse
@@ -30,7 +30,7 @@ from wine_cellar.apps.wine.forms import (
     WineUploadAIForm,
     image_fields_map,
 )
-from wine_cellar.apps.wine.models import Wine, WineImage
+from wine_cellar.apps.wine.models import ImageType, Wine, WineImage
 from wine_cellar.apps.wine.serializers import WineAiSerializer
 from wine_cellar.apps.wine.tasks import process_ai_wine_upload
 from wine_cellar.apps.wine.utils import WINE_PREFILL_TIMEOUT, wine_prefill_cache
@@ -168,22 +168,32 @@ class WineBaseView(OpenChoiceModelFormViewMixin, FormView):
             cleaned_data["appellation"][0] if cleaned_data["appellation"] else None
         )
         wine.user = user
+        is_new = wine.pk is None
         wine.save()
 
         for field in ["vineyard", "grapes", "food_pairings", "attributes", "source"]:
-            getattr(wine, field).set(cleaned_data[field])
+            related_manager = getattr(wine, field)
+            if is_new:
+                # A brand-new wine has no existing relations yet, so .set()'s
+                # mandatory "fetch old ids" diff query would always come back
+                # empty - add() skips that query entirely.
+                if cleaned_data[field]:
+                    related_manager.add(*cleaned_data[field])
+            else:
+                related_manager.set(cleaned_data[field])
 
         for form_field, image_type in image_fields_map.items():
             image = cleaned_data.get(form_field)
-            existing = WineImage.objects.filter(
-                wine=wine, user=user, image_type=image_type
-            )
             if image is False or (image and not hasattr(image, "instance")):
-                if existing.exists():
-                    old = existing.first()
-                    old.image.delete()
-                    old.thumbnail.delete()
-                    existing.delete()
+                old = WineImage.objects.filter(
+                    wine=wine, user=user, image_type=image_type
+                ).first()
+                if old:
+                    # save=False: the row is deleted right below anyway, so
+                    # the model re-save that save=True would trigger is waste.
+                    old.image.delete(save=False)
+                    old.thumbnail.delete(save=False)
+                    old.delete()
             if image and not hasattr(image, "instance"):
                 WineImage.objects.get_or_create(
                     image=image, wine=wine, user=user, image_type=image_type
@@ -310,11 +320,19 @@ class WineUpdateView(WineBaseView):
     template_name = "wine_edit.html"
 
     def get_initial(self):
-        wine = get_object_or_404(Wine, pk=self.kwargs["pk"], user=self.request.user)
-        return {**super().get_initial(), **model_to_dict(wine)}
+        self._wine = get_object_or_404(
+            Wine, pk=self.kwargs["pk"], user=self.request.user
+        )
+        return {**super().get_initial(), **model_to_dict(self._wine)}
 
     def get_wine_instance(self):
-        return get_object_or_404(Wine, pk=self.kwargs["pk"], user=self.request.user)
+        # get_initial() runs earlier in the same request (get_form_kwargs()
+        # always calls it) and already fetched this exact row.
+        if not hasattr(self, "_wine"):
+            self._wine = get_object_or_404(
+                Wine, pk=self.kwargs["pk"], user=self.request.user
+            )
+        return self._wine
 
     def form_valid(self, form):
         wine = self.get_wine_instance()
@@ -335,7 +353,13 @@ class WineDetailView(DetailView):
     model = Wine
 
     def get_queryset(self):
-        qs = super().get_queryset()
+        qs = (
+            super()
+            .get_queryset()
+            .select_related(
+                "region", "appellation", "size", "user", "user__user_settings"
+            )
+        )
         return qs.filter(user=self.request.user)
 
 
@@ -352,7 +376,18 @@ class WineListView(FilterView):
             effective_price=Coalesce(
                 Avg("storageitem__price"),
                 F("price"),
-            )
+            ),
+            total_stock_count=Count(
+                "storageitem", filter=Q(storageitem__deleted=False)
+            ),
+        )
+        qs = qs.prefetch_related(
+            "grapes",
+            Prefetch(
+                "wineimage_set",
+                queryset=WineImage.objects.filter(image_type=ImageType.FRONT),
+                to_attr="_prefetched_front_images",
+            ),
         )
         return qs.filter(user=self.request.user)
 
