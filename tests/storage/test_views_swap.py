@@ -9,7 +9,12 @@ from wine_cellar.apps.storage.models import StorageItem
 
 @pytest.mark.django_db
 def test_stock_swap_success(
-    client, user, storage_factory, wine_factory, storage_item_factory
+    client,
+    user,
+    storage_factory,
+    wine_factory,
+    storage_item_factory,
+    django_assert_num_queries,
 ):
     client.force_login(user)
     storage = storage_factory(user=user, rows=2, columns=2)
@@ -22,7 +27,8 @@ def test_stock_swap_success(
         storage=storage, wine=wine2, row=1, column=2, user=user
     )
     data = {"item1": item1.pk, "item2": item2.pk}
-    r = client.post(reverse("stock-swap"), data=data)
+    with django_assert_num_queries(12):
+        r = client.post(reverse("stock-swap"), data=data)
     assert r.status_code == HTTPStatus.OK
     assert r.json() == {"ok": True}
     item1.refresh_from_db()
@@ -36,7 +42,12 @@ def test_stock_swap_success(
 
 @pytest.mark.django_db
 def test_stock_swap_cross_storage_rejected(
-    client, user, storage_factory, wine_factory, storage_item_factory
+    client,
+    user,
+    storage_factory,
+    wine_factory,
+    storage_item_factory,
+    django_assert_num_queries,
 ):
     client.force_login(user)
     storage1 = storage_factory(user=user, rows=2, columns=2)
@@ -49,14 +60,20 @@ def test_stock_swap_cross_storage_rejected(
         storage=storage2, wine=wine, row=2, column=2, user=user
     )
     data = {"item1": item1.pk, "item2": item2.pk}
-    r = client.post(reverse("stock-swap"), data=data)
+    with django_assert_num_queries(4):
+        r = client.post(reverse("stock-swap"), data=data)
     assert r.status_code == HTTPStatus.BAD_REQUEST
     assert r.json()["ok"] is False
 
 
 @pytest.mark.django_db
 def test_stock_swap_chain_shift_forward(
-    client, user, storage_factory, wine_factory, storage_item_factory
+    client,
+    user,
+    storage_factory,
+    wine_factory,
+    storage_item_factory,
+    django_assert_num_queries,
 ):
     """Non-adjacent forward: items between old and new shift backward, no gaps."""
     client.force_login(user)
@@ -68,10 +85,11 @@ def test_stock_swap_chain_shift_forward(
     c = storage_item_factory(storage=storage, wine=wine, row=1, column=3, user=user)
     d = storage_item_factory(storage=storage, wine=wine, row=1, column=4, user=user)
     # Move A from (1,1) to (1,4): B,C,D shift backward to fill gap
-    r = client.post(
-        reverse("stock-swap"),
-        data={"item1": a.pk, "item2": d.pk},
-    )
+    with django_assert_num_queries(14):
+        r = client.post(
+            reverse("stock-swap"),
+            data={"item1": a.pk, "item2": d.pk},
+        )
     assert r.status_code == HTTPStatus.OK
     a.refresh_from_db()
     b.refresh_from_db()
@@ -85,7 +103,12 @@ def test_stock_swap_chain_shift_forward(
 
 @pytest.mark.django_db
 def test_stock_swap_chain_shift_backward(
-    client, user, storage_factory, wine_factory, storage_item_factory
+    client,
+    user,
+    storage_factory,
+    wine_factory,
+    storage_item_factory,
+    django_assert_num_queries,
 ):
     """Non-adjacent backward: items between new and old shift forward, no gaps."""
     client.force_login(user)
@@ -97,10 +120,11 @@ def test_stock_swap_chain_shift_backward(
     c = storage_item_factory(storage=storage, wine=wine, row=1, column=3, user=user)
     d = storage_item_factory(storage=storage, wine=wine, row=1, column=4, user=user)
     # Move D from (1,4) to (1,1): A,B,C shift forward to fill gap at (1,4)
-    r = client.post(
-        reverse("stock-swap"),
-        data={"item1": d.pk, "item2": a.pk},
-    )
+    with django_assert_num_queries(14):
+        r = client.post(
+            reverse("stock-swap"),
+            data={"item1": d.pk, "item2": a.pk},
+        )
     assert r.status_code == HTTPStatus.OK
     a.refresh_from_db()
     b.refresh_from_db()
@@ -114,7 +138,12 @@ def test_stock_swap_chain_shift_backward(
 
 @pytest.mark.django_db
 def test_stock_move_to_empty_slot(
-    client, user, storage_factory, wine_factory, storage_item_factory
+    client,
+    user,
+    storage_factory,
+    wine_factory,
+    storage_item_factory,
+    django_assert_num_queries,
 ):
     """Dropping on an empty slot just moves the item, no shift."""
     client.force_login(user)
@@ -127,7 +156,8 @@ def test_stock_move_to_empty_slot(
         "row": 1,
         "column": 3,
     }
-    r = client.post(reverse("stock-swap"), data=data)
+    with django_assert_num_queries(11):
+        r = client.post(reverse("stock-swap"), data=data)
     assert r.status_code == HTTPStatus.OK
     item.refresh_from_db()
     assert item.row == 1
@@ -136,7 +166,12 @@ def test_stock_move_to_empty_slot(
 
 @pytest.mark.django_db
 def test_stock_move_to_empty_slot_cross_storage_rejected(
-    client, user, storage_factory, wine_factory, storage_item_factory
+    client,
+    user,
+    storage_factory,
+    wine_factory,
+    storage_item_factory,
+    django_assert_num_queries,
 ):
     """Dropping on an empty slot in another storage is rejected."""
     client.force_login(user)
@@ -150,13 +185,19 @@ def test_stock_move_to_empty_slot_cross_storage_rejected(
         "row": 1,
         "column": 2,
     }
-    r = client.post(reverse("stock-swap"), data=data)
+    with django_assert_num_queries(3):
+        r = client.post(reverse("stock-swap"), data=data)
     assert r.status_code == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.django_db
 def test_stock_move_to_occupied_slot_rejected(
-    client, user, storage_factory, wine_factory, storage_item_factory
+    client,
+    user,
+    storage_factory,
+    wine_factory,
+    storage_item_factory,
+    django_assert_num_queries,
 ):
     """Dropping on an occupied slot via empty-slot params is rejected."""
     client.force_login(user)
@@ -170,23 +211,33 @@ def test_stock_move_to_occupied_slot_rejected(
         "row": 1,
         "column": 2,
     }
-    r = client.post(reverse("stock-swap"), data=data)
+    with django_assert_num_queries(10):
+        r = client.post(reverse("stock-swap"), data=data)
     assert r.status_code == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.django_db
-def test_stock_swap_unauthenticated(client, storage_item_factory):
+def test_stock_swap_unauthenticated(
+    client, storage_item_factory, django_assert_num_queries
+):
     item1 = storage_item_factory()
     item2 = storage_item_factory()
     data = {"item1": item1.pk, "item2": item2.pk}
-    r = client.post(reverse("stock-swap"), data=data)
+    with django_assert_num_queries(0):
+        r = client.post(reverse("stock-swap"), data=data)
     assert r.status_code == HTTPStatus.FOUND
     assert r.url == reverse("account_login") + "?next=" + reverse("stock-swap")
 
 
 @pytest.mark.django_db
 def test_stock_swap_other_user(
-    client, user, user_factory, storage_factory, wine_factory, storage_item_factory
+    client,
+    user,
+    user_factory,
+    storage_factory,
+    wine_factory,
+    storage_item_factory,
+    django_assert_num_queries,
 ):
     other = user_factory()
     client.force_login(user)
@@ -199,13 +250,19 @@ def test_stock_swap_other_user(
         storage=storage, wine=wine, row=1, column=2, user=other
     )
     data = {"item1": item1.pk, "item2": item2.pk}
-    r = client.post(reverse("stock-swap"), data=data)
+    with django_assert_num_queries(3):
+        r = client.post(reverse("stock-swap"), data=data)
     assert r.status_code == HTTPStatus.NOT_FOUND
 
 
 @pytest.mark.django_db
 def test_stock_swap_deleted_item(
-    client, user, storage_factory, wine_factory, storage_item_factory
+    client,
+    user,
+    storage_factory,
+    wine_factory,
+    storage_item_factory,
+    django_assert_num_queries,
 ):
     client.force_login(user)
     storage = storage_factory(user=user, rows=2, columns=2)
@@ -215,22 +272,30 @@ def test_stock_swap_deleted_item(
     )
     item2 = storage_item_factory(storage=storage, wine=wine, row=1, column=2, user=user)
     data = {"item1": item1.pk, "item2": item2.pk}
-    r = client.post(reverse("stock-swap"), data=data)
+    with django_assert_num_queries(3):
+        r = client.post(reverse("stock-swap"), data=data)
     assert r.status_code == HTTPStatus.NOT_FOUND
 
 
 @pytest.mark.django_db
-def test_stock_swap_missing_params(client, user):
+def test_stock_swap_missing_params(client, user, django_assert_num_queries):
     client.force_login(user)
-    r = client.post(reverse("stock-swap"), data={})
+    with django_assert_num_queries(3):
+        r = client.post(reverse("stock-swap"), data={})
     assert r.status_code == HTTPStatus.NOT_FOUND
-    r = client.post(reverse("stock-swap"), data={"item1": 1})
+    with django_assert_num_queries(3):
+        r = client.post(reverse("stock-swap"), data={"item1": 1})
     assert r.status_code == HTTPStatus.NOT_FOUND
 
 
 @pytest.mark.django_db
 def test_stock_swap_source_deleted_mid_race_rejected(
-    client, user, storage_factory, wine_factory, storage_item_factory
+    client,
+    user,
+    storage_factory,
+    wine_factory,
+    storage_item_factory,
+    django_assert_num_queries,
 ):
     """Source is soft-deleted by another request between the initial fetch
     and the lock-then-recheck inside the transaction - must be rejected,
@@ -249,16 +314,22 @@ def test_stock_swap_source_deleted_mid_race_rejected(
             self.deleted = True
 
     with patch.object(StorageItem, "refresh_from_db", fake_refresh):
-        r = client.post(
-            reverse("stock-swap"), data={"item1": item1.pk, "item2": item2.pk}
-        )
+        with django_assert_num_queries(9):
+            r = client.post(
+                reverse("stock-swap"), data={"item1": item1.pk, "item2": item2.pk}
+            )
     assert r.status_code == HTTPStatus.BAD_REQUEST
     assert r.json() == {"ok": False, "error": "Slot is occupied."}
 
 
 @pytest.mark.django_db
 def test_stock_swap_target_deleted_mid_race_rejected(
-    client, user, storage_factory, wine_factory, storage_item_factory
+    client,
+    user,
+    storage_factory,
+    wine_factory,
+    storage_item_factory,
+    django_assert_num_queries,
 ):
     """Target is soft-deleted by another request between the initial fetch
     and the lock-then-recheck - must be rejected."""
@@ -276,16 +347,22 @@ def test_stock_swap_target_deleted_mid_race_rejected(
             self.deleted = True
 
     with patch.object(StorageItem, "refresh_from_db", fake_refresh):
-        r = client.post(
-            reverse("stock-swap"), data={"item1": item1.pk, "item2": item2.pk}
-        )
+        with django_assert_num_queries(10):
+            r = client.post(
+                reverse("stock-swap"), data={"item1": item1.pk, "item2": item2.pk}
+            )
     assert r.status_code == HTTPStatus.BAD_REQUEST
     assert r.json() == {"ok": False, "error": "Slot is occupied."}
 
 
 @pytest.mark.django_db
 def test_stock_swap_target_moved_storage_mid_race_rejected(
-    client, user, storage_factory, wine_factory, storage_item_factory
+    client,
+    user,
+    storage_factory,
+    wine_factory,
+    storage_item_factory,
+    django_assert_num_queries,
 ):
     """Target is moved to a different storage by another request between
     the initial fetch and the lock-then-recheck - must be rejected."""
@@ -304,16 +381,22 @@ def test_stock_swap_target_moved_storage_mid_race_rejected(
             self.storage_id = other_storage.pk
 
     with patch.object(StorageItem, "refresh_from_db", fake_refresh):
-        r = client.post(
-            reverse("stock-swap"), data={"item1": item1.pk, "item2": item2.pk}
-        )
+        with django_assert_num_queries(10):
+            r = client.post(
+                reverse("stock-swap"), data={"item1": item1.pk, "item2": item2.pk}
+            )
     assert r.status_code == HTTPStatus.BAD_REQUEST
     assert r.json() == {"ok": False, "error": "Slot is occupied."}
 
 
 @pytest.mark.django_db
 def test_stock_swap_unlimited_storage_defaults_to_zero_zero(
-    client, user, storage_factory, wine_factory, storage_item_factory
+    client,
+    user,
+    storage_factory,
+    wine_factory,
+    storage_item_factory,
+    django_assert_num_queries,
 ):
     """For an unlimited storage (columns=0), the empty-slot move path skips
     all bounds/occupancy validation entirely (it's gated behind
@@ -327,7 +410,8 @@ def test_stock_swap_unlimited_storage_defaults_to_zero_zero(
         storage=storage, wine=wine, row=None, column=None, user=user
     )
     data = {"item1": item.pk, "storage": storage.pk}
-    r = client.post(reverse("stock-swap"), data=data)
+    with django_assert_num_queries(10):
+        r = client.post(reverse("stock-swap"), data=data)
     assert r.status_code == HTTPStatus.OK
     item.refresh_from_db()
     assert (item.row, item.column) == (0, 0)
@@ -335,7 +419,12 @@ def test_stock_swap_unlimited_storage_defaults_to_zero_zero(
 
 @pytest.mark.django_db
 def test_stock_swap_out_of_bounds_slot_rejected(
-    client, user, storage_factory, wine_factory, storage_item_factory
+    client,
+    user,
+    storage_factory,
+    wine_factory,
+    storage_item_factory,
+    django_assert_num_queries,
 ):
     """Moving to an empty slot outside the grid's bounds is rejected."""
     client.force_login(user)
@@ -343,14 +432,20 @@ def test_stock_swap_out_of_bounds_slot_rejected(
     wine = wine_factory(user=user)
     item = storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
     data = {"item1": item.pk, "storage": storage.pk, "row": 99, "column": 1}
-    r = client.post(reverse("stock-swap"), data=data)
+    with django_assert_num_queries(4):
+        r = client.post(reverse("stock-swap"), data=data)
     assert r.status_code == HTTPStatus.BAD_REQUEST
     assert r.json() == {"ok": False, "error": "Invalid slot."}
 
 
 @pytest.mark.django_db
 def test_stock_swap_chain_shift_spans_multiple_rows(
-    client, user, storage_factory, wine_factory, storage_item_factory
+    client,
+    user,
+    storage_factory,
+    wine_factory,
+    storage_item_factory,
+    django_assert_num_queries,
 ):
     """Chain-shift where old and new positions are on different rows must
     use the multi-row range filter in `_shift_toward`, not just the
@@ -365,7 +460,8 @@ def test_stock_swap_chain_shift_spans_multiple_rows(
     d = storage_item_factory(storage=storage, wine=wine, row=2, column=2, user=user)
     # Move A to D's slot: B, C, D each shift back one slot (wrapping across
     # the row boundary) to fill the gap left by A.
-    r = client.post(reverse("stock-swap"), data={"item1": a.pk, "item2": d.pk})
+    with django_assert_num_queries(14):
+        r = client.post(reverse("stock-swap"), data={"item1": a.pk, "item2": d.pk})
     assert r.status_code == HTTPStatus.OK
     a.refresh_from_db()
     b.refresh_from_db()

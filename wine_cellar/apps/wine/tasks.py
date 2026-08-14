@@ -53,7 +53,7 @@ def drink_by_reminder():
         .exclude(email__exact="")
         .exclude(user_settings__notifications=False)
     )
-    date = timezone.now().date() + timedelta(days=14)
+    date = timezone.localdate() + timedelta(days=14)
     for user in users:
         wines = Wine.objects.filter(
             user=user, drink_by=date, storageitem__isnull=False
@@ -72,7 +72,7 @@ def opened_bottle_reminder():
         .exclude(email__exact="")
         .exclude(user_settings__notifications=False)
     )
-    today = timezone.now().date()
+    today = timezone.localdate()
     for user in users:
         items = (
             StorageItem.objects.filter(

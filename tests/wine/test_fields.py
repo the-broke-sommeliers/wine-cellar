@@ -32,37 +32,48 @@ def test_open_multiple_choice_required():
 
 
 @pytest.mark.django_db
-def test_open_multiple_choice_required_present(size_factory):
+def test_open_multiple_choice_required_present(size_factory, django_assert_num_queries):
     size = size_factory()
     form = CustomTestForm(data={"required_field": [size.pk]})
-    assert form.is_valid()
+    with django_assert_num_queries(1):
+        assert form.is_valid()
 
 
 @pytest.mark.django_db
-def test_open_multiple_choice_required_empty(size_factory):
+def test_open_multiple_choice_required_empty(size_factory, django_assert_num_queries):
     size_factory()
     form = CustomTestFormSlicedQs(data={"required_field": [""]})
-    assert not form.is_valid()
+    with django_assert_num_queries(0):
+        assert not form.is_valid()
 
 
 @pytest.mark.django_db
-def test_open_multiple_choice_non_required_empty(size_factory):
+def test_open_multiple_choice_non_required_empty(
+    size_factory, django_assert_num_queries
+):
     size = size_factory()
     form = CustomTestForm(
         data={"required_field": [size.pk], "non_required_field": [""]}
     )
-    assert form.is_valid()
+    with django_assert_num_queries(1):
+        assert form.is_valid()
 
 
 @pytest.mark.django_db
-def test_open_multiple_choice_incompatible_field_class(size_factory):
+def test_open_multiple_choice_incompatible_field_class(
+    size_factory, django_assert_num_queries
+):
     size_factory()
     form = CustomTestFormType(data={"required_field": ["tom_new_optaaa"]})
-    assert not form.is_valid()
+    with django_assert_num_queries(0):
+        assert not form.is_valid()
 
 
 @pytest.mark.django_db
-def test_open_multiple_choice_compatible_field_class(size_factory):
+def test_open_multiple_choice_compatible_field_class(
+    size_factory, django_assert_num_queries
+):
     size_factory()
     form = CustomTestFormType(data={"required_field": ["tom_new_opt1"]})
-    assert form.is_valid()
+    with django_assert_num_queries(0):
+        assert form.is_valid()

@@ -7,9 +7,10 @@ from pytest_django.asserts import assertRedirects, assertTemplateUsed
 
 
 @pytest.mark.django_db
-def test_user_settings_page(client, user):
+def test_user_settings_page(client, user, django_assert_num_queries):
     client.force_login(user)
-    r = client.get(reverse("user-settings"))
+    with django_assert_num_queries(3):
+        r = client.get(reverse("user-settings"))
     assert r.status_code == HTTPStatus.OK
     assertTemplateUsed(response=r, template_name="base.html")
     assertTemplateUsed(response=r, template_name="settings.html")
@@ -19,7 +20,8 @@ def test_user_settings_page(client, user):
         "currency": "EUR",
         "notifications": True,
     }
-    r = client.post(reverse("user-settings"), data, follow=True)
+    with django_assert_num_queries(7):
+        r = client.post(reverse("user-settings"), data, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("user-settings"))
     user_settings = user.user_settings
@@ -32,7 +34,8 @@ def test_user_settings_page(client, user):
         "currency": "EUR",
         "notifications": False,
     }
-    r = client.post(reverse("user-settings"), data, follow=True)
+    with django_assert_num_queries(7):
+        r = client.post(reverse("user-settings"), data, follow=True)
     assert r.status_code == HTTPStatus.OK
     user_settings.refresh_from_db()
     assert user_settings.language == "en-gb"
@@ -41,8 +44,9 @@ def test_user_settings_page(client, user):
 
 
 @pytest.mark.django_db
-def test_user_signup_disabled(client, user):
-    r = client.get(reverse("account_signup"))
+def test_user_signup_disabled(client, user, django_assert_num_queries):
+    with django_assert_num_queries(0):
+        r = client.get(reverse("account_signup"))
     assert r.status_code == HTTPStatus.OK
     assertTemplateUsed(response=r, template_name="base.html")
     assertTemplateUsed(response=r, template_name="account/signup_closed.html")
@@ -50,8 +54,9 @@ def test_user_signup_disabled(client, user):
 
 @override_settings(ENABLE_SIGNUPS=True)
 @pytest.mark.django_db
-def test_user_signup_enabled(client, user):
-    r = client.get(reverse("account_signup"))
+def test_user_signup_enabled(client, user, django_assert_num_queries):
+    with django_assert_num_queries(1):
+        r = client.get(reverse("account_signup"))
     assert r.status_code == HTTPStatus.OK
     assertTemplateUsed(response=r, template_name="base.html")
     assertTemplateUsed(response=r, template_name="account/signup.html")

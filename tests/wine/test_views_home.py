@@ -10,8 +10,9 @@ from pytest_django.asserts import (
 
 
 @pytest.mark.django_db
-def test_homepage_unauthenticated(client):
-    r = client.get(reverse("homepage"), follow=True)
+def test_homepage_unauthenticated(client, django_assert_num_queries):
+    with django_assert_num_queries(1):
+        r = client.get(reverse("homepage"), follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("account_login") + "?next=/")
     assertTemplateUsed(response=r, template_name="base.html")
@@ -19,9 +20,10 @@ def test_homepage_unauthenticated(client):
 
 
 @pytest.mark.django_db
-def test_homepage(client, user):
+def test_homepage(client, user, django_assert_num_queries):
     client.force_login(user)
-    r = client.get(reverse("homepage"), follow=True)
+    with django_assert_num_queries(9):
+        r = client.get(reverse("homepage"), follow=True)
     assert r.status_code == HTTPStatus.OK
     assertTemplateUsed(response=r, template_name="base.html")
     assertTemplateUsed(response=r, template_name="homepage.html")
@@ -29,25 +31,29 @@ def test_homepage(client, user):
 
 
 @pytest.mark.django_db
-def test_admin_link_hidden_from_regular_user(client, user):
+def test_admin_link_hidden_from_regular_user(client, user, django_assert_num_queries):
     client.force_login(user)
-    r = client.get(reverse("homepage"))
+    with django_assert_num_queries(9):
+        r = client.get(reverse("homepage"))
     assert r.status_code == HTTPStatus.OK
     assert reverse("admin:index") not in r.content.decode()
 
 
 @pytest.mark.django_db
-def test_admin_link_visible_to_staff_user(client, user):
+def test_admin_link_visible_to_staff_user(client, user, django_assert_num_queries):
     user.is_staff = True
     user.save(update_fields=["is_staff"])
     client.force_login(user)
-    r = client.get(reverse("homepage"))
+    with django_assert_num_queries(9):
+        r = client.get(reverse("homepage"))
     assert r.status_code == HTTPStatus.OK
     assert reverse("admin:index") in r.content.decode()
 
 
 @pytest.mark.django_db
-def test_homepage_stats(client, user, wine_factory, storage_item_factory):
+def test_homepage_stats(
+    client, user, wine_factory, storage_item_factory, django_assert_num_queries
+):
     wine = wine_factory(user=user, vintage=2020)
     storage = user.storage_set.first()
     wine_2 = wine_factory(user=user, country="DE", vintage=2023, price=15.00)
@@ -59,7 +65,8 @@ def test_homepage_stats(client, user, wine_factory, storage_item_factory):
     storage_item_factory(wine=wine_2, storage=storage, price=12.00)
     storage_item_factory(wine=wine_2, storage=storage)
     client.force_login(user)
-    r = client.get(reverse("homepage"), follow=True)
+    with django_assert_num_queries(10):
+        r = client.get(reverse("homepage"), follow=True)
     assert r.status_code == HTTPStatus.OK
     assertTemplateUsed(response=r, template_name="base.html")
     assertTemplateUsed(response=r, template_name="homepage.html")
