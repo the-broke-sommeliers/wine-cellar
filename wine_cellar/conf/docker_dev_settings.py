@@ -77,7 +77,7 @@ MAILERS = {
             "username": os.environ.get("DJANGO_EMAIL_USER"),
             "password": os.environ.get("DJANGO_EMAIL_PASSWORD"),
             # USE_TLS and USE_SSL are mutual exclusive
-            "use_tls": os.environ.get("DJANGO_EMAIL_USE_TLS", "True") == "True",
+            "use_tls": os.environ.get("DJANGO_EMAIL_USE_TLS", "False") == "True",
             "use_ssl": os.environ.get("DJANGO_EMAIL_USE_SSL", "False") == "True",
         },
     },
