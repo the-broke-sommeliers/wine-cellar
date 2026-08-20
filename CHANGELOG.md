@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.12.0-rc.0 (2026-08-20)
+
+### feat
+
+- migrate to Django 6.1
+
+
+### fix
+
+- some inefficient database queries
+
+
+
 ## 0.11.0 (2026-08-20)
 
 ### BREAKING CHANGE
