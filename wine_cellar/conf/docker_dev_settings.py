@@ -58,29 +58,27 @@ SOCIALACCOUNT_EMAIL_VERIFICATION = os.environ.get(
 )
 
 
-EMAIL_HOST = os.environ.get("DJANGO_EMAIL_HOST")
-EMAIL_PORT = os.environ.get("DJANGO_EMAIL_PORT")
-EMAIL_HOST_USER = os.environ.get("DJANGO_EMAIL_USER")
-EMAIL_HOST_PASSWORD = os.environ.get("DJANGO_EMAIL_PASSWORD")
-# USE_TLS and USE_SSL are mutual exclusive
-EMAIL_USE_TLS = os.environ.get("DJANGO_EMAIL_USE_TLS", "True") == "True"
-EMAIL_USE_SSL = os.environ.get("DJANGO_EMAIL_USE_SSL", "False") == "True"
 DEFAULT_FROM_EMAIL = os.environ.get("DJANGO_DEFAULT_FROM_EMAIL")
 
 MAILERS = {
     "default": {
         "BACKEND": (
             "django.core.mail.backends.smtp.EmailBackend"
-            if EMAIL_HOST
+            if os.environ.get("DJANGO_EMAIL_HOST")
             else "django.core.mail.backends.console.EmailBackend"
         ),
         "OPTIONS": {
-            "host": EMAIL_HOST,
-            "port": int(EMAIL_PORT) if EMAIL_PORT else None,
-            "username": EMAIL_HOST_USER,
-            "password": EMAIL_HOST_PASSWORD,
-            "use_tls": EMAIL_USE_TLS,
-            "use_ssl": EMAIL_USE_SSL,
+            "host": os.environ.get("DJANGO_EMAIL_HOST"),
+            "port": (
+                int(os.environ.get("DJANGO_EMAIL_PORT"))
+                if os.environ.get("DJANGO_EMAIL_PORT")
+                else None
+            ),
+            "username": os.environ.get("DJANGO_EMAIL_USER"),
+            "password": os.environ.get("DJANGO_EMAIL_PASSWORD"),
+            # USE_TLS and USE_SSL are mutual exclusive
+            "use_tls": os.environ.get("DJANGO_EMAIL_USE_TLS", "True") == "True",
+            "use_ssl": os.environ.get("DJANGO_EMAIL_USE_SSL", "False") == "True",
         },
     },
 }
