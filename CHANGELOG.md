@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.11.0 (2026-08-20)
+
+### BREAKING CHANGE
+
+- email verification for regular sign-ups defaults to
+    optional now. If you currently allow signups and want email verification
+    change it to `mandatory` in your `.env.prod`.
+
+
+### feat
+
+- expose more SSO allauth settings
+
+
+### fix
+
+- default email verification for regular sign-ups is now optional
+    
+    BREAKING CHANGE: email verification for regular sign-ups defaults to
+    optional now. If you currently allow signups and want email verification
+    change it to `mandatory` in your `.env.prod`.
+
+- **deps**: update dependency litellm to v1.96.0
+- **deps**: update dependency django to v6.1
+- reenable python 3.14 as litellm finally supports it
+
+
+
 ## 0.10.0 (2026-08-13)
 
 ### feat
