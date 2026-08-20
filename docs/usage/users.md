@@ -41,7 +41,7 @@ ENABLE_SIGNUPS = True
 Once enabled, a registration page will be available for new users to sign up without admin intervention.
 
 ???+ Info
-    Signups will require an email server to be configured, otherwise users won't be able to verify their email. In case your admin account
+    Signups will don't require email verification by default, however it's strongly adviced to make it mandatory. For that an email server needs to be configured, otherwise users won't be able to verify their email. In case your admin account
     doesn't have an email configured, add one first.
 
 ???+ Info
