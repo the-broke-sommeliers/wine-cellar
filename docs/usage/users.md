@@ -43,3 +43,6 @@ Once enabled, a registration page will be available for new users to sign up wit
 ???+ Info
     Signups will require an email server to be configured, otherwise users won't be able to verify their email. In case your admin account
     doesn't have an email configured, add one first.
+
+???+ Info
+    This setting only controls the regular email/password signup form. First-time signup via SSO is controlled separately by `ENABLE_SOCIAL_SIGNUPS` — see [SSO](../setup/sso.md#first-time-signup-via-sso).
