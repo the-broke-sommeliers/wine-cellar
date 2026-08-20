@@ -203,10 +203,19 @@ SITE_URL = "http://127.0.0.1:8003"
 ACCOUNT_ADAPTER = (
     "wine_cellar.apps.user.signup_adapter.ConfigurableSignupAccountAdapter"
 )
+SOCIALACCOUNT_ADAPTER = (
+    "wine_cellar.apps.user.signup_adapter.ConfigurableSignupSocialAccountAdapter"
+)
 
 ENABLE_SIGNUPS = False
+ENABLE_SOCIAL_SIGNUPS = True
 ACCOUNT_EMAIL_VERIFICATION = "optional"
 ACCOUNT_SIGNUP_FIELDS = ["email", "username*", "password1*", "password2*"]
+
+# See https://docs.allauth.org/en/latest/socialaccount/configuration.html
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = False
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = False
+SOCIALACCOUNT_EMAIL_VERIFICATION = "optional"
 
 SECURE_CSP = {
     "default-src": [CSP.SELF],

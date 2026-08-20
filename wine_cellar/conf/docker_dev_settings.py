@@ -34,11 +34,27 @@ STATIC_ROOT = "staticfiles"
 SITE_URL = os.environ.get("DJANGO_SITE_URL")
 
 ENABLE_SIGNUPS = os.environ.get("DJANGO_ENABLE_SIGNUPS", "False") == "True"
-ACCOUNT_EMAIL_VERIFICATION = "mandatory" if ENABLE_SIGNUPS else "optional"
+ACCOUNT_EMAIL_VERIFICATION = os.environ.get(
+    "DJANGO_ACCOUNT_EMAIL_VERIFICATION", "optional"
+)
 ACCOUNT_SIGNUP_FIELDS = (
     ["email*", "username*", "password1*", "password2*"]
     if ENABLE_SIGNUPS
     else ["email", "username*", "password1*", "password2*"]
+)
+
+ENABLE_SOCIAL_SIGNUPS = os.environ.get("DJANGO_ENABLE_SOCIAL_SIGNUPS", "True") == "True"
+
+# See https://docs.allauth.org/en/latest/socialaccount/configuration.html
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = (
+    os.environ.get("DJANGO_SOCIALACCOUNT_EMAIL_AUTHENTICATION", "False") == "True"
+)
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = (
+    os.environ.get("DJANGO_SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT", "False")
+    == "True"
+)
+SOCIALACCOUNT_EMAIL_VERIFICATION = os.environ.get(
+    "DJANGO_SOCIALACCOUNT_EMAIL_VERIFICATION", "optional"
 )
 
 
