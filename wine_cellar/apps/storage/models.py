@@ -2,7 +2,7 @@ from django.db import models
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
-from wine_cellar.apps.wine.models import UserContentModel, Wine
+from wine_cellar.apps.wine.models import UserContentModel, Vintage, Wine
 
 
 class StorageLabelAxis(models.TextChoices):
@@ -102,7 +102,7 @@ class Storage(UserContentModel):
     def get_wines(self):
         return (
             self.items.filter(deleted=False)
-            .select_related("wine")
+            .select_related("vintage__wine")
             .order_by("row", "column")
         )
 
@@ -125,7 +125,7 @@ class Storage(UserContentModel):
 
 class StorageItem(UserContentModel):
     storage = models.ForeignKey(Storage, on_delete=models.CASCADE, related_name="items")
-    wine = models.ForeignKey(Wine, on_delete=models.CASCADE)
+    vintage = models.ForeignKey(Vintage, on_delete=models.CASCADE)
     row = models.PositiveIntegerField(null=True, blank=True)
     column = models.PositiveIntegerField(null=True, blank=True)
     deleted = models.BooleanField(default=False)
@@ -155,6 +155,7 @@ class StorageItemEventType(models.TextChoices):
     UNDO_OPEN = "undo_open", _("Opening Undone")
     WINE_ADDED = "wine_added", _("Wine Added")
     WINE_REMOVED = "wine_removed", _("Wine Removed")
+    VINTAGE_REMOVED = "vintage_removed", _("Vintage Removed")
 
 
 class StorageItemEvent(UserContentModel):
@@ -172,7 +173,15 @@ class StorageItemEvent(UserContentModel):
         Wine, on_delete=models.SET_NULL, null=True, blank=True, related_name="events"
     )
     wine_name = models.CharField(max_length=100)
-    event_type = models.CharField(max_length=12, choices=StorageItemEventType.choices)
+    vintage = models.ForeignKey(
+        Vintage,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="events",
+    )
+    vintage_year = models.PositiveIntegerField(null=True, blank=True)
+    event_type = models.CharField(max_length=16, choices=StorageItemEventType.choices)
     note = models.TextField(blank=True, null=True)
 
     # Icon per event type - unmapped types fall back to _DEFAULT_ICON.
@@ -184,6 +193,7 @@ class StorageItemEvent(UserContentModel):
         StorageItemEventType.UNDO_OPEN: "fa-solid fa-rotate-left",
         StorageItemEventType.WINE_ADDED: "fa-regular fa-plus",
         StorageItemEventType.WINE_REMOVED: "fa-regular fa-trash-can",
+        StorageItemEventType.VINTAGE_REMOVED: "fa-regular fa-trash-can",
     }
     _DEFAULT_ICON = "fa-solid fa-circle-info"
 

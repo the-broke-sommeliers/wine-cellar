@@ -18,7 +18,7 @@ def test_unauthenticated_cant_consume_stock(
 ):
     storage = storage_factory(user=user)
     wine = wine_factory(user=user)
-    item = storage_item_factory(storage=storage, wine=wine, user=user)
+    item = storage_item_factory(storage=storage, vintage=wine.latest_vintage, user=user)
     with django_assert_num_queries(1):
         r = client.get(reverse("stock-consume", kwargs={"pk": item.pk}), follow=True)
     assert r.status_code == HTTPStatus.OK
@@ -42,8 +42,8 @@ def test_consume_unopened_bottle(
     client.force_login(user)
     storage = storage_factory(user=user)
     wine = wine_factory(user=user)
-    item = storage_item_factory(storage=storage, wine=wine, user=user)
-    with django_assert_num_queries(23):
+    item = storage_item_factory(storage=storage, vintage=wine.latest_vintage, user=user)
+    with django_assert_num_queries(33):
         r = client.post(reverse("stock-consume", kwargs={"pk": item.pk}), follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(r, reverse("wine-detail", kwargs={"pk": wine.pk}))
@@ -67,12 +67,12 @@ def test_open_then_consume_creates_two_distinct_history_events(
     client.force_login(user)
     storage = storage_factory(user=user)
     wine = wine_factory(user=user)
-    item = storage_item_factory(storage=storage, wine=wine, user=user)
-    with django_assert_num_queries(8):
+    item = storage_item_factory(storage=storage, vintage=wine.latest_vintage, user=user)
+    with django_assert_num_queries(9):
         client.post(
             reverse("stock-open", kwargs={"pk": item.pk}), data={"note": "anniversary"}
         )
-    with django_assert_num_queries(9):
+    with django_assert_num_queries(10):
         client.post(reverse("stock-consume", kwargs={"pk": item.pk}))
     events = StorageItemEvent.objects.filter(storage_item=item).order_by("created")
     assert [e.event_type for e in events] == [
@@ -94,8 +94,10 @@ def test_consume_already_opened_bottle(
     client.force_login(user)
     storage = storage_factory(user=user)
     wine = wine_factory(user=user)
-    item = storage_item_factory(storage=storage, wine=wine, user=user, opened=True)
-    with django_assert_num_queries(23):
+    item = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, user=user, opened=True
+    )
+    with django_assert_num_queries(33):
         r = client.post(reverse("stock-consume", kwargs={"pk": item.pk}), follow=True)
     assert r.status_code == HTTPStatus.OK
     item.refresh_from_db()
@@ -115,8 +117,8 @@ def test_consume_redirects_to_storage_detail(
     client.force_login(user)
     storage = storage_factory(user=user)
     wine = wine_factory(user=user)
-    item = storage_item_factory(storage=storage, wine=wine, user=user)
-    with django_assert_num_queries(20):
+    item = storage_item_factory(storage=storage, vintage=wine.latest_vintage, user=user)
+    with django_assert_num_queries(21):
         r = client.post(
             reverse("stock-consume", kwargs={"pk": item.pk}) + "?next=storage",
             follow=True,
@@ -137,7 +139,9 @@ def test_cant_consume_already_deleted_bottle(
     client.force_login(user)
     storage = storage_factory(user=user)
     wine = wine_factory(user=user)
-    item = storage_item_factory(storage=storage, wine=wine, user=user, deleted=True)
+    item = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, user=user, deleted=True
+    )
     with django_assert_num_queries(3):
         r = client.get(reverse("stock-consume", kwargs={"pk": item.pk}))
     assert r.status_code == HTTPStatus.NOT_FOUND
@@ -157,7 +161,9 @@ def test_cant_consume_other_users_bottle(
     client.force_login(user)
     storage = storage_factory(user=other)
     wine = wine_factory(user=other)
-    item = storage_item_factory(storage=storage, wine=wine, user=other)
+    item = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, user=other
+    )
     with django_assert_num_queries(3):
         r = client.get(reverse("stock-consume", kwargs={"pk": item.pk}))
     assert r.status_code == HTTPStatus.NOT_FOUND
@@ -177,7 +183,11 @@ def test_history_shows_consumed(
     storage = storage_factory(user=user)
     wine = wine_factory(user=user)
     item = storage_item_factory(
-        storage=storage, wine=wine, user=user, opened=True, deleted=True
+        storage=storage,
+        vintage=wine.latest_vintage,
+        user=user,
+        opened=True,
+        deleted=True,
     )
     event = storage_item_event_factory(
         storage_item=item, user=user, event_type=StorageItemEventType.CONSUMED

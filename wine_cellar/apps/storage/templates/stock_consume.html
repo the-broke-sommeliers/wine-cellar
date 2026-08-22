@@ -14,7 +14,7 @@
                   class="form">
                 {% csrf_token %}
                 <p>
-                    {% blocktrans with name=storageitem.wine.name storage=storageitem.storage.name %}Are you sure you have finished the bottle "{{ name }}" from "{{ storage }}"? It will be marked as consumed in your history.{% endblocktrans %}
+                    {% blocktrans with name=storageitem.vintage.wine.name storage=storageitem.storage.name %}Are you sure you have finished the bottle "{{ name }}" from "{{ storage }}"? It will be marked as consumed in your history.{% endblocktrans %}
                 </p>
                 <div class="pure-controls">
                     <div class="pure-g">
@@ -23,7 +23,7 @@
                                 <a href="{% url 'storage-detail' storageitem.storage.pk %}"
                                    class="pure-button button__neutral">{% translate "Cancel" %}</a>
                             {% else %}
-                                <a href="{% url 'wine-detail' storageitem.wine.pk %}"
+                                <a href="{% url 'wine-detail' storageitem.vintage.wine.pk %}"
                                    class="pure-button button__neutral">{% translate "Cancel" %}</a>
                             {% endif %}
                         </div>

@@ -15,10 +15,10 @@ def send_opened_bottle_reminder(user, items):
     msg.send()
 
 
-def send_drink_by_reminder(user, wines):
+def send_drink_by_reminder(user, vintages):
     text_content = render_to_string(
         "emails/drink_by_reminder.txt",
-        context={"wines": wines, "user": user},
+        context={"vintages": vintages, "user": user},
     )
 
     msg = EmailMultiAlternatives(

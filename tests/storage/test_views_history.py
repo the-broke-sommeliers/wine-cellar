@@ -29,7 +29,7 @@ def test_history_orders_newest_first(
     client.force_login(user)
     storage = storage_factory(user=user)
     wine = wine_factory(user=user)
-    item = storage_item_factory(storage=storage, wine=wine, user=user)
+    item = storage_item_factory(storage=storage, vintage=wine.latest_vintage, user=user)
     added = storage_item_event_factory(
         storage_item=item, user=user, event_type=StorageItemEventType.ADDED
     )
@@ -63,13 +63,15 @@ def test_history_hides_other_users_events(
     client.force_login(user)
     storage = storage_factory(user=user)
     wine = wine_factory(user=user)
-    own_item = storage_item_factory(storage=storage, wine=wine, user=user)
+    own_item = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, user=user
+    )
     own_event = storage_item_event_factory(storage_item=own_item, user=user)
 
     other_storage = storage_factory(user=other)
     other_wine = wine_factory(user=other)
     other_item = storage_item_factory(
-        storage=other_storage, wine=other_wine, user=other
+        storage=other_storage, vintage=other_wine.latest_vintage, user=other
     )
     other_event = storage_item_event_factory(storage_item=other_item, user=other)
 
@@ -96,10 +98,10 @@ def test_history_shows_wine_added_and_removed_end_to_end(
         "vintage": 2019,
         "country": "FR",
     }
-    with django_assert_num_queries(8):
+    with django_assert_num_queries(9):
         client.post(reverse("wine-add"), data)
     wine = Wine.objects.get(name="Chablis 2019")
-    with django_assert_num_queries(17):
+    with django_assert_num_queries(20):
         client.post(reverse("wine-delete", kwargs={"pk": wine.pk}))
 
     with django_assert_num_queries(4):
@@ -128,7 +130,7 @@ def test_history_renders_as_activity_feed(
     client.force_login(user)
     storage = storage_factory(user=user)
     wine = wine_factory(user=user)
-    item = storage_item_factory(storage=storage, wine=wine, user=user)
+    item = storage_item_factory(storage=storage, vintage=wine.latest_vintage, user=user)
     event = storage_item_event_factory(
         storage_item=item, user=user, event_type=StorageItemEventType.OPENED
     )
@@ -155,7 +157,7 @@ def test_history_pagination(
     client.force_login(user)
     storage = storage_factory(user=user)
     wine = wine_factory(user=user)
-    item = storage_item_factory(storage=storage, wine=wine, user=user)
+    item = storage_item_factory(storage=storage, vintage=wine.latest_vintage, user=user)
     for _ in range(11):
         storage_item_event_factory(storage_item=item, user=user)
 

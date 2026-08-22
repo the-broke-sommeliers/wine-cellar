@@ -3,7 +3,6 @@
 {% load render_bundle from webpack_loader %}
 {% block extra_js %}
     {{ block.super }}
-    {% render_bundle 'tom_select' 'js' attrs='type="module" defer' %}
     {% render_bundle 'image_preview' 'js' attrs='type="module" defer' %}
     {% render_bundle 'barcode_scanner' 'js' attrs='type="module" defer' %}
     {{ form.media.js }}
@@ -13,10 +12,14 @@
     {{ form.media.css }}
 {% endblock styles %}
 {% block title %}
-    {% translate "Edit Wine" %}
+    {% if vintage %}
+        {% translate "Edit Vintage" %}
+    {% else %}
+        {% translate "Add Vintage" %}
+    {% endif %}
 {% endblock title %}
 {% block header %}
-    <h1 class="header__title">{% translate 'Edit Wine' %}</h1>
+    <h1 class="header__title">{{ wine.name }}</h1>
 {% endblock header %}
 {% block content %}
     <div class="pure-g">
@@ -32,12 +35,6 @@
                     </ul>
                 {% endif %}
                 <div class="form__fields">
-                    {% if wine.vintages.count > 1 %}
-                        {% translate "N/V" as nv_label %}
-                        <p class="text--gray">
-                            {% blocktranslate with year=wine.latest_vintage.year|default:nv_label %}The vintage-specific fields below (ABV, barcode, price, drink-by date, rating, comment) apply only to the {{ year }} vintage. Use the Vintages section on the wine's detail page to edit its other vintages.{% endblocktranslate %}
-                        </p>
-                    {% endif %}
                     {% for field in form %}
                         {% include 'forms/form_field.html' %}
                         {% if field.name == "barcode" %}
@@ -49,6 +46,11 @@
                 </div>
                 <div class="pure-controls">
                     <div class="form__buttons">
+                        <div>
+                            <a href="{% url 'wine-detail' wine.pk %}" class="pure-button button__neutral">
+                                <i class="fa-solid fa-arrow-left"></i> <span>{% translate "Back" %}</span>
+                            </a>
+                        </div>
                         <div class="form__buttons-right">
                             <button type="submit" class="pure-button button__primary">{% translate "Save" %}</button>
                         </div>

@@ -20,7 +20,8 @@ def test_wine_model(user, wine_factory, grape_factory, django_assert_num_queries
     wine = wine_factory(user=user, grapes=[grape])
     with django_assert_num_queries(1):
         assert wine.get_grapes == grape.name
-    with django_assert_num_queries(1):
+    # 1 query for latest_vintage, 1 for that vintage's image lookup.
+    with django_assert_num_queries(2):
         assert wine.image == static("images/bottle.svg")
 
 
@@ -36,12 +37,17 @@ def test_wine_image_thumbnail_falls_back_to_full_image_when_no_thumbnail(
     observe the pre-signal/signal-skipped fallback, create the front image
     with the signal disconnected."""
     wine = wine_factory(user=user)
+    vintage = wine.latest_vintage
     post_save.disconnect(generate_thumbnail, sender=WineImage)
     try:
-        front = wine_image_factory(user=user, wine=wine, image_type=ImageType.FRONT)
+        front = wine_image_factory(
+            user=user, vintage=vintage, image_type=ImageType.FRONT
+        )
     finally:
         post_save.connect(generate_thumbnail, sender=WineImage)
     assert not front.thumbnail
+    # latest_vintage is already cached from the fetch above - only the
+    # vintage's own image lookup remains.
     with django_assert_num_queries(1):
         assert wine.image_thumbnail == front.image.url
 
@@ -55,15 +61,18 @@ def test_wine_image_thumbnails_returns_ordered_by_type(
     django_assert_num_queries,
 ):
     wine = wine_factory(user=user)
+    vintage = wine.latest_vintage
     # Created out of order, and skipping LABEL_FRONT entirely.
     label_back = wine_image_factory(
-        user=user, wine=wine, image_type=ImageType.LABEL_BACK
+        user=user, vintage=vintage, image_type=ImageType.LABEL_BACK
     )
-    front = wine_image_factory(user=user, wine=wine, image_type=ImageType.FRONT)
-    back = wine_image_factory(user=user, wine=wine, image_type=ImageType.BACK)
+    front = wine_image_factory(user=user, vintage=vintage, image_type=ImageType.FRONT)
+    back = wine_image_factory(user=user, vintage=vintage, image_type=ImageType.BACK)
     front.refresh_from_db()
     back.refresh_from_db()
     label_back.refresh_from_db()
+    # latest_vintage is already cached from the fetch above - only the
+    # vintage's own image lookup remains.
     with django_assert_num_queries(1):
         assert wine.image_thumbnails == [
             front.thumbnail.url,
@@ -99,7 +108,10 @@ def test_wine_image(
     django_assert_num_queries,
 ):
     wine = wine_factory(user=user)
-    wine_image = wine_image_factory(user=user, wine=wine)
+    vintage = wine.latest_vintage
+    wine_image = wine_image_factory(user=user, vintage=vintage)
+    # latest_vintage is already cached from the fetch above - only the
+    # vintage's own image lookup remains.
     with django_assert_num_queries(1):
         assert wine.image == wine_image.image.url
     assert wine_image.image.path == str(
@@ -112,24 +124,25 @@ def test_get_average_price_with_currency(
     user, wine_factory, storage_item_factory, django_assert_num_queries
 ):
     wine = wine_factory(user=user)
-    storage_item_factory(wine=wine, price=10.00)
-    storage_item_factory(wine=wine, price=20.00)
+    vintage = wine.latest_vintage
+    storage_item_factory(vintage=vintage, price=10.00)
+    storage_item_factory(vintage=vintage, price=20.00)
 
     avg = Decimal("15.00")
     currency = settings.CURRENCY_SYMBOLS.get("EUR")
     expected = f"{number_format(avg, use_l10n=True)}{currency}"
 
-    with django_assert_num_queries(2):
-        assert wine.get_average_price_with_currency == expected
+    with django_assert_num_queries(3):
+        assert vintage.get_average_price_with_currency == expected
 
 
 @pytest.mark.django_db
 def test_get_average_price_no_items_returns_none(
     user, wine_factory, django_assert_num_queries
 ):
-    wine = wine_factory(user=user)
-    with django_assert_num_queries(2):
-        assert wine.get_average_price_with_currency is None
+    vintage = wine_factory(user=user).latest_vintage
+    with django_assert_num_queries(3):
+        assert vintage.get_average_price_with_currency is None
 
 
 @pytest.mark.django_db
@@ -137,15 +150,16 @@ def test_get_average_ignores_null_prices(
     user, wine_factory, storage_item_factory, django_assert_num_queries
 ):
     wine = wine_factory(user=user)
+    vintage = wine.latest_vintage
     # create one item with null price and one with a price
-    storage_item_factory(wine=wine)  # price is None by default
-    storage_item_factory(wine=wine, price=Decimal("20.00"))
+    storage_item_factory(vintage=vintage)  # price is None by default
+    storage_item_factory(vintage=vintage, price=Decimal("20.00"))
 
     avg = Decimal("20.00")
     currency = settings.CURRENCY_SYMBOLS.get("EUR")
     expected = f"{number_format(avg, use_l10n=True)}{currency}"
-    with django_assert_num_queries(2):
-        assert wine.get_average_price_with_currency == expected
+    with django_assert_num_queries(3):
+        assert vintage.get_average_price_with_currency == expected
 
 
 @pytest.mark.django_db
@@ -153,10 +167,11 @@ def test_get_average_all_null_prices_returns_none(
     user, wine_factory, storage_item_factory, django_assert_num_queries
 ):
     wine = wine_factory(user=user)
-    storage_item_factory(wine=wine)
-    storage_item_factory(wine=wine)
-    with django_assert_num_queries(2):
-        assert wine.get_average_price_with_currency is None
+    vintage = wine.latest_vintage
+    storage_item_factory(vintage=vintage)
+    storage_item_factory(vintage=vintage)
+    with django_assert_num_queries(3):
+        assert vintage.get_average_price_with_currency is None
 
 
 @pytest.mark.django_db
@@ -164,16 +179,54 @@ def test_get_average_respects_user_currency(
     user, wine_factory, storage_item_factory, django_assert_num_queries
 ):
     wine = wine_factory(user=user)
-    storage_item_factory(wine=wine, price=Decimal("10.00"))
-    storage_item_factory(wine=wine, price=Decimal("20.00"))
+    vintage = wine.latest_vintage
+    storage_item_factory(vintage=vintage, price=Decimal("10.00"))
+    storage_item_factory(vintage=vintage, price=Decimal("20.00"))
 
     # set user preference to USD
     us = UserSettings.objects.create(user=user, currency="USD")
     avg = Decimal("15.00")
     currency = settings.CURRENCY_SYMBOLS.get(us.currency)
     expected = f"{number_format(avg, use_l10n=True)}{currency}"
-    with django_assert_num_queries(1):
-        assert wine.get_average_price_with_currency == expected
+    with django_assert_num_queries(3):
+        assert vintage.get_average_price_with_currency == expected
+
+
+@pytest.mark.django_db
+def test_get_average_price_includes_vintage_reference_price(
+    user, wine_factory, storage_item_factory, django_assert_num_queries
+):
+    """The vintage's own reference price counts as a known price alongside
+    what was actually paid for stocked bottles - not restricted to stock."""
+    wine = wine_factory(user=user)
+    vintage = wine.latest_vintage
+    vintage.price = Decimal("30.00")
+    vintage.save()
+    storage_item_factory(vintage=vintage, price=Decimal("10.00"))
+    storage_item_factory(vintage=vintage, price=Decimal("20.00"))
+
+    avg = Decimal("20.00")  # (30 + 10 + 20) / 3
+    currency = settings.CURRENCY_SYMBOLS.get("EUR")
+    expected = f"{number_format(avg, use_l10n=True)}{currency}"
+    with django_assert_num_queries(3):
+        assert vintage.get_average_price_with_currency == expected
+
+
+@pytest.mark.django_db
+def test_get_average_price_from_reference_price_with_no_stock(
+    user, wine_factory, django_assert_num_queries
+):
+    """A vintage with no stock at all still contributes its own reference
+    price - averages aren't limited to currently-stocked bottles."""
+    wine = wine_factory(user=user)
+    vintage = wine.latest_vintage
+    vintage.price = Decimal("25.00")
+    vintage.save()
+
+    currency = settings.CURRENCY_SYMBOLS.get("EUR")
+    expected = f"{number_format(Decimal('25.00'), use_l10n=True)}{currency}"
+    with django_assert_num_queries(3):
+        assert vintage.get_average_price_with_currency == expected
 
 
 # ---------------------------------------------------------------------------
@@ -225,9 +278,10 @@ def test_total_stock_excludes_deleted(
     user, wine_factory, storage_item_factory, django_assert_num_queries
 ):
     wine = wine_factory(user=user)
+    vintage = wine.latest_vintage
     storage = user.storage_set.first()
-    storage_item_factory(wine=wine, storage=storage)
-    storage_item_factory(wine=wine, storage=storage, deleted=True)
+    storage_item_factory(vintage=vintage, storage=storage)
+    storage_item_factory(vintage=vintage, storage=storage, deleted=True)
     with django_assert_num_queries(1):
         assert wine.total_stock == 1
 
@@ -237,9 +291,10 @@ def test_get_stock_ordering(
     user, wine_factory, storage_factory, storage_item_factory, django_assert_num_queries
 ):
     wine = wine_factory(user=user)
+    vintage = wine.latest_vintage
     storage = storage_factory(user=user, rows=3, columns=3)
-    item_b = storage_item_factory(wine=wine, storage=storage, row=2, column=1)
-    item_a = storage_item_factory(wine=wine, storage=storage, row=1, column=1)
+    item_b = storage_item_factory(vintage=vintage, storage=storage, row=2, column=1)
+    item_a = storage_item_factory(vintage=vintage, storage=storage, row=1, column=1)
     with django_assert_num_queries(1):
         stock = list(wine.get_stock)
     assert stock[0] == item_a
@@ -255,7 +310,7 @@ def test_get_stock_prefetches_storage(
     if that's ever dropped instead of silently reintroducing an N+1."""
     wine = wine_factory(user=user)
     storage = storage_factory(user=user, rows=1, columns=1)
-    storage_item_factory(wine=wine, storage=storage, row=1, column=1)
+    storage_item_factory(vintage=wine.latest_vintage, storage=storage, row=1, column=1)
     stock = list(wine.get_stock.fetch_mode(FETCH_RAISE))
     assert [str(item.storage) for item in stock] == [str(storage)]
 
@@ -313,21 +368,21 @@ def test_get_sources(user, wine_factory, source_factory, django_assert_num_queri
 
 
 @pytest.mark.django_db
-def test_get_price_with_currency(user, wine_factory, django_assert_num_queries):
-    wine = wine_factory(user=user, price=Decimal("14.99"))
+def test_get_price_with_currency(user, vintage_factory, django_assert_num_queries):
+    vintage = vintage_factory(wine__user=user, price=Decimal("14.99"))
     currency = settings.CURRENCY_SYMBOLS.get("EUR")
     with django_assert_num_queries(1):
-        result = wine.get_price_with_currency
+        result = vintage.get_price_with_currency
     assert "14" in result
     assert currency in result
 
 
 @pytest.mark.django_db
-def test_drink_by_warning_date(user, wine_factory, django_assert_num_queries):
-    wine = wine_factory(user=user)
+def test_drink_by_warning_date(user, vintage_factory, django_assert_num_queries):
+    vintage = vintage_factory(wine__user=user)
     expected = datetime.date.today() + datetime.timedelta(days=30)
     with django_assert_num_queries(0):
-        assert wine.drink_by_warning_date == expected
+        assert vintage.drink_by_warning_date == expected
 
 
 @pytest.mark.django_db
@@ -335,3 +390,93 @@ def test_grape_str_empty_name(grape_factory, django_assert_num_queries):
     grape = grape_factory(name="")
     with django_assert_num_queries(0):
         assert str(grape) == ""
+
+
+@pytest.mark.django_db
+def test_wine_get_abv_range_single_value(
+    user, wine_factory, vintage_factory, django_assert_num_queries
+):
+    wine = wine_factory(user=user, _create_default_vintage=False)
+    vintage_factory(wine=wine, abv=13.0)
+    with django_assert_num_queries(1):
+        assert wine.get_abv_range == "13.0%"
+
+
+@pytest.mark.django_db
+def test_wine_get_abv_range_spans_vintages(
+    user, wine_factory, vintage_factory, django_assert_num_queries
+):
+    wine = wine_factory(user=user, _create_default_vintage=False)
+    vintage_factory(wine=wine, abv=13.0)
+    vintage_factory(wine=wine, abv=14.5)
+    with django_assert_num_queries(1):
+        assert wine.get_abv_range == "13.0–14.5%"
+
+
+@pytest.mark.django_db
+def test_wine_get_abv_range_none_when_unset(
+    user, wine_factory, vintage_factory, django_assert_num_queries
+):
+    wine = wine_factory(user=user, _create_default_vintage=False)
+    vintage_factory(wine=wine, abv=None)
+    with django_assert_num_queries(1):
+        assert wine.get_abv_range is None
+
+
+@pytest.mark.django_db
+def test_wine_get_average_rating(
+    user, wine_factory, vintage_factory, django_assert_num_queries
+):
+    wine = wine_factory(user=user, _create_default_vintage=False)
+    vintage_factory(wine=wine, rating=8)
+    vintage_factory(wine=wine, rating=9)
+    vintage_factory(wine=wine, rating=None)  # excluded, not counted as 0
+    with django_assert_num_queries(1):
+        assert wine.get_average_rating == "8.5/10"
+
+
+@pytest.mark.django_db
+def test_wine_get_average_rating_none_when_unset(
+    user, wine_factory, django_assert_num_queries
+):
+    wine = wine_factory(user=user)
+    with django_assert_num_queries(1):
+        assert wine.get_average_rating is None
+
+
+@pytest.mark.django_db
+def test_wine_get_average_price_combines_vintages_and_reference_prices(
+    user,
+    wine_factory,
+    vintage_factory,
+    storage_item_factory,
+    django_assert_num_queries,
+):
+    """Unweighted average, across vintages, of each vintage's own average
+    price (purchase prices plus its reference price) - a vintage with many
+    bottles doesn't outweigh one with few, and one with no stock at all
+    still counts via its reference price."""
+    wine = wine_factory(user=user, _create_default_vintage=False)
+    v1 = vintage_factory(wine=wine, price=Decimal("30.00"))
+    storage_item_factory(vintage=v1, price=Decimal("10.00"))
+    storage_item_factory(vintage=v1, price=Decimal("20.00"))
+    # v1 average: (30 + 10 + 20) / 3 = 20.00
+
+    vintage_factory(wine=wine, price=Decimal("50.00"))
+    # v2 average: 50.00 (reference price only, no stock)
+
+    avg = Decimal("35.00")  # (20 + 50) / 2
+    currency = settings.CURRENCY_SYMBOLS.get("EUR")
+    expected = f"{number_format(avg, use_l10n=True)}{currency}"
+    with django_assert_num_queries(2):
+        assert wine.get_average_price_with_currency == expected
+
+
+@pytest.mark.django_db
+def test_wine_get_average_price_none_when_unset(
+    user, wine_factory, vintage_factory, django_assert_num_queries
+):
+    wine = wine_factory(user=user, _create_default_vintage=False)
+    vintage_factory(wine=wine)
+    with django_assert_num_queries(2):
+        assert wine.get_average_price_with_currency is None

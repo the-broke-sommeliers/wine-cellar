@@ -9,7 +9,7 @@ from wine_cellar.apps.storage.models import (
     StorageItemEvent,
     StorageItemEventType,
 )
-from wine_cellar.apps.wine.models import Size, Wine
+from wine_cellar.apps.wine.models import Size, Vintage, Wine
 
 
 @pytest.mark.django_db
@@ -18,7 +18,7 @@ def test_wine_detail_authenticated(
 ):
     wine = wine_factory(user=user)
     client.force_login(user)
-    with django_assert_num_queries(14):
+    with django_assert_num_queries(23):
         r = client.get(reverse("wine-detail", kwargs={"pk": wine.pk}))
     assert r.status_code == HTTPStatus.OK
     assertTemplateUsed(response=r, template_name="wine_detail.html")
@@ -61,7 +61,7 @@ def test_wine_detail_with_location_renders_map_tag(
     default path every other detail-view test exercises."""
     wine = wine_factory(user=user, location=geojson_point_dict)
     client.force_login(user)
-    with django_assert_num_queries(14):
+    with django_assert_num_queries(23):
         r = client.get(reverse("wine-detail", kwargs={"pk": wine.pk}))
     assert r.status_code == HTTPStatus.OK
     assert 'id="wine_map"' in r.content.decode()
@@ -93,7 +93,7 @@ def test_wine_update_post_other_user_returns_404(
         "category": "DR",
         "abv": 13.0,
         "size": size.pk,
-        "vintage": 2002,
+        "year": 2002,
         "country": "DE",
     }
     with django_assert_num_queries(3):
@@ -114,42 +114,64 @@ def test_wine_update_nonexistent_pk_returns_404(
 
 
 @pytest.mark.django_db
-def test_wine_update_duplicate(client, user, wine_factory, django_assert_num_queries):
+def test_wine_update_duplicate(
+    client, user, wine_factory, vintage_factory, django_assert_num_queries
+):
     size = Size.objects.get(name=0.75)
     wine1 = wine_factory(
         user=user,
         name="Merlot",
         wine_type="RE",
-        abv=13.0,
         size=size,
-        vintage=2002,
         country="DE",
+        _create_default_vintage=False,
     )
+    vintage_factory(wine=wine1, year=2002, abv=13.0)
     wine2 = wine_factory(
         user=user,
         name="Chardonnay",
         wine_type="WH",
-        abv=12.0,
         size=size,
-        vintage=2020,
         country="FR",
+        _create_default_vintage=False,
     )
+    vintage_factory(wine=wine2, year=2020, abv=12.0)
     client.force_login(user)
     data = {
         "name": wine1.name,
         "wine_type": wine1.wine_type,
         "category": "DR",
-        "abv": wine1.abv,
+        "abv": wine1.latest_vintage.abv,
         "size": size.pk,
-        "vintage": wine1.vintage,
+        "year": wine1.latest_vintage.year,
         "country": wine1.country,
     }
-    with django_assert_num_queries(23):
+    with django_assert_num_queries(25):
         r = client.post(reverse("wine-edit", kwargs={"pk": wine2.pk}), data)
     assert r.status_code == HTTPStatus.OK
     assert r.context_data["form"].errors
     wine2.refresh_from_db()
     assert wine2.name == "Chardonnay"
+
+
+@pytest.mark.django_db
+def test_wine_edit_shows_vintage_scoping_hint_only_for_multi_vintage_wines(
+    client, user, wine_factory, vintage_factory, django_assert_num_queries
+):
+    single = wine_factory(user=user)
+    client.force_login(user)
+    with django_assert_num_queries(20):
+        r = client.get(reverse("wine-edit", kwargs={"pk": single.pk}))
+    assert r.status_code == HTTPStatus.OK
+    assert "apply only to the" not in r.content.decode()
+
+    multi = wine_factory(user=user, _create_default_vintage=False)
+    vintage_factory(wine=multi, year=2019)
+    vintage_factory(wine=multi, year=2021)
+    with django_assert_num_queries(20):
+        r = client.get(reverse("wine-edit", kwargs={"pk": multi.pk}))
+    assert r.status_code == HTTPStatus.OK
+    assert "apply only to the 2021 vintage" in r.content.decode()
 
 
 @pytest.mark.django_db
@@ -178,7 +200,7 @@ def test_wine_update_valid_fields(
         "category": "DR",
         "abv": 13.0,
         "size": size.pk,
-        "vintage": 2002,
+        "year": 2002,
         "grapes": grape1.pk,
         "food_pairings": food_pairing.pk,
         "source": source.pk,
@@ -186,7 +208,7 @@ def test_wine_update_valid_fields(
         "attributes": attribute.pk,
         "country": "DE",
     }
-    with django_assert_num_queries(44):
+    with django_assert_num_queries(55):
         r = client.post(reverse("wine-edit", kwargs={"pk": wine.pk}), data, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(
@@ -197,9 +219,9 @@ def test_wine_update_valid_fields(
     changed_wine = Wine.objects.first()
     assert changed_wine.name == wine.name
     assert changed_wine.wine_type == data["wine_type"]
-    assert changed_wine.abv == data["abv"]
+    assert changed_wine.latest_vintage.abv == data["abv"]
     assert changed_wine.size == size
-    assert changed_wine.vintage == data["vintage"]
+    assert changed_wine.latest_vintage.year == data["year"]
     assert changed_wine.grapes.count() == 1
     assert changed_wine.grapes.first() == grape1
     assert changed_wine.food_pairings.count() == 1
@@ -215,7 +237,7 @@ def test_wine_update_valid_fields(
 def test_wine_delete(client, user, wine_factory, django_assert_num_queries):
     wine = wine_factory(user=user)
     client.force_login(user)
-    with django_assert_num_queries(27):
+    with django_assert_num_queries(30):
         r = client.post(reverse("wine-delete", kwargs={"pk": wine.pk}), follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
@@ -228,7 +250,7 @@ def test_wine_delete_logs_removed_event(
 ):
     wine = wine_factory(user=user)
     client.force_login(user)
-    with django_assert_num_queries(17):
+    with django_assert_num_queries(20):
         client.post(reverse("wine-delete", kwargs={"pk": wine.pk}))
     event = StorageItemEvent.objects.get(event_type=StorageItemEventType.WINE_REMOVED)
     assert event.wine_name == wine.name
@@ -242,9 +264,11 @@ def test_wine_delete_preserves_bottle_history(
 ):
     """A bottle's history must survive the cascade delete of its wine."""
     wine = wine_factory(user=user, name="Chablis 2019")
-    item = storage_item_factory(storage__user=user, wine=wine, user=user)
+    item = storage_item_factory(
+        storage__user=user, vintage=wine.latest_vintage, user=user
+    )
     client.force_login(user)
-    with django_assert_num_queries(8):
+    with django_assert_num_queries(9):
         client.post(
             reverse("stock-open", kwargs={"pk": item.pk}), data={"note": "party"}
         )
@@ -252,7 +276,7 @@ def test_wine_delete_preserves_bottle_history(
     events_before = StorageItemEvent.objects.filter(wine_name=wine.name).count()
     assert events_before == 1  # the OPENED event
 
-    with django_assert_num_queries(20):
+    with django_assert_num_queries(23):
         client.post(reverse("wine-delete", kwargs={"pk": wine.pk}))
 
     assert not Wine.objects.exists()
@@ -276,10 +300,16 @@ def test_wine_delete_logs_removed_event_for_active_bottles(
 ):
     """Every still-active bottle gets its own REMOVED event on wine delete."""
     wine = wine_factory(user=user)
-    storage_item_factory(storage__user=user, wine=wine, user=user)
-    storage_item_factory(storage__user=user, wine=wine, user=user, opened=True)
+    storage_item_factory(storage__user=user, vintage=wine.latest_vintage, user=user)
+    storage_item_factory(
+        storage__user=user, vintage=wine.latest_vintage, user=user, opened=True
+    )
     already_consumed = storage_item_factory(
-        storage__user=user, wine=wine, user=user, opened=True, deleted=True
+        storage__user=user,
+        vintage=wine.latest_vintage,
+        user=user,
+        opened=True,
+        deleted=True,
     )
     consumed_event = StorageItemEvent.objects.create(
         storage_item=already_consumed,
@@ -290,7 +320,7 @@ def test_wine_delete_logs_removed_event_for_active_bottles(
     )
     client.force_login(user)
 
-    with django_assert_num_queries(20):
+    with django_assert_num_queries(23):
         client.post(reverse("wine-delete", kwargs={"pk": wine.pk}))
 
     removed_events = StorageItemEvent.objects.filter(
@@ -317,3 +347,224 @@ def test_wine_delete_other_user_returns_404(
         r = client.post(reverse("wine-delete", kwargs={"pk": wine.pk}))
     assert r.status_code == HTTPStatus.NOT_FOUND
     assert Wine.objects.count() == 1
+
+
+@pytest.mark.django_db
+def test_vintage_delete_last_vintage_is_blocked(
+    client, user, wine_factory, django_assert_num_queries
+):
+    wine = wine_factory(user=user)
+    vintage = wine.latest_vintage
+    client.force_login(user)
+    r = client.post(
+        reverse("vintage-delete", kwargs={"wine_pk": wine.pk, "pk": vintage.pk})
+    )
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["form"].errors
+    assert Vintage.objects.filter(pk=vintage.pk).exists()
+
+
+@pytest.mark.django_db
+def test_vintage_delete_with_no_stock_logs_only_the_summary_event(
+    client, user, wine_factory, vintage_factory, django_assert_num_queries
+):
+    wine = wine_factory(user=user, _create_default_vintage=False)
+    keep = vintage_factory(wine=wine, year=2019)
+    to_delete = vintage_factory(wine=wine, year=2021)
+    client.force_login(user)
+    r = client.post(
+        reverse("vintage-delete", kwargs={"wine_pk": wine.pk, "pk": to_delete.pk}),
+        follow=True,
+    )
+    assert r.status_code == HTTPStatus.OK
+    assertRedirects(
+        response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
+    )
+    assert not Vintage.objects.filter(pk=to_delete.pk).exists()
+    assert Vintage.objects.filter(pk=keep.pk).exists()
+    events = StorageItemEvent.objects.filter(wine_name=wine.name)
+    assert [e.event_type for e in events] == [StorageItemEventType.VINTAGE_REMOVED]
+    assert events[0].vintage_year == 2021
+
+
+@pytest.mark.django_db
+def test_vintage_delete_logs_removed_events_for_active_bottles(
+    client,
+    user,
+    wine_factory,
+    vintage_factory,
+    storage_item_factory,
+    django_assert_num_queries,
+):
+    """Deleting a non-last vintage with active stock removes that stock and
+    logs a REMOVED event per bottle, plus a VINTAGE_REMOVED summary event -
+    mirroring wine delete's history-preserving behaviour."""
+    wine = wine_factory(user=user, _create_default_vintage=False)
+    vintage_factory(wine=wine, year=2019)
+    to_delete = vintage_factory(wine=wine, year=2021)
+    active_item = storage_item_factory(storage__user=user, vintage=to_delete, user=user)
+    already_consumed = storage_item_factory(
+        storage__user=user, vintage=to_delete, user=user, deleted=True
+    )
+    client.force_login(user)
+
+    client.post(
+        reverse("vintage-delete", kwargs={"wine_pk": wine.pk, "pk": to_delete.pk})
+    )
+
+    assert not Vintage.objects.filter(pk=to_delete.pk).exists()
+    assert not StorageItem.objects.filter(pk=active_item.pk).exists()
+    # The already-consumed bottle cascades away too (it's still tied to the
+    # deleted vintage) but must not get its own REMOVED event.
+    assert not StorageItem.objects.filter(pk=already_consumed.pk).exists()
+    removed_events = StorageItemEvent.objects.filter(
+        wine_name=wine.name, event_type=StorageItemEventType.REMOVED
+    )
+    assert removed_events.count() == 1
+    event = removed_events.first()
+    assert event.vintage_year == 2021
+    assert event.note == "Removed automatically because the vintage was deleted."
+    summary_event = StorageItemEvent.objects.get(
+        wine_name=wine.name, event_type=StorageItemEventType.VINTAGE_REMOVED
+    )
+    assert summary_event.vintage_year == 2021
+
+
+@pytest.mark.django_db
+def test_vintage_delete_confirm_page_warns_about_active_stock(
+    client,
+    user,
+    wine_factory,
+    vintage_factory,
+    storage_item_factory,
+    django_assert_num_queries,
+):
+    wine = wine_factory(user=user, _create_default_vintage=False)
+    vintage_factory(wine=wine, year=2019)
+    to_delete = vintage_factory(wine=wine, year=2021)
+    storage_item_factory(storage__user=user, vintage=to_delete, user=user)
+    client.force_login(user)
+    r = client.get(
+        reverse("vintage-delete", kwargs={"wine_pk": wine.pk, "pk": to_delete.pk})
+    )
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["active_stock_count"] == 1
+    assert "still has" in r.content.decode()
+
+
+@pytest.mark.django_db
+def test_vintage_delete_other_user_returns_404(
+    client, user, user_factory, wine_factory, django_assert_num_queries
+):
+    other_user = user_factory()
+    wine = wine_factory(user=other_user)
+    vintage = wine.latest_vintage
+    client.force_login(user)
+    r = client.post(
+        reverse("vintage-delete", kwargs={"wine_pk": wine.pk, "pk": vintage.pk})
+    )
+    assert r.status_code == HTTPStatus.NOT_FOUND
+    assert Vintage.objects.filter(pk=vintage.pk).exists()
+
+
+@pytest.mark.django_db
+def test_vintage_create_duplicate_year_shows_form_error(
+    client, user, wine_factory, vintage_factory, django_assert_num_queries
+):
+    wine = wine_factory(user=user, _create_default_vintage=False)
+    vintage_factory(wine=wine, year=2020)
+    client.force_login(user)
+    r = client.post(reverse("vintage-add", kwargs={"wine_pk": wine.pk}), {"year": 2020})
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["form"].errors["year"]
+    assert Vintage.objects.filter(wine=wine).count() == 1
+
+
+@pytest.mark.django_db
+def test_vintage_create_same_year_different_wine_is_allowed(
+    client, user, wine_factory, vintage_factory, django_assert_num_queries
+):
+    wine_a = wine_factory(user=user, _create_default_vintage=False)
+    vintage_factory(wine=wine_a, year=2020)
+    wine_b = wine_factory(user=user, _create_default_vintage=False)
+    client.force_login(user)
+    r = client.post(
+        reverse("vintage-add", kwargs={"wine_pk": wine_b.pk}),
+        {"year": 2020},
+        follow=True,
+    )
+    assert r.status_code == HTTPStatus.OK
+    assert Vintage.objects.filter(wine=wine_b, year=2020).exists()
+
+
+@pytest.mark.django_db
+def test_vintage_update_duplicate_year_shows_form_error(
+    client, user, wine_factory, vintage_factory, django_assert_num_queries
+):
+    wine = wine_factory(user=user, _create_default_vintage=False)
+    vintage_factory(wine=wine, year=2020)
+    other = vintage_factory(wine=wine, year=2021)
+    client.force_login(user)
+    r = client.post(
+        reverse("vintage-edit", kwargs={"wine_pk": wine.pk, "pk": other.pk}),
+        {"year": 2020},
+    )
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["form"].errors["year"]
+    other.refresh_from_db()
+    assert other.year == 2021
+
+
+@pytest.mark.django_db
+def test_vintage_update_keeping_its_own_year_is_allowed(
+    client, user, wine_factory, vintage_factory, django_assert_num_queries
+):
+    """Editing a vintage without changing its year must not false-positive
+    against itself."""
+    wine = wine_factory(user=user, _create_default_vintage=False)
+    vintage = vintage_factory(wine=wine, year=2020, comment="")
+    client.force_login(user)
+    r = client.post(
+        reverse("vintage-edit", kwargs={"wine_pk": wine.pk, "pk": vintage.pk}),
+        {"year": 2020, "comment": "updated"},
+        follow=True,
+    )
+    assert r.status_code == HTTPStatus.OK
+    vintage.refresh_from_db()
+    assert vintage.comment == "updated"
+
+
+@pytest.mark.django_db
+def test_wine_update_duplicate_vintage_year_shows_vintage_specific_message(
+    client, user, wine_factory, vintage_factory, django_assert_num_queries
+):
+    """A vintage-year collision reached via the wine-edit form (which
+    embeds the latest vintage's scalar fields) must report a
+    vintage-specific message, not the wine-level duplicate message."""
+    size = Size.objects.get(name=0.75)
+    wine = wine_factory(
+        user=user,
+        wine_type="RE",
+        size=size,
+        country="DE",
+        _create_default_vintage=False,
+    )
+    vintage_factory(wine=wine, year=2019)
+    latest = vintage_factory(wine=wine, year=2021)
+    client.force_login(user)
+    data = {
+        "name": wine.name,
+        "wine_type": wine.wine_type,
+        "category": "DR",
+        "abv": latest.abv,
+        "size": size.pk,
+        "year": 2019,
+        "country": wine.country,
+    }
+    r = client.post(reverse("wine-edit", kwargs={"pk": wine.pk}), data)
+    assert r.status_code == HTTPStatus.OK
+    errors = r.context_data["form"].errors
+    assert "year" in errors
+    assert "vintage with this year" in str(errors["year"])
+    latest.refresh_from_db()
+    assert latest.year == 2021

@@ -15,11 +15,12 @@
     {% endif %}
 {% endblock title %}
 {% block header %}
+    {% translate "N/V" as nv_label %}
     <h1 class="header__title">
         {% if is_edit %}
-            {% translate "Edit Bottle" %}
+            {% blocktranslate with wine=vintage.wine.name year=vintage.year|default:nv_label %}Edit Bottle — {{ wine }} ({{ year }}){% endblocktranslate %}
         {% else %}
-            {% translate "Add Bottle" %}
+            {% blocktranslate with wine=vintage.wine.name year=vintage.year|default:nv_label %}Add Bottle — {{ wine }} ({{ year }}){% endblocktranslate %}
         {% endif %}
     </h1>
 {% endblock header %}

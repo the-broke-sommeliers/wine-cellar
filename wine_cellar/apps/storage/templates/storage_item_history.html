@@ -25,6 +25,7 @@
                                         {% else %}
                                             {{ event.wine_name }}
                                         {% endif %}
+                                        {% if event.vintage_year %}({{ event.vintage_year }}){% endif %}
                                         — {{ event.get_event_type_display }}
                                     </p>
                                     {% if event.note or event.storage_item %}

@@ -65,6 +65,25 @@ pytest-clean:
 coverage:
 	$(VIRTUAL_ENV)/bin/py.test --reuse-db --cov --cov-report=html
 
+.PHONY: pytest-postgres
+pytest-postgres:
+	docker rm -f wine_cellar_test_db > /dev/null 2>&1 || true
+	docker run -d --rm --name wine_cellar_test_db \
+		-e POSTGRES_USER=wine_cellar_test \
+		-e POSTGRES_PASSWORD=wine_cellar_test \
+		-e POSTGRES_DB=wine_cellar_test \
+		-p 5433:5432 \
+		postgres:16@sha256:95206741a5b214807675e14165369d05b93a9cf692223b616d07cca227e74b0b > /dev/null
+	trap 'docker stop wine_cellar_test_db > /dev/null' EXIT; \
+	until docker exec wine_cellar_test_db pg_isready -U wine_cellar_test > /dev/null 2>&1; do sleep 1; done; \
+	SQL_ENGINE=django.db.backends.postgresql \
+	SQL_DATABASE=wine_cellar_test \
+	SQL_USER=wine_cellar_test \
+	SQL_PASSWORD=wine_cellar_test \
+	SQL_HOST=localhost \
+	SQL_PORT=5433 \
+	$(VIRTUAL_ENV)/bin/py.test $(ARGUMENTS)
+
 .PHONY: e2e
 e2e:
 	$(VIRTUAL_ENV)/bin/playwright install chromium

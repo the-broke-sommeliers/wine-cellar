@@ -21,10 +21,10 @@ def test_stock_swap_success(
     wine1 = wine_factory(user=user)
     wine2 = wine_factory(user=user)
     item1 = storage_item_factory(
-        storage=storage, wine=wine1, row=1, column=1, user=user
+        storage=storage, vintage=wine1.latest_vintage, row=1, column=1, user=user
     )
     item2 = storage_item_factory(
-        storage=storage, wine=wine2, row=1, column=2, user=user
+        storage=storage, vintage=wine2.latest_vintage, row=1, column=2, user=user
     )
     data = {"item1": item1.pk, "item2": item2.pk}
     with django_assert_num_queries(12):
@@ -54,10 +54,10 @@ def test_stock_swap_cross_storage_rejected(
     storage2 = storage_factory(user=user, rows=2, columns=2)
     wine = wine_factory(user=user)
     item1 = storage_item_factory(
-        storage=storage1, wine=wine, row=1, column=1, user=user
+        storage=storage1, vintage=wine.latest_vintage, row=1, column=1, user=user
     )
     item2 = storage_item_factory(
-        storage=storage2, wine=wine, row=2, column=2, user=user
+        storage=storage2, vintage=wine.latest_vintage, row=2, column=2, user=user
     )
     data = {"item1": item1.pk, "item2": item2.pk}
     with django_assert_num_queries(4):
@@ -80,10 +80,18 @@ def test_stock_swap_chain_shift_forward(
     storage = storage_factory(user=user, rows=2, columns=4)
     wine = wine_factory(user=user)
     # A@(1,1)  B@(1,2)  C@(1,3)  D@(1,4)
-    a = storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
-    b = storage_item_factory(storage=storage, wine=wine, row=1, column=2, user=user)
-    c = storage_item_factory(storage=storage, wine=wine, row=1, column=3, user=user)
-    d = storage_item_factory(storage=storage, wine=wine, row=1, column=4, user=user)
+    a = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=1, column=1, user=user
+    )
+    b = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=1, column=2, user=user
+    )
+    c = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=1, column=3, user=user
+    )
+    d = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=1, column=4, user=user
+    )
     # Move A from (1,1) to (1,4): B,C,D shift backward to fill gap
     with django_assert_num_queries(14):
         r = client.post(
@@ -115,10 +123,18 @@ def test_stock_swap_chain_shift_backward(
     storage = storage_factory(user=user, rows=1, columns=4)
     wine = wine_factory(user=user)
     # A@(1,1)  B@(1,2)  C@(1,3)  D@(1,4)
-    a = storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
-    b = storage_item_factory(storage=storage, wine=wine, row=1, column=2, user=user)
-    c = storage_item_factory(storage=storage, wine=wine, row=1, column=3, user=user)
-    d = storage_item_factory(storage=storage, wine=wine, row=1, column=4, user=user)
+    a = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=1, column=1, user=user
+    )
+    b = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=1, column=2, user=user
+    )
+    c = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=1, column=3, user=user
+    )
+    d = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=1, column=4, user=user
+    )
     # Move D from (1,4) to (1,1): A,B,C shift forward to fill gap at (1,4)
     with django_assert_num_queries(14):
         r = client.post(
@@ -149,7 +165,9 @@ def test_stock_move_to_empty_slot(
     client.force_login(user)
     storage = storage_factory(user=user, rows=1, columns=3)
     wine = wine_factory(user=user)
-    item = storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
+    item = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=1, column=1, user=user
+    )
     data = {
         "item1": item.pk,
         "storage": storage.pk,
@@ -178,7 +196,9 @@ def test_stock_move_to_empty_slot_cross_storage_rejected(
     storage1 = storage_factory(user=user, rows=1, columns=3)
     storage2 = storage_factory(user=user, rows=1, columns=3)
     wine = wine_factory(user=user)
-    item = storage_item_factory(storage=storage1, wine=wine, row=1, column=1, user=user)
+    item = storage_item_factory(
+        storage=storage1, vintage=wine.latest_vintage, row=1, column=1, user=user
+    )
     data = {
         "item1": item.pk,
         "storage": storage2.pk,
@@ -203,8 +223,12 @@ def test_stock_move_to_occupied_slot_rejected(
     client.force_login(user)
     storage = storage_factory(user=user, rows=1, columns=2)
     wine = wine_factory(user=user)
-    item1 = storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
-    storage_item_factory(storage=storage, wine=wine, row=1, column=2, user=user)
+    item1 = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=1, column=1, user=user
+    )
+    storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=1, column=2, user=user
+    )
     data = {
         "item1": item1.pk,
         "storage": storage.pk,
@@ -244,10 +268,10 @@ def test_stock_swap_other_user(
     storage = storage_factory(user=other, rows=2, columns=2)
     wine = wine_factory(user=other)
     item1 = storage_item_factory(
-        storage=storage, wine=wine, row=1, column=1, user=other
+        storage=storage, vintage=wine.latest_vintage, row=1, column=1, user=other
     )
     item2 = storage_item_factory(
-        storage=storage, wine=wine, row=1, column=2, user=other
+        storage=storage, vintage=wine.latest_vintage, row=1, column=2, user=other
     )
     data = {"item1": item1.pk, "item2": item2.pk}
     with django_assert_num_queries(3):
@@ -268,9 +292,16 @@ def test_stock_swap_deleted_item(
     storage = storage_factory(user=user, rows=2, columns=2)
     wine = wine_factory(user=user)
     item1 = storage_item_factory(
-        storage=storage, wine=wine, row=1, column=1, user=user, deleted=True
+        storage=storage,
+        vintage=wine.latest_vintage,
+        row=1,
+        column=1,
+        user=user,
+        deleted=True,
     )
-    item2 = storage_item_factory(storage=storage, wine=wine, row=1, column=2, user=user)
+    item2 = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=1, column=2, user=user
+    )
     data = {"item1": item1.pk, "item2": item2.pk}
     with django_assert_num_queries(3):
         r = client.post(reverse("stock-swap"), data=data)
@@ -303,8 +334,12 @@ def test_stock_swap_source_deleted_mid_race_rejected(
     client.force_login(user)
     storage = storage_factory(user=user, rows=1, columns=2)
     wine = wine_factory(user=user)
-    item1 = storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
-    item2 = storage_item_factory(storage=storage, wine=wine, row=1, column=2, user=user)
+    item1 = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=1, column=1, user=user
+    )
+    item2 = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=1, column=2, user=user
+    )
 
     original_refresh = StorageItem.refresh_from_db
 
@@ -336,8 +371,12 @@ def test_stock_swap_target_deleted_mid_race_rejected(
     client.force_login(user)
     storage = storage_factory(user=user, rows=1, columns=2)
     wine = wine_factory(user=user)
-    item1 = storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
-    item2 = storage_item_factory(storage=storage, wine=wine, row=1, column=2, user=user)
+    item1 = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=1, column=1, user=user
+    )
+    item2 = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=1, column=2, user=user
+    )
 
     original_refresh = StorageItem.refresh_from_db
 
@@ -370,8 +409,12 @@ def test_stock_swap_target_moved_storage_mid_race_rejected(
     storage = storage_factory(user=user, rows=1, columns=2)
     other_storage = storage_factory(user=user, rows=1, columns=2)
     wine = wine_factory(user=user)
-    item1 = storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
-    item2 = storage_item_factory(storage=storage, wine=wine, row=1, column=2, user=user)
+    item1 = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=1, column=1, user=user
+    )
+    item2 = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=1, column=2, user=user
+    )
 
     original_refresh = StorageItem.refresh_from_db
 
@@ -407,7 +450,7 @@ def test_stock_swap_unlimited_storage_defaults_to_zero_zero(
     storage = storage_factory(user=user, rows=0, columns=0)
     wine = wine_factory(user=user)
     item = storage_item_factory(
-        storage=storage, wine=wine, row=None, column=None, user=user
+        storage=storage, vintage=wine.latest_vintage, row=None, column=None, user=user
     )
     data = {"item1": item.pk, "storage": storage.pk}
     with django_assert_num_queries(10):
@@ -430,7 +473,9 @@ def test_stock_swap_out_of_bounds_slot_rejected(
     client.force_login(user)
     storage = storage_factory(user=user, rows=2, columns=2)
     wine = wine_factory(user=user)
-    item = storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
+    item = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=1, column=1, user=user
+    )
     data = {"item1": item.pk, "storage": storage.pk, "row": 99, "column": 1}
     with django_assert_num_queries(4):
         r = client.post(reverse("stock-swap"), data=data)
@@ -454,10 +499,18 @@ def test_stock_swap_chain_shift_spans_multiple_rows(
     storage = storage_factory(user=user, rows=2, columns=2)
     wine = wine_factory(user=user)
     # Full grid, row-major: A@(1,1) B@(1,2) C@(2,1) D@(2,2)
-    a = storage_item_factory(storage=storage, wine=wine, row=1, column=1, user=user)
-    b = storage_item_factory(storage=storage, wine=wine, row=1, column=2, user=user)
-    c = storage_item_factory(storage=storage, wine=wine, row=2, column=1, user=user)
-    d = storage_item_factory(storage=storage, wine=wine, row=2, column=2, user=user)
+    a = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=1, column=1, user=user
+    )
+    b = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=1, column=2, user=user
+    )
+    c = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=2, column=1, user=user
+    )
+    d = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=2, column=2, user=user
+    )
     # Move A to D's slot: B, C, D each shift back one slot (wrapping across
     # the row boundary) to fill the gap left by A.
     with django_assert_num_queries(14):

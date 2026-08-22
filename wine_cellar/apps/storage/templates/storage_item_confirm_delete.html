@@ -14,12 +14,12 @@
                   class="form">
                 {% csrf_token %}
                 <p>
-                    {% blocktrans with name=storageitem.wine.name storage=storageitem.storage.name %}Are you sure you want to take the bottle "{{ name }}" out of "{{ storage }}"? This will remove it from your cellar inventory.{% endblocktrans %}
+                    {% blocktrans with name=storageitem.vintage.wine.name storage=storageitem.storage.name %}Are you sure you want to take the bottle "{{ name }}" out of "{{ storage }}"? This will remove it from your cellar inventory.{% endblocktrans %}
                 </p>
                 <div class="pure-controls">
                     <div class="pure-g">
                         <div class="pure-u-1 pure-u-sm-1-2">
-                            <a href="{% url 'wine-detail' storageitem.wine.pk %}"
+                            <a href="{% url 'wine-detail' storageitem.vintage.wine.pk %}"
                                class="pure-button button__neutral">{% translate "Cancel" %}</a>
                         </div>
                         <div id="save_button_container" class="pure-u-1 pure-u-sm-1-2">

@@ -22,8 +22,12 @@ def test_storage_detail_default_order_is_row_major(
     client.force_login(user)
     storage = storage_factory(user=user, rows=2, columns=2)
     wine = wine_factory(user=user)
-    a = storage_item_factory(storage=storage, wine=wine, row=1, column=2, user=user)
-    b = storage_item_factory(storage=storage, wine=wine, row=2, column=1, user=user)
+    a = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=1, column=2, user=user
+    )
+    b = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=2, column=1, user=user
+    )
     with django_assert_num_queries(10):
         r = client.get(reverse("storage-detail", kwargs={"pk": storage.pk}))
     assert r.status_code == HTTPStatus.OK
@@ -47,8 +51,12 @@ def test_storage_detail_swap_axes_orders_column_major(
     storage = storage_factory(user=user, rows=2, columns=2, swap_axes=True)
     wine = wine_factory(user=user)
     # A is at (2, 1), B is at (1, 2): row-major puts B first, column-major puts A first
-    a = storage_item_factory(storage=storage, wine=wine, row=2, column=1, user=user)
-    b = storage_item_factory(storage=storage, wine=wine, row=1, column=2, user=user)
+    a = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=2, column=1, user=user
+    )
+    b = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=1, column=2, user=user
+    )
     with django_assert_num_queries(10):
         r = client.get(reverse("storage-detail", kwargs={"pk": storage.pk}))
     assert r.status_code == HTTPStatus.OK
@@ -74,7 +82,9 @@ def test_storage_detail_attaches_labels(
     storage_label_factory(storage=storage, axis="row", index=1, name="Spain")
     storage_label_factory(storage=storage, axis="column", index=2, name="Cheap")
     wine = wine_factory(user=user)
-    storage_item_factory(storage=storage, wine=wine, row=1, column=2, user=user)
+    storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=1, column=2, user=user
+    )
     with django_assert_num_queries(10):
         r = client.get(reverse("storage-detail", kwargs={"pk": storage.pk}))
     assert r.status_code == HTTPStatus.OK
@@ -102,7 +112,9 @@ def test_storage_detail_shows_both_axis_labels_regardless_of_swap_axes(
     storage_label_factory(storage=storage, axis="row", index=1, name="Spain")
     storage_label_factory(storage=storage, axis="column", index=2, name="Cheap")
     wine = wine_factory(user=user)
-    storage_item_factory(storage=storage, wine=wine, row=1, column=2, user=user)
+    storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=1, column=2, user=user
+    )
 
     with django_assert_num_queries(10):
         r = client.get(reverse("storage-detail", kwargs={"pk": storage.pk}))
@@ -134,7 +146,9 @@ def test_storage_detail_hides_label_text_when_axis_disabled(
     storage_label_factory(storage=storage, axis="row", index=1, name="Spain")
     storage_label_factory(storage=storage, axis="column", index=2, name="Cheap")
     wine = wine_factory(user=user)
-    storage_item_factory(storage=storage, wine=wine, row=1, column=2, user=user)
+    storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=1, column=2, user=user
+    )
 
     with django_assert_num_queries(10):
         r = client.get(reverse("storage-detail", kwargs={"pk": storage.pk}))

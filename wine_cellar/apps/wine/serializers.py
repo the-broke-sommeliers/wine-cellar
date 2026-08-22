@@ -105,9 +105,9 @@ class WineAiSerializer:
             initial["name"] = ai_json["name"]
 
         try:
-            vintage = int(ai_json.get("vintage"))
-            if 1900 <= vintage <= 2100:
-                initial["vintage"] = vintage
+            year = int(ai_json.get("vintage"))
+            if 1900 <= year <= 2100:
+                initial["year"] = year
         except (TypeError, ValueError):
             pass
 

@@ -22,7 +22,8 @@ def test_add_stock_to_a_grid_storage(
     storage = storage_factory(user=user, name="Wine Fridge", rows=2, columns=2)
     wine = wine_factory(user=user, name="New Arrival")
     login(user)
-    page.goto(f"{live_server.url}{reverse('stock-add', kwargs={'pk': wine.pk})}")
+    vintage_pk = wine.latest_vintage.pk
+    page.goto(f"{live_server.url}{reverse('stock-add', kwargs={'pk': vintage_pk})}")
 
     tom_select_pick(page, "id_storage", "Wine Fridge")
     grid_cell(page, 1, 2).click()
@@ -45,7 +46,8 @@ def test_add_multiple_bottles_by_clicking_cells(
     storage = storage_factory(user=user, name="Wine Fridge", rows=2, columns=2)
     wine = wine_factory(user=user, name="Case Delivery")
     login(user)
-    page.goto(f"{live_server.url}{reverse('stock-add', kwargs={'pk': wine.pk})}")
+    vintage_pk = wine.latest_vintage.pk
+    page.goto(f"{live_server.url}{reverse('stock-add', kwargs={'pk': vintage_pk})}")
 
     tom_select_pick(page, "id_storage", "Wine Fridge")
     grid_cell(page, 1, 1).click()
@@ -67,10 +69,13 @@ def test_auto_fill_selects_first_free_cells(
 ):
     storage = storage_factory(user=user, name="Wine Fridge", rows=2, columns=2)
     occupant = wine_factory(user=user, name="Occupant")
-    storage_item_factory(storage=storage, wine=occupant, user=user, row=1, column=1)
+    storage_item_factory(
+        storage=storage, vintage=occupant.latest_vintage, user=user, row=1, column=1
+    )
     wine = wine_factory(user=user, name="Auto Filled")
     login(user)
-    page.goto(f"{live_server.url}{reverse('stock-add', kwargs={'pk': wine.pk})}")
+    vintage_pk = wine.latest_vintage.pk
+    page.goto(f"{live_server.url}{reverse('stock-add', kwargs={'pk': vintage_pk})}")
 
     tom_select_pick(page, "id_storage", "Wine Fridge")
     page.locator("#id_quantity").fill("2")
@@ -91,10 +96,13 @@ def test_full_grid_disables_all_cells_and_submit(
 ):
     storage = storage_factory(user=user, name="Tiny Rack", rows=1, columns=1)
     occupant = wine_factory(user=user, name="Occupant")
-    storage_item_factory(storage=storage, wine=occupant, user=user, row=1, column=1)
+    storage_item_factory(
+        storage=storage, vintage=occupant.latest_vintage, user=user, row=1, column=1
+    )
     wine = wine_factory(user=user, name="Newcomer")
     login(user)
-    page.goto(f"{live_server.url}{reverse('stock-add', kwargs={'pk': wine.pk})}")
+    vintage_pk = wine.latest_vintage.pk
+    page.goto(f"{live_server.url}{reverse('stock-add', kwargs={'pk': vintage_pk})}")
 
     tom_select_pick(page, "id_storage", "Tiny Rack")
     assert grid_cell(page, 1, 1).is_disabled()
@@ -111,7 +119,8 @@ def test_wide_grid_scrolls_horizontally_on_narrow_viewport(
     wine = wine_factory(user=user, name="Somewhere In There")
     login(user)
     page.set_viewport_size({"width": 376, "height": 800})
-    page.goto(f"{live_server.url}{reverse('stock-add', kwargs={'pk': wine.pk})}")
+    vintage_pk = wine.latest_vintage.pk
+    page.goto(f"{live_server.url}{reverse('stock-add', kwargs={'pk': vintage_pk})}")
 
     tom_select_pick(page, "id_storage", "Wide Rack")
 
@@ -139,7 +148,8 @@ def test_unlimited_shelf_hides_grid_picker(
     # Auto-created "Default Shelf" - see storage/signals.py.
     wine = wine_factory(user=user, name="Loose Bottle")
     login(user)
-    page.goto(f"{live_server.url}{reverse('stock-add', kwargs={'pk': wine.pk})}")
+    vintage_pk = wine.latest_vintage.pk
+    page.goto(f"{live_server.url}{reverse('stock-add', kwargs={'pk': vintage_pk})}")
 
     tom_select_pick(page, "id_storage", "Default Shelf")
     assert "hidden" in (page.locator("#grid-picker").get_attribute("class") or "")
@@ -157,7 +167,9 @@ def test_editing_preselects_current_slot(
     """The edit form preselects the bottle's current slot."""
     storage = storage_factory(user=user, name="Grid Rack", rows=1, columns=2)
     wine = wine_factory(user=user, name="Movable")
-    item = storage_item_factory(storage=storage, wine=wine, user=user, row=1, column=1)
+    item = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, user=user, row=1, column=1
+    )
     login(user)
     page.goto(f"{live_server.url}{reverse('stock-edit', kwargs={'pk': item.pk})}")
 
@@ -182,7 +194,7 @@ def test_editing_into_a_slot_taken_after_page_load_shows_validation_error(
     storage = storage_factory(user=user, name="Shared Rack", rows=1, columns=2)
     mover_wine = wine_factory(user=user, name="Wants To Move")
     mover_item = storage_item_factory(
-        storage=storage, wine=mover_wine, user=user, row=1, column=2
+        storage=storage, vintage=mover_wine.latest_vintage, user=user, row=1, column=2
     )
     login(user)
     page.goto(f"{live_server.url}{reverse('stock-edit', kwargs={'pk': mover_item.pk})}")
@@ -192,7 +204,9 @@ def test_editing_into_a_slot_taken_after_page_load_shows_validation_error(
 
     # Someone else takes column 1 before this form is submitted.
     occupant = wine_factory(user=user, name="Stays Put")
-    storage_item_factory(storage=storage, wine=occupant, user=user, row=1, column=1)
+    storage_item_factory(
+        storage=storage, vintage=occupant.latest_vintage, user=user, row=1, column=1
+    )
 
     page.get_by_role("button", name="Save").click()
     page.wait_for_timeout(300)
@@ -209,7 +223,9 @@ def test_editing_stock_from_storage_grid_returns_to_storage_detail(
     """`?next=storage` returns the user to the storage grid after editing."""
     storage = storage_factory(user=user, name="Grid Rack", rows=1, columns=2)
     wine = wine_factory(user=user, name="Movable")
-    item = storage_item_factory(storage=storage, wine=wine, user=user, row=1, column=1)
+    item = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, user=user, row=1, column=1
+    )
     login(user)
     page.goto(
         f"{live_server.url}{reverse('stock-edit', kwargs={'pk': item.pk})}?next=storage"
@@ -231,7 +247,9 @@ def test_editing_switch_to_different_storage_requires_new_slot(
     storage = storage_factory(user=user, name="Grid Rack", rows=1, columns=1)
     other_storage = storage_factory(user=user, name="Other Rack", rows=1, columns=1)
     wine = wine_factory(user=user, name="Movable")
-    item = storage_item_factory(storage=storage, wine=wine, user=user, row=1, column=1)
+    item = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, user=user, row=1, column=1
+    )
     login(user)
     page.goto(f"{live_server.url}{reverse('stock-edit', kwargs={'pk': item.pk})}")
 
@@ -255,7 +273,9 @@ def test_editing_switch_to_unlimited_storage_needs_no_slot(
 ):
     storage = storage_factory(user=user, name="Grid Rack", rows=1, columns=1)
     wine = wine_factory(user=user, name="Movable")
-    item = storage_item_factory(storage=storage, wine=wine, user=user, row=1, column=1)
+    item = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, user=user, row=1, column=1
+    )
     login(user)
     page.goto(f"{live_server.url}{reverse('stock-edit', kwargs={'pk': item.pk})}")
 

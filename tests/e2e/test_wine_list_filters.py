@@ -44,7 +44,7 @@ def test_stock_yes_filter_shows_only_wines_in_stock(
     in_stock = wine_factory(user=user, name="In Stock Wine")
     wine_factory(user=user, name="Not In Stock Wine")
     storage = storage_factory(user=user, rows=0, columns=0)
-    storage_item_factory(wine=in_stock, storage=storage, user=user)
+    storage_item_factory(vintage=in_stock.latest_vintage, storage=storage, user=user)
     login(user)
     page.goto(f"{live_server.url}{reverse('wine-list')}")
 

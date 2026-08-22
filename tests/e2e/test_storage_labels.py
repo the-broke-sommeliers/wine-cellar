@@ -20,7 +20,9 @@ def test_naming_rows_persists_and_shows_in_grid(
 ):
     storage = storage_factory(user=user, rows=3, columns=2)
     wine = wine_factory(user=user, name="Labeled Wine")
-    storage_item_factory(storage=storage, wine=wine, user=user, row=1, column=1)
+    storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, user=user, row=1, column=1
+    )
     login(user)
 
     page.goto(labels_url(live_server, storage.pk, "row"))

@@ -18,7 +18,9 @@ def test_unauthenticated_cant_undo_open(
 ):
     storage = storage_factory(user=user)
     wine = wine_factory(user=user)
-    item = storage_item_factory(storage=storage, wine=wine, user=user, opened=True)
+    item = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, user=user, opened=True
+    )
     with django_assert_num_queries(1):
         r = client.get(reverse("stock-undo-open", kwargs={"pk": item.pk}), follow=True)
     assert r.status_code == HTTPStatus.OK
@@ -46,13 +48,13 @@ def test_undo_open_clears_opened_and_reminder(
     wine = wine_factory(user=user)
     item = storage_item_factory(
         storage=storage,
-        wine=wine,
+        vintage=wine.latest_vintage,
         user=user,
         opened=True,
         opened_note="birthday dinner",
         drink_by=date.today() + timedelta(days=7),
     )
-    with django_assert_num_queries(24):
+    with django_assert_num_queries(34):
         r = client.post(reverse("stock-undo-open", kwargs={"pk": item.pk}), follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(r, reverse("wine-detail", kwargs={"pk": wine.pk}))
@@ -76,8 +78,10 @@ def test_undo_open_redirects_to_storage_detail(
     client.force_login(user)
     storage = storage_factory(user=user)
     wine = wine_factory(user=user)
-    item = storage_item_factory(storage=storage, wine=wine, user=user, opened=True)
-    with django_assert_num_queries(20):
+    item = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, user=user, opened=True
+    )
+    with django_assert_num_queries(21):
         r = client.post(
             reverse("stock-undo-open", kwargs={"pk": item.pk}) + "?next=storage",
             follow=True,
@@ -98,7 +102,7 @@ def test_cant_undo_open_on_unopened_bottle(
     client.force_login(user)
     storage = storage_factory(user=user)
     wine = wine_factory(user=user)
-    item = storage_item_factory(storage=storage, wine=wine, user=user)
+    item = storage_item_factory(storage=storage, vintage=wine.latest_vintage, user=user)
     with django_assert_num_queries(3):
         r = client.get(reverse("stock-undo-open", kwargs={"pk": item.pk}))
     assert r.status_code == HTTPStatus.NOT_FOUND
@@ -117,7 +121,11 @@ def test_cant_undo_open_on_deleted_bottle(
     storage = storage_factory(user=user)
     wine = wine_factory(user=user)
     item = storage_item_factory(
-        storage=storage, wine=wine, user=user, opened=True, deleted=True
+        storage=storage,
+        vintage=wine.latest_vintage,
+        user=user,
+        opened=True,
+        deleted=True,
     )
     with django_assert_num_queries(3):
         r = client.get(reverse("stock-undo-open", kwargs={"pk": item.pk}))
@@ -138,7 +146,9 @@ def test_cant_undo_open_other_users_bottle(
     client.force_login(user)
     storage = storage_factory(user=other)
     wine = wine_factory(user=other)
-    item = storage_item_factory(storage=storage, wine=wine, user=other, opened=True)
+    item = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, user=other, opened=True
+    )
     with django_assert_num_queries(3):
         r = client.get(reverse("stock-undo-open", kwargs={"pk": item.pk}))
     assert r.status_code == HTTPStatus.NOT_FOUND

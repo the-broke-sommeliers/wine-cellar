@@ -21,7 +21,7 @@ from wine_cellar.apps.storage.models import (
     StorageLabel,
     StorageLabelAxis,
 )
-from wine_cellar.apps.wine.models import Wine
+from wine_cellar.apps.wine.models import Vintage
 
 
 class SlotConflictError(Exception):
@@ -326,12 +326,20 @@ class StorageItemAddView(FormView):
         context = super().get_context_data(**kwargs)
         context["storage_cells_data"] = storage_picker_payload(self.request.user)
         context["is_edit"] = False
+        # Display-only - not scoped to request.user like form_valid()'s
+        # lookup: this is just the heading label, and re-renders on a form
+        # error must not 404 the whole page over an unrelated field error.
+        context["vintage"] = get_object_or_404(
+            Vintage.objects.select_related("wine"), pk=self.kwargs["pk"]
+        )
         return context
 
     def form_valid(self, form):
-        wine = get_object_or_404(Wine, pk=self.kwargs["pk"], user=self.request.user)
+        vintage = get_object_or_404(
+            Vintage, pk=self.kwargs["pk"], wine__user=self.request.user
+        )
         try:
-            self.process_form_data(wine, self.request.user, form.cleaned_data)
+            self.process_form_data(vintage, self.request.user, form.cleaned_data)
         except (SlotConflictError, IntegrityError):
             form.add_error(
                 None,
@@ -341,13 +349,14 @@ class StorageItemAddView(FormView):
                 ),
             )
             return self.form_invalid(form)
-        self.success_url = reverse_lazy("wine-detail", kwargs={"pk": wine.pk})
+        self.success_url = reverse_lazy("wine-detail", kwargs={"pk": vintage.wine.pk})
         return super().form_valid(form)
 
     @staticmethod
-    def process_form_data(wine, user, cleaned_data):
+    def process_form_data(vintage, user, cleaned_data):
         storage = cleaned_data["storage"]
         price = cleaned_data.get("price")
+        wine = vintage.wine
 
         with transaction.atomic():
             # Re-validate under lock - see SlotConflictError.
@@ -355,7 +364,9 @@ class StorageItemAddView(FormView):
             if storage.is_unlimited:
                 quantity = cleaned_data.get("quantity") or 1
                 items = StorageItem.objects.bulk_create(
-                    StorageItem(storage=storage, wine=wine, user=user, price=price)
+                    StorageItem(
+                        storage=storage, vintage=vintage, user=user, price=price
+                    )
                     for _ in range(quantity)
                 )
             else:
@@ -366,7 +377,7 @@ class StorageItemAddView(FormView):
                 items = StorageItem.objects.bulk_create(
                     StorageItem(
                         storage=storage,
-                        wine=wine,
+                        vintage=vintage,
                         row=row,
                         column=column,
                         user=user,
@@ -379,6 +390,8 @@ class StorageItemAddView(FormView):
                     storage_item=item,
                     wine=wine,
                     wine_name=wine.name,
+                    vintage=vintage,
+                    vintage_year=vintage.year,
                     user=user,
                     event_type=StorageItemEventType.ADDED,
                 )
@@ -393,7 +406,9 @@ class StorageItemUpdateView(FormView):
     def get_initial(self):
         initial = super().get_initial()
         self.storage_item = get_object_or_404(
-            StorageItem, pk=self.kwargs["pk"], user=self.request.user
+            StorageItem.objects.select_related("vintage__wine"),
+            pk=self.kwargs["pk"],
+            user=self.request.user,
         )
         initial.update(model_to_dict(self.storage_item))
         return initial
@@ -412,6 +427,7 @@ class StorageItemUpdateView(FormView):
             self.request.user, exclude_item=self.storage_item
         )
         context["is_edit"] = True
+        context["vintage"] = self.storage_item.vintage
         return context
 
     def get_success_url(self):
@@ -420,7 +436,9 @@ class StorageItemUpdateView(FormView):
             return reverse_lazy(
                 "storage-detail", kwargs={"pk": self.storage_item.storage.pk}
             )
-        return reverse_lazy("wine-detail", kwargs={"pk": self.storage_item.wine.pk})
+        return reverse_lazy(
+            "wine-detail", kwargs={"pk": self.storage_item.vintage.wine.pk}
+        )
 
     def form_valid(self, form):
         try:
@@ -467,7 +485,7 @@ class StorageItemDeleteView(DeleteView):
         next = self.request.GET.get("next")
         if next == "storage":
             return reverse_lazy("storage-detail", kwargs={"pk": self.object.storage.pk})
-        return reverse_lazy("wine-detail", kwargs={"pk": self.object.wine.pk})
+        return reverse_lazy("wine-detail", kwargs={"pk": self.object.vintage.wine.pk})
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -480,8 +498,10 @@ class StorageItemDeleteView(DeleteView):
             self.object.save(update_fields=["deleted"])
             StorageItemEvent.objects.create(
                 storage_item=self.object,
-                wine=self.object.wine,
-                wine_name=self.object.wine.name,
+                wine=self.object.vintage.wine,
+                wine_name=self.object.vintage.wine.name,
+                vintage=self.object.vintage,
+                vintage_year=self.object.vintage.year,
                 user=self.request.user,
                 event_type=StorageItemEventType.REMOVED,
             )
@@ -510,7 +530,7 @@ class StorageItemOpenView(FormView):
         next_param = self.request.GET.get("next")
         if next_param == "storage":
             return reverse_lazy("storage-detail", kwargs={"pk": self.object.storage.pk})
-        return reverse_lazy("wine-detail", kwargs={"pk": self.object.wine.pk})
+        return reverse_lazy("wine-detail", kwargs={"pk": self.object.vintage.wine.pk})
 
     def form_valid(self, form):
         self.object = self.get_object()
@@ -525,8 +545,10 @@ class StorageItemOpenView(FormView):
             self.object.save(update_fields=["opened", "opened_note", "drink_by"])
             StorageItemEvent.objects.create(
                 storage_item=self.object,
-                wine=self.object.wine,
-                wine_name=self.object.wine.name,
+                wine=self.object.vintage.wine,
+                wine_name=self.object.vintage.wine.name,
+                vintage=self.object.vintage,
+                vintage_year=self.object.vintage.year,
                 user=self.request.user,
                 event_type=StorageItemEventType.OPENED,
                 note=note,
@@ -542,7 +564,7 @@ class StorageItemConsumeView(DeleteView):
         next_param = self.request.GET.get("next")
         if next_param == "storage":
             return reverse_lazy("storage-detail", kwargs={"pk": self.object.storage.pk})
-        return reverse_lazy("wine-detail", kwargs={"pk": self.object.wine.pk})
+        return reverse_lazy("wine-detail", kwargs={"pk": self.object.vintage.wine.pk})
 
     def get_queryset(self):
         return super().get_queryset().filter(user=self.request.user, deleted=False)
@@ -555,8 +577,10 @@ class StorageItemConsumeView(DeleteView):
             self.object.save(update_fields=["opened", "deleted"])
             StorageItemEvent.objects.create(
                 storage_item=self.object,
-                wine=self.object.wine,
-                wine_name=self.object.wine.name,
+                wine=self.object.vintage.wine,
+                wine_name=self.object.vintage.wine.name,
+                vintage=self.object.vintage,
+                vintage_year=self.object.vintage.year,
                 user=self.request.user,
                 event_type=StorageItemEventType.CONSUMED,
             )
@@ -571,7 +595,7 @@ class StorageItemUndoOpenView(DeleteView):
         next_param = self.request.GET.get("next")
         if next_param == "storage":
             return reverse_lazy("storage-detail", kwargs={"pk": self.object.storage.pk})
-        return reverse_lazy("wine-detail", kwargs={"pk": self.object.wine.pk})
+        return reverse_lazy("wine-detail", kwargs={"pk": self.object.vintage.wine.pk})
 
     def get_queryset(self):
         return (
@@ -589,8 +613,10 @@ class StorageItemUndoOpenView(DeleteView):
             self.object.save(update_fields=["opened", "opened_note", "drink_by"])
             StorageItemEvent.objects.create(
                 storage_item=self.object,
-                wine=self.object.wine,
-                wine_name=self.object.wine.name,
+                wine=self.object.vintage.wine,
+                wine_name=self.object.vintage.wine.name,
+                vintage=self.object.vintage,
+                vintage_year=self.object.vintage.year,
                 user=self.request.user,
                 event_type=StorageItemEventType.UNDO_OPEN,
             )

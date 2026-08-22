@@ -17,14 +17,14 @@ def test_drag_onto_adjacent_item_swaps_positions(
     storage = storage_factory(user=user, rows=1, columns=2)
     item_a = storage_item_factory(
         storage=storage,
-        wine=wine_factory(user=user, name="Wine A"),
+        vintage=wine_factory(user=user, name="Wine A").latest_vintage,
         user=user,
         row=1,
         column=1,
     )
     item_b = storage_item_factory(
         storage=storage,
-        wine=wine_factory(user=user, name="Wine B"),
+        vintage=wine_factory(user=user, name="Wine B").latest_vintage,
         user=user,
         row=1,
         column=2,
@@ -52,21 +52,21 @@ def test_drag_onto_non_adjacent_item_shifts_the_chain(
     storage = storage_factory(user=user, rows=1, columns=3)
     item_a = storage_item_factory(
         storage=storage,
-        wine=wine_factory(user=user, name="Wine A"),
+        vintage=wine_factory(user=user, name="Wine A").latest_vintage,
         user=user,
         row=1,
         column=1,
     )
     item_b = storage_item_factory(
         storage=storage,
-        wine=wine_factory(user=user, name="Wine B"),
+        vintage=wine_factory(user=user, name="Wine B").latest_vintage,
         user=user,
         row=1,
         column=2,
     )
     item_c = storage_item_factory(
         storage=storage,
-        wine=wine_factory(user=user, name="Wine C"),
+        vintage=wine_factory(user=user, name="Wine C").latest_vintage,
         user=user,
         row=1,
         column=3,
@@ -98,7 +98,7 @@ def test_drag_onto_empty_slot_moves_item_there(
     storage = storage_factory(user=user, rows=1, columns=2)
     item = storage_item_factory(
         storage=storage,
-        wine=wine_factory(user=user, name="Lone Wine"),
+        vintage=wine_factory(user=user, name="Lone Wine").latest_vintage,
         user=user,
         row=1,
         column=1,

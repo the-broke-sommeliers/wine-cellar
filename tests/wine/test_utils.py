@@ -42,10 +42,12 @@ def test_wine_to_json_none(wine_factory, geojson_point, django_assert_num_querie
         "country_name": "Germany",
         "country_icon": "🇩🇪",
         "image": wine.image_thumbnail,
-        "vintage": wine.vintage,
+        "vintage": wine.latest_vintage.year,
         "location": geojson_point,
         "url": wine.get_absolute_url(),
     }
+    # latest_vintage (and its image lookup) is already cached from building
+    # `expected` above.
     with django_assert_num_queries(0):
         assert wine_to_json(wine) == expected
 
@@ -85,7 +87,7 @@ def test_get_map_attributes_with_wine(
                 "country_name": "Germany",
                 "country_icon": "🇩🇪",
                 "image": wine.image_thumbnail,
-                "vintage": wine.vintage,
+                "vintage": wine.latest_vintage.year,
                 "location": geojson_point,
                 "url": wine.get_absolute_url(),
             }
@@ -161,11 +163,11 @@ def test_make_thumbnail_no_exif_falls_back(
     """No EXIF at all - the plain fallback path, made explicit rather than
     only exercised incidentally by other tests via the factory's default
     (EXIF-less) image."""
-    wine = wine_factory(user=user)
+    vintage = wine_factory(user=user).latest_vintage
     with django_assert_num_queries(2):
         wine_image = wine_image_factory(
             user=user,
-            wine=wine,
+            vintage=vintage,
             image=SimpleUploadedFile(
                 "no_exif.jpg", _half_split_jpeg(), content_type="image/jpeg"
             ),
@@ -188,12 +190,12 @@ def test_make_thumbnail_corrupt_exif_falls_back(
     make `Image._getexif()` itself raise - the `except (AttributeError,
     KeyError, IndexError)` guard must still produce an un-rotated
     thumbnail instead of propagating the error to the caller."""
-    wine = wine_factory(user=user)
+    vintage = wine_factory(user=user).latest_vintage
     with patch.object(JpegImageFile, "_getexif", side_effect=AttributeError):
         with django_assert_num_queries(2):
             wine_image = wine_image_factory(
                 user=user,
-                wine=wine,
+                vintage=vintage,
                 image=SimpleUploadedFile(
                     "corrupt_exif.jpg", _half_split_jpeg(), content_type="image/jpeg"
                 ),
@@ -230,11 +232,11 @@ def test_make_thumbnail_rotates_by_exif_orientation(
 ):
     """Phone photos routinely carry an EXIF orientation tag - the thumbnail
     must be rotated to match, not saved sideways/upside-down."""
-    wine = wine_factory(user=user)
+    vintage = wine_factory(user=user).latest_vintage
     with django_assert_num_queries(2):
         wine_image = wine_image_factory(
             user=user,
-            wine=wine,
+            vintage=vintage,
             image=SimpleUploadedFile(
                 f"exif_{orientation}.jpg",
                 _half_split_jpeg(orientation),

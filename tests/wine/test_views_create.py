@@ -106,7 +106,7 @@ def test_wine_create_post_with_barcode(client, user, django_assert_num_queries):
         "category": "DR",
         "abv": 13.0,
         "size": size.pk,
-        "vintage": 2002,
+        "year": 2002,
         "country": "DE",
         "form_step": 5,
     }
@@ -116,7 +116,7 @@ def test_wine_create_post_with_barcode(client, user, django_assert_num_queries):
     r = client.get(reverse("wine-add") + f"?prefill_token={token}")
     initial = r.context_data["form"].initial.copy()
     initial.update(data)
-    with django_assert_num_queries(20):
+    with django_assert_num_queries(22):
         r = client.post(reverse("wine-add"), data=initial, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
@@ -126,10 +126,10 @@ def test_wine_create_post_with_barcode(client, user, django_assert_num_queries):
     wine = Wine.objects.first()
     assert wine.name == data["name"]
     assert wine.wine_type == data["wine_type"]
-    assert wine.abv == data["abv"]
+    assert wine.latest_vintage.abv == data["abv"]
     assert wine.size == size
-    assert wine.vintage == data["vintage"]
-    assert wine.barcode == "12345"
+    assert wine.latest_vintage.year == data["year"]
+    assert wine.latest_vintage.barcode == "12345"
 
 
 @pytest.mark.django_db
@@ -142,7 +142,7 @@ def test_wine_create_post_with_drink_by(client, user, django_assert_num_queries)
         "category": "DR",
         "abv": 13.0,
         "size": size.pk,
-        "vintage": 2002,
+        "year": 2002,
         "drink_by": "2003-02-25",
         "country": "DE",
         "form_step": 5,
@@ -153,7 +153,7 @@ def test_wine_create_post_with_drink_by(client, user, django_assert_num_queries)
     r = client.get(reverse("wine-add") + f"?prefill_token={token}")
     initial = r.context_data["form"].initial.copy()
     initial.update(data)
-    with django_assert_num_queries(20):
+    with django_assert_num_queries(22):
         r = client.post(reverse("wine-add"), data=initial, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
@@ -163,11 +163,11 @@ def test_wine_create_post_with_drink_by(client, user, django_assert_num_queries)
     wine = Wine.objects.first()
     assert wine.name == data["name"]
     assert wine.wine_type == data["wine_type"]
-    assert wine.abv == data["abv"]
+    assert wine.latest_vintage.abv == data["abv"]
     assert wine.size == size
-    assert wine.vintage == data["vintage"]
-    assert wine.barcode == "12345"
-    assert wine.drink_by == datetime.date(day=25, month=2, year=2003)
+    assert wine.latest_vintage.year == data["year"]
+    assert wine.latest_vintage.barcode == "12345"
+    assert wine.latest_vintage.drink_by == datetime.date(day=25, month=2, year=2003)
 
 
 @pytest.mark.django_db
@@ -182,7 +182,7 @@ def test_wine_create_post_with_invalid_drink_by(
         "category": "DR",
         "abv": 13.0,
         "size": size.pk,
-        "vintage": 2002,
+        "year": 2002,
         "drink_by": "02-02-2000",
         "country": "DE",
         "form_step": 5,
@@ -228,7 +228,7 @@ def test_wine_create_post_with_steps(
     data_step1 = {
         "category": "DR",
         "abv": 13.0,
-        "vintage": 2002,
+        "year": 2002,
     }
     initial = r.context_data["form"].data.copy()
     assert initial["form_step"] == 1
@@ -279,7 +279,7 @@ def test_wine_create_post_with_steps(
     # post form step 5
     initial = r.context_data["form"].data.copy()
     assert initial["form_step"] == 5
-    with django_assert_num_queries(28):
+    with django_assert_num_queries(30):
         r = client.post(reverse("wine-add"), data=initial, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
@@ -295,14 +295,14 @@ def test_wine_create_post_with_steps(
     data.update(data_step4)
     assert wine.name == data["name"]
     assert wine.wine_type == data["wine_type"]
-    assert wine.abv == data["abv"]
+    assert wine.latest_vintage.abv == data["abv"]
     assert wine.size == size
     assert wine.country == data["country"]
     assert wine.region == region
     assert wine.appellation == appellation
-    assert wine.vintage == data["vintage"]
-    assert wine.comment == data["comment"]
-    assert wine.rating == data["rating"]
+    assert wine.latest_vintage.year == data["year"]
+    assert wine.latest_vintage.comment == data["comment"]
+    assert wine.latest_vintage.rating == data["rating"]
 
 
 @pytest.mark.django_db
@@ -315,7 +315,7 @@ def test_wine_create_post_invalid_step(client, user, django_assert_num_queries):
         "category": "DR",
         "abv": 13.0,
         "size": size.pk,
-        "vintage": 2002,
+        "year": 2002,
         "country": "DE",
         "form_step": 6,
     }
@@ -339,11 +339,11 @@ def test_wine_create_post_valid(client, user, django_assert_num_queries):
         "category": "DR",
         "abv": 13.0,
         "size": size.pk,
-        "vintage": 2002,
+        "year": 2002,
         "country": "DE",
     }
     assert not Wine.objects.exists()
-    with django_assert_num_queries(20):
+    with django_assert_num_queries(22):
         r = client.post(reverse("wine-add"), data, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
@@ -353,9 +353,9 @@ def test_wine_create_post_valid(client, user, django_assert_num_queries):
     wine = Wine.objects.first()
     assert wine.name == data["name"]
     assert wine.wine_type == data["wine_type"]
-    assert wine.abv == data["abv"]
+    assert wine.latest_vintage.abv == data["abv"]
     assert wine.size == size
-    assert wine.vintage == data["vintage"]
+    assert wine.latest_vintage.year == data["year"]
     event = StorageItemEvent.objects.get(wine=wine)
     assert event.event_type == StorageItemEventType.WINE_ADDED
     assert event.wine_name == wine.name
@@ -375,13 +375,13 @@ def test_wine_create_save_finish_commits_early(client, user, django_assert_num_q
         "category": "DR",
         "abv": 13.0,
         "size": size.pk,
-        "vintage": 2002,
+        "year": 2002,
         "country": "DE",
         "form_step": 0,
         "save_finish": "1",
     }
     assert not Wine.objects.exists()
-    with django_assert_num_queries(20):
+    with django_assert_num_queries(22):
         r = client.post(reverse("wine-add"), data, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
@@ -404,7 +404,7 @@ def test_wine_update_does_not_log_wine_added(
         "size": Size.objects.get(name=0.75).pk,
         "country": wine.country,
     }
-    with django_assert_num_queries(34):
+    with django_assert_num_queries(45):
         client.post(reverse("wine-edit", kwargs={"pk": wine.pk}), data, follow=True)
     assert not StorageItemEvent.objects.filter(
         event_type=StorageItemEventType.WINE_ADDED
@@ -425,12 +425,12 @@ def test_wine_create_post_single_grape_valid(
         "category": "DR",
         "abv": 13.0,
         "size": size.pk,
-        "vintage": 2002,
+        "year": 2002,
         "grapes": grape1.pk,
         "country": "DE",
     }
     assert not Wine.objects.exists()
-    with django_assert_num_queries(23):
+    with django_assert_num_queries(25):
         r = client.post(reverse("wine-add"), data, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
@@ -440,9 +440,9 @@ def test_wine_create_post_single_grape_valid(
     wine = Wine.objects.first()
     assert wine.name == data["name"]
     assert wine.wine_type == data["wine_type"]
-    assert wine.abv == data["abv"]
+    assert wine.latest_vintage.abv == data["abv"]
     assert wine.size == size
-    assert wine.vintage == data["vintage"]
+    assert wine.latest_vintage.year == data["year"]
     assert wine.grapes.count() == 1
     assert wine.grapes.first() == grape1
 
@@ -461,12 +461,12 @@ def test_wine_create_post_multiple_grape_valid(
         "category": "DR",
         "abv": 13.0,
         "size": size.pk,
-        "vintage": 2002,
+        "year": 2002,
         "grapes": [grape1.pk, grape2.pk],
         "country": "DE",
     }
     assert not Wine.objects.exists()
-    with django_assert_num_queries(23):
+    with django_assert_num_queries(25):
         r = client.post(reverse("wine-add"), data, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
@@ -476,9 +476,9 @@ def test_wine_create_post_multiple_grape_valid(
     wine = Wine.objects.first()
     assert wine.name == data["name"]
     assert wine.wine_type == data["wine_type"]
-    assert wine.abv == data["abv"]
+    assert wine.latest_vintage.abv == data["abv"]
     assert wine.size == size
-    assert wine.vintage == data["vintage"]
+    assert wine.latest_vintage.year == data["year"]
     assert wine.grapes.count() == 2
     assert wine.grapes.filter(id__in=[grape1.pk, grape2.pk])
 
@@ -495,12 +495,12 @@ def test_wine_create_post_new_grape_valid(
         "category": "DR",
         "abv": 13.0,
         "size": size.pk,
-        "vintage": 2002,
+        "year": 2002,
         "grapes": "tom_new_optTestGrape",
         "country": "DE",
     }
     assert not Wine.objects.exists()
-    with django_assert_num_queries(26):
+    with django_assert_num_queries(28):
         r = client.post(reverse("wine-add"), data, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
@@ -510,9 +510,9 @@ def test_wine_create_post_new_grape_valid(
     wine = Wine.objects.first()
     assert wine.name == data["name"]
     assert wine.wine_type == data["wine_type"]
-    assert wine.abv == data["abv"]
+    assert wine.latest_vintage.abv == data["abv"]
     assert wine.size == size
-    assert wine.vintage == data["vintage"]
+    assert wine.latest_vintage.year == data["year"]
     assert wine.grapes.count() == 1
     assert wine.grapes.first().name == "TestGrape"
 
@@ -529,7 +529,7 @@ def test_wine_create_post_invalid_grape(
         "category": "DR",
         "abv": 13.0,
         "capacity": size.pk,
-        "vintage": 2002,
+        "year": 2002,
         "grapes": [1.0],
         "country": "DE",
     }
@@ -548,7 +548,7 @@ def test_wine_create_post_invalid_grape(
         "category": "DR",
         "abv": 13.0,
         "size": size.pk,
-        "vintage": 2002,
+        "year": 2002,
         "grapes": 1,
         "country": "DE",
     }
@@ -577,12 +577,12 @@ def test_wine_create_post_new_grape_multiple_valid(
         "category": "DR",
         "abv": 13.0,
         "size": size.pk,
-        "vintage": 2002,
+        "year": 2002,
         "grapes": ["tom_new_optTestGrape", grape1.pk, grape2.pk],
         "country": "DE",
     }
     assert not Wine.objects.exists()
-    with django_assert_num_queries(27):
+    with django_assert_num_queries(29):
         r = client.post(reverse("wine-add"), data, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
@@ -592,9 +592,9 @@ def test_wine_create_post_new_grape_multiple_valid(
     wine = Wine.objects.first()
     assert wine.name == data["name"]
     assert wine.wine_type == data["wine_type"]
-    assert wine.abv == data["abv"]
+    assert wine.latest_vintage.abv == data["abv"]
     assert wine.size == size
-    assert wine.vintage == data["vintage"]
+    assert wine.latest_vintage.year == data["year"]
     assert wine.grapes.count() == 3
     assert wine.grapes.filter(id__in=[grape1.pk, grape2.pk])
     assert wine.grapes.filter(name="TestGrape")
@@ -625,7 +625,7 @@ def test_wine_create_post_all_valid_fields(
         "category": "DR",
         "abv": 13.0,
         "size": size.pk,
-        "vintage": 2002,
+        "year": 2002,
         "grapes": grape1.pk,
         "food_pairings": food_pairing.pk,
         "source": source.pk,
@@ -634,7 +634,7 @@ def test_wine_create_post_all_valid_fields(
         "country": "DE",
     }
     assert not Wine.objects.exists()
-    with django_assert_num_queries(35):
+    with django_assert_num_queries(37):
         r = client.post(reverse("wine-add"), data, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
@@ -644,9 +644,9 @@ def test_wine_create_post_all_valid_fields(
     wine = Wine.objects.first()
     assert wine.name == data["name"]
     assert wine.wine_type == data["wine_type"]
-    assert wine.abv == data["abv"]
+    assert wine.latest_vintage.abv == data["abv"]
     assert wine.size == size
-    assert wine.vintage == data["vintage"]
+    assert wine.latest_vintage.year == data["year"]
     assert wine.grapes.count() == 1
     assert wine.grapes.first() == grape1
     assert wine.food_pairings.count() == 1
@@ -665,9 +665,7 @@ def test_wine_create_duplicate(client, user, wine_factory, django_assert_num_que
         user=user,
         name="Merlot",
         wine_type="RE",
-        abv=13.0,
         size=size,
-        vintage=2002,
         country="DE",
     )
     client.force_login(user)
@@ -677,7 +675,7 @@ def test_wine_create_duplicate(client, user, wine_factory, django_assert_num_que
         "category": "DR",
         "abv": 13.0,
         "size": size.pk,
-        "vintage": 2002,
+        "year": 2002,
         "country": "DE",
         "form_step": 5,
     }
@@ -770,7 +768,7 @@ def test_wine_edit_replace_front_image(
         "size": size.pk,
     }
 
-    with django_assert_num_queries(40):
+    with django_assert_num_queries(51):
         r = client.post(
             reverse("wine-edit", kwargs={"pk": wine.pk}),
             {**base_data, "image_front": random_png("front1.png")},
@@ -780,9 +778,14 @@ def test_wine_edit_replace_front_image(
     assertRedirects(
         response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
     )
-    assert WineImage.objects.filter(wine=wine, image_type=ImageType.FRONT).count() == 1
+    assert (
+        WineImage.objects.filter(
+            vintage=wine.latest_vintage, image_type=ImageType.FRONT
+        ).count()
+        == 1
+    )
 
-    with django_assert_num_queries(40):
+    with django_assert_num_queries(51):
         r = client.post(
             reverse("wine-edit", kwargs={"pk": wine.pk}),
             {**base_data, "image_front": random_png("front2.png")},
@@ -811,7 +814,7 @@ def test_wine_edit_overwrite_front_and_back_with_newer_images(
         "size": size.pk,
     }
 
-    with django_assert_num_queries(46):
+    with django_assert_num_queries(57):
         r = client.post(
             reverse("wine-edit", kwargs={"pk": wine.pk}),
             {
@@ -822,10 +825,20 @@ def test_wine_edit_overwrite_front_and_back_with_newer_images(
             follow=True,
         )
     assert r.status_code == HTTPStatus.OK
-    assert WineImage.objects.filter(wine=wine, image_type=ImageType.FRONT).count() == 1
-    assert WineImage.objects.filter(wine=wine, image_type=ImageType.BACK).count() == 1
+    assert (
+        WineImage.objects.filter(
+            vintage=wine.latest_vintage, image_type=ImageType.FRONT
+        ).count()
+        == 1
+    )
+    assert (
+        WineImage.objects.filter(
+            vintage=wine.latest_vintage, image_type=ImageType.BACK
+        ).count()
+        == 1
+    )
 
-    with django_assert_num_queries(47):
+    with django_assert_num_queries(58):
         r = client.post(
             reverse("wine-edit", kwargs={"pk": wine.pk}),
             {
@@ -840,8 +853,12 @@ def test_wine_edit_overwrite_front_and_back_with_newer_images(
         response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
     )
 
-    front_images = WineImage.objects.filter(wine=wine, image_type=ImageType.FRONT)
-    back_images = WineImage.objects.filter(wine=wine, image_type=ImageType.BACK)
+    front_images = WineImage.objects.filter(
+        vintage=wine.latest_vintage, image_type=ImageType.FRONT
+    )
+    back_images = WineImage.objects.filter(
+        vintage=wine.latest_vintage, image_type=ImageType.BACK
+    )
     # Overwriting must not leave the old row (and file) behind.
     assert front_images.count() == 1
     assert back_images.count() == 1
@@ -887,21 +904,25 @@ def test_wine_create_overwriting_ai_stashed_images_with_newer_ones(
             "category": "DR",
             "abv": 13.0,
             "size": size.pk,
-            "vintage": 2002,
+            "year": 2002,
             "country": "DE",
             "form_step": 5,
             "image_front": random_png("newer_front.png"),
             "image_back": random_png("newer_back.png"),
         }
     )
-    with django_assert_num_queries(32):
+    with django_assert_num_queries(34):
         r = client.post(reverse("wine-add"), data=initial, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
 
     wine = Wine.objects.first()
-    front_images = WineImage.objects.filter(wine=wine, image_type=ImageType.FRONT)
-    back_images = WineImage.objects.filter(wine=wine, image_type=ImageType.BACK)
+    front_images = WineImage.objects.filter(
+        vintage=wine.latest_vintage, image_type=ImageType.FRONT
+    )
+    back_images = WineImage.objects.filter(
+        vintage=wine.latest_vintage, image_type=ImageType.BACK
+    )
     assert front_images.count() == 1
     assert back_images.count() == 1
     assert "newer_front" in front_images.first().image.name
@@ -946,17 +967,22 @@ def test_wine_create_uses_ai_uploaded_front_image(
             "category": "DR",
             "abv": 13.0,
             "size": size.pk,
-            "vintage": 2002,
+            "year": 2002,
             "country": "DE",
             "form_step": 5,
         }
     )
-    with django_assert_num_queries(26):
+    with django_assert_num_queries(28):
         r = client.post(reverse("wine-add"), data=initial, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
     wine = Wine.objects.first()
-    assert WineImage.objects.filter(wine=wine, image_type=ImageType.FRONT).count() == 1
+    assert (
+        WineImage.objects.filter(
+            vintage=wine.latest_vintage, image_type=ImageType.FRONT
+        ).count()
+        == 1
+    )
 
 
 @pytest.mark.django_db
@@ -1004,12 +1030,12 @@ def test_wine_create_other_users_prefill_token_not_deleted_on_save(
         "category": "DR",
         "abv": 13.0,
         "size": size.pk,
-        "vintage": 2002,
+        "year": 2002,
         "country": "DE",
         "form_step": 5,
         "prefill_token": token,
     }
-    with django_assert_num_queries(20):
+    with django_assert_num_queries(22):
         r = client.post(reverse("wine-add"), data=data, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
@@ -1045,17 +1071,19 @@ def test_wine_create_explicit_image_overrides_ai_stashed_image(
             "category": "DR",
             "abv": 13.0,
             "size": size.pk,
-            "vintage": 2002,
+            "year": 2002,
             "country": "DE",
             "form_step": 5,
             "image_front": random_png("manual_front.png"),
         }
     )
-    with django_assert_num_queries(26):
+    with django_assert_num_queries(28):
         r = client.post(reverse("wine-add"), data=initial, follow=True)
     assert r.status_code == HTTPStatus.OK
     wine = Wine.objects.first()
-    images = WineImage.objects.filter(wine=wine, image_type=ImageType.FRONT)
+    images = WineImage.objects.filter(
+        vintage=wine.latest_vintage, image_type=ImageType.FRONT
+    )
     assert images.count() == 1
     assert "manual_front" in images.first().image.name
     assert "ai_front" not in images.first().image.name
@@ -1129,18 +1157,23 @@ def test_wine_create_clearing_ai_stashed_image_discards_it(
             "category": "DR",
             "abv": 13.0,
             "size": size.pk,
-            "vintage": 2002,
+            "year": 2002,
             "country": "DE",
             "form_step": 5,
             "image_front-clear": "on",
         }
     )
-    with django_assert_num_queries(21):
+    with django_assert_num_queries(23):
         r = client.post(reverse("wine-add"), data=initial, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("wine-list"))
     wine = Wine.objects.first()
-    assert WineImage.objects.filter(wine=wine, image_type=ImageType.FRONT).count() == 0
+    assert (
+        WineImage.objects.filter(
+            vintage=wine.latest_vintage, image_type=ImageType.FRONT
+        ).count()
+        == 0
+    )
 
 
 @pytest.mark.django_db

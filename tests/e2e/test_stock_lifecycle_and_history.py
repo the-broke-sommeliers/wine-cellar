@@ -16,7 +16,9 @@ def test_open_bottle_with_reminder_shows_opened_styling(
 ):
     storage = storage_factory(user=user, rows=1, columns=1)
     wine = wine_factory(user=user, name="To Be Opened")
-    item = storage_item_factory(storage=storage, wine=wine, user=user, row=1, column=1)
+    item = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, user=user, row=1, column=1
+    )
     login(user)
     page.goto(f"{live_server.url}{reverse('stock-open', kwargs={'pk': item.pk})}")
 
@@ -44,7 +46,7 @@ def test_undo_open_reverts_state(
     wine = wine_factory(user=user, name="Reopened")
     item = storage_item_factory(
         storage=storage,
-        wine=wine,
+        vintage=wine.latest_vintage,
         user=user,
         row=1,
         column=1,
@@ -70,7 +72,9 @@ def test_consume_sealed_bottle_directly(
     mark it opened+deleted (StorageItemConsumeView.form_valid)."""
     storage = storage_factory(user=user, rows=1, columns=1)
     wine = wine_factory(user=user, name="Straight To Finished")
-    item = storage_item_factory(storage=storage, wine=wine, user=user, row=1, column=1)
+    item = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, user=user, row=1, column=1
+    )
     login(user)
     page.goto(f"{live_server.url}{reverse('stock-consume', kwargs={'pk': item.pk})}")
     page.get_by_role("button", name="Finish Bottle").click()
@@ -88,7 +92,9 @@ def test_delete_item_removes_from_grid(
 ):
     storage = storage_factory(user=user, rows=1, columns=1)
     wine = wine_factory(user=user, name="Removed Bottle")
-    item = storage_item_factory(storage=storage, wine=wine, user=user, row=1, column=1)
+    item = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, user=user, row=1, column=1
+    )
     login(user)
     page.goto(f"{live_server.url}{reverse('stock-delete', kwargs={'pk': item.pk})}")
     page.get_by_role("button", name="Delete").click()
@@ -122,7 +128,9 @@ def test_actions_from_storage_grid_return_to_storage_detail(
 ):
     storage = storage_factory(user=user, rows=1, columns=1)
     wine = wine_factory(user=user, name="Grid Origin")
-    item = storage_item_factory(storage=storage, wine=wine, user=user, row=1, column=1)
+    item = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, user=user, row=1, column=1
+    )
     login(user)
     page.goto(
         f"{live_server.url}{reverse(url_name, kwargs={'pk': item.pk})}?next=storage"
@@ -151,13 +159,21 @@ def test_history_page_shows_correct_status_per_item(
     consumed_wine = wine_factory(user=user, name="History Consumed")
     removed_wine = wine_factory(user=user, name="History Removed")
     opened_item = storage_item_factory(
-        storage=storage, wine=opened_wine, user=user, opened=True
+        storage=storage, vintage=opened_wine.latest_vintage, user=user, opened=True
     )
     consumed_item = storage_item_factory(
-        storage=storage, wine=consumed_wine, user=user, opened=True, deleted=True
+        storage=storage,
+        vintage=consumed_wine.latest_vintage,
+        user=user,
+        opened=True,
+        deleted=True,
     )
     removed_item = storage_item_factory(
-        storage=storage, wine=removed_wine, user=user, opened=False, deleted=True
+        storage=storage,
+        vintage=removed_wine.latest_vintage,
+        user=user,
+        opened=False,
+        deleted=True,
     )
     storage_item_event_factory(
         storage_item=opened_item,
@@ -203,7 +219,9 @@ def test_history_pagination(
     storage = storage_factory(user=user, rows=0, columns=0)
     for i in range(11):
         wine = wine_factory(user=user, name=f"History Wine {i:02d}")
-        item = storage_item_factory(storage=storage, wine=wine, user=user, opened=True)
+        item = storage_item_factory(
+            storage=storage, vintage=wine.latest_vintage, user=user, opened=True
+        )
         storage_item_event_factory(
             storage_item=item,
             wine=wine,

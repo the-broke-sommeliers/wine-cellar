@@ -31,9 +31,10 @@ def test_scan_page_mounts_scanner_ui_without_a_camera(live_server, page, login, 
 
 @pytest.mark.django_db
 def test_scanning_a_known_barcode_redirects_to_its_wine(
-    live_server, page, login, user, wine_factory
+    live_server, page, login, user, wine_factory, vintage_factory
 ):
-    wine = wine_factory(user=user, name="Scanned Wine", barcode="1234567890123")
+    wine = wine_factory(user=user, name="Scanned Wine", _create_default_vintage=False)
+    vintage_factory(wine=wine, barcode="1234567890123")
     login(user)
     page.goto(f"{live_server.url}/wine/scan/1234567890123")
     page.wait_for_url(f"**{reverse('wine-detail', kwargs={'pk': wine.pk})}")
