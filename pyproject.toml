@@ -61,6 +61,12 @@ profile = "black"
 skip_gitignore = true
 line_length = 88
 
+[tool.djlint]
+# allauth's `{% element %}...{% endelement %}` / `{% slot %}...{% endslot %}`
+# template tags aren't known to djlint's django profile, which otherwise
+# flags every use as an unmatched end tag (T038) in wine_cellar/templates/allauth/.
+custom_blocks = "element,slot"
+
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "wine_cellar.conf.test"
 python_files = ["test_*.py", "*_test.py"]
