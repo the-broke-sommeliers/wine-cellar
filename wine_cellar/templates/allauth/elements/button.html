@@ -6,7 +6,7 @@
 {% if attrs.name %}name="{{ attrs.name }}"{% endif %}
 {% if attrs.value %}value="{{ attrs.value }}"{% endif %}
 {% if attrs.type %}type="{{ attrs.type }}"{% endif %}
-class="pure-button button__primary"
+class="pure-button {% if "danger" in attrs.tags or "delete" in attrs.tags %}button__danger{% else %}button__primary{% endif %}"
 >
 {% slot %}
 {% endslot %}

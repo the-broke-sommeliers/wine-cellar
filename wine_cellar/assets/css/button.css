@@ -66,6 +66,44 @@
   border: 2px solid var(--dark-green);
 }
 
+.button__danger {
+  background-color: var(--red);
+  color: var(--light);
+  border-radius: 6px;
+
+  &:hover {
+    background-color: var(--darker-red);
+  }
+
+  &:focus {
+    outline: 2px solid var(--focus-ring-color);
+    outline-offset: 2px;
+    background-color: var(--darker-red);
+  }
+
+  &:active {
+    background-color: var(--darkest-red);
+  }
+}
+
+.provider-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.provider-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  box-sizing: border-box;
+  text-decoration: none;
+}
+
 .wine__edit-delete-buttons {
   display: flex;
   gap: 6px;

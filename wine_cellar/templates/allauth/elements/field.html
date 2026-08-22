@@ -1,15 +1,30 @@
 {% load i18n allauth %}
 <div class="form-container">
-    <label for="{{ attrs.id }}">
-        {% slot label %}{% endslot %}
-        {% if not attrs.required %}
-            {% if attrs.type != "checkbox" and attrs.type != "radio" %}
+    {% if attrs.type == "checkbox" or attrs.type == "radio" %}
+        <label for="{{ attrs.id }}" class="form-choice">
+            <input {% if attrs.required %}required{% endif %}
+                   {% if attrs.disabled %}disabled{% endif %}
+                   {% if attrs.readonly %}readonly{% endif %}
+                   {% if attrs.checked %}checked{% endif %}
+                   {% if attrs.name %}name="{{ attrs.name }}"{% endif %}
+                   {% if attrs.id %}id="{{ attrs.id }}"{% endif %}
+                   {% if attrs.autocomplete %}autocomplete="{{ attrs.autocomplete }}"{% endif %}
+                   {% if attrs.value is not None %}value="{{ attrs.value }}"{% endif %}
+                   aria-invalid="{% if attrs.errors %}true{% else %}false{% endif %}"
+                   type="{{ attrs.type }}"
+                   class="form-choice__input">
+            <span class="form-choice__label">{% slot label %}{% endslot %}</span>
+        </label>
+    {% else %}
+        <label for="{{ attrs.id }}">
+            {% slot label %}{% endslot %}
+            {% if not attrs.required %}
                 <p class="d-inline"
                    role="presentation"
                    title="{% translate "This field is optional" %}">{% translate "(Optional)" %}</p>
             {% endif %}
-        {% endif %}
-    </label>
+        </label>
+    {% endif %}
     {% if attrs.help_text and attrs.type != "password" %}
         <div class="form-hint">{% slot help_text %}{% endslot %}</div>
     {% endif %}
@@ -19,26 +34,28 @@
         </ul>
     {% endif %}
 
-    {% if attrs.type == "textarea" %}
-        <textarea {% if attrs.required %}required{% endif %}
-                  {% if attrs.rows %}rows="{{ attrs.rows }}"{% endif %}
-                  {% if attrs.disabled %}disabled{% endif %}
-                  {% if attrs.readonly %}readonly{% endif %}
-                  {% if attrs.checked %}checked{% endif %}
-                  {% if attrs.name %}name="{{ attrs.name }}"{% endif %}
-                  {% if attrs.id %}id="{{ attrs.id }}"{% endif %}
-                  aria-invalid="{% if attrs.errors %}true{% else %}false{% endif %}">{% if attrs.value is not None %}{{ attrs.value }}{% endif %}</textarea>
-    {% else %}
-        <input {% if attrs.required %}required{% endif %}
-               {% if attrs.disabled %}disabled{% endif %}
-               {% if attrs.readonly %}readonly{% endif %}
-               {% if attrs.checked %}checked{% endif %}
-               {% if attrs.name %}name="{{ attrs.name }}"{% endif %}
-               {% if attrs.id %}id="{{ attrs.id }}"{% endif %}
-               {% if attrs.autocomplete %}autocomplete="{{ attrs.autocomplete }}"{% endif %}
-               {% if attrs.value is not None %}value="{{ attrs.value }}"{% endif %}
-               aria-invalid="{% if attrs.errors %}true{% else %}false{% endif %}"
-               type="{{ attrs.type }}">
+    {% if attrs.type != "checkbox" and attrs.type != "radio" %}
+        {% if attrs.type == "textarea" %}
+            <textarea {% if attrs.required %}required{% endif %}
+                      {% if attrs.rows %}rows="{{ attrs.rows }}"{% endif %}
+                      {% if attrs.disabled %}disabled{% endif %}
+                      {% if attrs.readonly %}readonly{% endif %}
+                      {% if attrs.checked %}checked{% endif %}
+                      {% if attrs.name %}name="{{ attrs.name }}"{% endif %}
+                      {% if attrs.id %}id="{{ attrs.id }}"{% endif %}
+                      aria-invalid="{% if attrs.errors %}true{% else %}false{% endif %}">{% if attrs.value is not None %}{{ attrs.value }}{% endif %}</textarea>
+        {% else %}
+            <input {% if attrs.required %}required{% endif %}
+                   {% if attrs.disabled %}disabled{% endif %}
+                   {% if attrs.readonly %}readonly{% endif %}
+                   {% if attrs.checked %}checked{% endif %}
+                   {% if attrs.name %}name="{{ attrs.name }}"{% endif %}
+                   {% if attrs.id %}id="{{ attrs.id }}"{% endif %}
+                   {% if attrs.autocomplete %}autocomplete="{{ attrs.autocomplete }}"{% endif %}
+                   {% if attrs.value is not None %}value="{{ attrs.value }}"{% endif %}
+                   aria-invalid="{% if attrs.errors %}true{% else %}false{% endif %}"
+                   type="{{ attrs.type }}">
+        {% endif %}
     {% endif %}
      {% if attrs.help_text and attrs.type == "password" %}
         <div class="form-hint">{% slot help_text %}{% endslot %}</div>
