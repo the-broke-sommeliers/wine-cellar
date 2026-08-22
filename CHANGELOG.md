@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.12.0-rc.1 (2026-08-20)
+## 0.12.0-rc.2 (2026-08-22)
 
 ### feat
 
@@ -12,9 +12,20 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### fix
 
+- SSO button styling
+
+- **deps**: update dependency litellm to v1.96.2
+- **deps**: update dependency django-allauth to v65.19.1
+- set email tls to False if not set in .env.prod to avoid confusion
+
 - inline EMAIL_ settings to prevent Django from throwing an error
 
 - some inefficient database queries
+
+
+### refactor
+
+- replace react barcode scanenr package with local implementation
 
 
 
