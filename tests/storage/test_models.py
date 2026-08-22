@@ -23,10 +23,19 @@ def test_storage_slots_calcution_correct(
     storage = storage_factory(user=user, rows=5, columns=5)
     wine = wine_factory(user=user)
     item_deleted = storage_item_factory(
-        storage=storage, wine=wine, user=user, row=1, column=1, deleted=True
+        storage=storage,
+        vintage=wine.latest_vintage,
+        user=user,
+        row=1,
+        column=1,
+        deleted=True,
     )
-    item = storage_item_factory(storage=storage, wine=wine, user=user, row=1, column=1)
-    item = storage_item_factory(storage=storage, wine=wine, user=user, row=1, column=2)
+    item = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, user=user, row=1, column=1
+    )
+    item = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, user=user, row=1, column=2
+    )
     assert item.deleted is False
     assert item_deleted.deleted is True
     assert StorageItem.objects.count() == 3
@@ -44,7 +53,7 @@ def test_is_full_true(
 ):
     storage = storage_factory(user=user, rows=1, columns=1)
     wine = wine_factory(user=user)
-    storage_item_factory(storage=storage, wine=wine, row=1, column=1)
+    storage_item_factory(storage=storage, vintage=wine.latest_vintage, row=1, column=1)
     with django_assert_num_queries(1):
         is_full = storage.is_full
     assert is_full is True
@@ -56,7 +65,7 @@ def test_is_full_false(
 ):
     storage = storage_factory(user=user, rows=2, columns=2)
     wine = wine_factory(user=user)
-    storage_item_factory(storage=storage, wine=wine, row=1, column=1)
+    storage_item_factory(storage=storage, vintage=wine.latest_vintage, row=1, column=1)
     with django_assert_num_queries(1):
         is_full = storage.is_full
     assert is_full is False
@@ -72,7 +81,7 @@ def test_is_slot_occupied_true(
 ):
     storage = storage_factory(user=user, rows=2, columns=2)
     wine = wine_factory(user=user)
-    storage_item_factory(storage=storage, wine=wine, row=1, column=1)
+    storage_item_factory(storage=storage, vintage=wine.latest_vintage, row=1, column=1)
     with django_assert_num_queries(1):
         occupied = storage.is_slot_occupied(1, 1)
     assert occupied is True
@@ -88,7 +97,9 @@ def test_is_slot_occupied_false_after_delete(
 ):
     storage = storage_factory(user=user, rows=2, columns=2)
     wine = wine_factory(user=user)
-    storage_item_factory(storage=storage, wine=wine, row=1, column=1, deleted=True)
+    storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=1, column=1, deleted=True
+    )
     with django_assert_num_queries(1):
         occupied = storage.is_slot_occupied(1, 1)
     assert occupied is False
@@ -104,8 +115,12 @@ def test_get_wines_excludes_deleted(
 ):
     storage = storage_factory(user=user, rows=2, columns=2)
     wine = wine_factory(user=user)
-    active_item = storage_item_factory(storage=storage, wine=wine, row=1, column=1)
-    storage_item_factory(storage=storage, wine=wine, row=1, column=2, deleted=True)
+    active_item = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=1, column=1
+    )
+    storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, row=1, column=2, deleted=True
+    )
     with django_assert_num_queries(1):
         wines = list(storage.get_wines)
     assert len(wines) == 1
@@ -120,15 +135,15 @@ def test_get_wines_prefetches_wine(
     storage_item_factory,
     django_assert_num_queries,
 ):
-    """Regression guard: storage_detail.html accesses `entry.wine` per row,
-    so get_wines must select_related it - fetch_mode(FETCH_RAISE) fails loudly
-    if that's ever dropped instead of silently reintroducing an N+1."""
+    """Regression guard: storage_detail.html accesses `entry.vintage.wine` per
+    row, so get_wines must select_related it - fetch_mode(FETCH_RAISE) fails
+    loudly if that's ever dropped instead of silently reintroducing an N+1."""
     storage = storage_factory(user=user, rows=1, columns=1)
     wine = wine_factory(user=user)
-    storage_item_factory(storage=storage, wine=wine, row=1, column=1)
+    storage_item_factory(storage=storage, vintage=wine.latest_vintage, row=1, column=1)
     with django_assert_num_queries(1):
         entries = list(storage.get_wines.fetch_mode(FETCH_RAISE))
-    assert [entry.wine.name for entry in entries] == [wine.name]
+    assert [entry.vintage.wine.name for entry in entries] == [wine.name]
 
 
 @pytest.mark.django_db
@@ -142,10 +157,14 @@ def test_unique_active_slot_constraint_rejects_duplicate(
     """DB backstop for the (storage, row, column) race - see the views' locking."""
     storage = storage_factory(user=user, rows=1, columns=1)
     wine = wine_factory(user=user)
-    storage_item_factory(storage=storage, wine=wine, user=user, row=1, column=1)
+    storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, user=user, row=1, column=1
+    )
     with django_assert_num_queries(4):
         with pytest.raises(IntegrityError), transaction.atomic():
-            storage_item_factory(storage=storage, wine=wine, user=user, row=1, column=1)
+            storage_item_factory(
+                storage=storage, vintage=wine.latest_vintage, user=user, row=1, column=1
+            )
     assert StorageItem.objects.filter(storage=storage, deleted=False).count() == 1
 
 
@@ -162,11 +181,18 @@ def test_unique_active_slot_constraint_ignores_deleted_items(
     storage = storage_factory(user=user, rows=1, columns=1)
     wine = wine_factory(user=user)
     storage_item_factory(
-        storage=storage, wine=wine, user=user, row=1, column=1, deleted=True
+        storage=storage,
+        vintage=wine.latest_vintage,
+        user=user,
+        row=1,
+        column=1,
+        deleted=True,
     )
     # Should not raise.
     with django_assert_num_queries(1):
-        storage_item_factory(storage=storage, wine=wine, user=user, row=1, column=1)
+        storage_item_factory(
+            storage=storage, vintage=wine.latest_vintage, user=user, row=1, column=1
+        )
     assert StorageItem.objects.filter(storage=storage, deleted=False).count() == 1
 
 
@@ -180,9 +206,9 @@ def test_unique_active_slot_constraint_ignores_unlimited_storages(
     assert storage.is_unlimited
     wine = wine_factory(user=user)
     # Should not raise, even though both items share (storage, None, None).
-    with django_assert_num_queries(2):
-        storage_item_factory(storage=storage, wine=wine, user=user)
-        storage_item_factory(storage=storage, wine=wine, user=user)
+    with django_assert_num_queries(3):
+        storage_item_factory(storage=storage, vintage=wine.latest_vintage, user=user)
+        storage_item_factory(storage=storage, vintage=wine.latest_vintage, user=user)
     assert StorageItem.objects.filter(storage=storage, deleted=False).count() == 2
 
 

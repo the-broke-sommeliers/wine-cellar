@@ -46,15 +46,16 @@ class WineFilter(django_filters.FilterSet):
         method="filter_storage",
         label=_("Storage"),
     )
+    vintage = django_filters.NumberFilter(method="filter_vintage", label=_("Vintage"))
     order = NullsLastOrderingFilter(
         choices=(
             ("-created", _("Recently Added")),
             ("created", _("Least Recently Added")),
             ("-name", _("Name Descending")),
             ("name", _("Name Ascending")),
-            ("-vintage", _("Youngest First")),
-            ("vintage", _("Oldest First")),
-            ("drink_by", _("Drink By")),
+            ("-vintage_year", _("Youngest First")),
+            ("vintage_year", _("Oldest First")),
+            ("next_drink_by", _("Drink By")),
             ("-effective_price", _("Highest Price (Avg)")),
             ("effective_price", _("Lowest Price (Avg)")),
         ),
@@ -63,10 +64,14 @@ class WineFilter(django_filters.FilterSet):
         null_label=None,
     )
 
+    def filter_vintage(self, queryset, name, value):
+        return queryset.filter(vintages__year=value).distinct()
+
     def filter_stock(self, queryset, name, value):
         if value == "1":
             return queryset.filter(
-                storageitem__isnull=False, storageitem__deleted=False
+                vintages__storageitem__isnull=False,
+                vintages__storageitem__deleted=False,
             ).distinct()
         else:
             return queryset
@@ -75,7 +80,7 @@ class WineFilter(django_filters.FilterSet):
         if not value:
             return queryset
         return queryset.filter(
-            storageitem__storage=value, storageitem__deleted=False
+            vintages__storageitem__storage=value, vintages__storageitem__deleted=False
         ).distinct()
 
     class Meta:
@@ -86,7 +91,6 @@ class WineFilter(django_filters.FilterSet):
             "wine_type",
             "attributes",
             "category",
-            "vintage",
             "vineyard",
             "grapes",
             "food_pairings",

@@ -186,6 +186,14 @@ p.form-hint {
   padding-left: 1rem;
 }
 
+.form-warning {
+  background: var(--danger-tint);
+  color: var(--red);
+  border-radius: var(--border-radius);
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
 .filter-form {
   background: white;
   border-radius: var(--border-radius);

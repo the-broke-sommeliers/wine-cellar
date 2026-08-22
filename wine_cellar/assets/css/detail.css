@@ -128,6 +128,16 @@
   color: var(--red);
 }
 
+.card__action-btn--add {
+  color: var(--dark-green);
+  font-weight: 700;
+}
+
+.card__action-btn--add:hover {
+  background: var(--green-tint);
+  color: var(--darker-green);
+}
+
 .card__highlights {
   display: flex;
   flex-wrap: wrap;
@@ -157,8 +167,13 @@
 
 .card__fields {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
   gap: 0.5rem 1.5rem;
+}
+
+.card__fields--standalone {
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  margin-top: 1.15rem;
 }
 
 .card__field {
@@ -175,6 +190,25 @@
 
 .card__field-value {
   color: var(--darker-gray);
+}
+
+/* Tuned contrast, scoped to the wine detail card only: lighter/smaller
+   labels, near-black values, more row air - so a page with several
+   label/value groups stacked (Wine/Origin/Numbers) stays easy to scan
+   without affecting card__field's other users (e.g. storage_detail.html). */
+.card--wine-details .card__field-label {
+  font-size: 0.7rem;
+  color: var(--text-color-gray);
+  letter-spacing: 0.07em;
+}
+
+.card--wine-details .card__field-value {
+  font-size: 0.96rem;
+  color: #161616;
+}
+
+.card--wine-details .card__fields {
+  gap: 0.75rem 1.75rem;
 }
 
 .card__section {
@@ -314,6 +348,10 @@
   background: rgba(212, 117, 0, 0.05);
 }
 
+.stock-item--other-vintage {
+  opacity: 0.4;
+}
+
 .table-legend {
   display: flex;
   align-items: center;
@@ -374,4 +412,72 @@
     font-size: var(--font-sm);
     color: var(--text-color-gray);
   }
+}
+
+.vintage-switcher {
+  margin-top: 1.5rem;
+}
+
+.vintage-switcher__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  border-bottom: 1px solid var(--border-color-light);
+}
+
+.vintage-switcher__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  flex-wrap: wrap;
+  padding-bottom: 0.5rem;
+}
+
+.vintage-switcher__add {
+  margin-right: 0.6rem;
+}
+
+.vintage-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.4rem;
+}
+
+.vintage-tabs__tab {
+  padding: 0 0.1rem 0.55rem;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  background: none;
+  color: var(--text-color-gray);
+  font-size: var(--font-sm);
+  cursor: pointer;
+  transition:
+    color 0.15s,
+    border-color 0.15s;
+}
+
+.vintage-tabs__tab:hover {
+  color: var(--darker-gray);
+}
+
+.vintage-tabs__tab--active {
+  color: var(--darker-green);
+  font-weight: 700;
+  border-bottom-color: var(--dark-green);
+}
+
+.vintage-tabs__tab:focus-visible {
+  outline: 3px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+.vintage-panel {
+  padding-top: 0.95rem;
+}
+
+.vintage-panel__comment {
+  margin-top: 1.1rem;
 }

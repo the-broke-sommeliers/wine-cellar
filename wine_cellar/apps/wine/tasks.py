@@ -13,7 +13,7 @@ from wine_cellar.apps.wine.emails import (
     send_drink_by_reminder,
     send_opened_bottle_reminder,
 )
-from wine_cellar.apps.wine.models import Category, Wine, WineType
+from wine_cellar.apps.wine.models import Category, Vintage, WineType
 from wine_cellar.apps.wine.serializers import WineAiSerializer
 from wine_cellar.apps.wine.utils import (
     WINE_PREFILL_TIMEOUT,
@@ -55,11 +55,11 @@ def drink_by_reminder():
     )
     date = timezone.localdate() + timedelta(days=14)
     for user in users:
-        wines = Wine.objects.filter(
-            user=user, drink_by=date, storageitem__isnull=False
+        vintages = Vintage.objects.filter(
+            wine__user=user, drink_by=date, storageitem__isnull=False
         ).distinct()
-        if wines.count() > 0:
-            send_drink_by_reminder(user, wines)
+        if vintages.count() > 0:
+            send_drink_by_reminder(user, vintages)
 
 
 @shared_task(name="opened_bottle_reminder")
@@ -78,7 +78,7 @@ def opened_bottle_reminder():
             StorageItem.objects.filter(
                 user=user, opened=True, deleted=False, drink_by=today
             )
-            .select_related("wine")
+            .select_related("vintage__wine")
             .fetch_mode(FETCH_RAISE)
         )
         if items.exists():

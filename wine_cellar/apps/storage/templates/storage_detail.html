@@ -105,7 +105,8 @@
                                     </td>
                                     {% endif %}
                                     <td>
-                                        <a href="{% url 'wine-detail' entry.wine.pk %}">{{ entry.wine.name }}</a>
+                                        <a href="{% url 'wine-detail' entry.vintage.wine.pk %}">{{ entry.vintage.wine.name }}</a>
+                                        {% if entry.vintage.year %}<span class="text--gray">({{ entry.vintage.year }})</span>{% endif %}
                                         {% if entry.opened %}<span class="visually-hidden">{% translate "Opened" %}</span>{% endif %}
                                     </td>
                                     {% if swap_axes %}

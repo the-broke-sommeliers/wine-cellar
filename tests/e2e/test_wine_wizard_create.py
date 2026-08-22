@@ -40,7 +40,7 @@ def test_full_wizard_create_flow_reaches_wine_list(
     page.wait_for_selector("#create__fs_1:not(.hidden)")
 
     tom_select_pick(page, "id_grapes", "Merlot", create=True)
-    page.locator("#id_vintage").fill("2018")
+    page.locator("#id_year").fill("2018")
     page.get_by_role("button", name="Continue").click()
     page.wait_for_selector("#create__fs_2:not(.hidden)")
 
@@ -72,14 +72,14 @@ def test_back_button_preserves_previously_entered_values(
     page.get_by_role("button", name="Continue").click()
     page.wait_for_selector("#create__fs_1:not(.hidden)")
 
-    page.locator("#id_vintage").fill("2015")
+    page.locator("#id_year").fill("2015")
     page.get_by_role("button", name="Back").click()
     page.wait_for_selector("#create__fs_0:not(.hidden)")
     assert page.locator("#id_name").input_value() == "Back Button Wine"
 
     page.get_by_role("button", name="Continue").click()
     page.wait_for_selector("#create__fs_1:not(.hidden)")
-    assert page.locator("#id_vintage").input_value() == "2015"
+    assert page.locator("#id_year").input_value() == "2015"
 
 
 @pytest.mark.django_db
@@ -114,18 +114,16 @@ def test_duplicate_wine_error_is_shown_to_the_user(
     and calls ``form.add_error(None, "...already exists...")`` - a
     *non-field* error. `wine_create.html` renders `form.non_field_errors`
     right after the CSRF token so that message actually reaches the user."""
-    # The uniqueness constraint is on (name, wine_type, abv, size, vintage,
-    # country, user) - SQL treats NULL as never equal to NULL, so any NULL
-    # column would exempt the row from the constraint entirely. Every field
-    # needs a concrete, matching value for the collision to actually fire.
+    # The uniqueness constraint is on (name, wine_type, size, country, user) -
+    # SQL treats NULL as never equal to NULL, so any NULL column would exempt
+    # the row from the constraint entirely. Every field needs a concrete,
+    # matching value for the collision to actually fire.
     size = size_factory(user=user, name=0.75)
     wine_factory(
         user=user,
         name="Twin Wine",
         wine_type="RE",
         country="DE",
-        vintage=2019,
-        abv=13.5,
         size=size,
     )
 
@@ -134,7 +132,7 @@ def test_duplicate_wine_error_is_shown_to_the_user(
     fill_step_0(page, name="Twin Wine")
     page.get_by_role("button", name="Continue").click()
     page.wait_for_selector("#create__fs_1:not(.hidden)")
-    page.locator("#id_vintage").fill("2019")
+    page.locator("#id_year").fill("2019")
     page.locator("#id_abv").fill("13.5")
 
     page.get_by_role("button", name="Save and Finish").click()

@@ -82,7 +82,9 @@ def test_grid_order_flips_with_swap_axes(
 ):
     storage = storage_factory(user=user, rows=2, columns=2, swap_axes=False)
     wine_a = wine_factory(user=user, name="Row1Col2")
-    storage_item_factory(storage=storage, wine=wine_a, user=user, row=1, column=2)
+    storage_item_factory(
+        storage=storage, vintage=wine_a.latest_vintage, user=user, row=1, column=2
+    )
     login(user)
 
     # `th` is styled `text-transform: uppercase`, which `innerText` reflects

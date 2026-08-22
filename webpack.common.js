@@ -57,6 +57,9 @@ module.exports = {
     wine_carousel: {
       import: ['./wine_cellar/assets/js/wine_carousel.ts'],
     },
+    vintage_tabs: {
+      import: ['./wine_cellar/assets/js/vintage_tabs.ts'],
+    },
     image_preview: {
       import: ['./wine_cellar/assets/js/image_preview.ts'],
     },

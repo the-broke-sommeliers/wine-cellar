@@ -35,7 +35,9 @@ def test_delete_wine_confirm_flow(live_server, page, login, user, wine_factory):
     login(user)
     page.goto(f"{live_server.url}{reverse('wine-detail', kwargs={'pk': wine.pk})}")
 
-    page.get_by_role("link", name="Delete").click()
+    # exact=True: the vintage panel on the same page has its own "Delete
+    # Vintage" link, which would otherwise substring-match "Delete" too.
+    page.get_by_role("link", name="Delete", exact=True).click()
     page.wait_for_url(f"**{reverse('wine-delete', kwargs={'pk': wine.pk})}")
     assert "Doomed Wine" in page.locator("main").inner_text()
 

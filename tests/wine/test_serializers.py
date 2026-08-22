@@ -62,7 +62,7 @@ def test_deserialize_ai_payload_returns_model_instances(
 
 @pytest.mark.django_db
 def test_deserialize_ai_payload_leaves_absent_relations_untouched(
-    django_assert_num_queries
+    django_assert_num_queries,
 ):
     """A payload with no relation fields (e.g. a plain barcode prefill) should
     not have `region`/`appellation`/`grapes`/`vineyard` invented as None/[]."""
@@ -98,7 +98,7 @@ def test_invalid_alcohol_string_is_ignored(django_assert_num_queries):
 
 @pytest.mark.django_db
 def test_serialize_relation_raises_type_error_on_invalid_multi(
-    django_assert_num_queries
+    django_assert_num_queries,
 ):
     serializer = WineAiSerializer()
 
@@ -138,7 +138,7 @@ def test_deserialize_relation_scalar_for_multi_wrapped_in_list(
 
 @pytest.mark.django_db
 def test_deserialize_relation_raises_type_error_on_invalid_multi(
-    django_assert_num_queries
+    django_assert_num_queries,
 ):
     serializer = WineAiSerializer()
 
@@ -189,7 +189,7 @@ def test_serialize_ai_payload_vintage_string_coerced(django_assert_num_queries):
     ai_json = {"name": "Wine", "vintage": "2018"}
     with django_assert_num_queries(0):
         initial = serializer.serialize_ai_payload(ai_json)
-    assert initial["vintage"] == 2018
+    assert initial["year"] == 2018
 
 
 @pytest.mark.django_db
@@ -198,7 +198,7 @@ def test_serialize_ai_payload_vintage_non_numeric_dropped(django_assert_num_quer
     ai_json = {"name": "Wine", "vintage": "NV"}
     with django_assert_num_queries(0):
         initial = serializer.serialize_ai_payload(ai_json)
-    assert "vintage" not in initial
+    assert "year" not in initial
 
 
 @pytest.mark.django_db

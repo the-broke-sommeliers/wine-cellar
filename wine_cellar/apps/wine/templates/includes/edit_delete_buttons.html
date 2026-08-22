@@ -1,9 +1,11 @@
 {% load i18n %}
+{% translate "Edit" as default_edit_label %}
+{% translate "Delete" as default_delete_label %}
 <div class="wine__edit-delete-buttons">
-    <a class="card__action-btn" href="{{ edit_url }}" title="{% translate "Edit" %}">
-        <i class="fa-regular fa-pen-to-square"></i> <span>{% translate "Edit" %}</span>
+    <a class="card__action-btn" href="{{ edit_url }}" title="{{ edit_label|default:default_edit_label }}">
+        <i class="fa-regular fa-pen-to-square"></i> <span>{{ edit_label|default:default_edit_label }}</span>
     </a>
-    <a class="card__action-btn card__action-btn--delete" href="{{ delete_url }}" title="{% translate "Delete" %}">
-        <i class="fa-regular fa-trash-can"></i> <span>{% translate "Delete" %}</span>
+    <a class="card__action-btn card__action-btn--delete" href="{{ delete_url }}" title="{{ delete_label|default:default_delete_label }}">
+        <i class="fa-regular fa-trash-can"></i> <span>{{ delete_label|default:default_delete_label }}</span>
     </a>
 </div>

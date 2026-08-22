@@ -17,14 +17,21 @@ class StorageAdmin(admin.ModelAdmin):
 
 @admin.register(StorageItem)
 class StorageItemAdmin(admin.ModelAdmin):
-    list_display = ("id", "storage", "wine", "row", "column", "created")
-    search_fields = ("wine__name", "storage__name")
+    list_display = ("id", "storage", "vintage", "row", "column", "created")
+    search_fields = ("vintage__wine__name", "storage__name")
     list_filter = ("storage",)
 
 
 @admin.register(StorageItemEvent)
 class StorageItemEventAdmin(admin.ModelAdmin):
-    list_display = ("id", "wine_name", "storage_item", "event_type", "created")
+    list_display = (
+        "id",
+        "wine_name",
+        "vintage_year",
+        "storage_item",
+        "event_type",
+        "created",
+    )
     search_fields = ("wine_name", "storage_item__storage__name")
     list_filter = ("event_type", "created")
 

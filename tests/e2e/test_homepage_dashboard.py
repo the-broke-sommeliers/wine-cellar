@@ -34,13 +34,16 @@ def test_homepage_stats_reflect_data_and_deep_link_into_wine_list(
     login,
     user,
     wine_factory,
+    vintage_factory,
     storage_factory,
     storage_item_factory,
 ):
-    wine_old = wine_factory(user=user, country="DE", vintage=1950)
-    wine_factory(user=user, country="FR", vintage=2020)
+    wine_old = wine_factory(user=user, country="DE", _create_default_vintage=False)
+    vintage_old = vintage_factory(wine=wine_old, year=1950)
+    wine_new = wine_factory(user=user, country="FR", _create_default_vintage=False)
+    vintage_factory(wine=wine_new, year=2020)
     storage = storage_factory(user=user, rows=0, columns=0)
-    storage_item_factory(wine=wine_old, storage=storage, user=user, price=10)
+    storage_item_factory(vintage=vintage_old, storage=storage, user=user, price=10)
 
     login(user)
     page.goto(live_server.url)
@@ -60,9 +63,9 @@ def test_homepage_stats_reflect_data_and_deep_link_into_wine_list(
     assert cards_on_list.count() == 1
     assert wine_old.name in cards_on_list.inner_text()
 
-    # "Oldest Wine" deep-links with order=vintage and the oldest wine sorts first.
+    # "Oldest Wine" deep-links with order=vintage_year and the oldest wine sorts first.
     page.goto(live_server.url)
     stat_cards(page).nth(5).locator("a.stats__link").click()
-    page.wait_for_url("**order=vintage**")
+    page.wait_for_url("**order=vintage_year**")
     first_card = page.locator("ul.wine-card__list li.wine-card").first
     assert wine_old.name in first_card.inner_text()

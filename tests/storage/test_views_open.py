@@ -20,7 +20,7 @@ def test_unauthenticated_cant_open_stock(
 ):
     storage = storage_factory(user=user)
     wine = wine_factory(user=user)
-    item = storage_item_factory(storage=storage, wine=wine, user=user)
+    item = storage_item_factory(storage=storage, vintage=wine.latest_vintage, user=user)
     with django_assert_num_queries(1):
         r = client.get(reverse("stock-open", kwargs={"pk": item.pk}), follow=True)
     assert r.status_code == HTTPStatus.OK
@@ -44,9 +44,9 @@ def test_user_can_open_stock_from_wine_detail(
     client.force_login(user)
     storage = storage_factory(user=user)
     wine = wine_factory(user=user)
-    item = storage_item_factory(storage=storage, wine=wine, user=user)
+    item = storage_item_factory(storage=storage, vintage=wine.latest_vintage, user=user)
     data = {"note": "birthday dinner"}
-    with django_assert_num_queries(23):
+    with django_assert_num_queries(33):
         r = client.post(
             reverse("stock-open", kwargs={"pk": item.pk}), data=data, follow=True
         )
@@ -73,10 +73,11 @@ def test_user_can_open_with_drink_reminder(
     client.force_login(user)
     storage = storage_factory(user=user)
     wine = wine_factory(user=user)
-    item = storage_item_factory(storage=storage, wine=wine, user=user)
-    original_drink_by = wine.drink_by
+    vintage = wine.latest_vintage
+    item = storage_item_factory(storage=storage, vintage=vintage, user=user)
+    original_drink_by = vintage.drink_by
     data = {"drink_in_days": 7}
-    with django_assert_num_queries(23):
+    with django_assert_num_queries(33):
         r = client.post(
             reverse("stock-open", kwargs={"pk": item.pk}), data=data, follow=True
         )
@@ -84,8 +85,8 @@ def test_user_can_open_with_drink_reminder(
     item.refresh_from_db()
     assert item.opened is True
     assert item.drink_by == timezone.localdate() + timedelta(days=7)
-    wine.refresh_from_db()
-    assert wine.drink_by == original_drink_by
+    vintage.refresh_from_db()
+    assert vintage.drink_by == original_drink_by
 
 
 @pytest.mark.django_db
@@ -100,8 +101,8 @@ def test_user_can_open_stock_from_storage_detail(
     client.force_login(user)
     storage = storage_factory(user=user)
     wine = wine_factory(user=user)
-    item = storage_item_factory(storage=storage, wine=wine, user=user)
-    with django_assert_num_queries(19):
+    item = storage_item_factory(storage=storage, vintage=wine.latest_vintage, user=user)
+    with django_assert_num_queries(20):
         r = client.post(
             reverse("stock-open", kwargs={"pk": item.pk}) + "?next=storage",
             data={},
@@ -125,7 +126,9 @@ def test_user_cant_open_other_users_stock(
     client.force_login(user)
     storage = storage_factory(user=other)
     wine = wine_factory(user=other)
-    item = storage_item_factory(storage=storage, wine=wine, user=other)
+    item = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, user=other
+    )
     with django_assert_num_queries(3):
         r = client.get(reverse("stock-open", kwargs={"pk": item.pk}))
     assert r.status_code == HTTPStatus.NOT_FOUND
@@ -143,7 +146,9 @@ def test_user_cant_open_already_deleted_stock(
     client.force_login(user)
     storage = storage_factory(user=user)
     wine = wine_factory(user=user)
-    item = storage_item_factory(storage=storage, wine=wine, user=user, deleted=True)
+    item = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, user=user, deleted=True
+    )
     with django_assert_num_queries(3):
         r = client.get(reverse("stock-open", kwargs={"pk": item.pk}))
     assert r.status_code == HTTPStatus.NOT_FOUND
@@ -161,10 +166,37 @@ def test_user_cant_open_already_opened_stock(
     client.force_login(user)
     storage = storage_factory(user=user)
     wine = wine_factory(user=user)
-    item = storage_item_factory(storage=storage, wine=wine, user=user, opened=True)
+    item = storage_item_factory(
+        storage=storage, vintage=wine.latest_vintage, user=user, opened=True
+    )
     with django_assert_num_queries(3):
         r = client.get(reverse("stock-open", kwargs={"pk": item.pk}))
     assert r.status_code == HTTPStatus.NOT_FOUND
+
+
+@pytest.mark.django_db
+def test_open_confirmation_shows_the_specific_vintage_being_opened(
+    client,
+    user,
+    storage_factory,
+    wine_factory,
+    vintage_factory,
+    storage_item_factory,
+    django_assert_num_queries,
+):
+    client.force_login(user)
+    storage = storage_factory(user=user)
+    wine = wine_factory(user=user, _create_default_vintage=False)
+    older_vintage = vintage_factory(wine=wine, user=user, year=2015, rating=6)
+    vintage_factory(wine=wine, user=user, year=2021, rating=9)
+    assert wine.latest_vintage.year == 2021
+    item = storage_item_factory(storage=storage, vintage=older_vintage, user=user)
+    with django_assert_num_queries(10):
+        r = client.get(reverse("stock-open", kwargs={"pk": item.pk}))
+    assert r.status_code == HTTPStatus.OK
+    content = r.content.decode()
+    assert "2015" in content
+    assert "2021" not in content
 
 
 @pytest.mark.django_db
@@ -181,19 +213,19 @@ def test_history_shows_opened_and_deleted_items(
     storage = storage_factory(user=user)
     wine = wine_factory(user=user)
     deleted_item = storage_item_factory(
-        storage=storage, wine=wine, user=user, deleted=True
+        storage=storage, vintage=wine.latest_vintage, user=user, deleted=True
     )
     removed_event = storage_item_event_factory(
         storage_item=deleted_item, user=user, event_type=StorageItemEventType.REMOVED
     )
     opened_item = storage_item_factory(
-        storage=storage, wine=wine, user=user, opened=True
+        storage=storage, vintage=wine.latest_vintage, user=user, opened=True
     )
     opened_event = storage_item_event_factory(
         storage_item=opened_item, user=user, event_type=StorageItemEventType.OPENED
     )
     # An item with no events at all (e.g. never touched) has nothing to show.
-    storage_item_factory(storage=storage, wine=wine, user=user)
+    storage_item_factory(storage=storage, vintage=wine.latest_vintage, user=user)
     with django_assert_num_queries(4):
         r = client.get(reverse("stock-history"))
     assert r.status_code == HTTPStatus.OK

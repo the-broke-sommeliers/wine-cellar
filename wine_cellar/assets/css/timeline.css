@@ -50,7 +50,8 @@
 }
 
 .timeline__icon--removed,
-.timeline__icon--wine-removed {
+.timeline__icon--wine-removed,
+.timeline__icon--vintage-removed {
   background: var(--danger-tint);
   color: var(--red);
 }

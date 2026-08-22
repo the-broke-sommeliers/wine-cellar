@@ -376,7 +376,7 @@ def test_storage_detail_view(
 ):
     storage = Storage.objects.filter(user=user).first()
     wine = wine_factory(user=user)
-    storage_item_factory(storage=storage, wine=wine)
+    storage_item_factory(storage=storage, vintage=wine.latest_vintage)
     client.force_login(user)
     with django_assert_num_queries(8):
         r = client.get(reverse("storage-detail", kwargs={"pk": storage.pk}))
