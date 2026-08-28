@@ -30,7 +30,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "Faker==40.36.0",
+    "Faker==40.37.0",
     "black==26.5.1",
     "django-debug-toolbar==7.1.1",
     "djlint==1.44.2",
