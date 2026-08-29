@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.12.0-rc.2 (2026-08-22)
+## 0.12.0 (2026-08-29)
 
 ### feat
 
@@ -12,6 +12,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### fix
 
+- **deps**: update dependency @maplibre/maplibre-gl-leaflet to v0.1.4
+- **deps**: update dependency barcode-detector to v3.2.2
+- **deps**: update dependency litellm to v1.97.0
 - SSO button styling
 
 - **deps**: update dependency litellm to v1.96.2
