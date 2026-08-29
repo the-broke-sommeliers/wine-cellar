@@ -110,12 +110,20 @@
   gap: 4px;
   padding: 4px 10px;
   font-size: var(--font-xs);
+  line-height: 1;
   color: var(--text-color-gray);
   text-decoration: none;
   border-radius: 4px;
   transition:
     background-color 0.15s,
     color 0.15s;
+
+  i {
+    /* the icon glyph fills its full line box while capital-only text
+       sits flush with the top of its line box (unused descender space
+       below); nudge the icon up to visually center it against the text */
+    transform: translateY(-0.125em);
+  }
 }
 
 .card__action-btn:hover {
