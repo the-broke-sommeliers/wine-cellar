@@ -282,6 +282,8 @@ class WineForm(TomSelectMixin, WineFormPostCleanMixin, forms.Form):
     size = OpenMultipleChoiceField(
         queryset=Size.objects.none(),
         field_name="name",
+        field_class=float,
+        localize=True,
         label=_("Size"),
         help_text=_(
             "Please enter the volume of bottle or box ect. in liters, e.g. 0.75."

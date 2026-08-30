@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.forms import ModelMultipleChoiceField
+from django.utils.formats import sanitize_separators
 from django.utils.translation import gettext_lazy as _
 
 
@@ -41,6 +42,8 @@ class OpenMultipleChoiceField(ModelMultipleChoiceField):
 
                 if self.field_class:
                     try:
+                        if self.localize:
+                            new_val = sanitize_separators(new_val)
                         new_val = self.field_class(new_val)
                     except ValueError:
                         raise ValidationError(
