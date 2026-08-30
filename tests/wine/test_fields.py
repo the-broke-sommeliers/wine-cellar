@@ -1,5 +1,6 @@
 import pytest
 from django.forms import forms
+from django.utils import translation
 
 from wine_cellar.apps.wine.fields import OpenMultipleChoiceField
 from wine_cellar.apps.wine.models import Size
@@ -23,6 +24,16 @@ class CustomTestFormSlicedQs(forms.Form):
 class CustomTestFormType(forms.Form):
     required_field = OpenMultipleChoiceField(
         queryset=Size.objects.all(), field_name="name", required=True, field_class=float
+    )
+
+
+class CustomTestFormLocalizedFloat(forms.Form):
+    required_field = OpenMultipleChoiceField(
+        queryset=Size.objects.all(),
+        field_name="name",
+        required=True,
+        field_class=float,
+        localize=True,
     )
 
 
@@ -77,3 +88,26 @@ def test_open_multiple_choice_compatible_field_class(
     form = CustomTestFormType(data={"required_field": ["tom_new_opt1"]})
     with django_assert_num_queries(0):
         assert form.is_valid()
+
+
+@pytest.mark.django_db
+def test_open_multiple_choice_localized_float_decimal_comma(
+    size_factory, django_assert_num_queries
+):
+    size_factory()
+    with translation.override("de"):
+        form = CustomTestFormLocalizedFloat(data={"required_field": ["tom_new_opt1,5"]})
+        with django_assert_num_queries(0):
+            assert form.is_valid()
+    assert form.fields["required_field"].new_values == [1.5]
+
+
+@pytest.mark.django_db
+def test_open_multiple_choice_localized_float_decimal_point(
+    size_factory, django_assert_num_queries
+):
+    size_factory()
+    form = CustomTestFormLocalizedFloat(data={"required_field": ["tom_new_opt1.5"]})
+    with django_assert_num_queries(0):
+        assert form.is_valid()
+    assert form.fields["required_field"].new_values == [1.5]
