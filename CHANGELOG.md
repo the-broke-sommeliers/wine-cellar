@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.12.1 (2026-08-30)
+
+### fix
+
+- size form field not accepting decimal comma
+
+- **deps**: update dependency litellm to v1.98.0
+
+
 ## 0.12.0 (2026-08-29)
 
 ### feat
