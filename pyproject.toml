@@ -50,7 +50,7 @@ prod = [
     "psycopg[c]==3.3.4",
     "gunicorn==26.1.0",
     "redis==8.1.0",
-    "sentry-sdk==2.68.0",
+    "sentry-sdk==2.68.1",
 ]
 
 [tool.uv]
