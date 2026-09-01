@@ -43,6 +43,8 @@ ACCOUNT_SIGNUP_FIELDS = (
 
 ENABLE_SOCIAL_SIGNUPS = os.environ.get("DJANGO_ENABLE_SOCIAL_SIGNUPS", "True") == "True"
 
+ENABLE_WHATS_NEW = os.environ.get("DJANGO_ENABLE_WHATS_NEW", "True") == "True"
+
 # See https://docs.allauth.org/en/latest/socialaccount/configuration.html
 SOCIALACCOUNT_EMAIL_AUTHENTICATION = (
     os.environ.get("DJANGO_SOCIALACCOUNT_EMAIL_AUTHENTICATION", "False") == "True"
@@ -93,6 +95,10 @@ CELERY_RESULT_BACKEND = os.environ.get(
 # Use a separate logical DB (index 1) from Celery's broker/backend (index 0)
 # to keep key namespaces apart on the same Redis instance.
 CACHES["wine_prefill"] = {  # noqa: F405
+    "BACKEND": "django.core.cache.backends.redis.RedisCache",
+    "LOCATION": f"{os.environ.get('REDIS_URL', 'redis://redis:6379')}/1",
+}
+CACHES["whats_new"] = {  # noqa: F405
     "BACKEND": "django.core.cache.backends.redis.RedisCache",
     "LOCATION": f"{os.environ.get('REDIS_URL', 'redis://redis:6379')}/1",
 }

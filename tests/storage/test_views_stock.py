@@ -49,7 +49,7 @@ def test_user_can_add_stock(client, user, wine_factory, django_assert_num_querie
     data = {
         "storage": storage.pk,
     }
-    with django_assert_num_queries(35):
+    with django_assert_num_queries(36):
         r = client.post(
             reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
         )
@@ -76,7 +76,7 @@ def test_user_can_add_multiple_bottles_to_unlimited_shelf(
         "storage": storage.pk,
         "quantity": 3,
     }
-    with django_assert_num_queries(35):
+    with django_assert_num_queries(36):
         r = client.post(
             reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
         )
@@ -150,7 +150,7 @@ def test_user_can_delete_stock(
     item = storage_item_factory(storage=storage, vintage=wine.latest_vintage, user=user)
     assert item.deleted is False
     assert StorageItem.objects.count() == 1
-    with django_assert_num_queries(33):
+    with django_assert_num_queries(34):
         r = client.post(reverse("stock-delete", kwargs={"pk": item.pk}), follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(
@@ -280,7 +280,7 @@ def test_user_can_add_to_specific_slot(
         "storage": storage.pk,
         "slots": json.dumps([[2, 1]]),
     }
-    with django_assert_num_queries(37):
+    with django_assert_num_queries(38):
         r = client.post(
             reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
         )
@@ -306,7 +306,7 @@ def test_user_can_add_multiple_slots_at_once(
         "storage": storage.pk,
         "slots": json.dumps([[1, 1], [1, 2], [2, 1]]),
     }
-    with django_assert_num_queries(37):
+    with django_assert_num_queries(38):
         r = client.post(
             reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
         )
@@ -577,7 +577,7 @@ def test_used_slot_is_free_after_delete(
         "storage": storage.pk,
         "slots": json.dumps([[1, 1]]),
     }
-    with django_assert_num_queries(37):
+    with django_assert_num_queries(38):
         r = client.post(
             reverse("stock-add", kwargs={"pk": vintage_new.pk}),
             data=data,
@@ -613,7 +613,7 @@ def test_user_can_edit_existing_item_new_slot(
         "storage": storage.pk,
         "slots": json.dumps([[2, 1]]),
     }
-    with django_assert_num_queries(35):
+    with django_assert_num_queries(36):
         r = client.post(
             reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
         )
@@ -650,7 +650,7 @@ def test_user_can_edit_existing_item_keeping_same_slot(
         "storage": storage.pk,
         "slots": json.dumps([[1, 1]]),
     }
-    with django_assert_num_queries(35):
+    with django_assert_num_queries(36):
         r = client.post(
             reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
         )
@@ -688,7 +688,7 @@ def test_user_can_edit_existing_item_new_price(
         "slots": json.dumps([[1, 1]]),
         "price": 15.0,
     }
-    with django_assert_num_queries(35):
+    with django_assert_num_queries(36):
         r = client.post(
             reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
         )
@@ -851,7 +851,7 @@ def test_user_can_edit_item_to_unlimited_shelf(
         "storage": unlimited_storage.pk,
         "slots": json.dumps([]),
     }
-    with django_assert_num_queries(33):
+    with django_assert_num_queries(34):
         r = client.post(
             reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
         )
@@ -936,7 +936,7 @@ def test_user_can_add_stock_with_price(
         "storage": storage.pk,
         "price": "12.50",
     }
-    with django_assert_num_queries(35):
+    with django_assert_num_queries(36):
         r = client.post(
             reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
         )

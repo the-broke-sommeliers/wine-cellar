@@ -26,7 +26,7 @@ def test_storage_create_page_unauthenticated(client, user, django_assert_num_que
 @pytest.mark.django_db
 def test_storage_create_page(client, user, django_assert_num_queries):
     client.force_login(user)
-    with django_assert_num_queries(2):
+    with django_assert_num_queries(3):
         r = client.get(reverse("storage-add"), follow=True)
     assert r.status_code == HTTPStatus.OK
     assertTemplateUsed(response=r, template_name="base.html")
@@ -37,7 +37,7 @@ def test_storage_create_page(client, user, django_assert_num_queries):
 def test_storage_create_post_empty(client, user, django_assert_num_queries):
     client.force_login(user)
     data = {}
-    with django_assert_num_queries(2):
+    with django_assert_num_queries(3):
         r = client.post(reverse("storage-add"), data)
     assert r.status_code == HTTPStatus.OK
     f = r.context["form"]
@@ -72,7 +72,7 @@ def test_storage_create_post(client, user, django_assert_num_queries):
     }
 
     assert Storage.objects.count() == 1
-    with django_assert_num_queries(9):
+    with django_assert_num_queries(10):
         r = client.post(reverse("storage-add"), data=data, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("storage-list"))
@@ -97,7 +97,7 @@ def test_storage_create_post_swap_axes(client, user, django_assert_num_queries):
         "columns": 10,
         "swap_axes": "on",
     }
-    with django_assert_num_queries(9):
+    with django_assert_num_queries(10):
         r = client.post(reverse("storage-add"), data=data, follow=True)
     assert r.status_code == HTTPStatus.OK
     storage = Storage.objects.last()
@@ -116,7 +116,7 @@ def test_storage_create_post_row_labels_enabled(
         "columns": 10,
         "row_labels_enabled": "on",
     }
-    with django_assert_num_queries(9):
+    with django_assert_num_queries(10):
         r = client.post(reverse("storage-add"), data=data, follow=True)
     assert r.status_code == HTTPStatus.OK
     storage = Storage.objects.last()
@@ -136,7 +136,7 @@ def test_storage_create_post_column_labels_enabled(
         "columns": 10,
         "column_labels_enabled": "on",
     }
-    with django_assert_num_queries(9):
+    with django_assert_num_queries(10):
         r = client.post(reverse("storage-add"), data=data, follow=True)
     assert r.status_code == HTTPStatus.OK
     storage = Storage.objects.last()
@@ -186,7 +186,7 @@ def test_storage_update_post(client, user, django_assert_num_queries):
         "columns": 10,
     }
     assert Storage.objects.count() == 1
-    with django_assert_num_queries(15):
+    with django_assert_num_queries(16):
         r = client.post(
             reverse("storage-edit", kwargs={"pk": storage.pk}), data=data, follow=True
         )
@@ -213,7 +213,7 @@ def test_storage_update_post_swap_axes(client, user, django_assert_num_queries):
         "columns": 10,
         "swap_axes": "on",
     }
-    with django_assert_num_queries(15):
+    with django_assert_num_queries(16):
         r = client.post(
             reverse("storage-edit", kwargs={"pk": storage.pk}), data=data, follow=True
         )
@@ -244,7 +244,7 @@ def test_storage_update_post_row_labels_enabled(
         "columns": 10,
         "row_labels_enabled": "on",
     }
-    with django_assert_num_queries(15):
+    with django_assert_num_queries(16):
         r = client.post(
             reverse("storage-edit", kwargs={"pk": storage.pk}), data=data, follow=True
         )
@@ -275,7 +275,7 @@ def test_storage_update_post_column_labels_enabled(
         "columns": 10,
         "column_labels_enabled": "on",
     }
-    with django_assert_num_queries(15):
+    with django_assert_num_queries(16):
         r = client.post(
             reverse("storage-edit", kwargs={"pk": storage.pk}), data=data, follow=True
         )
@@ -298,7 +298,7 @@ def test_storage_cant_delete_only(client, user, django_assert_num_queries):
     client.force_login(user)
     assert Storage.objects.count() == 1
     storage = Storage.objects.first()
-    with django_assert_num_queries(4):
+    with django_assert_num_queries(5):
         r = client.post(
             reverse("storage-delete", kwargs={"pk": storage.pk}), follow=True
         )
@@ -331,7 +331,7 @@ def test_storage_can_delete_multiple(
     storage_factory(user=user)
     assert Storage.objects.count() == 2
     storage = Storage.objects.first()
-    with django_assert_num_queries(12):
+    with django_assert_num_queries(13):
         r = client.post(
             reverse("storage-delete", kwargs={"pk": storage.pk}), follow=True
         )
@@ -348,7 +348,7 @@ def test_storage_can_delete_multiple(
 @pytest.mark.django_db
 def test_storage_list_view(client, user, django_assert_num_queries):
     client.force_login(user)
-    with django_assert_num_queries(5):
+    with django_assert_num_queries(6):
         r = client.get(reverse("storage-list"))
     assert r.status_code == HTTPStatus.OK
     assertTemplateUsed(response=r, template_name="storage_list.html")
@@ -378,7 +378,7 @@ def test_storage_detail_view(
     wine = wine_factory(user=user)
     storage_item_factory(storage=storage, vintage=wine.latest_vintage)
     client.force_login(user)
-    with django_assert_num_queries(8):
+    with django_assert_num_queries(9):
         r = client.get(reverse("storage-detail", kwargs={"pk": storage.pk}))
     assert r.status_code == HTTPStatus.OK
     assertTemplateUsed(response=r, template_name="storage_detail.html")

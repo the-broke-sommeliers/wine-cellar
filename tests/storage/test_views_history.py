@@ -39,7 +39,7 @@ def test_history_orders_newest_first(
     consumed = storage_item_event_factory(
         storage_item=item, user=user, event_type=StorageItemEventType.CONSUMED
     )
-    with django_assert_num_queries(4):
+    with django_assert_num_queries(5):
         r = client.get(reverse("stock-history"))
     assert r.status_code == HTTPStatus.OK
     events = list(r.context["events"])
@@ -75,7 +75,7 @@ def test_history_hides_other_users_events(
     )
     other_event = storage_item_event_factory(storage_item=other_item, user=other)
 
-    with django_assert_num_queries(4):
+    with django_assert_num_queries(5):
         r = client.get(reverse("stock-history"))
     assert r.status_code == HTTPStatus.OK
     pks = [e.pk for e in r.context["events"]]
@@ -104,7 +104,7 @@ def test_history_shows_wine_added_and_removed_end_to_end(
     with django_assert_num_queries(20):
         client.post(reverse("wine-delete", kwargs={"pk": wine.pk}))
 
-    with django_assert_num_queries(4):
+    with django_assert_num_queries(5):
         r = client.get(reverse("stock-history"))
     assert r.status_code == HTTPStatus.OK
     assert r.content.decode().count("Chablis 2019") >= 2
@@ -135,7 +135,7 @@ def test_history_renders_as_activity_feed(
         storage_item=item, user=user, event_type=StorageItemEventType.OPENED
     )
 
-    with django_assert_num_queries(4):
+    with django_assert_num_queries(5):
         r = client.get(reverse("stock-history"))
     assert r.status_code == HTTPStatus.OK
     content = r.content.decode()
@@ -161,7 +161,7 @@ def test_history_pagination(
     for _ in range(11):
         storage_item_event_factory(storage_item=item, user=user)
 
-    with django_assert_num_queries(4):
+    with django_assert_num_queries(5):
         r = client.get(reverse("stock-history"))
     assert r.status_code == HTTPStatus.OK
     assert len(r.context["events"]) == 10

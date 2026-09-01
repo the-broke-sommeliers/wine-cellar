@@ -24,6 +24,7 @@ module.exports = {
         './wine_cellar/assets/css/homepage.css',
         './wine_cellar/assets/css/button.css',
         './wine_cellar/assets/css/spinner.css',
+        './wine_cellar/assets/css/whats-new.css',
       ],
     },
     tom_select: {

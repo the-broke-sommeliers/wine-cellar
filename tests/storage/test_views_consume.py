@@ -43,7 +43,7 @@ def test_consume_unopened_bottle(
     storage = storage_factory(user=user)
     wine = wine_factory(user=user)
     item = storage_item_factory(storage=storage, vintage=wine.latest_vintage, user=user)
-    with django_assert_num_queries(33):
+    with django_assert_num_queries(34):
         r = client.post(reverse("stock-consume", kwargs={"pk": item.pk}), follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(r, reverse("wine-detail", kwargs={"pk": wine.pk}))
@@ -97,7 +97,7 @@ def test_consume_already_opened_bottle(
     item = storage_item_factory(
         storage=storage, vintage=wine.latest_vintage, user=user, opened=True
     )
-    with django_assert_num_queries(33):
+    with django_assert_num_queries(34):
         r = client.post(reverse("stock-consume", kwargs={"pk": item.pk}), follow=True)
     assert r.status_code == HTTPStatus.OK
     item.refresh_from_db()
@@ -118,7 +118,7 @@ def test_consume_redirects_to_storage_detail(
     storage = storage_factory(user=user)
     wine = wine_factory(user=user)
     item = storage_item_factory(storage=storage, vintage=wine.latest_vintage, user=user)
-    with django_assert_num_queries(21):
+    with django_assert_num_queries(22):
         r = client.post(
             reverse("stock-consume", kwargs={"pk": item.pk}) + "?next=storage",
             follow=True,
@@ -192,7 +192,7 @@ def test_history_shows_consumed(
     event = storage_item_event_factory(
         storage_item=item, user=user, event_type=StorageItemEventType.CONSUMED
     )
-    with django_assert_num_queries(4):
+    with django_assert_num_queries(5):
         r = client.get(reverse("stock-history"))
     assert r.status_code == HTTPStatus.OK
     events = list(r.context["events"])

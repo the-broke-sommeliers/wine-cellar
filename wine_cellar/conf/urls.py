@@ -37,7 +37,7 @@ from wine_cellar.apps.storage.views import (
     StorageListView,
     StorageUpdateView,
 )
-from wine_cellar.apps.user.views import UserSettingsView
+from wine_cellar.apps.user.views import UserSettingsView, WhatsNewDismissView
 from wine_cellar.apps.wine.views import (
     HomePageView,
     VintageCreateView,
@@ -62,6 +62,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("allauth.urls")),
     path("user/settings/", UserSettingsView.as_view(), name="user-settings"),
+    path("whats-new/dismiss/", WhatsNewDismissView.as_view(), name="whats-new-dismiss"),
     path("storages/", StorageListView.as_view(), name="storage-list"),
     path("storage/<int:pk>", StorageDetailView.as_view(), name="storage-detail"),
     path("storage/add/", StorageCreateView.as_view(), name="storage-add"),

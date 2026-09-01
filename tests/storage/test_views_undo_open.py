@@ -54,7 +54,7 @@ def test_undo_open_clears_opened_and_reminder(
         opened_note="birthday dinner",
         drink_by=date.today() + timedelta(days=7),
     )
-    with django_assert_num_queries(34):
+    with django_assert_num_queries(35):
         r = client.post(reverse("stock-undo-open", kwargs={"pk": item.pk}), follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(r, reverse("wine-detail", kwargs={"pk": wine.pk}))
@@ -81,7 +81,7 @@ def test_undo_open_redirects_to_storage_detail(
     item = storage_item_factory(
         storage=storage, vintage=wine.latest_vintage, user=user, opened=True
     )
-    with django_assert_num_queries(21):
+    with django_assert_num_queries(22):
         r = client.post(
             reverse("stock-undo-open", kwargs={"pk": item.pk}) + "?next=storage",
             follow=True,

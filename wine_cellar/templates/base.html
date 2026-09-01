@@ -21,6 +21,24 @@
         </title>
     </head>
     <body class="layout">
+        {% if whats_new_releases %}
+            <div class="whats-new-overlay">
+                <div class="whats-new-overlay__card card">
+                    <h2>{% translate "What's New" %}</h2>
+                    {% for release in whats_new_releases %}
+                        <h3>{{ release.version }}</h3>
+                        <ul>
+                            {% for item in release.items %}<li>{{ item }}</li>{% endfor %}
+                        </ul>
+                    {% endfor %}
+                    <form method="post" action="{% url 'whats-new-dismiss' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.path }}">
+                        <button type="submit" class="pure-button button__primary">{% translate "Got it" %}</button>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
         {% block menu %}
             {% spaceless %}
                 <header>
