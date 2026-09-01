@@ -84,6 +84,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "wine_cellar.apps.user.context_processors.whats_new",
             ],
         },
     },
@@ -110,6 +111,7 @@ DATABASES = {
 CACHES = {
     "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"},
     "wine_prefill": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"},
+    "whats_new": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"},
 }
 
 AUTHENTICATION_BACKENDS = [
@@ -212,6 +214,7 @@ SOCIALACCOUNT_ADAPTER = (
 
 ENABLE_SIGNUPS = False
 ENABLE_SOCIAL_SIGNUPS = True
+ENABLE_WHATS_NEW = True
 ACCOUNT_EMAIL_VERIFICATION = "optional"
 ACCOUNT_SIGNUP_FIELDS = ["email", "username*", "password1*", "password2*"]
 

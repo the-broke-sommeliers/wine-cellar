@@ -46,7 +46,7 @@ def test_user_can_open_stock_from_wine_detail(
     wine = wine_factory(user=user)
     item = storage_item_factory(storage=storage, vintage=wine.latest_vintage, user=user)
     data = {"note": "birthday dinner"}
-    with django_assert_num_queries(33):
+    with django_assert_num_queries(34):
         r = client.post(
             reverse("stock-open", kwargs={"pk": item.pk}), data=data, follow=True
         )
@@ -77,7 +77,7 @@ def test_user_can_open_with_drink_reminder(
     item = storage_item_factory(storage=storage, vintage=vintage, user=user)
     original_drink_by = vintage.drink_by
     data = {"drink_in_days": 7}
-    with django_assert_num_queries(33):
+    with django_assert_num_queries(34):
         r = client.post(
             reverse("stock-open", kwargs={"pk": item.pk}), data=data, follow=True
         )
@@ -102,7 +102,7 @@ def test_user_can_open_stock_from_storage_detail(
     storage = storage_factory(user=user)
     wine = wine_factory(user=user)
     item = storage_item_factory(storage=storage, vintage=wine.latest_vintage, user=user)
-    with django_assert_num_queries(20):
+    with django_assert_num_queries(21):
         r = client.post(
             reverse("stock-open", kwargs={"pk": item.pk}) + "?next=storage",
             data={},
@@ -191,7 +191,7 @@ def test_open_confirmation_shows_the_specific_vintage_being_opened(
     vintage_factory(wine=wine, user=user, year=2021, rating=9)
     assert wine.latest_vintage.year == 2021
     item = storage_item_factory(storage=storage, vintage=older_vintage, user=user)
-    with django_assert_num_queries(10):
+    with django_assert_num_queries(11):
         r = client.get(reverse("stock-open", kwargs={"pk": item.pk}))
     assert r.status_code == HTTPStatus.OK
     content = r.content.decode()
@@ -226,7 +226,7 @@ def test_history_shows_opened_and_deleted_items(
     )
     # An item with no events at all (e.g. never touched) has nothing to show.
     storage_item_factory(storage=storage, vintage=wine.latest_vintage, user=user)
-    with django_assert_num_queries(4):
+    with django_assert_num_queries(5):
         r = client.get(reverse("stock-history"))
     assert r.status_code == HTTPStatus.OK
     events = list(r.context["events"])

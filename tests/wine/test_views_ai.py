@@ -45,7 +45,7 @@ def _mock_response(content):
 @pytest.mark.django_db
 def test_wine_choose_action_ai_disabled(client, user, django_assert_num_queries):
     client.force_login(user)
-    with django_assert_num_queries(2):
+    with django_assert_num_queries(3):
         r = client.get(reverse("wine-add-choose"))
     assert r.status_code == HTTPStatus.OK
     assert r.context_data["ai_enabled"] is False
@@ -55,7 +55,7 @@ def test_wine_choose_action_ai_disabled(client, user, django_assert_num_queries)
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
 def test_wine_choose_action_ai_enabled(client, user, django_assert_num_queries):
     client.force_login(user)
-    with django_assert_num_queries(2):
+    with django_assert_num_queries(3):
         r = client.get(reverse("wine-add-choose"))
     assert r.status_code == HTTPStatus.OK
     assert r.context_data["ai_enabled"] is True
@@ -70,7 +70,7 @@ def test_wine_upload_ai_page_ai_disabled_by_default(
     based implementation) - assert it directly rather than relying on the
     other view's test to catch a regression here."""
     client.force_login(user)
-    with django_assert_num_queries(2):
+    with django_assert_num_queries(3):
         r = client.get(reverse("wine-ai-upload"))
     assert r.status_code == HTTPStatus.OK
     assert r.context_data["ai_enabled"] is False
@@ -82,7 +82,7 @@ def test_wine_upload_ai_page_ai_enabled_with_settings(
     client, user, django_assert_num_queries
 ):
     client.force_login(user)
-    with django_assert_num_queries(2):
+    with django_assert_num_queries(3):
         r = client.get(reverse("wine-ai-upload"))
     assert r.status_code == HTTPStatus.OK
     assert r.context_data["ai_enabled"] is True
@@ -91,7 +91,7 @@ def test_wine_upload_ai_page_ai_enabled_with_settings(
 @pytest.mark.django_db
 def test_wine_choose_action_with_barcode(client, user, django_assert_num_queries):
     client.force_login(user)
-    with django_assert_num_queries(2):
+    with django_assert_num_queries(3):
         r = client.get(reverse("wine-add-choose") + "?barcode=9780201633610")
     assert r.status_code == HTTPStatus.OK
     assert r.context_data["barcode"] == "9780201633610"

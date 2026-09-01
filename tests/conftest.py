@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 from django.conf import settings
+from django.core.cache import caches
 from pytest_factoryboy import register
 
 from wine_cellar.apps.storage.tests.factories import (
@@ -12,7 +13,7 @@ from wine_cellar.apps.storage.tests.factories import (
     StorageItemFactory,
     StorageLabelFactory,
 )
-from wine_cellar.apps.user.tests.factories import UserFactory
+from wine_cellar.apps.user.tests.factories import UserFactory, UserSettingsFactory
 from wine_cellar.apps.wine.tests.factories import (
     AppellationFactory,
     AttributeFactory,
@@ -28,6 +29,7 @@ from wine_cellar.apps.wine.tests.factories import (
 )
 
 register(UserFactory)
+register(UserSettingsFactory)
 register(WineFactory)
 register(VintageFactory)
 register(GrapeFactory)
@@ -43,6 +45,13 @@ register(StorageItemEventFactory)
 register(StorageLabelFactory)
 register(RegionFactory)
 register(AppellationFactory)
+
+
+@pytest.fixture(autouse=True)
+def _clear_whats_new_cache():
+    caches["whats_new"].clear()
+    yield
+    caches["whats_new"].clear()
 
 
 @pytest.fixture

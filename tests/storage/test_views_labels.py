@@ -28,7 +28,7 @@ def test_storage_detail_default_order_is_row_major(
     b = storage_item_factory(
         storage=storage, vintage=wine.latest_vintage, row=2, column=1, user=user
     )
-    with django_assert_num_queries(10):
+    with django_assert_num_queries(11):
         r = client.get(reverse("storage-detail", kwargs={"pk": storage.pk}))
     assert r.status_code == HTTPStatus.OK
     assert r.context["swap_axes"] is False
@@ -57,7 +57,7 @@ def test_storage_detail_swap_axes_orders_column_major(
     b = storage_item_factory(
         storage=storage, vintage=wine.latest_vintage, row=1, column=2, user=user
     )
-    with django_assert_num_queries(10):
+    with django_assert_num_queries(11):
         r = client.get(reverse("storage-detail", kwargs={"pk": storage.pk}))
     assert r.status_code == HTTPStatus.OK
     assert r.context["swap_axes"] is True
@@ -85,7 +85,7 @@ def test_storage_detail_attaches_labels(
     storage_item_factory(
         storage=storage, vintage=wine.latest_vintage, row=1, column=2, user=user
     )
-    with django_assert_num_queries(10):
+    with django_assert_num_queries(11):
         r = client.get(reverse("storage-detail", kwargs={"pk": storage.pk}))
     assert r.status_code == HTTPStatus.OK
     item = next(
@@ -116,7 +116,7 @@ def test_storage_detail_shows_both_axis_labels_regardless_of_swap_axes(
         storage=storage, vintage=wine.latest_vintage, row=1, column=2, user=user
     )
 
-    with django_assert_num_queries(10):
+    with django_assert_num_queries(11):
         r = client.get(reverse("storage-detail", kwargs={"pk": storage.pk}))
     content = r.content.decode()
     assert "(Spain)" in content
@@ -150,7 +150,7 @@ def test_storage_detail_hides_label_text_when_axis_disabled(
         storage=storage, vintage=wine.latest_vintage, row=1, column=2, user=user
     )
 
-    with django_assert_num_queries(10):
+    with django_assert_num_queries(11):
         r = client.get(reverse("storage-detail", kwargs={"pk": storage.pk}))
     content = r.content.decode()
     assert "(Spain)" not in content
@@ -168,7 +168,7 @@ def test_storage_detail_shows_both_naming_links_by_default(
 ):
     client.force_login(user)
     storage = storage_factory(user=user, rows=2, columns=2)
-    with django_assert_num_queries(10):
+    with django_assert_num_queries(11):
         r = client.get(reverse("storage-detail", kwargs={"pk": storage.pk}))
     content = r.content.decode()
     assert "Name Rows" in content
@@ -181,7 +181,7 @@ def test_storage_detail_naming_links_ignore_swap_axes(
 ):
     client.force_login(user)
     storage = storage_factory(user=user, rows=2, columns=2, swap_axes=True)
-    with django_assert_num_queries(10):
+    with django_assert_num_queries(11):
         r = client.get(reverse("storage-detail", kwargs={"pk": storage.pk}))
     content = r.content.decode()
     assert "Name Rows" in content
@@ -194,7 +194,7 @@ def test_storage_detail_hides_row_link_when_row_labels_disabled(
 ):
     client.force_login(user)
     storage = storage_factory(user=user, rows=2, columns=2, row_labels_enabled=False)
-    with django_assert_num_queries(10):
+    with django_assert_num_queries(11):
         r = client.get(reverse("storage-detail", kwargs={"pk": storage.pk}))
     content = r.content.decode()
     assert "Name Rows" not in content
@@ -207,7 +207,7 @@ def test_storage_detail_hides_column_link_when_column_labels_disabled(
 ):
     client.force_login(user)
     storage = storage_factory(user=user, rows=2, columns=2, column_labels_enabled=False)
-    with django_assert_num_queries(10):
+    with django_assert_num_queries(11):
         r = client.get(reverse("storage-detail", kwargs={"pk": storage.pk}))
     content = r.content.decode()
     assert "Name Rows" in content
@@ -226,7 +226,7 @@ def test_storage_detail_hides_both_links_when_both_disabled(
         row_labels_enabled=False,
         column_labels_enabled=False,
     )
-    with django_assert_num_queries(10):
+    with django_assert_num_queries(11):
         r = client.get(reverse("storage-detail", kwargs={"pk": storage.pk}))
     content = r.content.decode()
     assert "Name Rows" not in content
@@ -239,7 +239,7 @@ def test_storage_detail_shows_row_link_when_columns_zero(
 ):
     client.force_login(user)
     storage = storage_factory(user=user, rows=2, columns=0)
-    with django_assert_num_queries(8):
+    with django_assert_num_queries(9):
         r = client.get(reverse("storage-detail", kwargs={"pk": storage.pk}))
     content = r.content.decode()
     assert "Name Rows" in content
@@ -252,7 +252,7 @@ def test_storage_detail_shows_column_link_when_rows_zero(
 ):
     client.force_login(user)
     storage = storage_factory(user=user, rows=0, columns=2)
-    with django_assert_num_queries(8):
+    with django_assert_num_queries(9):
         r = client.get(reverse("storage-detail", kwargs={"pk": storage.pk}))
     content = r.content.decode()
     assert "Name Rows" not in content
@@ -265,7 +265,7 @@ def test_storage_detail_no_naming_link_without_grid(
 ):
     client.force_login(user)
     storage = storage_factory(user=user, rows=0, columns=0)
-    with django_assert_num_queries(8):
+    with django_assert_num_queries(9):
         r = client.get(reverse("storage-detail", kwargs={"pk": storage.pk}))
     content = r.content.decode()
     assert "Name Rows" not in content
@@ -283,7 +283,7 @@ def test_storage_labels_get_row_screen(
 ):
     client.force_login(user)
     storage = storage_factory(user=user, rows=2, columns=3)
-    with django_assert_num_queries(4):
+    with django_assert_num_queries(5):
         r = client.get(
             reverse("storage-labels", kwargs={"pk": storage.pk, "axis": "row"})
         )
@@ -298,7 +298,7 @@ def test_storage_labels_get_column_screen(
 ):
     client.force_login(user)
     storage = storage_factory(user=user, rows=2, columns=3)
-    with django_assert_num_queries(4):
+    with django_assert_num_queries(5):
         r = client.get(
             reverse("storage-labels", kwargs={"pk": storage.pk, "axis": "column"})
         )
@@ -494,7 +494,7 @@ def test_storage_labels_get_paginates_at_25(
 ):
     client.force_login(user)
     storage = storage_factory(user=user, rows=60, columns=1)
-    with django_assert_num_queries(4):
+    with django_assert_num_queries(5):
         r = client.get(
             reverse("storage-labels", kwargs={"pk": storage.pk, "axis": "row"})
         )
@@ -512,7 +512,7 @@ def test_storage_labels_get_page_2_returns_next_slice(
 ):
     client.force_login(user)
     storage = storage_factory(user=user, rows=60, columns=1)
-    with django_assert_num_queries(4):
+    with django_assert_num_queries(5):
         r = client.get(
             reverse("storage-labels", kwargs={"pk": storage.pk, "axis": "row"}),
             {"page": 2},
@@ -527,7 +527,7 @@ def test_storage_labels_get_out_of_range_page_clamps_to_last(
 ):
     client.force_login(user)
     storage = storage_factory(user=user, rows=60, columns=1)
-    with django_assert_num_queries(4):
+    with django_assert_num_queries(5):
         r = client.get(
             reverse("storage-labels", kwargs={"pk": storage.pk, "axis": "row"}),
             {"page": 999},
