@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.13.0-rc.0 (2026-09-01)
+
+### BREAKING CHANGE
+
+- With this release wines can now have multiple vintages
+    instead of the same wine from different years having to be separate wine
+    records. It's recommended to backup your database before upgrading to
+    this release as it will attempt to guess and merge different wine
+    records which actually are the same wine of a different vintage into
+    one.
+
+
+### feat
+
+- introduce a what's changed screen
+
+- split the wine model into a wine and a separate vintage model
+    
+    BREAKING CHANGE: With this release wines can now have multiple vintages
+    instead of the same wine from different years having to be separate wine
+    records. It's recommended to backup your database before upgrading to
+    this release as it will attempt to guess and merge different wine
+    records which actually are the same wine of a different vintage into
+    one.
+
+
+### fix
+
+- button labels
+
+
+
 ## 0.12.1 (2026-08-30)
 
 ### fix
