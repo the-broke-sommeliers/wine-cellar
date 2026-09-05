@@ -37,7 +37,7 @@ dev = [
     "djlint==1.44.2",
     "factory-boy==3.3.3",
     "flake8==7.3.0",
-    "isort==8.0.1",
+    "isort==9.0.1",
     "playwright==1.62.0",
     "psycopg[binary]==3.3.4",
     "pytest-cov==7.1.0",
