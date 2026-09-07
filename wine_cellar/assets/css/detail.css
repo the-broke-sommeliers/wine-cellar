@@ -428,11 +428,18 @@
 
 .vintage-switcher__row {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.5rem 1rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
   border-bottom: 1px solid var(--border-color-light);
+
+  @media screen and (min-width: 64em) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+  }
 }
 
 .vintage-switcher__actions {
@@ -440,17 +447,44 @@
   align-items: center;
   gap: 0.15rem;
   flex-wrap: wrap;
+  width: 100%;
   padding-bottom: 0.5rem;
+
+  @media screen and (min-width: 64em) {
+    width: auto;
+  }
 }
 
 .vintage-switcher__add {
   margin-right: 0.6rem;
+  padding-left: 0;
+
+  @media screen and (min-width: 64em) {
+    padding-left: 10px;
+  }
+}
+
+/* When the Edit/Delete Vintage buttons wrap onto their own line (below
+   ~700px, before the Add Vintage button they'd otherwise follow), the
+   Edit button's default left padding leaves it indented instead of flush
+   with the other wrapped controls. */
+#vintage-actions .wine__edit-delete-buttons a:first-child {
+  padding-left: 0;
+
+  @media screen and (min-width: 48em) {
+    padding-left: 10px;
+  }
 }
 
 .vintage-tabs {
   display: flex;
   flex-wrap: wrap;
   gap: 1.4rem;
+  width: 100%;
+
+  @media screen and (min-width: 64em) {
+    width: auto;
+  }
 }
 
 .vintage-tabs__tab {
