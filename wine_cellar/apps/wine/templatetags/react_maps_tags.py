@@ -1,6 +1,7 @@
 import json
 
 from django import template
+from django.urls import reverse
 from django.utils.html import format_html
 
 from wine_cellar.apps.wine.models import Wine
@@ -19,8 +20,8 @@ def react_detail_map(wine: Wine):
 
 
 @register.simple_tag()
-def react_map(wines: list[Wine]):
-    attributes = get_map_attributes(wines=wines)
+def react_map():
+    attributes = get_map_attributes(data_url=reverse("wine-map-data"))
     return format_html(
         '<div id="wine_map" ' 'data-attributes="{attributes}"></div>',
         attributes=json.dumps(attributes),

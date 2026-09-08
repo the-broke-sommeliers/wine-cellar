@@ -43,7 +43,7 @@ def test_consume_unopened_bottle(
     storage = storage_factory(user=user)
     wine = wine_factory(user=user)
     item = storage_item_factory(storage=storage, vintage=wine.latest_vintage, user=user)
-    with django_assert_num_queries(34):
+    with django_assert_num_queries(33):
         r = client.post(reverse("stock-consume", kwargs={"pk": item.pk}), follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(r, reverse("wine-detail", kwargs={"pk": wine.pk}))
@@ -97,7 +97,7 @@ def test_consume_already_opened_bottle(
     item = storage_item_factory(
         storage=storage, vintage=wine.latest_vintage, user=user, opened=True
     )
-    with django_assert_num_queries(34):
+    with django_assert_num_queries(33):
         r = client.post(reverse("stock-consume", kwargs={"pk": item.pk}), follow=True)
     assert r.status_code == HTTPStatus.OK
     item.refresh_from_db()

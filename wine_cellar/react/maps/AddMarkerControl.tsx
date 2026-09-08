@@ -28,7 +28,7 @@ export function checkPointInsidePolygon(
   return isInPolygon
 }
 
-const markerProps = { icon: makeIcon(), draggable: true }
+const markerProps = { icon: makeIcon(undefined, true), draggable: true }
 
 interface AddMarkerControlProps extends L.ControlOptions {
   input: HTMLInputElement

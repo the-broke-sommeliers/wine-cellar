@@ -54,7 +54,7 @@ def test_undo_open_clears_opened_and_reminder(
         opened_note="birthday dinner",
         drink_by=date.today() + timedelta(days=7),
     )
-    with django_assert_num_queries(35):
+    with django_assert_num_queries(34):
         r = client.post(reverse("stock-undo-open", kwargs={"pk": item.pk}), follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(r, reverse("wine-detail", kwargs={"pk": wine.pk}))

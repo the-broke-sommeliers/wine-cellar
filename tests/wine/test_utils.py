@@ -45,9 +45,8 @@ def test_wine_to_json_none(wine_factory, geojson_point, django_assert_num_querie
         "vintage": wine.latest_vintage.year,
         "location": geojson_point,
         "url": wine.get_absolute_url(),
+        "total_stock": wine.total_stock,
     }
-    # latest_vintage (and its image lookup) is already cached from building
-    # `expected` above.
     with django_assert_num_queries(0):
         assert wine_to_json(wine) == expected
 
@@ -90,6 +89,7 @@ def test_get_map_attributes_with_wine(
                 "vintage": wine.latest_vintage.year,
                 "location": geojson_point,
                 "url": wine.get_absolute_url(),
+                "total_stock": wine.total_stock,
             }
         ],
     }
@@ -111,6 +111,21 @@ def test_get_map_attributes_with_point_height(geojson_point):
         },
     }
     assert get_map_attributes(point=geojson_point, height="50vh") == expected
+
+
+def test_get_map_attributes_with_data_url():
+    expected = {
+        "map": {
+            "attribution": '<a href="https://openfreemap.org" target="_blank">'
+            + 'OpenFreeMap</a> <a href="https://www.openmaptiles.org/" '
+            + 'target="_blank">© OpenMapTiles</a> Data from '
+            + '<a href="https://www.openstreetmap.org/copyright" '
+            + 'target="_blank">OpenStreetMap</a>',
+            "baseUrl": settings.MAP_BASEURL,
+            "dataUrl": "/wines/map/data",
+        },
+    }
+    assert get_map_attributes(data_url="/wines/map/data") == expected
 
 
 def test_latlong_to_point(geojson_point_dict):

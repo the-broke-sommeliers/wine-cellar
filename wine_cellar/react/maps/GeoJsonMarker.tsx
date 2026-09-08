@@ -6,9 +6,12 @@ import {
 } from '@react-leaflet/core'
 import L from 'leaflet'
 
-export const makeIcon = (iconUrl?: string) =>
+const PIN_IN_STOCK = '/static/images/map_pin.svg'
+const PIN_OUT_OF_STOCK = '/static/images/map_pin_out_of_stock.svg'
+
+export const makeIcon = (iconUrl?: string, inStock?: boolean) =>
   L.icon({
-    iconUrl: iconUrl || '/static/images/map_pin.svg',
+    iconUrl: iconUrl || (inStock ? PIN_IN_STOCK : PIN_OUT_OF_STOCK),
     iconSize: [30, 36],
     iconAnchor: [15, 36],
     shadowSize: [40, 54],
@@ -25,13 +28,25 @@ interface GeoJsonMarkerProps extends L.MarkerOptions {
  * Creates a Leaflet marker from a GeoJSON. This is needed to
  * be able to add any Tooltip or Popup to the Markers using JSX.
  */
+const iconFor = (
+  feature: GeoJSON.Feature<GeoJSON.Point>,
+  explicitIcon?: L.Icon
+): L.Icon =>
+  explicitIcon ||
+  makeIcon(
+    feature.properties?.category_icon,
+    (feature.properties?.total_stock ?? 0) > 0
+  )
+
 const createGeoJsonMarker = (
   { feature, ...props }: GeoJsonMarkerProps,
   context: LeafletContextInterface
 ) => {
   const coords = [...feature.geometry.coordinates].reverse() as [number, number]
-  const icon = props.icon || makeIcon(feature.properties?.category_icon)
-  const propsWithIcon = { ...props, icon }
+  const propsWithIcon = {
+    ...props,
+    icon: iconFor(feature, props.icon as L.Icon | undefined),
+  }
   const instance = L.marker(coords, propsWithIcon)
 
   return createElementObject(
@@ -43,13 +58,10 @@ const createGeoJsonMarker = (
 const updateGeoJsonMarker = (
   instance: L.Marker,
   { feature, ...props }: GeoJsonMarkerProps,
-  prevProps: GeoJsonMarkerProps
+  _prevProps: GeoJsonMarkerProps
 ) => {
   const coords = [...feature.geometry.coordinates].reverse() as [number, number]
-  if (props.icon !== prevProps.icon) {
-    const icon = props.icon || makeIcon(feature.properties?.category_icon)
-    instance.setIcon(icon)
-  }
+  instance.setIcon(iconFor(feature, props.icon as L.Icon | undefined))
   instance.setLatLng(coords)
 }
 

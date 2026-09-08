@@ -1,12 +1,12 @@
 import django_filters
-from django.db.models import F, Q
+from django.db.models import Exists, F, OuterRef, Q
 from django.db.models.expressions import OrderBy
 from django.utils.translation import gettext_lazy as _
 from django_filters import ChoiceFilter, OrderingFilter
 
-from wine_cellar.apps.storage.models import Storage
+from wine_cellar.apps.storage.models import Storage, StorageItem
 from wine_cellar.apps.wine.forms import WineFilterForm
-from wine_cellar.apps.wine.models import Wine
+from wine_cellar.apps.wine.models import Vintage, Wine
 
 
 class NullsLastOrderingFilter(OrderingFilter):
@@ -65,14 +65,19 @@ class WineFilter(django_filters.FilterSet):
     )
 
     def filter_vintage(self, queryset, name, value):
-        return queryset.filter(vintages__year=value).distinct()
+        return queryset.filter(
+            Exists(Vintage.objects.filter(wine=OuterRef("pk"), year=value))
+        )
 
     def filter_stock(self, queryset, name, value):
         if value == "1":
             return queryset.filter(
-                vintages__storageitem__isnull=False,
-                vintages__storageitem__deleted=False,
-            ).distinct()
+                Exists(
+                    StorageItem.objects.filter(
+                        vintage__wine=OuterRef("pk"), deleted=False
+                    )
+                )
+            )
         else:
             return queryset
 
@@ -80,8 +85,12 @@ class WineFilter(django_filters.FilterSet):
         if not value:
             return queryset
         return queryset.filter(
-            vintages__storageitem__storage=value, vintages__storageitem__deleted=False
-        ).distinct()
+            Exists(
+                StorageItem.objects.filter(
+                    vintage__wine=OuterRef("pk"), storage=value, deleted=False
+                )
+            )
+        )
 
     class Meta:
         form = WineFilterForm
@@ -134,3 +143,9 @@ class WineFilter(django_filters.FilterSet):
         for key, fil in self.filters.items():
             if key in self.Meta.labels:
                 fil.label = self.Meta.labels[key]
+
+
+class WineMapFilter(WineFilter):
+    def __init__(self, data=None, queryset=None, *, request=None, prefix=None):
+        super().__init__(data, queryset, request=request, prefix=prefix)
+        self.filters.pop("order", None)

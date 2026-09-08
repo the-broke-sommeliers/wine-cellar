@@ -72,12 +72,16 @@ def wine_to_json(wine: Wine) -> dict:
         "vintage": wine.latest_vintage.year if wine.latest_vintage else None,
         "location": wine.location,
         "url": wine.get_absolute_url(),
+        "total_stock": wine.total_stock,
     }
     return feature
 
 
 def get_map_attributes(
-    wines: list[Wine] = None, point: str = None, height: str = ""
+    wines: list[Wine] = None,
+    point: str = None,
+    height: str = "",
+    data_url: str = None,
 ) -> dict:
     map_settings = {
         "attribution": '<a href="https://openfreemap.org" target="_blank">'
@@ -91,6 +95,8 @@ def get_map_attributes(
         map_settings["point"] = point
     if height:
         map_settings["style"] = {"height": height}
+    if data_url:
+        map_settings["dataUrl"] = data_url
 
     attributes = {"map": map_settings}
     if wines is not None:

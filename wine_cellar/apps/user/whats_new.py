@@ -32,6 +32,11 @@ WHATS_NEW_RELEASES = [
                 "you think of the new design."
             ),
             _('Added a "What\'s New" screen to highlight notable changes.'),
+            _(
+                "The map view can now be filtered just like the wine list, "
+                "and out-of-stock wines are shown with a distinct marker "
+                "color."
+            ),
         ],
     ),
 ]

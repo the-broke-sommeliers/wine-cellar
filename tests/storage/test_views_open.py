@@ -46,7 +46,7 @@ def test_user_can_open_stock_from_wine_detail(
     wine = wine_factory(user=user)
     item = storage_item_factory(storage=storage, vintage=wine.latest_vintage, user=user)
     data = {"note": "birthday dinner"}
-    with django_assert_num_queries(34):
+    with django_assert_num_queries(33):
         r = client.post(
             reverse("stock-open", kwargs={"pk": item.pk}), data=data, follow=True
         )
@@ -77,7 +77,7 @@ def test_user_can_open_with_drink_reminder(
     item = storage_item_factory(storage=storage, vintage=vintage, user=user)
     original_drink_by = vintage.drink_by
     data = {"drink_in_days": 7}
-    with django_assert_num_queries(34):
+    with django_assert_num_queries(33):
         r = client.post(
             reverse("stock-open", kwargs={"pk": item.pk}), data=data, follow=True
         )

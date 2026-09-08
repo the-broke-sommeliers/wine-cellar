@@ -22,7 +22,7 @@ def test_wine_scanned_existing(
     # wine_detail.html now also renders the per-vintage tab strip (a
     # "vintages" queryset + its own image prefetch, plus each tab's own
     # image/image_thumbnails lookups), on top of the wine-level image calls.
-    with django_assert_num_queries(27):
+    with django_assert_num_queries(26):
         r = client.get(
             reverse("wine-scan", kwargs={"barcode": vintage.barcode}), follow=True
         )

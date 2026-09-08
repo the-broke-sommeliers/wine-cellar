@@ -2,6 +2,92 @@
   height: 60vh;
 }
 
+.map-with-markers {
+  position: relative;
+}
+
+.map-spinner {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 3px solid rgba(64, 128, 72, 0.2);
+  border-top-color: var(--dark-green);
+  animation: map-spin 0.9s linear infinite;
+}
+
+.map-spinner--small {
+  width: 13px;
+  height: 13px;
+  border-width: 2px;
+}
+
+@keyframes map-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.map-loading-overlay,
+.map-empty-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(246, 245, 239, 0.9);
+  border-radius: 8px;
+  text-align: center;
+  padding: 1rem;
+}
+
+.map-loading-overlay {
+  color: var(--text-color-gray);
+  font-size: var(--font-sm);
+}
+
+.map-empty-overlay {
+  color: var(--text-color-gray);
+}
+
+.map-empty-overlay i {
+  font-size: 1.75rem;
+  color: #b9b9b9;
+}
+
+.map-empty-overlay__title {
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.map-refetch-pill,
+.map-error-banner {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: white;
+  border-radius: 999px;
+  box-shadow: var(--container-box-shadow);
+  padding: 6px 14px;
+  font-size: var(--font-xs);
+}
+
+.map-refetch-pill {
+  color: var(--text-color-gray);
+}
+
+.map-error-banner {
+  color: var(--red);
+}
+
 .marker-cluster {
   background-clip: padding-box;
   border-radius: 20px;
@@ -82,4 +168,43 @@
   border-radius: var(--border-radius);
   box-shadow: var(--container-box-shadow);
   padding: 0.25rem;
+}
+
+@media screen and (min-width: 35.5em) {
+  .map-container {
+    margin-top: calc(var(--font-md) * 1.33);
+  }
+}
+
+.map-legend {
+  list-style: none;
+  display: flex;
+  justify-content: flex-end;
+  gap: 20px;
+  align-items: center;
+  padding: 0;
+  margin: 0.75rem 4px 0 4px;
+}
+
+.map-legend li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: var(--font-xs);
+  color: var(--text-color-gray);
+}
+
+.map-legend__swatch {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.map-legend__swatch--in-stock {
+  background: var(--dark-green);
+}
+
+.map-legend__swatch--out-of-stock {
+  background: var(--warning);
 }
