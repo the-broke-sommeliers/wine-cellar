@@ -39,7 +39,7 @@ dev = [
     "flake8==7.3.0",
     "isort==8.0.1",
     "playwright==1.62.0",
-    "psycopg[binary]==3.3.4",
+    "psycopg[binary]==3.3.5",
     "pytest-cov==7.1.0",
     "pytest-django==4.14.0",
     "pytest-factoryboy==2.8.1",
@@ -49,7 +49,7 @@ dev = [
     "zensical==0.0.57",
 ]
 prod = [
-    "psycopg[c]==3.3.4",
+    "psycopg[c]==3.3.5",
     "gunicorn==26.2.0",
     "redis==8.1.0",
     "sentry-sdk==2.68.1",
