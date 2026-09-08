@@ -298,11 +298,6 @@ class Wine(UserContentModel):
 
     @cached_property
     def total_stock(self):
-        # Prefer the annotation added by WineListView.get_queryset() to avoid
-        # a per-row COUNT query; fall back to a live count when unannotated
-        # (e.g. wine_detail.html, which doesn't go through that queryset).
-        # Cached since wine_detail.html now reads this more than once per
-        # request (Stock header, stock table, and the Numbers group).
         annotated = getattr(self, "total_stock_count", None)
         if annotated is not None:
             return annotated

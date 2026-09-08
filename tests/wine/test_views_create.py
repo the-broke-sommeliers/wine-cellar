@@ -404,7 +404,7 @@ def test_wine_update_does_not_log_wine_added(
         "size": Size.objects.get(name=0.75).pk,
         "country": wine.country,
     }
-    with django_assert_num_queries(46):
+    with django_assert_num_queries(45):
         client.post(reverse("wine-edit", kwargs={"pk": wine.pk}), data, follow=True)
     assert not StorageItemEvent.objects.filter(
         event_type=StorageItemEventType.WINE_ADDED
@@ -768,7 +768,7 @@ def test_wine_edit_replace_front_image(
         "size": size.pk,
     }
 
-    with django_assert_num_queries(52):
+    with django_assert_num_queries(51):
         r = client.post(
             reverse("wine-edit", kwargs={"pk": wine.pk}),
             {**base_data, "image_front": random_png("front1.png")},
@@ -785,7 +785,7 @@ def test_wine_edit_replace_front_image(
         == 1
     )
 
-    with django_assert_num_queries(51):
+    with django_assert_num_queries(50):
         r = client.post(
             reverse("wine-edit", kwargs={"pk": wine.pk}),
             {**base_data, "image_front": random_png("front2.png")},
@@ -814,7 +814,7 @@ def test_wine_edit_overwrite_front_and_back_with_newer_images(
         "size": size.pk,
     }
 
-    with django_assert_num_queries(58):
+    with django_assert_num_queries(57):
         r = client.post(
             reverse("wine-edit", kwargs={"pk": wine.pk}),
             {
@@ -838,7 +838,7 @@ def test_wine_edit_overwrite_front_and_back_with_newer_images(
         == 1
     )
 
-    with django_assert_num_queries(58):
+    with django_assert_num_queries(57):
         r = client.post(
             reverse("wine-edit", kwargs={"pk": wine.pk}),
             {

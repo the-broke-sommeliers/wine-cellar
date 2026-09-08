@@ -18,7 +18,7 @@ def test_wine_detail_authenticated(
 ):
     wine = wine_factory(user=user)
     client.force_login(user)
-    with django_assert_num_queries(24):
+    with django_assert_num_queries(23):
         r = client.get(reverse("wine-detail", kwargs={"pk": wine.pk}))
     assert r.status_code == HTTPStatus.OK
     assertTemplateUsed(response=r, template_name="wine_detail.html")
@@ -61,7 +61,7 @@ def test_wine_detail_with_location_renders_map_tag(
     default path every other detail-view test exercises."""
     wine = wine_factory(user=user, location=geojson_point_dict)
     client.force_login(user)
-    with django_assert_num_queries(24):
+    with django_assert_num_queries(23):
         r = client.get(reverse("wine-detail", kwargs={"pk": wine.pk}))
     assert r.status_code == HTTPStatus.OK
     assert 'id="wine_map"' in r.content.decode()
@@ -208,7 +208,7 @@ def test_wine_update_valid_fields(
         "attributes": attribute.pk,
         "country": "DE",
     }
-    with django_assert_num_queries(56):
+    with django_assert_num_queries(55):
         r = client.post(reverse("wine-edit", kwargs={"pk": wine.pk}), data, follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(

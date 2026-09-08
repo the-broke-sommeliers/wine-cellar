@@ -34,7 +34,7 @@ from wine_cellar.apps.storage.models import (
 )
 from wine_cellar.apps.user.views import get_user_settings
 from wine_cellar.apps.wine.fields import OpenChoiceModelFormViewMixin
-from wine_cellar.apps.wine.filters import WineFilter
+from wine_cellar.apps.wine.filters import WineFilter, WineMapFilter
 from wine_cellar.apps.wine.forms import (
     VintageForm,
     WineForm,
@@ -44,7 +44,11 @@ from wine_cellar.apps.wine.forms import (
 from wine_cellar.apps.wine.models import ImageType, Vintage, Wine, WineImage
 from wine_cellar.apps.wine.serializers import WineAiSerializer
 from wine_cellar.apps.wine.tasks import process_ai_wine_upload
-from wine_cellar.apps.wine.utils import WINE_PREFILL_TIMEOUT, wine_prefill_cache
+from wine_cellar.apps.wine.utils import (
+    WINE_PREFILL_TIMEOUT,
+    wine_prefill_cache,
+    wine_to_json,
+)
 
 
 class HomePageView(TemplateView):
@@ -420,6 +424,7 @@ class WineDetailView(DetailView):
             .select_related(
                 "region", "appellation", "size", "user", "user__user_settings"
             )
+            .annotate(total_stock_count=_total_stock_count())
         )
         return qs.filter(user=self.request.user)
 
@@ -433,6 +438,14 @@ class WineDetailView(DetailView):
             )
         )
         return context
+
+
+def _total_stock_count() -> Count:
+    return Count(
+        "vintages__storageitem",
+        filter=Q(vintages__storageitem__deleted=False),
+        distinct=True,
+    )
 
 
 class WineListView(FilterView):
@@ -472,11 +485,7 @@ class WineListView(FilterView):
                 Subquery(storage_avg_price),
                 Subquery(vintage_avg_price),
             ),
-            total_stock_count=Count(
-                "vintages__storageitem",
-                filter=Q(vintages__storageitem__deleted=False),
-                distinct=True,
-            ),
+            total_stock_count=_total_stock_count(),
             # Max/Min are unaffected by join fan-out (repeating a value
             # doesn't change its max/min), so these are safe to keep as
             # ordinary annotations sharing the "vintages" join above.
@@ -769,21 +778,24 @@ class VintageDeleteView(DeleteView):
         return redirect(success_url)
 
 
-class WineMapView(TemplateView):
+class WineMapView(FilterView):
     template_name = "wine_map.html"
+    filterset_class = WineMapFilter
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        wines = Wine.objects.filter(user=self.request.user).prefetch_related(
-            latest_vintage_prefetch()
-        )
+    def get_queryset(self):
+        return Wine.objects.none()
 
-        context.update(
-            {
-                "wines": wines,
-            }
+
+class WineMapDataView(View):
+    def get(self, request):
+        qs = (
+            Wine.objects.filter(user=request.user)
+            .prefetch_related(latest_vintage_prefetch())
+            .annotate(total_stock_count=_total_stock_count())
         )
-        return context
+        wines_qs = WineMapFilter(request.GET, queryset=qs, request=request).qs
+
+        return JsonResponse({"wines": [wine_to_json(w) for w in wines_qs]})
 
 
 def _get_owned_prefill_entry(token, user):

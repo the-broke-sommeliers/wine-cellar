@@ -5,6 +5,7 @@ const translations = {
   country: django.pgettext('Singular', 'Country'),
   image_alt: django.gettext('Picture of a wine bottle.'),
   vintage: django.gettext('Vintage'),
+  stock: django.gettext('Stock'),
 }
 
 interface ItemPopupProps {
@@ -16,6 +17,7 @@ interface ItemPopupProps {
       country_icon: string
       country_name: string
       vintage?: string
+      total_stock?: number
     }
   }
 }
@@ -53,6 +55,12 @@ export const ItemPopup = ({ feature }: ItemPopupProps) => {
             <div className="popup-detail">
               <span className="popup-label">{translations.vintage}:</span>
               <span>{feature.properties.vintage}</span>
+            </div>
+          )}
+          {feature.properties.total_stock !== undefined && (
+            <div className="popup-detail">
+              <span className="popup-label">{translations.stock}:</span>
+              <span>{feature.properties.total_stock}</span>
             </div>
           )}
         </div>

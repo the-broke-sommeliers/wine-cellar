@@ -1,6 +1,11 @@
 import type L from 'leaflet'
 import React, { type ReactNode, useImperativeHandle } from 'react'
-import { MapContainer, type MapContainerProps, useMap } from 'react-leaflet'
+import {
+  MapContainer,
+  type MapContainerProps,
+  useMap,
+  ZoomControl,
+} from 'react-leaflet'
 import MaplibreGlLayer from './MaplibreGlLayer'
 
 interface MapProps extends Omit<MapContainerProps, 'children'> {
@@ -27,8 +32,10 @@ const Map = React.forwardRef<L.Map, MapProps>(function Map(
       zoom={2}
       maxZoom={18}
       {...rest}
+      zoomControl={false}
       center={[52.520008, 13.404954]}
     >
+      <ZoomControl position="topright" />
       <MapLayers />
       {children}
     </MapContainer>
