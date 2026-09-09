@@ -272,7 +272,8 @@ p.form-hint {
       pointer-events: none;
     }
 
-    .filter-form__header-toggle::before {
+    .filter-form__header-toggle::before,
+    .filter-toggle-checkbox:checked ~ .filter-form__header-toggle::before {
       content: none;
     }
 
