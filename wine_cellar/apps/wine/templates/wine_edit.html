@@ -3,7 +3,7 @@
 {% load render_bundle from webpack_loader %}
 {% block extra_js %}
     {{ block.super }}
-    {% render_bundle 'tom_select' 'js' attrs='type="module" defer' %}
+    {% render_bundle 'tom_select' 'js' %}
     {% render_bundle 'image_preview' 'js' attrs='type="module" defer' %}
     {% render_bundle 'barcode_scanner' 'js' attrs='type="module" defer' %}
     {{ form.media.js }}
