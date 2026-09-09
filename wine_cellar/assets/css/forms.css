@@ -209,6 +209,10 @@ p.form-hint {
   .ts-wrapper .ts-control {
     width: 100%;
   }
+
+  button[type="submit"] {
+    margin: 0;
+  }
 }
 
 /* responsive styling for large and small filters */
