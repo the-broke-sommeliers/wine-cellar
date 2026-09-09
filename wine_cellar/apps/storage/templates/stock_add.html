@@ -3,7 +3,7 @@
 {% load render_bundle from webpack_loader %}
 {% block extra_js %}
     {{ block.super }}
-    {% render_bundle 'tom_select' 'js' attrs='type="module" defer' %}
+    {% render_bundle 'tom_select' 'js' %}
     {% render_bundle 'stock_add' 'css' %}
     {% render_bundle 'stock_add' 'js' attrs='defer' %}
 {% endblock extra_js %}
