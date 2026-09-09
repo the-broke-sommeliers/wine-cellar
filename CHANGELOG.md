@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.13.0-rc.0 (2026-09-01)
+## 0.13.0 (2026-09-09)
 
 ### BREAKING CHANGE
 
@@ -16,6 +16,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 
 ### feat
+
+- add filters to map view
 
 - introduce a what's changed screen
 
@@ -31,6 +33,17 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### fix
 
+- filter showing collapsible sign on big screens
+
+- filter buttons misaligned on screens <= 480px
+
+- tom-select shouldn't load deferred
+
+- **deps**: update dependency django to v6.1.1
+- **deps**: update dependency django-allauth to v65.19.2
+- vintage menu breakpoints
+
+- **deps**: update dependency litellm to v1.99.0
 - button labels
 
 
