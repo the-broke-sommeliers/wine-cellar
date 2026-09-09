@@ -32,7 +32,7 @@ dependencies = [
 dev = [
     "Faker==40.37.0",
     "black==26.5.1",
-    "django-debug-toolbar==7.1.1",
+    "django-debug-toolbar==8.0.0",
     "django-test-migrations==1.6.0",
     "djlint==1.44.2",
     "factory-boy==3.3.3",
