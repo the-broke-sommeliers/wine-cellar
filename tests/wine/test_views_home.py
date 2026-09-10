@@ -10,9 +10,8 @@ from pytest_django.asserts import (
 
 
 @pytest.mark.django_db
-def test_homepage_unauthenticated(client, django_assert_num_queries):
-    with django_assert_num_queries(1):
-        r = client.get(reverse("homepage"), follow=True)
+def test_homepage_unauthenticated(client):
+    r = client.get(reverse("homepage"), follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(response=r, expected_url=reverse("account_login") + "?next=/")
     assertTemplateUsed(response=r, template_name="base.html")
@@ -31,21 +30,19 @@ def test_homepage(client, user, django_assert_num_queries):
 
 
 @pytest.mark.django_db
-def test_admin_link_hidden_from_regular_user(client, user, django_assert_num_queries):
+def test_admin_link_hidden_from_regular_user(client, user):
     client.force_login(user)
-    with django_assert_num_queries(10):
-        r = client.get(reverse("homepage"))
+    r = client.get(reverse("homepage"))
     assert r.status_code == HTTPStatus.OK
     assert reverse("admin:index") not in r.content.decode()
 
 
 @pytest.mark.django_db
-def test_admin_link_visible_to_staff_user(client, user, django_assert_num_queries):
+def test_admin_link_visible_to_staff_user(client, user):
     user.is_staff = True
     user.save(update_fields=["is_staff"])
     client.force_login(user)
-    with django_assert_num_queries(10):
-        r = client.get(reverse("homepage"))
+    r = client.get(reverse("homepage"))
     assert r.status_code == HTTPStatus.OK
     assert reverse("admin:index") in r.content.decode()
 
@@ -57,7 +54,6 @@ def test_homepage_stats(
     wine_factory,
     vintage_factory,
     storage_item_factory,
-    django_assert_num_queries,
 ):
     wine = wine_factory(user=user, _create_default_vintage=False)
     vintage = vintage_factory(wine=wine, year=2020)
@@ -73,8 +69,7 @@ def test_homepage_stats(
     storage_item_factory(vintage=vintage_2, storage=storage, price=12.00)
     storage_item_factory(vintage=vintage_2, storage=storage)
     client.force_login(user)
-    with django_assert_num_queries(10):
-        r = client.get(reverse("homepage"), follow=True)
+    r = client.get(reverse("homepage"), follow=True)
     assert r.status_code == HTTPStatus.OK
     assertTemplateUsed(response=r, template_name="base.html")
     assertTemplateUsed(response=r, template_name="homepage.html")

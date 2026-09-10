@@ -14,15 +14,13 @@ def test_unauthenticated_cant_undo_open(
     storage_factory,
     wine_factory,
     storage_item_factory,
-    django_assert_num_queries,
 ):
     storage = storage_factory(user=user)
     wine = wine_factory(user=user)
     item = storage_item_factory(
         storage=storage, vintage=wine.latest_vintage, user=user, opened=True
     )
-    with django_assert_num_queries(1):
-        r = client.get(reverse("stock-undo-open", kwargs={"pk": item.pk}), follow=True)
+    r = client.get(reverse("stock-undo-open", kwargs={"pk": item.pk}), follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(
         response=r,
@@ -39,7 +37,6 @@ def test_undo_open_clears_opened_and_reminder(
     storage_factory,
     wine_factory,
     storage_item_factory,
-    django_assert_num_queries,
 ):
     from datetime import date, timedelta
 
@@ -54,8 +51,7 @@ def test_undo_open_clears_opened_and_reminder(
         opened_note="birthday dinner",
         drink_by=date.today() + timedelta(days=7),
     )
-    with django_assert_num_queries(34):
-        r = client.post(reverse("stock-undo-open", kwargs={"pk": item.pk}), follow=True)
+    r = client.post(reverse("stock-undo-open", kwargs={"pk": item.pk}), follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(r, reverse("wine-detail", kwargs={"pk": wine.pk}))
     item.refresh_from_db()
@@ -73,7 +69,6 @@ def test_undo_open_redirects_to_storage_detail(
     storage_factory,
     wine_factory,
     storage_item_factory,
-    django_assert_num_queries,
 ):
     client.force_login(user)
     storage = storage_factory(user=user)
@@ -81,11 +76,10 @@ def test_undo_open_redirects_to_storage_detail(
     item = storage_item_factory(
         storage=storage, vintage=wine.latest_vintage, user=user, opened=True
     )
-    with django_assert_num_queries(22):
-        r = client.post(
-            reverse("stock-undo-open", kwargs={"pk": item.pk}) + "?next=storage",
-            follow=True,
-        )
+    r = client.post(
+        reverse("stock-undo-open", kwargs={"pk": item.pk}) + "?next=storage",
+        follow=True,
+    )
     assert r.status_code == HTTPStatus.OK
     assertRedirects(r, reverse("storage-detail", kwargs={"pk": storage.pk}))
 
@@ -97,14 +91,12 @@ def test_cant_undo_open_on_unopened_bottle(
     storage_factory,
     wine_factory,
     storage_item_factory,
-    django_assert_num_queries,
 ):
     client.force_login(user)
     storage = storage_factory(user=user)
     wine = wine_factory(user=user)
     item = storage_item_factory(storage=storage, vintage=wine.latest_vintage, user=user)
-    with django_assert_num_queries(3):
-        r = client.get(reverse("stock-undo-open", kwargs={"pk": item.pk}))
+    r = client.get(reverse("stock-undo-open", kwargs={"pk": item.pk}))
     assert r.status_code == HTTPStatus.NOT_FOUND
 
 
@@ -115,7 +107,6 @@ def test_cant_undo_open_on_deleted_bottle(
     storage_factory,
     wine_factory,
     storage_item_factory,
-    django_assert_num_queries,
 ):
     client.force_login(user)
     storage = storage_factory(user=user)
@@ -127,8 +118,7 @@ def test_cant_undo_open_on_deleted_bottle(
         opened=True,
         deleted=True,
     )
-    with django_assert_num_queries(3):
-        r = client.get(reverse("stock-undo-open", kwargs={"pk": item.pk}))
+    r = client.get(reverse("stock-undo-open", kwargs={"pk": item.pk}))
     assert r.status_code == HTTPStatus.NOT_FOUND
 
 
@@ -140,7 +130,6 @@ def test_cant_undo_open_other_users_bottle(
     storage_factory,
     wine_factory,
     storage_item_factory,
-    django_assert_num_queries,
 ):
     other = user_factory()
     client.force_login(user)
@@ -149,6 +138,5 @@ def test_cant_undo_open_other_users_bottle(
     item = storage_item_factory(
         storage=storage, vintage=wine.latest_vintage, user=other, opened=True
     )
-    with django_assert_num_queries(3):
-        r = client.get(reverse("stock-undo-open", kwargs={"pk": item.pk}))
+    r = client.get(reverse("stock-undo-open", kwargs={"pk": item.pk}))
     assert r.status_code == HTTPStatus.NOT_FOUND

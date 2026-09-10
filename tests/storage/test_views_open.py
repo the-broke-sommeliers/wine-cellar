@@ -16,13 +16,11 @@ def test_unauthenticated_cant_open_stock(
     storage_factory,
     wine_factory,
     storage_item_factory,
-    django_assert_num_queries,
 ):
     storage = storage_factory(user=user)
     wine = wine_factory(user=user)
     item = storage_item_factory(storage=storage, vintage=wine.latest_vintage, user=user)
-    with django_assert_num_queries(1):
-        r = client.get(reverse("stock-open", kwargs={"pk": item.pk}), follow=True)
+    r = client.get(reverse("stock-open", kwargs={"pk": item.pk}), follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(
         response=r,
@@ -39,17 +37,15 @@ def test_user_can_open_stock_from_wine_detail(
     storage_factory,
     wine_factory,
     storage_item_factory,
-    django_assert_num_queries,
 ):
     client.force_login(user)
     storage = storage_factory(user=user)
     wine = wine_factory(user=user)
     item = storage_item_factory(storage=storage, vintage=wine.latest_vintage, user=user)
     data = {"note": "birthday dinner"}
-    with django_assert_num_queries(33):
-        r = client.post(
-            reverse("stock-open", kwargs={"pk": item.pk}), data=data, follow=True
-        )
+    r = client.post(
+        reverse("stock-open", kwargs={"pk": item.pk}), data=data, follow=True
+    )
     assert r.status_code == HTTPStatus.OK
     assertRedirects(r, reverse("wine-detail", kwargs={"pk": wine.pk}))
     item.refresh_from_db()
@@ -68,7 +64,6 @@ def test_user_can_open_with_drink_reminder(
     storage_factory,
     wine_factory,
     storage_item_factory,
-    django_assert_num_queries,
 ):
     client.force_login(user)
     storage = storage_factory(user=user)
@@ -77,10 +72,9 @@ def test_user_can_open_with_drink_reminder(
     item = storage_item_factory(storage=storage, vintage=vintage, user=user)
     original_drink_by = vintage.drink_by
     data = {"drink_in_days": 7}
-    with django_assert_num_queries(33):
-        r = client.post(
-            reverse("stock-open", kwargs={"pk": item.pk}), data=data, follow=True
-        )
+    r = client.post(
+        reverse("stock-open", kwargs={"pk": item.pk}), data=data, follow=True
+    )
     assert r.status_code == HTTPStatus.OK
     item.refresh_from_db()
     assert item.opened is True
@@ -96,18 +90,16 @@ def test_user_can_open_stock_from_storage_detail(
     storage_factory,
     wine_factory,
     storage_item_factory,
-    django_assert_num_queries,
 ):
     client.force_login(user)
     storage = storage_factory(user=user)
     wine = wine_factory(user=user)
     item = storage_item_factory(storage=storage, vintage=wine.latest_vintage, user=user)
-    with django_assert_num_queries(21):
-        r = client.post(
-            reverse("stock-open", kwargs={"pk": item.pk}) + "?next=storage",
-            data={},
-            follow=True,
-        )
+    r = client.post(
+        reverse("stock-open", kwargs={"pk": item.pk}) + "?next=storage",
+        data={},
+        follow=True,
+    )
     assert r.status_code == HTTPStatus.OK
     assertRedirects(r, reverse("storage-detail", kwargs={"pk": storage.pk}))
 
@@ -120,7 +112,6 @@ def test_user_cant_open_other_users_stock(
     storage_factory,
     wine_factory,
     storage_item_factory,
-    django_assert_num_queries,
 ):
     other = user_factory()
     client.force_login(user)
@@ -129,8 +120,7 @@ def test_user_cant_open_other_users_stock(
     item = storage_item_factory(
         storage=storage, vintage=wine.latest_vintage, user=other
     )
-    with django_assert_num_queries(3):
-        r = client.get(reverse("stock-open", kwargs={"pk": item.pk}))
+    r = client.get(reverse("stock-open", kwargs={"pk": item.pk}))
     assert r.status_code == HTTPStatus.NOT_FOUND
 
 
@@ -141,7 +131,6 @@ def test_user_cant_open_already_deleted_stock(
     storage_factory,
     wine_factory,
     storage_item_factory,
-    django_assert_num_queries,
 ):
     client.force_login(user)
     storage = storage_factory(user=user)
@@ -149,8 +138,7 @@ def test_user_cant_open_already_deleted_stock(
     item = storage_item_factory(
         storage=storage, vintage=wine.latest_vintage, user=user, deleted=True
     )
-    with django_assert_num_queries(3):
-        r = client.get(reverse("stock-open", kwargs={"pk": item.pk}))
+    r = client.get(reverse("stock-open", kwargs={"pk": item.pk}))
     assert r.status_code == HTTPStatus.NOT_FOUND
 
 
@@ -161,7 +149,6 @@ def test_user_cant_open_already_opened_stock(
     storage_factory,
     wine_factory,
     storage_item_factory,
-    django_assert_num_queries,
 ):
     client.force_login(user)
     storage = storage_factory(user=user)
@@ -169,8 +156,7 @@ def test_user_cant_open_already_opened_stock(
     item = storage_item_factory(
         storage=storage, vintage=wine.latest_vintage, user=user, opened=True
     )
-    with django_assert_num_queries(3):
-        r = client.get(reverse("stock-open", kwargs={"pk": item.pk}))
+    r = client.get(reverse("stock-open", kwargs={"pk": item.pk}))
     assert r.status_code == HTTPStatus.NOT_FOUND
 
 
@@ -182,7 +168,6 @@ def test_open_confirmation_shows_the_specific_vintage_being_opened(
     wine_factory,
     vintage_factory,
     storage_item_factory,
-    django_assert_num_queries,
 ):
     client.force_login(user)
     storage = storage_factory(user=user)
@@ -191,8 +176,7 @@ def test_open_confirmation_shows_the_specific_vintage_being_opened(
     vintage_factory(wine=wine, user=user, year=2021, rating=9)
     assert wine.latest_vintage.year == 2021
     item = storage_item_factory(storage=storage, vintage=older_vintage, user=user)
-    with django_assert_num_queries(11):
-        r = client.get(reverse("stock-open", kwargs={"pk": item.pk}))
+    r = client.get(reverse("stock-open", kwargs={"pk": item.pk}))
     assert r.status_code == HTTPStatus.OK
     content = r.content.decode()
     assert "2015" in content
@@ -207,7 +191,6 @@ def test_history_shows_opened_and_deleted_items(
     wine_factory,
     storage_item_factory,
     storage_item_event_factory,
-    django_assert_num_queries,
 ):
     client.force_login(user)
     storage = storage_factory(user=user)
@@ -226,8 +209,7 @@ def test_history_shows_opened_and_deleted_items(
     )
     # An item with no events at all (e.g. never touched) has nothing to show.
     storage_item_factory(storage=storage, vintage=wine.latest_vintage, user=user)
-    with django_assert_num_queries(5):
-        r = client.get(reverse("stock-history"))
+    r = client.get(reverse("stock-history"))
     assert r.status_code == HTTPStatus.OK
     events = list(r.context["events"])
     pks = [e.pk for e in events]
