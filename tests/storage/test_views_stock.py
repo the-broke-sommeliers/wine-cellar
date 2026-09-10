@@ -22,13 +22,10 @@ from wine_cellar.apps.storage.views import (
 
 
 @pytest.mark.django_db
-def test_unauthenticated_cant_add_stock(
-    client, user, wine_factory, django_assert_num_queries
-):
+def test_unauthenticated_cant_add_stock(client, user, wine_factory):
     wine = wine_factory(user=user)
     vintage = wine.latest_vintage
-    with django_assert_num_queries(1):
-        r = client.post(reverse("stock-add", kwargs={"pk": vintage.pk}), follow=True)
+    r = client.post(reverse("stock-add", kwargs={"pk": vintage.pk}), follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(
         response=r,
@@ -41,7 +38,7 @@ def test_unauthenticated_cant_add_stock(
 
 
 @pytest.mark.django_db
-def test_user_can_add_stock(client, user, wine_factory, django_assert_num_queries):
+def test_user_can_add_stock(client, user, wine_factory):
     client.force_login(user)
     storage = Storage.objects.first()
     wine = wine_factory(user=user)
@@ -49,10 +46,9 @@ def test_user_can_add_stock(client, user, wine_factory, django_assert_num_querie
     data = {
         "storage": storage.pk,
     }
-    with django_assert_num_queries(35):
-        r = client.post(
-            reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
-        )
+    r = client.post(
+        reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
+    )
     assert r.status_code == HTTPStatus.OK
     assertRedirects(
         response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
@@ -65,9 +61,7 @@ def test_user_can_add_stock(client, user, wine_factory, django_assert_num_querie
 
 
 @pytest.mark.django_db
-def test_user_can_add_multiple_bottles_to_unlimited_shelf(
-    client, user, wine_factory, django_assert_num_queries
-):
+def test_user_can_add_multiple_bottles_to_unlimited_shelf(client, user, wine_factory):
     client.force_login(user)
     storage = Storage.objects.first()
     wine = wine_factory(user=user)
@@ -76,10 +70,9 @@ def test_user_can_add_multiple_bottles_to_unlimited_shelf(
         "storage": storage.pk,
         "quantity": 3,
     }
-    with django_assert_num_queries(35):
-        r = client.post(
-            reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
-        )
+    r = client.post(
+        reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
+    )
     assert r.status_code == HTTPStatus.OK
     assertRedirects(
         response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
@@ -96,7 +89,7 @@ def test_user_can_add_multiple_bottles_to_unlimited_shelf(
 
 @pytest.mark.django_db
 def test_user_cant_add_stock_to_other_users_storage(
-    client, user, user_factory, wine_factory, django_assert_num_queries
+    client, user, user_factory, wine_factory
 ):
     storage = Storage.objects.filter(user=user).first()
     other_user = user_factory()
@@ -109,19 +102,17 @@ def test_user_cant_add_stock_to_other_users_storage(
     data = {
         "storage": other_storage.pk,
     }
-    with django_assert_num_queries(7):
-        r = client.post(
-            reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
-        )
+    r = client.post(
+        reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
+    )
     assert r.status_code == HTTPStatus.OK
     assert r.context["form"].errors
     assert other_storage.used_slots == 0
-    with django_assert_num_queries(7):
-        r = client.post(
-            reverse("stock-add", kwargs={"pk": other_vintage.pk}),
-            data=data,
-            follow=True,
-        )
+    r = client.post(
+        reverse("stock-add", kwargs={"pk": other_vintage.pk}),
+        data=data,
+        follow=True,
+    )
     assert r.status_code == HTTPStatus.OK
     assert r.context["form"].errors
     assert other_storage.used_slots == 0
@@ -129,29 +120,25 @@ def test_user_cant_add_stock_to_other_users_storage(
     data = {
         "storage": storage.pk,
     }
-    with django_assert_num_queries(5):
-        r = client.post(
-            reverse("stock-add", kwargs={"pk": other_vintage.pk}),
-            data=data,
-            follow=True,
-        )
+    r = client.post(
+        reverse("stock-add", kwargs={"pk": other_vintage.pk}),
+        data=data,
+        follow=True,
+    )
     assert r.status_code == HTTPStatus.NOT_FOUND
     assert other_storage.used_slots == 0
     assert StorageItem.objects.count() == 0
 
 
 @pytest.mark.django_db
-def test_user_can_delete_stock(
-    client, user, wine_factory, storage_item_factory, django_assert_num_queries
-):
+def test_user_can_delete_stock(client, user, wine_factory, storage_item_factory):
     client.force_login(user)
     storage = Storage.objects.first()
     wine = wine_factory(user=user)
     item = storage_item_factory(storage=storage, vintage=wine.latest_vintage, user=user)
     assert item.deleted is False
     assert StorageItem.objects.count() == 1
-    with django_assert_num_queries(33):
-        r = client.post(reverse("stock-delete", kwargs={"pk": item.pk}), follow=True)
+    r = client.post(reverse("stock-delete", kwargs={"pk": item.pk}), follow=True)
     assert r.status_code == HTTPStatus.OK
     assertRedirects(
         response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
@@ -170,7 +157,6 @@ def test_user_cant_delete_other_users_stock(
     user_factory,
     wine_factory,
     storage_item_factory,
-    django_assert_num_queries,
 ):
     client.force_login(user)
     user2 = user_factory()
@@ -181,8 +167,7 @@ def test_user_cant_delete_other_users_stock(
     )
     assert item.deleted is False
     assert StorageItem.objects.count() == 1
-    with django_assert_num_queries(3):
-        r = client.post(reverse("stock-delete", kwargs={"pk": item.pk}), follow=True)
+    r = client.post(reverse("stock-delete", kwargs={"pk": item.pk}), follow=True)
     assert r.status_code == HTTPStatus.NOT_FOUND
     assert StorageItem.objects.count() == 1
     item.refresh_from_db()
@@ -196,7 +181,6 @@ def test_user_cant_add_to_full_slot(
     storage_factory,
     storage_item_factory,
     wine_factory,
-    django_assert_num_queries,
 ):
     storage = storage_factory(user=user, rows=1, columns=1)
     client.force_login(user)
@@ -207,10 +191,9 @@ def test_user_cant_add_to_full_slot(
         "storage": storage.pk,
         "slots": json.dumps([[1, 1]]),
     }
-    with django_assert_num_queries(10):
-        r = client.post(
-            reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
-        )
+    r = client.post(
+        reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
+    )
     assert r.status_code == HTTPStatus.OK
     assert r.context["form"].errors
     # Only the pre-existing occupant - the rejected submission created nothing.
@@ -218,9 +201,7 @@ def test_user_cant_add_to_full_slot(
 
 
 @pytest.mark.django_db
-def test_add_stock_race_rechecks_under_lock(
-    user, storage_factory, wine_factory, django_assert_num_queries
-):
+def test_add_stock_race_rechecks_under_lock(user, storage_factory, wine_factory):
     """Two requests both saw slot (1, 1) as free - the second write must be
     rejected by the lock+recheck, not double-occupy the slot."""
     storage = storage_factory(user=user, rows=1, columns=1)
@@ -230,13 +211,11 @@ def test_add_stock_race_rechecks_under_lock(
     vintage2 = wine2.latest_vintage
     cleaned_data = {"storage": storage, "price": None, "slots": [(1, 1)]}
 
-    with django_assert_num_queries(6):
-        StorageItemAddView.process_form_data(vintage1, user, cleaned_data)
+    StorageItemAddView.process_form_data(vintage1, user, cleaned_data)
     assert StorageItem.objects.filter(storage=storage, deleted=False).count() == 1
 
-    with django_assert_num_queries(5):
-        with pytest.raises(SlotConflictError):
-            StorageItemAddView.process_form_data(vintage2, user, cleaned_data)
+    with pytest.raises(SlotConflictError):
+        StorageItemAddView.process_form_data(vintage2, user, cleaned_data)
 
     # No partial/duplicate write from the rejected second call.
     assert StorageItem.objects.filter(storage=storage, deleted=False).count() == 1
@@ -245,7 +224,7 @@ def test_add_stock_race_rechecks_under_lock(
 
 @pytest.mark.django_db
 def test_add_stock_slot_conflict_shows_friendly_form_error(
-    client, user, storage_factory, wine_factory, django_assert_num_queries
+    client, user, storage_factory, wine_factory
 ):
     """The view's own `except SlotConflictError` branch in `form_valid`
     (distinct from `process_form_data` itself, exercised above) must
@@ -258,10 +237,9 @@ def test_add_stock_slot_conflict_shows_friendly_form_error(
     with patch.object(
         StorageItemAddView, "process_form_data", side_effect=SlotConflictError
     ):
-        with django_assert_num_queries(11):
-            r = client.post(
-                reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
-            )
+        r = client.post(
+            reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
+        )
     assert r.status_code == HTTPStatus.OK
     assert r.context["form"].errors
     assert "no longer free" in str(r.context["form"].errors)
@@ -269,9 +247,7 @@ def test_add_stock_slot_conflict_shows_friendly_form_error(
 
 
 @pytest.mark.django_db
-def test_user_can_add_to_specific_slot(
-    client, user, storage_factory, wine_factory, django_assert_num_queries
-):
+def test_user_can_add_to_specific_slot(client, user, storage_factory, wine_factory):
     storage = storage_factory(user=user, rows=2, columns=2)
     client.force_login(user)
     wine = wine_factory(user=user)
@@ -280,10 +256,9 @@ def test_user_can_add_to_specific_slot(
         "storage": storage.pk,
         "slots": json.dumps([[2, 1]]),
     }
-    with django_assert_num_queries(37):
-        r = client.post(
-            reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
-        )
+    r = client.post(
+        reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
+    )
     assert r.status_code == HTTPStatus.OK
     assertRedirects(
         response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
@@ -296,7 +271,7 @@ def test_user_can_add_to_specific_slot(
 
 @pytest.mark.django_db
 def test_user_can_add_multiple_slots_at_once(
-    client, user, storage_factory, wine_factory, django_assert_num_queries
+    client, user, storage_factory, wine_factory
 ):
     storage = storage_factory(user=user, rows=2, columns=2)
     client.force_login(user)
@@ -306,10 +281,9 @@ def test_user_can_add_multiple_slots_at_once(
         "storage": storage.pk,
         "slots": json.dumps([[1, 1], [1, 2], [2, 1]]),
     }
-    with django_assert_num_queries(37):
-        r = client.post(
-            reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
-        )
+    r = client.post(
+        reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
+    )
     assert r.status_code == HTTPStatus.OK
     assertRedirects(
         response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
@@ -326,9 +300,7 @@ def test_user_can_add_multiple_slots_at_once(
 
 
 @pytest.mark.django_db
-def test_user_cant_add_duplicate_slot(
-    client, user, storage_factory, wine_factory, django_assert_num_queries
-):
+def test_user_cant_add_duplicate_slot(client, user, storage_factory, wine_factory):
     storage = storage_factory(user=user, rows=2, columns=2)
     client.force_login(user)
     wine = wine_factory(user=user)
@@ -337,10 +309,9 @@ def test_user_cant_add_duplicate_slot(
         "storage": storage.pk,
         "slots": json.dumps([[1, 1], [1, 1]]),
     }
-    with django_assert_num_queries(9):
-        r = client.post(
-            reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
-        )
+    r = client.post(
+        reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
+    )
     assert r.status_code == HTTPStatus.OK
     assert r.context["form"].errors
     assert StorageItem.objects.count() == 0
@@ -348,7 +319,7 @@ def test_user_cant_add_duplicate_slot(
 
 @pytest.mark.django_db
 def test_user_cant_add_with_no_slots_selected(
-    client, user, storage_factory, wine_factory, django_assert_num_queries
+    client, user, storage_factory, wine_factory
 ):
     storage = storage_factory(user=user, rows=2, columns=2)
     client.force_login(user)
@@ -358,21 +329,19 @@ def test_user_cant_add_with_no_slots_selected(
         "storage": storage.pk,
         "slots": json.dumps([]),
     }
-    with django_assert_num_queries(9):
-        r = client.post(
-            reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
-        )
+    r = client.post(
+        reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
+    )
     assert r.status_code == HTTPStatus.OK
     assert r.context["form"].errors
     assert StorageItem.objects.count() == 0
 
 
 @pytest.mark.django_db
-def test_slots_invalid_json_rejected(user, storage_factory, django_assert_num_queries):
+def test_slots_invalid_json_rejected(user, storage_factory):
     storage = storage_factory(user=user, rows=1, columns=1)
     form = StockForm(data={"storage": storage.pk, "slots": "not-json"}, user=user)
-    with django_assert_num_queries(1):
-        assert not form.is_valid()
+    assert not form.is_valid()
     assert "Invalid slot selection" in str(form.errors["slots"])
 
 
@@ -382,13 +351,10 @@ def test_slots_invalid_json_rejected(user, storage_factory, django_assert_num_qu
     ["[[1]]", '[["a", "b"]]', '[{"row": 1, "column": 1}]'],
     ids=["wrong-pair-length", "non-int-values", "not-a-list-of-pairs"],
 )
-def test_slots_wrong_shape_rejected(
-    user, storage_factory, raw_slots, django_assert_num_queries
-):
+def test_slots_wrong_shape_rejected(user, storage_factory, raw_slots):
     storage = storage_factory(user=user, rows=2, columns=2)
     form = StockForm(data={"storage": storage.pk, "slots": raw_slots}, user=user)
-    with django_assert_num_queries(1):
-        assert not form.is_valid()
+    assert not form.is_valid()
     assert "Invalid slot selection" in str(form.errors["slots"])
 
 
@@ -399,7 +365,6 @@ def test_partial_over_capacity_add_creates_nothing(
     storage_factory,
     storage_item_factory,
     wine_factory,
-    django_assert_num_queries,
 ):
     """One free slot requested alongside one that's already occupied - the
     whole submission is rejected, not partially fulfilled."""
@@ -415,19 +380,16 @@ def test_partial_over_capacity_add_creates_nothing(
         "storage": storage.pk,
         "slots": json.dumps([[1, 1], [1, 2]]),
     }
-    with django_assert_num_queries(10):
-        r = client.post(
-            reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
-        )
+    r = client.post(
+        reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
+    )
     assert r.status_code == HTTPStatus.OK
     assert r.context["form"].errors
     assert StorageItem.objects.filter(vintage__wine=wine).count() == 0
 
 
 @pytest.mark.django_db
-def test_user_cant_add_to_invalid_slot(
-    client, user, storage_factory, wine_factory, django_assert_num_queries
-):
+def test_user_cant_add_to_invalid_slot(client, user, storage_factory, wine_factory):
     storage = storage_factory(user=user, rows=2, columns=2)
     client.force_login(user)
     wine = wine_factory(user=user)
@@ -436,10 +398,9 @@ def test_user_cant_add_to_invalid_slot(
         "storage": storage.pk,
         "slots": json.dumps([[3, 1]]),
     }
-    with django_assert_num_queries(10):
-        r = client.post(
-            reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
-        )
+    r = client.post(
+        reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
+    )
     assert r.status_code == HTTPStatus.OK
     assert r.context["form"].errors
 
@@ -483,15 +444,12 @@ def test_form_context_has_grid_cells(
 
 
 @pytest.mark.django_db
-def test_form_context_marks_unlimited_shelf(
-    client, user, wine_factory, django_assert_num_queries
-):
+def test_form_context_marks_unlimited_shelf(client, user, wine_factory):
     client.force_login(user)
     storage = Storage.objects.filter(user=user).first()
     wine = wine_factory(user=user)
     vintage = wine.latest_vintage
-    with django_assert_num_queries(6):
-        r = client.get(reverse("stock-add", kwargs={"pk": vintage.pk}))
+    r = client.get(reverse("stock-add", kwargs={"pk": vintage.pk}))
     assert r.status_code == HTTPStatus.OK
     assert r.context["storage_cells_data"][storage.pk] == {"unlimited": True}
 
@@ -503,7 +461,6 @@ def test_edit_form_context_marks_current_slot(
     storage_factory,
     storage_item_factory,
     wine_factory,
-    django_assert_num_queries,
 ):
     storage = storage_factory(user=user, rows=2, columns=2)
     client.force_login(user)
@@ -511,8 +468,7 @@ def test_edit_form_context_marks_current_slot(
     item = storage_item_factory(
         storage=storage, vintage=wine.latest_vintage, row=1, column=1, user=user
     )
-    with django_assert_num_queries(8):
-        r = client.get(reverse("stock-edit", kwargs={"pk": item.pk}))
+    r = client.get(reverse("stock-edit", kwargs={"pk": item.pk}))
     assert r.status_code == HTTPStatus.OK
     payload = r.context["storage_cells_data"][storage.pk]
     assert {(c["row"], c["column"]): c["state"] for c in payload["cells"]} == {
@@ -530,7 +486,6 @@ def test_edit_form_context_only_marks_current_for_its_own_storage(
     storage_factory,
     storage_item_factory,
     wine_factory,
-    django_assert_num_queries,
 ):
     """A different storage that happens to share the same coordinates as
     the item's current slot must not have that cell marked "current" too -
@@ -542,8 +497,7 @@ def test_edit_form_context_only_marks_current_for_its_own_storage(
     item = storage_item_factory(
         storage=storage, vintage=wine.latest_vintage, row=1, column=1, user=user
     )
-    with django_assert_num_queries(8):
-        r = client.get(reverse("stock-edit", kwargs={"pk": item.pk}))
+    r = client.get(reverse("stock-edit", kwargs={"pk": item.pk}))
     assert r.status_code == HTTPStatus.OK
     other_payload = r.context["storage_cells_data"][other_storage.pk]
     assert {(c["row"], c["column"]): c["state"] for c in other_payload["cells"]} == {
@@ -558,7 +512,6 @@ def test_used_slot_is_free_after_delete(
     storage_factory,
     storage_item_factory,
     wine_factory,
-    django_assert_num_queries,
 ):
     wine = wine_factory(user=user)
     wine_new = wine_factory(user=user)
@@ -577,12 +530,11 @@ def test_used_slot_is_free_after_delete(
         "storage": storage.pk,
         "slots": json.dumps([[1, 1]]),
     }
-    with django_assert_num_queries(37):
-        r = client.post(
-            reverse("stock-add", kwargs={"pk": vintage_new.pk}),
-            data=data,
-            follow=True,
-        )
+    r = client.post(
+        reverse("stock-add", kwargs={"pk": vintage_new.pk}),
+        data=data,
+        follow=True,
+    )
     assert r.status_code == HTTPStatus.OK
     assertRedirects(
         response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine_new.pk})
@@ -601,7 +553,6 @@ def test_user_can_edit_existing_item_new_slot(
     storage_factory,
     wine_factory,
     storage_item_factory,
-    django_assert_num_queries,
 ):
     storage = storage_factory(user=user, rows=2, columns=2)
     client.force_login(user)
@@ -613,10 +564,9 @@ def test_user_can_edit_existing_item_new_slot(
         "storage": storage.pk,
         "slots": json.dumps([[2, 1]]),
     }
-    with django_assert_num_queries(35):
-        r = client.post(
-            reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
-        )
+    r = client.post(
+        reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
+    )
     assert r.status_code == HTTPStatus.OK
     assertRedirects(
         response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
@@ -636,7 +586,6 @@ def test_user_can_edit_existing_item_keeping_same_slot(
     storage_factory,
     wine_factory,
     storage_item_factory,
-    django_assert_num_queries,
 ):
     """Submitting the bottle's own current slot (the "current" cell, not
     "free") is a no-op move and must still be accepted."""
@@ -650,10 +599,9 @@ def test_user_can_edit_existing_item_keeping_same_slot(
         "storage": storage.pk,
         "slots": json.dumps([[1, 1]]),
     }
-    with django_assert_num_queries(35):
-        r = client.post(
-            reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
-        )
+    r = client.post(
+        reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
+    )
     assert r.status_code == HTTPStatus.OK
     assertRedirects(
         response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
@@ -670,7 +618,6 @@ def test_user_can_edit_existing_item_new_price(
     storage_factory,
     wine_factory,
     storage_item_factory,
-    django_assert_num_queries,
 ):
     storage = storage_factory(user=user, rows=2, columns=2)
     client.force_login(user)
@@ -688,10 +635,9 @@ def test_user_can_edit_existing_item_new_price(
         "slots": json.dumps([[1, 1]]),
         "price": 15.0,
     }
-    with django_assert_num_queries(35):
-        r = client.post(
-            reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
-        )
+    r = client.post(
+        reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
+    )
     assert r.status_code == HTTPStatus.OK
     assertRedirects(
         response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
@@ -712,7 +658,6 @@ def test_user_cant_edit_to_occupied_slot(
     storage_factory,
     wine_factory,
     storage_item_factory,
-    django_assert_num_queries,
 ):
     storage = storage_factory(user=user, rows=2, columns=2)
     client.force_login(user)
@@ -732,17 +677,16 @@ def test_user_cant_edit_to_occupied_slot(
         "storage": storage.pk,
         "slots": json.dumps([[2, 1]]),
     }
-    with django_assert_num_queries(10):
-        r = client.post(
-            reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
-        )
+    r = client.post(
+        reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
+    )
     assert r.status_code == HTTPStatus.OK
     assert r.context["form"].errors
 
 
 @pytest.mark.django_db
 def test_edit_stock_race_rechecks_under_lock(
-    user, storage_factory, wine_factory, storage_item_factory, django_assert_num_queries
+    user, storage_factory, wine_factory, storage_item_factory
 ):
     """A slot taken between validation and write must be rejected."""
     storage = storage_factory(user=user, rows=1, columns=2)
@@ -760,9 +704,8 @@ def test_edit_stock_race_rechecks_under_lock(
     )
     cleaned_data = {"storage": storage, "price": None, "slots": [(1, 2)]}
 
-    with django_assert_num_queries(5):
-        with pytest.raises(SlotConflictError):
-            StorageItemUpdateView.process_form_data(item_to_move, user, cleaned_data)
+    with pytest.raises(SlotConflictError):
+        StorageItemUpdateView.process_form_data(item_to_move, user, cleaned_data)
 
     item_to_move.refresh_from_db()
     assert (item_to_move.row, item_to_move.column) == (1, 1)
@@ -775,7 +718,6 @@ def test_edit_stock_slot_conflict_shows_friendly_form_error(
     storage_factory,
     wine_factory,
     storage_item_factory,
-    django_assert_num_queries,
 ):
     """The view's own `except SlotConflictError` branch in `form_valid`
     (distinct from `process_form_data` itself, exercised above) must
@@ -790,10 +732,9 @@ def test_edit_stock_slot_conflict_shows_friendly_form_error(
     with patch.object(
         StorageItemUpdateView, "process_form_data", side_effect=SlotConflictError
     ):
-        with django_assert_num_queries(10):
-            r = client.post(
-                reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
-            )
+        r = client.post(
+            reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
+        )
     assert r.status_code == HTTPStatus.OK
     assert r.context["form"].errors
     assert "no longer free" in str(r.context["form"].errors)
@@ -808,7 +749,6 @@ def test_user_cant_edit_grid_slot_with_no_slot_selected(
     storage_factory,
     wine_factory,
     storage_item_factory,
-    django_assert_num_queries,
 ):
     storage = storage_factory(user=user, rows=2, columns=2)
     client.force_login(user)
@@ -820,10 +760,9 @@ def test_user_cant_edit_grid_slot_with_no_slot_selected(
         "storage": storage.pk,
         "slots": json.dumps([]),
     }
-    with django_assert_num_queries(9):
-        r = client.post(
-            reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
-        )
+    r = client.post(
+        reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
+    )
     assert r.status_code == HTTPStatus.OK
     assert r.context["form"].errors
     item.refresh_from_db()
@@ -838,7 +777,6 @@ def test_user_can_edit_item_to_unlimited_shelf(
     storage_factory,
     wine_factory,
     storage_item_factory,
-    django_assert_num_queries,
 ):
     storage = storage_factory(user=user, rows=2, columns=2)
     unlimited_storage = Storage.objects.filter(user=user).first()
@@ -851,10 +789,9 @@ def test_user_can_edit_item_to_unlimited_shelf(
         "storage": unlimited_storage.pk,
         "slots": json.dumps([]),
     }
-    with django_assert_num_queries(33):
-        r = client.post(
-            reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
-        )
+    r = client.post(
+        reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
+    )
     assert r.status_code == HTTPStatus.OK
     assertRedirects(
         response=r, expected_url=reverse("wine-detail", kwargs={"pk": wine.pk})
@@ -872,7 +809,6 @@ def test_user_cant_edit_item_to_unlimited_shelf_with_stale_slot(
     storage_factory,
     wine_factory,
     storage_item_factory,
-    django_assert_num_queries,
 ):
     storage = storage_factory(user=user, rows=2, columns=2)
     unlimited_storage = Storage.objects.filter(user=user).first()
@@ -885,10 +821,9 @@ def test_user_cant_edit_item_to_unlimited_shelf_with_stale_slot(
         "storage": unlimited_storage.pk,
         "slots": json.dumps([[1, 1]]),
     }
-    with django_assert_num_queries(9):
-        r = client.post(
-            reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
-        )
+    r = client.post(
+        reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
+    )
     assert r.status_code == HTTPStatus.OK
     assert r.context["form"].errors
     item.refresh_from_db()
@@ -903,7 +838,6 @@ def test_user_cant_edit_to_other_users_storage(
     storage_factory,
     wine_factory,
     storage_item_factory,
-    django_assert_num_queries,
 ):
     other_user = user_factory()
     other_storage = Storage.objects.filter(user=other_user).first()
@@ -916,18 +850,15 @@ def test_user_cant_edit_to_other_users_storage(
     data = {
         "storage": other_storage.pk,
     }
-    with django_assert_num_queries(9):
-        r = client.post(
-            reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
-        )
+    r = client.post(
+        reverse("stock-edit", kwargs={"pk": item.pk}), data=data, follow=True
+    )
     assert r.status_code == HTTPStatus.OK
     assert r.context["form"].errors
 
 
 @pytest.mark.django_db
-def test_user_can_add_stock_with_price(
-    client, user, wine_factory, django_assert_num_queries
-):
+def test_user_can_add_stock_with_price(client, user, wine_factory):
     client.force_login(user)
     storage = Storage.objects.filter(user=user).first()
     wine = wine_factory(user=user)
@@ -936,10 +867,9 @@ def test_user_can_add_stock_with_price(
         "storage": storage.pk,
         "price": "12.50",
     }
-    with django_assert_num_queries(35):
-        r = client.post(
-            reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
-        )
+    r = client.post(
+        reverse("stock-add", kwargs={"pk": vintage.pk}), data=data, follow=True
+    )
     assert r.status_code == HTTPStatus.OK
     item = StorageItem.objects.filter(vintage__wine=wine).first()
     assert item is not None

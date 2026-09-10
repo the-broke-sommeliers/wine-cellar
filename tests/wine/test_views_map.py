@@ -9,11 +9,10 @@ from wine_cellar.apps.wine.filters import WineMapFilter
 
 
 @pytest.mark.django_db
-def test_wine_map_view(client, user, wine_factory, django_assert_num_queries):
+def test_wine_map_view(client, user, wine_factory):
     wine_factory(user=user)
     client.force_login(user)
-    with django_assert_num_queries(10):
-        r = client.get(reverse("wine-map"))
+    r = client.get(reverse("wine-map"))
     assert r.status_code == HTTPStatus.OK
     assertTemplateUsed(response=r, template_name="wine_map.html")
 

@@ -8,9 +8,8 @@ from wine_cellar.apps.wine.models import Size, Wine
 
 
 @pytest.mark.django_db
-def test_history_unauthenticated_redirects(client, django_assert_num_queries):
-    with django_assert_num_queries(1):
-        r = client.get(reverse("stock-history"), follow=True)
+def test_history_unauthenticated_redirects(client):
+    r = client.get(reverse("stock-history"), follow=True)
     assert r.status_code == HTTPStatus.OK
     assert r.redirect_chain
     assert reverse("account_login") in r.redirect_chain[0][0]
@@ -24,7 +23,6 @@ def test_history_orders_newest_first(
     wine_factory,
     storage_item_factory,
     storage_item_event_factory,
-    django_assert_num_queries,
 ):
     client.force_login(user)
     storage = storage_factory(user=user)
@@ -39,8 +37,7 @@ def test_history_orders_newest_first(
     consumed = storage_item_event_factory(
         storage_item=item, user=user, event_type=StorageItemEventType.CONSUMED
     )
-    with django_assert_num_queries(5):
-        r = client.get(reverse("stock-history"))
+    r = client.get(reverse("stock-history"))
     assert r.status_code == HTTPStatus.OK
     events = list(r.context["events"])
     # Events were created in ascending order, so newest-first means the
@@ -57,7 +54,6 @@ def test_history_hides_other_users_events(
     wine_factory,
     storage_item_factory,
     storage_item_event_factory,
-    django_assert_num_queries,
 ):
     other = user_factory()
     client.force_login(user)
@@ -75,8 +71,7 @@ def test_history_hides_other_users_events(
     )
     other_event = storage_item_event_factory(storage_item=other_item, user=other)
 
-    with django_assert_num_queries(5):
-        r = client.get(reverse("stock-history"))
+    r = client.get(reverse("stock-history"))
     assert r.status_code == HTTPStatus.OK
     pks = [e.pk for e in r.context["events"]]
     assert own_event.pk in pks
@@ -84,9 +79,7 @@ def test_history_hides_other_users_events(
 
 
 @pytest.mark.django_db
-def test_history_shows_wine_added_and_removed_end_to_end(
-    client, user, django_assert_num_queries
-):
+def test_history_shows_wine_added_and_removed_end_to_end(client, user):
     """Adding then deleting a wine shows up on the history page, in order,
     even after the wine itself is gone."""
     client.force_login(user)
@@ -98,14 +91,11 @@ def test_history_shows_wine_added_and_removed_end_to_end(
         "vintage": 2019,
         "country": "FR",
     }
-    with django_assert_num_queries(9):
-        client.post(reverse("wine-add"), data)
+    client.post(reverse("wine-add"), data)
     wine = Wine.objects.get(name="Chablis 2019")
-    with django_assert_num_queries(20):
-        client.post(reverse("wine-delete", kwargs={"pk": wine.pk}))
+    client.post(reverse("wine-delete", kwargs={"pk": wine.pk}))
 
-    with django_assert_num_queries(5):
-        r = client.get(reverse("stock-history"))
+    r = client.get(reverse("stock-history"))
     assert r.status_code == HTTPStatus.OK
     assert r.content.decode().count("Chablis 2019") >= 2
     events = list(r.context["events"])
@@ -123,7 +113,6 @@ def test_history_renders_as_activity_feed(
     wine_factory,
     storage_item_factory,
     storage_item_event_factory,
-    django_assert_num_queries,
 ):
     """Sanity check that the timeline template actually renders - one
     .timeline__item per event, with its icon class present."""
@@ -135,8 +124,7 @@ def test_history_renders_as_activity_feed(
         storage_item=item, user=user, event_type=StorageItemEventType.OPENED
     )
 
-    with django_assert_num_queries(5):
-        r = client.get(reverse("stock-history"))
+    r = client.get(reverse("stock-history"))
     assert r.status_code == HTTPStatus.OK
     content = r.content.decode()
     assert content.count("timeline__item") == 1

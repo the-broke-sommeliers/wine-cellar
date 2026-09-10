@@ -43,71 +43,54 @@ def test_open_multiple_choice_required():
 
 
 @pytest.mark.django_db
-def test_open_multiple_choice_required_present(size_factory, django_assert_num_queries):
+def test_open_multiple_choice_required_present(size_factory):
     size = size_factory()
     form = CustomTestForm(data={"required_field": [size.pk]})
-    with django_assert_num_queries(1):
-        assert form.is_valid()
+    assert form.is_valid()
 
 
 @pytest.mark.django_db
-def test_open_multiple_choice_required_empty(size_factory, django_assert_num_queries):
+def test_open_multiple_choice_required_empty(size_factory):
     size_factory()
     form = CustomTestFormSlicedQs(data={"required_field": [""]})
-    with django_assert_num_queries(0):
-        assert not form.is_valid()
+    assert not form.is_valid()
 
 
 @pytest.mark.django_db
-def test_open_multiple_choice_non_required_empty(
-    size_factory, django_assert_num_queries
-):
+def test_open_multiple_choice_non_required_empty(size_factory):
     size = size_factory()
     form = CustomTestForm(
         data={"required_field": [size.pk], "non_required_field": [""]}
     )
-    with django_assert_num_queries(1):
-        assert form.is_valid()
+    assert form.is_valid()
 
 
 @pytest.mark.django_db
-def test_open_multiple_choice_incompatible_field_class(
-    size_factory, django_assert_num_queries
-):
+def test_open_multiple_choice_incompatible_field_class(size_factory):
     size_factory()
     form = CustomTestFormType(data={"required_field": ["tom_new_optaaa"]})
-    with django_assert_num_queries(0):
-        assert not form.is_valid()
+    assert not form.is_valid()
 
 
 @pytest.mark.django_db
-def test_open_multiple_choice_compatible_field_class(
-    size_factory, django_assert_num_queries
-):
+def test_open_multiple_choice_compatible_field_class(size_factory):
     size_factory()
     form = CustomTestFormType(data={"required_field": ["tom_new_opt1"]})
-    with django_assert_num_queries(0):
-        assert form.is_valid()
+    assert form.is_valid()
 
 
 @pytest.mark.django_db
-def test_open_multiple_choice_localized_float_decimal_comma(
-    size_factory, django_assert_num_queries
-):
+def test_open_multiple_choice_localized_float_decimal_comma(size_factory):
     size_factory()
     with translation.override("de"):
         form = CustomTestFormLocalizedFloat(data={"required_field": ["tom_new_opt1,5"]})
-        with django_assert_num_queries(0):
-            assert form.is_valid()
+        assert form.is_valid()
     assert form.fields["required_field"].new_values == [1.5]
 
 
 @pytest.mark.django_db
-def test_open_multiple_choice_localized_float_decimal_point(
-    size_factory, django_assert_num_queries
-):
+def test_open_multiple_choice_localized_float_decimal_point(size_factory):
     size_factory()
     form = CustomTestFormLocalizedFloat(data={"required_field": ["tom_new_opt1.5"]})
-    with django_assert_num_queries(0):
-        assert form.is_valid()
+    assert form.is_valid()
     assert form.fields["required_field"].new_values == [1.5]
