@@ -221,6 +221,18 @@ def test_get_type_label(user, wine_factory):
 
 
 @pytest.mark.django_db
+def test_get_type_label_federweisser(user, wine_factory):
+    wine = wine_factory(user=user, wine_type="FW")
+    assert wine.get_type == "Federweisser"
+
+
+@pytest.mark.django_db
+def test_get_type_label_federroter(user, wine_factory):
+    wine = wine_factory(user=user, wine_type="FR")
+    assert wine.get_type == "Federroter"
+
+
+@pytest.mark.django_db
 def test_get_category_label(user, wine_factory):
     wine = wine_factory(user=user, wine_type="WH")
     wine.category = "DR"
