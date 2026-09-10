@@ -113,7 +113,10 @@ class VintageFactory(DjangoModelFactory):
 
     wine = factory.SubFactory(WineFactory, _create_default_vintage=False)
     user = factory.LazyAttribute(lambda v: v.wine.user)
-    year = factory.LazyFunction(lambda: random.randint(1900, 2024))
+    # Sequence, not random: avoids colliding with the "unique vintage"
+    # (wine, year, user) constraint when a test creates several vintages
+    # for the same wine without an explicit year.
+    year = factory.Sequence(lambda n: 1900 + n)
     abv = 12.0
 
 
