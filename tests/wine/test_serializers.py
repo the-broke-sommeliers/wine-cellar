@@ -139,6 +139,14 @@ def test_serialize_ai_payload_wine_type_mapped():
 
 
 @pytest.mark.django_db
+def test_serialize_ai_payload_wine_type_mapped_federweisser():
+    serializer = WineAiSerializer()
+    ai_json = {"name": "Junger Wein", "type": "federweisser"}
+    initial = serializer.serialize_ai_payload(ai_json)
+    assert initial["wine_type"] == "FW"
+
+
+@pytest.mark.django_db
 def test_serialize_ai_payload_category_mapped():
     serializer = WineAiSerializer()
     ai_json = {"name": "Dry Red", "sweetness": "dry"}
