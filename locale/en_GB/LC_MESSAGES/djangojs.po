@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-08 15:57+0200\n"
+"POT-Creation-Date: 2026-09-10 18:46+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -24,6 +24,13 @@ msgstr "Clear Image"
 #: wine_cellar/assets/js/image_preview.ts:51
 msgid "Restore image"
 msgstr "Restore image"
+
+#: wine_cellar/assets/js/stock_add.ts:88
+#, javascript-format
+msgid "%s bottle selected"
+msgid_plural "%s bottles selected"
+msgstr[0] "%s bottle selected"
+msgstr[1] "%s bottles selected"
 
 #: wine_cellar/assets/js/wine_upload_ai.ts:35
 msgid "Uploading your photos…"
@@ -76,11 +83,23 @@ msgstr "Picture of a wine bottle."
 msgid "Vintage"
 msgstr "Vintage"
 
-#: wine_cellar/react/react_bar_code.tsx:8
+#: wine_cellar/react/maps/ItemPopup.tsx:8
+msgid "Stock"
+msgstr "Stock"
+
+#: wine_cellar/react/maps/WineMaps.tsx:170
+msgid "Updating…"
+msgstr "Updating…"
+
+#: wine_cellar/react/maps/WineMaps.tsx:188
+msgid "No wines match your filters"
+msgstr "No wines match your filters"
+
+#: wine_cellar/react/react_bar_code.tsx:10
 msgid "Advanced"
 msgstr "Advanced"
 
-#: wine_cellar/react/react_bar_code.tsx:10
+#: wine_cellar/react/react_bar_code.tsx:12
 msgid ""
 "Choose the type of barcode you want to scan, sometimes this can help if "
 "scanning doesn't work."
@@ -88,14 +107,14 @@ msgstr ""
 "Choose the type of barcode you want to scan, sometimes this can help if "
 "scanning doesn't work."
 
-#: wine_cellar/react/react_bar_code.tsx:12
+#: wine_cellar/react/react_bar_code.tsx:14
 msgid "Scan Barcode"
 msgstr "Scan Barcode"
 
-#: wine_cellar/react/react_bar_code.tsx:13
+#: wine_cellar/react/react_bar_code.tsx:15
 msgid "Close Scanner"
 msgstr "Close Scanner"
 
-#: wine_cellar/react/react_bar_code.tsx:71
+#: wine_cellar/react/react_bar_code.tsx:73
 msgid "All"
 msgstr "All"

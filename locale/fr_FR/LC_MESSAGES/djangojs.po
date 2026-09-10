@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-08 15:57+0200\n"
+"POT-Creation-Date: 2026-09-10 18:46+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,13 +27,21 @@ msgstr "Effacer l'image"
 msgid "Restore image"
 msgstr "Restaurer l'image"
 
+#: wine_cellar/assets/js/stock_add.ts:88
+#, javascript-format
+msgid "%s bottle selected"
+msgid_plural "%s bottles selected"
+msgstr[0] "%s bouteille sélectionnée"
+msgstr[1] "%s bouteilles sélectionnées"
+
 #: wine_cellar/assets/js/wine_upload_ai.ts:35
 msgid "Uploading your photos…"
 msgstr "Téléchargement de vos photos…"
 
 #: wine_cellar/assets/js/wine_upload_ai.ts:37
 msgid "Analyzing your label with AI… this can take up to a minute."
-msgstr "Analyse de votre étiquette par IA… cela peut prendre jusqu'à une minute."
+msgstr ""
+"Analyse de votre étiquette par IA… cela peut prendre jusqu'à une minute."
 
 #: wine_cellar/assets/js/wine_upload_ai.ts:88
 msgid "Wine identified — now refining its location…"
@@ -57,7 +65,8 @@ msgstr "La requête IA a échoué."
 
 #: wine_cellar/assets/js/wine_upload_ai.ts:131
 msgid "This is taking longer than expected. Please try again in a few minutes."
-msgstr "Cela prend plus de temps que prévu. Veuillez réessayer dans quelques minutes."
+msgstr ""
+"Cela prend plus de temps que prévu. Veuillez réessayer dans quelques minutes."
 
 #: wine_cellar/assets/js/wine_upload_ai.ts:168
 #: wine_cellar/assets/js/wine_upload_ai.ts:174
@@ -77,11 +86,23 @@ msgstr "Image d'une bouteille de vin."
 msgid "Vintage"
 msgstr "Millésime"
 
-#: wine_cellar/react/react_bar_code.tsx:8
+#: wine_cellar/react/maps/ItemPopup.tsx:8
+msgid "Stock"
+msgstr "Stock"
+
+#: wine_cellar/react/maps/WineMaps.tsx:170
+msgid "Updating…"
+msgstr "Mise à jour…"
+
+#: wine_cellar/react/maps/WineMaps.tsx:188
+msgid "No wines match your filters"
+msgstr "Aucun vin ne correspond à vos filtres"
+
+#: wine_cellar/react/react_bar_code.tsx:10
 msgid "Advanced"
 msgstr "Avancé"
 
-#: wine_cellar/react/react_bar_code.tsx:10
+#: wine_cellar/react/react_bar_code.tsx:12
 msgid ""
 "Choose the type of barcode you want to scan, sometimes this can help if "
 "scanning doesn't work."
@@ -89,14 +110,14 @@ msgstr ""
 "Choisissez le type de code-barre que vous voulez scanner, cela peut parfois "
 "aider si le scan ne fonctionne pas."
 
-#: wine_cellar/react/react_bar_code.tsx:12
+#: wine_cellar/react/react_bar_code.tsx:14
 msgid "Scan Barcode"
 msgstr "Scanner le code-barre"
 
-#: wine_cellar/react/react_bar_code.tsx:13
+#: wine_cellar/react/react_bar_code.tsx:15
 msgid "Close Scanner"
 msgstr "Fermer le scanner"
 
-#: wine_cellar/react/react_bar_code.tsx:71
+#: wine_cellar/react/react_bar_code.tsx:73
 msgid "All"
 msgstr "Tout"
