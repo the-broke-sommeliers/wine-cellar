@@ -2,18 +2,19 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-08 15:57+0200\n"
+"POT-Creation-Date: 2026-09-10 18:46+0200\n"
 "PO-Revision-Date: 2026-02-17 16:42+0000\n"
-"Language-Team: Swedish (Sweden) (https://app.transifex.com/the-broke-sommeliers/teams/304909/sv_SE/)\n"
+"Language-Team: Swedish (Sweden) (https://app.transifex.com/the-broke-"
+"sommeliers/teams/304909/sv_SE/)\n"
+"Language: sv_SE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: sv_SE\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: wine_cellar/assets/js/image_preview.ts:50
@@ -23,6 +24,13 @@ msgstr "Rensa bild"
 #: wine_cellar/assets/js/image_preview.ts:51
 msgid "Restore image"
 msgstr "Återställ bild"
+
+#: wine_cellar/assets/js/stock_add.ts:88
+#, javascript-format
+msgid "%s bottle selected"
+msgid_plural "%s bottles selected"
+msgstr[0] "%s flaska vald"
+msgstr[1] "%s flaskor valda"
 
 #: wine_cellar/assets/js/wine_upload_ai.ts:35
 msgid "Uploading your photos…"
@@ -53,8 +61,7 @@ msgid "The AI request failed."
 msgstr "AI-förfrågan misslyckades."
 
 #: wine_cellar/assets/js/wine_upload_ai.ts:131
-msgid ""
-"This is taking longer than expected. Please try again in a few minutes."
+msgid "This is taking longer than expected. Please try again in a few minutes."
 msgstr "Det här tar längre tid än väntat. Försök igen om några minuter."
 
 #: wine_cellar/assets/js/wine_upload_ai.ts:168
@@ -75,24 +82,38 @@ msgstr "Bild av en vinflaska."
 msgid "Vintage"
 msgstr "Årgång"
 
-#: wine_cellar/react/react_bar_code.tsx:8
+#: wine_cellar/react/maps/ItemPopup.tsx:8
+msgid "Stock"
+msgstr "Lager"
+
+#: wine_cellar/react/maps/WineMaps.tsx:170
+msgid "Updating…"
+msgstr "Uppdaterar…"
+
+#: wine_cellar/react/maps/WineMaps.tsx:188
+msgid "No wines match your filters"
+msgstr "Inga viner matchar dina filter"
+
+#: wine_cellar/react/react_bar_code.tsx:10
 msgid "Advanced"
 msgstr "Avancerat"
 
-#: wine_cellar/react/react_bar_code.tsx:10
+#: wine_cellar/react/react_bar_code.tsx:12
 msgid ""
 "Choose the type of barcode you want to scan, sometimes this can help if "
 "scanning doesn't work."
-msgstr "Välj vilken typ av streckkod du vill skanna, ibland kan det hjälpa om skanningen inte fungerar."
+msgstr ""
+"Välj vilken typ av streckkod du vill skanna, ibland kan det hjälpa om "
+"skanningen inte fungerar."
 
-#: wine_cellar/react/react_bar_code.tsx:12
+#: wine_cellar/react/react_bar_code.tsx:14
 msgid "Scan Barcode"
 msgstr "Skanna streckkod"
 
-#: wine_cellar/react/react_bar_code.tsx:13
+#: wine_cellar/react/react_bar_code.tsx:15
 msgid "Close Scanner"
 msgstr "Stäng skannern"
 
-#: wine_cellar/react/react_bar_code.tsx:71
+#: wine_cellar/react/react_bar_code.tsx:73
 msgid "All"
 msgstr "Alla"
