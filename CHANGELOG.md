@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.14.0 (2026-09-10)
+
+### feat
+
+- add Federweisser as wine type
+
+
+
 ## 0.13.0 (2026-09-09)
 
 ### BREAKING CHANGE
