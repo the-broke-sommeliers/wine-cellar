@@ -33,6 +33,8 @@ class WineType(models.TextChoices):
     DESSERT = "DE", _("Dessert")
     FORTIFIED = "FO", _("Fortified")
     ORANGE = "OR", _("Orange")
+    FEDERWEISSER = "FW", _("Federweisser")
+    FEDERROTER = "FR", _("Federroter")
 
 
 class Category(models.TextChoices):

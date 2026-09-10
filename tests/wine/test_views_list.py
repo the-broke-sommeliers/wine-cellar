@@ -235,6 +235,18 @@ def test_wine_filter_by_wine_type(client, user, wine_factory):
 
 
 @pytest.mark.django_db
+def test_wine_filter_by_wine_type_federweisser(client, user, wine_factory):
+    wine_fw = wine_factory(user=user, wine_type="FW", name="Federweisser Wine")
+    wine_white = wine_factory(user=user, wine_type="WH", name="White Wine")
+    client.force_login(user)
+    r = client.get(reverse("wine-list") + "?wine_type=FW")
+    assert r.status_code == HTTPStatus.OK
+    wines = list(r.context_data["wines"])
+    assert wine_fw in wines
+    assert wine_white not in wines
+
+
+@pytest.mark.django_db
 def test_wine_filter_by_country(client, user, wine_factory):
     wine_de = wine_factory(user=user, country="DE", name="German Wine")
     wine_fr = wine_factory(user=user, country="FR", name="French Wine")
