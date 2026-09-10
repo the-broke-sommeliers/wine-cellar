@@ -34,7 +34,7 @@ dev = [
     "black==26.5.1",
     "django-debug-toolbar==7.1.1",
     "django-test-migrations==1.6.0",
-    "djlint==1.44.2",
+    "djlint==1.45.0",
     "factory-boy==3.3.3",
     "flake8==7.3.0",
     "isort==9.0.1",
