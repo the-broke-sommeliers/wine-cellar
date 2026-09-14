@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.14.1 (2026-09-14)
+
+### fix
+
+- broken map on wine detail view
+
+- show vintages on wine card
+
+- **deps**: update all non-major dependencies
+
+
 ## 0.14.0 (2026-09-10)
 
 ### feat
