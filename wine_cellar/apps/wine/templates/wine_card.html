@@ -1,8 +1,8 @@
 {% load static i18n %}
-{% with vintage=vintage|default:wine.latest_vintage %}
+{% with explicit_vintage=vintage resolved_vintage=vintage|default:wine.latest_vintage drink_by_vintage=vintage|default:wine.next_drink_by_vintage %}
     <li class="wine-card">
         <div class="wine-card__image-wrapper">
-            <img src="{{ vintage.image_thumbnail|default:wine.image_thumbnail }}"
+            <img src="{{ resolved_vintage.image_thumbnail|default:wine.image_thumbnail }}"
                  class="wine-card__img"
                  height="160"
                  width="120"
@@ -16,25 +16,27 @@
             {% if wine.get_grapes %}
                 <p><span class="text--gray">{% translate "Grapes" %}:</span> {{ wine.get_grapes | truncatechars:31 | title }}</p>
             {% endif %}
-            {% if vintage %}
-                {% if vintage.year %}
-                    <p><span class="text--gray">{% translate "Vintage" %}:</span> {{ vintage.year }}</p>
+            {% if explicit_vintage %}
+                {% if explicit_vintage.year %}
+                    <p><span class="text--gray">{% translate "Vintage" %}:</span> {{ explicit_vintage.year }}</p>
                 {% endif %}
-                {% if vintage.drink_by %}
-                    <p>
-                        <span class="text--gray">{% translate "Drink By" %}:</span> {{ vintage.drink_by }}
-                        {% if vintage.drink_by <= vintage.drink_by_warning_date %}
-                            <i class="fa-solid fa-circle-exclamation wine-card__drink-warning"
-                               aria-label="{% translate "Drink soon" %}"></i>
-                        {% endif %}
-                    </p>
-                {% endif %}
-                {% if vintage.rating %}
-                    <p class="wine-card__rating" aria-label="{% blocktranslate with rating=vintage.rating %}Rating: {{ rating }} out of 10{% endblocktranslate %}">
-                        <i class="fa-solid fa-star" aria-hidden="true"></i>
-                        <span>{{ vintage.rating }}/10</span>
-                    </p>
-                {% endif %}
+            {% elif wine.vintage_years_display %}
+                <p><span class="text--gray">{% translate "Vintage" %}:</span> {{ wine.vintage_years_display }}</p>
+            {% endif %}
+            {% if drink_by_vintage.drink_by %}
+                <p>
+                    <span class="text--gray">{% translate "Drink By" %}:</span> {{ drink_by_vintage.drink_by }}
+                    {% if drink_by_vintage.drink_by <= drink_by_vintage.drink_by_warning_date %}
+                        <i class="fa-solid fa-circle-exclamation wine-card__drink-warning"
+                           aria-label="{% translate "Drink soon" %}"></i>
+                    {% endif %}
+                </p>
+            {% endif %}
+            {% if resolved_vintage.rating %}
+                <p class="wine-card__rating" aria-label="{% blocktranslate with rating=resolved_vintage.rating %}Rating: {{ rating }} out of 10{% endblocktranslate %}">
+                    <i class="fa-solid fa-star" aria-hidden="true"></i>
+                    <span>{{ resolved_vintage.rating }}/10</span>
+                </p>
             {% endif %}
         </div>
         <div class="wine-card__stock">

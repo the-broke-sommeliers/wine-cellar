@@ -211,6 +211,48 @@ class Wine(UserContentModel):
         return self.vintages.order_by("-year").first()
 
     @cached_property
+    def vintage_years(self):
+        prefetched = getattr(self, "_prefetched_vintages", None)
+        if prefetched is not None:
+            years = {v.year for v in prefetched if v.year is not None}
+        else:
+            years = set(self.vintages.exclude(year=None).values_list("year", flat=True))
+        return sorted(years)
+
+    @cached_property
+    def vintage_years_display(self):
+        """Years as one comma-separated string, collapsing each run of
+        consecutive years into a range (e.g. "2004, 2007–2010, 2019")."""
+        years = self.vintage_years
+        if not years:
+            return None
+        parts = []
+        start = prev = years[0]
+        for year in years[1:]:
+            if year == prev + 1:
+                prev = year
+                continue
+            parts.append(str(start) if start == prev else f"{start}–{prev}")
+            start = prev = year
+        parts.append(str(start) if start == prev else f"{start}–{prev}")
+        return ", ".join(parts)
+
+    @cached_property
+    def next_drink_by_vintage(self):
+        """The vintage with the soonest "drink by" date, across all of the
+        wine's vintages - the single, specific, actionable date to surface
+        on the card. Matches the "Drink By" sort's framing (see
+        WineListView.next_drink_by) that the most urgent vintage is the
+        one that matters."""
+        prefetched = getattr(self, "_prefetched_vintages", None)
+        if prefetched is not None:
+            candidates = [v for v in prefetched if v.drink_by is not None]
+            if not candidates:
+                return None
+            return min(candidates, key=lambda v: v.drink_by)
+        return self.vintages.exclude(drink_by=None).order_by("drink_by").first()
+
+    @cached_property
     def get_vineyards(self):
         return "\n".join([str(vineyard) for vineyard in self.vineyard.all()])
 
