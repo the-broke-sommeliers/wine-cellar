@@ -231,16 +231,24 @@
   background: #f0f0f0;
 }
 
-.card__map > *,
-.card__map > * > *,
-.card__map > * > * > * {
+.card__map > * {
   height: 100%;
   width: 100%;
 }
 
-.card__map .leaflet-container {
+/* .map-with-markers has no in-flow content of its own once
+   .leaflet-container below is taken out of flow (see next rule), so it
+   needs its height set explicitly rather than inherited from children. */
+.card__map .map-with-markers {
   height: 100%;
-  width: 100%;
+}
+
+/* Anchored to .map-with-markers (position: relative, see map.css) rather
+   than sized by percentage height, so it doesn't care how many wrapper
+   divs react-leaflet puts between it and .leaflet-container. */
+.card__map .leaflet-container {
+  position: absolute;
+  inset: 0;
   border-radius: 8px;
 }
 
