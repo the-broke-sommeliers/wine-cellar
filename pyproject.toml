@@ -21,6 +21,7 @@ dependencies = [
     "django-filter==26.1",
     "django-webpack-loader==3.2.4",
     "django-widget-tweaks==1.5.1",
+    "fastmcp>=4.0.5",
     "litellm==1.100.0",
     "pillow==12.3.0",
     "pycountry==26.2.16",
@@ -81,7 +82,7 @@ markers = [
 ]
 
 [tool.setuptools]
-packages = ["wine_cellar"]
+packages = ["wine_cellar", "mcp_server"]
 [tool.black]
 line-length = 88
 target-version = ['py313']
