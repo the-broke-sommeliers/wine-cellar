@@ -1,12 +1,9 @@
 """Wine list filtering/ordering/pagination (WineListView + WineFilter,
 wine_cellar/apps/wine/filters.py, template wine_list.html).
 
-The filter form is rendered twice in the template (a `<details>`-wrapped
-copy for small screens, an always-open copy for large screens), toggled
-purely by CSS media queries - both get real ids. At the default desktop
-viewport only `.filter-form--lg` is visible, so plain field interactions
-are scoped to it explicitly (`tom_select_pick` already filters `:visible`
-internally for the tom-select fields).
+The filter form is rendered once and toggled purely by CSS (a checkbox
+hides/shows it on small screens; a media query forces it permanently open
+on large screens), so a single `.filter-form` locator covers both.
 """
 
 import pytest
@@ -18,7 +15,7 @@ pytestmark = pytest.mark.e2e
 
 
 def visible_filter_form(page):
-    return page.locator(".filter-form--lg")
+    return page.locator(".filter-form")
 
 
 @pytest.mark.django_db

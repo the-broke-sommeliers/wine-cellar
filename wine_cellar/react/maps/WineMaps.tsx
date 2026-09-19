@@ -46,11 +46,11 @@ export const Map = React.forwardRef<L.Map, MapProps>(function Map(
 interface Wine {
   location?: GeoJSON.Feature<GeoJSON.Point>
   country?: string
-  image?: string
-  url?: string
-  name?: string
-  country_icon?: string
-  country_name?: string
+  image: string
+  url: string
+  name: string
+  country_icon: string
+  country_name: string
   vintage?: string
   total_stock?: number
   [key: string]: unknown
@@ -120,22 +120,24 @@ export const MapWithMarkers = ({
   const latLngs: [number, number][] = []
   const markers = wines.map((wine, index) => {
     const feature = {
-      ...(wine.location ?? (countries as any)[wine.country || '']),
+      ...(wine.location ??
+        (countries as Record<string, GeoJSON.Feature<GeoJSON.Point>>)[
+          wine.country || ''
+        ]),
     }
     if (!feature?.geometry) {
       return null
     }
-    latLngs.push([
-      feature.geometry.coordinates[1],
-      feature.geometry.coordinates[0],
-    ])
+    latLngs.push(
+      [...feature.geometry.coordinates].reverse() as [number, number]
+    )
     feature.properties = Object.assign(wine, feature.properties)
+    const wineFeature = feature as GeoJSON.Feature<GeoJSON.Point> & {
+      properties: Wine
+    }
     return (
-      <GeoJsonMarker
-        key={index}
-        feature={feature as GeoJSON.Feature<GeoJSON.Point>}
-      >
-        {!withoutPopup && <ItemPopup feature={feature as any} />}
+      <GeoJsonMarker key={wine.url ?? index} feature={wineFeature}>
+        {!withoutPopup && <ItemPopup feature={wineFeature} />}
       </GeoJsonMarker>
     )
   })
