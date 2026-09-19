@@ -24,6 +24,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils.formats import number_format
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DeleteView, DetailView, FormView, TemplateView, View
 from django_filters.views import FilterView
@@ -335,12 +336,48 @@ class WineCreateView(AiPrefillMixin, WineBaseView):
         context["ai_image_back_name"] = images.get("back", {}).get("name")
         return context
 
+    def _duplicate_wine_match(self, form):
+        cleaned_data = form.cleaned_data
+        size = cleaned_data.get("size")
+        if not size:
+            # size[0] only carries a pk once resolved to an *existing* Size
+            # row - a brand-new not-yet-created size value can't collide
+            # with anything, so skip the lookup entirely (see
+            # OpenMultipleChoiceField / create_new_objects in
+            # wine_cellar/apps/wine/fields.py:30-95).
+            return None
+        initial = {
+            "name": cleaned_data.get("name"),
+            "wine_type": cleaned_data.get("wine_type"),
+            "size": size[0].pk,
+            "country": cleaned_data.get("country"),
+        }
+        return _find_matching_wine(initial, self.request.user)
+
+    def _add_duplicate_wine_error(self, form, match):
+        form.add_error(
+            None,
+            format_html(
+                "{} {}",
+                _("A wine with these details already exists in your cellar:"),
+                format_html(
+                    '<a href="{}" target="_blank" rel="noopener noreferrer">{}</a>.',
+                    match.get_absolute_url(),
+                    match.name,
+                ),
+            ),
+        )
+
     def form_valid(self, form):
         form_step = form.cleaned_data.get("form_step", 5)
 
         if form_step is None:
             form_step = 5
         if form_step == 5 or "save_finish" in self.request.POST:
+            match = self._duplicate_wine_match(form)
+            if match:
+                self._add_duplicate_wine_error(form, match)
+                return super().form_invalid(form)
             token = form.cleaned_data.get("prefill_token")
             prefill_data = self._get_prefill_data() if token else {}
             if prefill_data.get("images"):
@@ -362,9 +399,14 @@ class WineCreateView(AiPrefillMixin, WineBaseView):
                 )
                 return super().form_invalid(form)
             except IntegrityError:
-                form.add_error(
-                    None, _("A wine with these details already exists in your cellar.")
-                )
+                match = self._duplicate_wine_match(form)
+                if match:
+                    self._add_duplicate_wine_error(form, match)
+                else:
+                    form.add_error(
+                        None,
+                        _("A wine with these details already exists in your cellar."),
+                    )
                 return super().form_invalid(form)
             if prefill_data:
                 wine_prefill_cache.delete(f"wine_prefill_{token}")
@@ -374,6 +416,11 @@ class WineCreateView(AiPrefillMixin, WineBaseView):
             if "back" in self.request.POST:
                 form.data["form_step"] = max(0, form.cleaned_data["form_step"] - 1)
             else:
+                if form_step == 0:
+                    match = self._duplicate_wine_match(form)
+                    if match:
+                        self._add_duplicate_wine_error(form, match)
+                        return super().form_invalid(form)
                 form.data["form_step"] = form.cleaned_data["form_step"] + 1
             return super().form_invalid(form)
         return super().form_invalid(form)
