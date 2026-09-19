@@ -3,12 +3,35 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.15.0-rc.0 (2026-09-19)
+
+### feat
+
+- show the existing wine when trying to add a duplicate in the error message
+
+- the ai assisted wine adding flow now checks and warns for duplicates
+
+- enable proper logging, can be controlled via env
+
+
+### fix
+
+- make ai image scan prompt more precise
+
+- some linter issues
+
+- couple of small issues/improvements
+
+- **docker**: fail to start if a migration fails
+- don't fail if thumbnail generation fails
+
+- **deps**: update all non-major dependencies
+
 ## 0.14.2 (2026-09-19)
 
 ### fix
 
 - rename duplicate wines which haven't been folded into another wine as vintage
-
 
 
 ## 0.14.1 (2026-09-14)
