@@ -110,16 +110,16 @@ def test_blank_required_field_blocks_submission(
 def test_duplicate_wine_error_is_shown_to_the_user(
     live_server, page, login, user, wine_factory, size_factory
 ):
-    """WineCreateView.form_valid() catches the duplicate-wine IntegrityError
-    and calls ``form.add_error(None, "...already exists...")`` - a
-    *non-field* error. `wine_create.html` renders `form.non_field_errors`
-    right after the CSRF token so that message actually reaches the user."""
+    """WineCreateView.form_valid() now checks for a duplicate as soon as the
+    user tries to leave step 0 via "Continue" - the wizard should stay on
+    step 0 and show a non-field error linking to the existing wine, instead
+    of only catching it via IntegrityError after the final save."""
     # The uniqueness constraint is on (name, wine_type, size, country, user) -
     # SQL treats NULL as never equal to NULL, so any NULL column would exempt
     # the row from the constraint entirely. Every field needs a concrete,
     # matching value for the collision to actually fire.
     size = size_factory(user=user, name=0.75)
-    wine_factory(
+    existing = wine_factory(
         user=user,
         name="Twin Wine",
         wine_type="RE",
@@ -131,17 +131,18 @@ def test_duplicate_wine_error_is_shown_to_the_user(
     page.goto(f"{live_server.url}{reverse('wine-add')}")
     fill_step_0(page, name="Twin Wine")
     page.get_by_role("button", name="Continue").click()
-    page.wait_for_selector("#create__fs_1:not(.hidden)")
-    page.locator("#id_year").fill("2019")
-    page.locator("#id_abv").fill("13.5")
+    page.wait_for_selector(".form-errorlist")
 
-    page.get_by_role("button", name="Save and Finish").click()
-    page.wait_for_timeout(500)
-
-    # The duplicate is correctly rejected at the data layer either way...
+    # The duplicate is correctly rejected before ever attempting to save...
     assert Wine.objects.filter(user=user, name="Twin Wine").count() == 1
-    # ...but the user should actually be told that's what happened.
+    # ...the wizard stays on step 0 instead of advancing...
+    assert page.locator("#create__fs_0:not(.hidden)").count() == 1
+    # ...and the user is told, with a link to the existing wine so they can
+    # check whether it's really the same bottle.
     assert "already exists" in page.locator("main").inner_text()
+    link = page.locator(f'main a[href="{existing.get_absolute_url()}"]')
+    assert link.count() == 1
+    assert link.get_attribute("target") == "_blank"
 
 
 @pytest.mark.django_db

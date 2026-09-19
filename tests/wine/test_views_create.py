@@ -368,6 +368,66 @@ def test_wine_create_save_finish_commits_early(client, user):
 
 
 @pytest.mark.django_db
+def test_wine_create_step0_duplicate_shows_linked_error_and_blocks_advancing(
+    client, user, wine_factory
+):
+    """Duplicate detection now runs as soon as the user tries to leave step 0
+    (`form_step == 0` -> "Continue"), instead of only being caught by the
+    `IntegrityError` at the final save - the wizard should stay on step 0 and
+    surface a non-field error linking to the existing wine."""
+    client.force_login(user)
+    size = Size.objects.get(name=0.75)
+    existing = wine_factory(
+        user=user, name="Merlot", wine_type="RE", size=size, country="DE"
+    )
+    data = {
+        "name": "Merlot",
+        "wine_type": "RE",
+        "size": size.pk,
+        "country": "DE",
+        "form_step": 0,
+    }
+    r = client.post(reverse("wine-add"), data)
+    assert r.status_code == HTTPStatus.OK
+    form = r.context_data["form"]
+    assert form["form_step"].value() in (0, "0")
+    assert form.non_field_errors()
+    assert (
+        f'<a href="{existing.get_absolute_url()}" target="_blank"' in r.content.decode()
+    )
+    assert Wine.objects.filter(user=user).count() == 1
+
+
+@pytest.mark.django_db
+def test_wine_create_save_finish_step0_duplicate_shows_linked_error(
+    client, user, wine_factory
+):
+    """Submitting "Save and Finish" directly from step 0 hits the same
+    pre-check before the save is attempted, rather than relying on the
+    `IntegrityError` fallback."""
+    client.force_login(user)
+    size = Size.objects.get(name=0.75)
+    existing = wine_factory(
+        user=user, name="Merlot", wine_type="RE", size=size, country="DE"
+    )
+    data = {
+        "name": "Merlot",
+        "wine_type": "RE",
+        "size": size.pk,
+        "country": "DE",
+        "form_step": 0,
+        "save_finish": "1",
+    }
+    r = client.post(reverse("wine-add"), data)
+    assert r.status_code == HTTPStatus.OK
+    assert r.context_data["form"].non_field_errors()
+    assert (
+        f'<a href="{existing.get_absolute_url()}" target="_blank"' in r.content.decode()
+    )
+    assert Wine.objects.filter(user=user).count() == 1
+
+
+@pytest.mark.django_db
 def test_wine_update_does_not_log_wine_added(client, user, wine):
     """Editing an existing wine reuses the same create-flow form_valid logic
     as WineCreateView - it must not log a second WINE_ADDED event."""

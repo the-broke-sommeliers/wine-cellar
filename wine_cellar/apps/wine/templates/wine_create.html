@@ -28,7 +28,7 @@
                 {% csrf_token %}
                 {% if form.non_field_errors %}
                     <ul class="form-errorlist" aria-live="assertive" aria-atomic="true">
-                        {% for error in form.non_field_errors %}<li>{{ error|escape }}</li>{% endfor %}
+                        {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
                     </ul>
                 {% endif %}
                 {% with step=form.form_step.value|add:"0" %}
