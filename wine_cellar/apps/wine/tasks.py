@@ -32,13 +32,27 @@ _wine_types = ", ".join([choice.label.lower() for choice in WineType])
 _sweetness_categories = ", ".join([choice.label.lower() for choice in Category])
 
 MODEL_INSTRUCTIONS = f"""
-Return JSON with fields:
+You are shown one or two photos of a wine bottle - front and/or back label.
+Examine both images closely, including any small or dense print on the back
+label, and extract the following details.
+
+Return JSON only, with no surrounding commentary or markdown, containing
+these fields. Unless a field's description below says otherwise, omit it
+rather than guessing if it cannot be determined.
+
 name: wine name
 country: ISO2 code
 type: {_wine_types}
 size: float, bottle size in liters, e.g. 0.75, if no value guess
-grapes: list of grapes
-vintage: year
+grapes: list of grapes. If not printed on the label, infer the likely
+  grape(s) from the wine's type, region, and appellation when they strongly
+  imply a variety (e.g. a red Burgundy is pinot noir, a Chablis is
+  chardonnay, a Barolo is nebbiolo). Leave empty only if no variety can be
+  reasonably inferred.
+vintage: four-digit harvest year as an integer, e.g. 2018. Look carefully
+  at both label images for a year printed anywhere on the bottle, including
+  large standalone numerals on the back label - it is not always next to
+  the wine name. Only omit this field if no year appears anywhere.
 abs: float, alcohol %
 sweetness: {_sweetness_categories}
 vineyard: list of vineyard names
