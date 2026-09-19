@@ -24,3 +24,5 @@ CLAUDE.md
 .claude/
 .mcp.json
 .devcontainer/
+.devcontainer
+.serena/

@@ -4,7 +4,6 @@ import {
   createElementObject,
   createTileLayerComponent,
   type LeafletContextInterface,
-  updateGridLayer,
 } from '@react-leaflet/core'
 
 interface MaplibreGlLayerProps {
@@ -19,18 +18,16 @@ const createMaplibreGlLayer = (
   const instance = L.maplibreGL({
     style: props.baseUrl,
     ...(props.attribution && { attribution: props.attribution }),
-  } as any)
+  })
 
   return createElementObject(instance, context)
 }
 
 const updateMaplibreGlLayer = (
-  instance: any,
+  instance: L.MaplibreGL,
   props: MaplibreGlLayerProps,
   prevProps: MaplibreGlLayerProps
 ) => {
-  updateGridLayer(instance, props, prevProps)
-
   const { baseUrl, attribution } = props
   if (baseUrl != null && baseUrl !== prevProps.baseUrl) {
     instance.getMaplibreMap().setStyle(baseUrl)

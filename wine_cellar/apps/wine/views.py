@@ -2,6 +2,7 @@ import base64
 import logging
 import uuid
 from decimal import Decimal
+from urllib.parse import urlencode
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
@@ -1015,7 +1016,9 @@ class WineUploadAIPollView(View):
                     "wine-ai-existing-match", kwargs={"token": token}
                 )
             else:
-                redirect_url = f"{reverse('wine-add')}?prefill_token={token}"
+                redirect_url = (
+                    f"{reverse('wine-add')}?{urlencode({'prefill_token': token})}"
+                )
             return JsonResponse({"status": "done", "redirect": redirect_url})
         if entry.get("status") == "error":
             return JsonResponse(
@@ -1029,7 +1032,7 @@ class WineAiExistingMatchView(View):
 
     def get(self, request, *args, **kwargs):
         token = self.kwargs["token"]
-        fallback = f"{reverse('wine-add')}?prefill_token={token}"
+        fallback = f"{reverse('wine-add')}?{urlencode({'prefill_token': token})}"
         entry = _get_owned_prefill_entry(token, request.user)
         if not entry or entry.get("status") != "done":
             return redirect(fallback)
