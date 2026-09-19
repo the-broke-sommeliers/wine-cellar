@@ -11,7 +11,11 @@
         <div class="pure-u-1 pure-u-lg-1-2 m-auto">
             <div class="card">
                 <p class="text--gray">
-                    {% translate "The details we extracted match a wine you already have:" %}
+                    {% if name_case_differs %}
+                        {% translate "This looks very similar to a wine you already have - only the capitalization of the name differs:" %}
+                    {% else %}
+                        {% translate "The details we extracted match a wine you already have:" %}
+                    {% endif %}
                 </p>
                 <ul class="wine-card__list">
                     {% include 'wine_card.html' with wine=wine %}
