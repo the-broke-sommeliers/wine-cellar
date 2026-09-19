@@ -6,7 +6,7 @@ from decimal import Decimal
 from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
 from django.core.files.base import ContentFile
-from django.db import IntegrityError, connections, transaction
+from django.db import IntegrityError, connections, models, transaction
 from django.db.models import (
     Avg,
     Count,
@@ -187,6 +187,38 @@ class WineBaseView(OpenChoiceModelFormViewMixin, FormView):
     def get_vintage_instance(self, wine):
         raise NotImplementedError
 
+    def _duplicate_wine_match(self, form):
+        cleaned_data = form.cleaned_data
+        size = cleaned_data.get("size")
+        if not size:
+            # size[0] only carries a pk once resolved to an *existing* Size
+            # row - a brand-new not-yet-created size value can't collide
+            # with anything, so skip the lookup entirely (see
+            # OpenMultipleChoiceField / create_new_objects in
+            # wine_cellar/apps/wine/fields.py:30-95).
+            return None
+        initial = {
+            "name": cleaned_data.get("name"),
+            "wine_type": cleaned_data.get("wine_type"),
+            "size": size[0].pk,
+            "country": cleaned_data.get("country"),
+        }
+        return _find_matching_wine(initial, self.request.user)
+
+    def _add_duplicate_wine_error(self, form, match):
+        form.add_error(
+            None,
+            format_html(
+                "{} {}",
+                _("A wine with these details already exists in your cellar:"),
+                format_html(
+                    '<a href="{}" target="_blank" rel="noopener noreferrer">{}</a>.',
+                    match.get_absolute_url(),
+                    match.name,
+                ),
+            ),
+        )
+
     def update_wine_from_cleaned_data(self, form, wine=None):
         cleaned_data = form.cleaned_data
         user = self.request.user
@@ -336,38 +368,6 @@ class WineCreateView(AiPrefillMixin, WineBaseView):
         context["ai_image_back_name"] = images.get("back", {}).get("name")
         return context
 
-    def _duplicate_wine_match(self, form):
-        cleaned_data = form.cleaned_data
-        size = cleaned_data.get("size")
-        if not size:
-            # size[0] only carries a pk once resolved to an *existing* Size
-            # row - a brand-new not-yet-created size value can't collide
-            # with anything, so skip the lookup entirely (see
-            # OpenMultipleChoiceField / create_new_objects in
-            # wine_cellar/apps/wine/fields.py:30-95).
-            return None
-        initial = {
-            "name": cleaned_data.get("name"),
-            "wine_type": cleaned_data.get("wine_type"),
-            "size": size[0].pk,
-            "country": cleaned_data.get("country"),
-        }
-        return _find_matching_wine(initial, self.request.user)
-
-    def _add_duplicate_wine_error(self, form, match):
-        form.add_error(
-            None,
-            format_html(
-                "{} {}",
-                _("A wine with these details already exists in your cellar:"),
-                format_html(
-                    '<a href="{}" target="_blank" rel="noopener noreferrer">{}</a>.',
-                    match.get_absolute_url(),
-                    match.name,
-                ),
-            ),
-        )
-
     def form_valid(self, form):
         form_step = form.cleaned_data.get("form_step", 5)
 
@@ -469,9 +469,14 @@ class WineUpdateView(WineBaseView):
             )
             return super().form_invalid(form)
         except IntegrityError:
-            form.add_error(
-                None, _("A wine with these details already exists in your cellar.")
-            )
+            match = self._duplicate_wine_match(form)
+            if match:
+                self._add_duplicate_wine_error(form, match)
+            else:
+                form.add_error(
+                    None,
+                    _("A wine with these details already exists in your cellar."),
+                )
             return super().form_invalid(form)
         self.success_url = reverse_lazy("wine-detail", kwargs={"pk": wine.pk})
         return super().form_valid(form)
@@ -707,7 +712,17 @@ class VintageCreateView(AiPrefillMixin, FormView):
         for field in VINTAGE_FIELDS:
             setattr(vintage, field, cleaned_data.get(field))
         try:
-            vintage.save()
+            with transaction.atomic():
+                vintage.save()
+                for form_field, image_type in image_fields_map.items():
+                    image = cleaned_data.get(form_field)
+                    if image and not hasattr(image, "instance"):
+                        WineImage.objects.get_or_create(
+                            image=image,
+                            vintage=vintage,
+                            user=user,
+                            image_type=image_type,
+                        )
         except IntegrityError:
             # Backstop for the race between clean_year()'s check and this
             # save() - clean_year() already catches the common case.
@@ -715,12 +730,6 @@ class VintageCreateView(AiPrefillMixin, FormView):
                 "year", _("A vintage with this year already exists for this wine.")
             )
             return self.form_invalid(form)
-        for form_field, image_type in image_fields_map.items():
-            image = cleaned_data.get(form_field)
-            if image and not hasattr(image, "instance"):
-                WineImage.objects.get_or_create(
-                    image=image, vintage=vintage, user=user, image_type=image_type
-                )
         if prefill_data:
             wine_prefill_cache.delete(f"wine_prefill_{token}")
         self.success_url = reverse_lazy("wine-detail", kwargs={"pk": wine.pk})
@@ -894,7 +903,19 @@ def _get_owned_prefill_entry(token, user):
     return data
 
 
-_WINE_MATCH_FIELDS = ("name", "wine_type", "size", "country")
+def _unique_wine_constraint_fields():
+    """Derive the match fields from Wine.Meta's "unique wine" constraint
+    itself (minus "user", which _find_matching_wine filters by separately)
+    instead of hand-duplicating the field list, so the two can't drift."""
+    for constraint in Wine._meta.constraints:
+        if isinstance(constraint, models.UniqueConstraint) and (
+            constraint.name == "unique wine"
+        ):
+            return tuple(f for f in constraint.fields if f != "user")
+    raise LookupError('Wine model is missing its "unique wine" UniqueConstraint')
+
+
+_WINE_MATCH_FIELDS = _unique_wine_constraint_fields()
 
 
 def _find_matching_wine(initial, user):

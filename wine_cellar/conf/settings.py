@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import logging
 import os
 from pathlib import Path
 
@@ -229,6 +230,11 @@ SOCIALACCOUNT_EMAIL_VERIFICATION = "optional"
 # docker logs. This makes errors (unhandled exceptions, 500s) always show up
 # on stdout/stderr, where `docker compose logs` picks them up.
 LOG_LEVEL = os.environ.get("DJANGO_LOG_LEVEL", "WARNING")
+# Floor for "django.request" below - always at least ERROR (so 500s keep
+# surfacing) but still honors a more verbose DJANGO_LOG_LEVEL.
+DJANGO_REQUEST_LOG_LEVEL = (
+    LOG_LEVEL if logging.getLevelName(LOG_LEVEL) <= logging.ERROR else "ERROR"
+)
 
 LOGGING = {
     "version": 1,
@@ -256,10 +262,11 @@ LOGGING = {
             "propagate": False,
         },
         # Unhandled exceptions in views (500s) are logged here with a full
-        # traceback; always surface those regardless of DJANGO_LOG_LEVEL.
+        # traceback; always surface those regardless of DJANGO_LOG_LEVEL, but
+        # still honor a more verbose setting (e.g. to see 404s/warnings too).
         "django.request": {
             "handlers": ["console"],
-            "level": "ERROR",
+            "level": DJANGO_REQUEST_LOG_LEVEL,
             "propagate": False,
         },
         "django.security": {
