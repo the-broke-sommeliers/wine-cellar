@@ -626,6 +626,27 @@ def test_ai_upload_poll_done_with_match_redirects_to_existing_match_view(
 @pytest.mark.django_db
 @override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
 @patch("litellm.completion")
+def test_ai_upload_poll_done_with_case_differing_name_redirects_to_existing_match_view(
+    mock_completion, client, user, wine_factory
+):
+    """A repeat AI scan of the same label can come back with different name
+    casing - that must still be treated as a match, not a silent duplicate."""
+    size = Size.objects.get(name=0.75)
+    wine_factory(user=user, name="Merlot", wine_type="RE", size=size, country="DE")
+    mock_completion.return_value = _mock_response(
+        '{"name": "MERLOT", "country": "DE", "type": "red", "size": "0.75"}'
+    )
+    client.force_login(user)
+    r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
+    assert r.status_code == HTTPStatus.OK
+    poll = _poll(client, r.json()["poll_url"])
+    assert poll["status"] == "done"
+    assert resolve(urlparse(poll["redirect"]).path).url_name == "wine-ai-existing-match"
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("litellm.completion")
 def test_ai_upload_poll_done_partial_initial_skips_match_check(
     mock_completion, client, user, wine_factory
 ):
@@ -673,6 +694,37 @@ def test_ai_existing_match_view_renders_matched_wine(client, user, wine_factory)
     assert r.context["wine"] == wine
     assert r.context["prefill_token"] == token
     assert "existing_vintage_year" not in r.context
+    assert "name_case_differs" not in r.context
+
+
+@pytest.mark.django_db
+def test_ai_existing_match_view_flags_case_differing_name(client, user, wine_factory):
+    size = Size.objects.get(name=0.75)
+    wine = wine_factory(
+        user=user, name="Chapel Down Bacchus", wine_type="WH", size=size, country="GB"
+    )
+    token = "case-match-token"
+    wine_prefill_cache.set(
+        f"wine_prefill_{token}",
+        {
+            "status": "done",
+            "initial": {
+                "name": "CHAPEL DOWN BACCHUS",
+                "wine_type": "WH",
+                "size": size.pk,
+                "country": "GB",
+            },
+            "images": {},
+            "user_id": user.pk,
+        },
+        timeout=60,
+    )
+    client.force_login(user)
+    r = client.get(reverse("wine-ai-existing-match", kwargs={"token": token}))
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["wine"] == wine
+    assert r.context["name_case_differs"] is True
+    assert "looks very similar" in r.content.decode()
 
 
 @pytest.mark.django_db
