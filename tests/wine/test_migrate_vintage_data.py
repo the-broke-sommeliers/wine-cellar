@@ -346,6 +346,52 @@ def test_three_way_same_year_collision_excluded_wines_stay_independent(migrator)
         assert vintages[0].wine_id == survivor.pk
 
 
+def test_standalone_duplicates_are_renamed_so_0021_unique_constraint_applies(migrator):
+    old_state = migrator.apply_initial_migration(PRE_STATE)
+    Wine = old_state.apps.get_model("wine", "Wine")
+    Size = old_state.apps.get_model("wine", "Size")
+    User = old_state.apps.get_model("auth", "User")
+
+    user = User.objects.create(username="tester")
+    size = Size.objects.first()
+    kwargs = _wine_kwargs(user, size=size)
+    oldest = Wine.objects.create(**kwargs, vintage=2019, abv=12.0)
+    middle = Wine.objects.create(**kwargs, vintage=2019, abv=12.5)
+    newest = Wine.objects.create(**kwargs, vintage=2019, abv=13.0)
+    taken = Wine.objects.create(**{**kwargs, "name": "Bordeaux Merlot (2)"})
+
+    migrator.apply_tested_migration(MID_STATE)
+    head_state = migrator.apply_tested_migration(HEAD_STATE)
+    Wine3 = head_state.apps.get_model("wine", "Wine")
+    Vintage3 = head_state.apps.get_model("wine", "Vintage")
+
+    assert Wine3.objects.get(pk=oldest.pk).name == "Bordeaux Merlot"
+    assert Wine3.objects.get(pk=taken.pk).name == "Bordeaux Merlot (2)"
+    assert Wine3.objects.get(pk=middle.pk).name == "Bordeaux Merlot (3)"
+    assert Wine3.objects.get(pk=newest.pk).name == "Bordeaux Merlot (4)"
+    for wine in (oldest, middle, newest):
+        assert Vintage3.objects.filter(wine_id=wine.pk, year=2019).count() == 1
+
+
+def test_renamed_standalone_name_stays_within_max_length(migrator):
+    old_state = migrator.apply_initial_migration(PRE_STATE)
+    Wine = old_state.apps.get_model("wine", "Wine")
+    Size = old_state.apps.get_model("wine", "Size")
+    User = old_state.apps.get_model("auth", "User")
+
+    user = User.objects.create(username="tester")
+    kwargs = _wine_kwargs(user, size=Size.objects.first(), name="x" * 100)
+    Wine.objects.create(**kwargs, vintage=2019, abv=12.0)
+    duplicate = Wine.objects.create(**kwargs, vintage=2019, abv=12.5)
+
+    migrator.apply_tested_migration(MID_STATE)
+    head_state = migrator.apply_tested_migration(HEAD_STATE)
+    renamed = head_state.apps.get_model("wine", "Wine").objects.get(pk=duplicate.pk)
+
+    assert len(renamed.name) == 100
+    assert renamed.name.endswith(" (2)")
+
+
 def test_dissimilar_vineyard_excludes_wine_from_fold(migrator):
     old_state = migrator.apply_initial_migration(PRE_STATE)
     Wine = old_state.apps.get_model("wine", "Wine")

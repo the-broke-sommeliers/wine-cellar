@@ -1,5 +1,45 @@
+from collections import defaultdict
+
 import django.db.models.deletion
 from django.db import migrations, models
+
+NAME_MAX_LENGTH = 100
+
+
+def rename_duplicate_wines(apps, schema_editor):
+    """0020 leaves year-colliding or dissimilar wines as standalone rows that
+    still share the new unique key. Suffix the newer ones with " (n)" so the
+    constraint below can be added."""
+    if schema_editor.connection.vendor == "postgresql":
+        schema_editor.execute("SET CONSTRAINTS ALL IMMEDIATE")
+
+    Wine = apps.get_model("wine", "Wine")
+    rows = [
+        (pk, name, (wine_type, size_id, country, user_id))
+        for pk, name, wine_type, size_id, country, user_id in Wine.objects.order_by(
+            "pk"
+        ).values_list("pk", "name", "wine_type", "size_id", "country", "user_id")
+    ]
+    taken = defaultdict(set)
+    for _pk, name, key in rows:
+        taken[key].add(name)
+
+    claimed = defaultdict(set)
+    for pk, name, key in rows:
+        # NULLs are distinct in a unique constraint, so these can't collide
+        if key[1] is None or key[3] is None or name not in claimed[key]:
+            claimed[key].add(name)
+            continue
+        n = 2
+        while True:
+            suffix = f" ({n})"
+            candidate = name[: NAME_MAX_LENGTH - len(suffix)] + suffix
+            if candidate not in taken[key]:
+                break
+            n += 1
+        taken[key].add(candidate)
+        claimed[key].add(candidate)
+        Wine.objects.filter(pk=pk).update(name=candidate)
 
 
 class Migration(migrations.Migration):
@@ -10,6 +50,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunPython(rename_duplicate_wines, migrations.RunPython.noop),
         migrations.RemoveConstraint(
             model_name="wine",
             name="unique wine",
