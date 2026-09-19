@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import os
 from typing import TYPE_CHECKING
 
@@ -9,6 +10,8 @@ from PIL import ExifTags, Image
 
 if TYPE_CHECKING:
     from wine_cellar.apps.wine.models import Wine
+
+logger = logging.getLogger(__name__)
 
 _DASH_CHARS = "‐‑‒–—―−"  # hyphen..horizontal bar, minus sign
 _DASH_TRANSLATION = str.maketrans({c: "-" for c in _DASH_CHARS})
@@ -44,9 +47,12 @@ def make_thumbnail(instance, height=225):
                 img = img.rotate(270, expand=True)
             elif orientation_value == 8:
                 img = img.rotate(90, expand=True)
-    except (AttributeError, KeyError, IndexError):
-        # Image has no EXIF or orientation info
-        pass
+    except Exception:
+        logger.warning(
+            "Failed to read EXIF orientation while creating thumbnail for %s",
+            image_path,
+            exc_info=True,
+        )
 
     aspect = img.width / img.height
     width = int(height * aspect)

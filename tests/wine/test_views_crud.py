@@ -9,7 +9,8 @@ from wine_cellar.apps.storage.models import (
     StorageItemEvent,
     StorageItemEventType,
 )
-from wine_cellar.apps.wine.models import Size, Vintage, Wine
+from tests.helpers import exif_jpeg, invalid_image, random_png
+from wine_cellar.apps.wine.models import ImageType, Size, Vintage, Wine, WineImage
 
 
 @pytest.mark.django_db
@@ -441,6 +442,216 @@ def test_vintage_create_duplicate_year_shows_form_error(
     assert r.status_code == HTTPStatus.OK
     assert r.context["form"].errors["year"]
     assert Vintage.objects.filter(wine=wine).count() == 1
+
+
+@pytest.mark.django_db
+def test_vintage_create_with_image_succeeds(
+    client, user, wine_factory, clear_image_folder
+):
+    wine = wine_factory(user=user, _create_default_vintage=False)
+    client.force_login(user)
+    r = client.post(
+        reverse("vintage-add", kwargs={"wine_pk": wine.pk}),
+        {"year": 2020, "image_front": random_png("front.png")},
+        follow=True,
+    )
+    assert r.status_code == HTTPStatus.OK
+    vintage = Vintage.objects.get(wine=wine, year=2020)
+    image = WineImage.objects.get(vintage=vintage)
+    assert image.image_type == ImageType.FRONT
+    assert image.thumbnail
+
+
+@pytest.mark.django_db
+def test_vintage_create_with_exif_image_succeeds(
+    client, user, wine_factory, clear_image_folder
+):
+    """Real phone-camera photos carry EXIF orientation data - reproduces the
+    reported 500 when adding a vintage picture (see make_thumbnail())."""
+    wine = wine_factory(user=user, _create_default_vintage=False)
+    client.force_login(user)
+    r = client.post(
+        reverse("vintage-add", kwargs={"wine_pk": wine.pk}),
+        {"year": 2020, "image_front": exif_jpeg("front.jpg")},
+        follow=True,
+    )
+    assert r.status_code == HTTPStatus.OK
+    vintage = Vintage.objects.get(wine=wine, year=2020)
+    image = WineImage.objects.get(vintage=vintage)
+    assert image.image_type == ImageType.FRONT
+    assert image.thumbnail
+
+
+@pytest.mark.django_db
+def test_vintage_create_with_back_image_succeeds(
+    client, user, wine_factory, clear_image_folder
+):
+    """Only image_front was ever exercised on create - confirm the other
+    image slots in image_fields_map are wired correctly too."""
+    wine = wine_factory(user=user, _create_default_vintage=False)
+    client.force_login(user)
+    r = client.post(
+        reverse("vintage-add", kwargs={"wine_pk": wine.pk}),
+        {"year": 2020, "image_back": random_png("back.png")},
+        follow=True,
+    )
+    assert r.status_code == HTTPStatus.OK
+    vintage = Vintage.objects.get(wine=wine, year=2020)
+    assert WineImage.objects.filter(
+        vintage=vintage, image_type=ImageType.BACK
+    ).exists()
+
+
+@pytest.mark.django_db
+def test_vintage_create_with_invalid_image_shows_form_error(
+    client, user, wine_factory, clear_image_folder
+):
+    """A non-image upload must be rejected by form validation, not crash the
+    view - there are no explicit size/extension validators, so Pillow's
+    verify() via ImageField.to_python() is the only guard."""
+    wine = wine_factory(user=user, _create_default_vintage=False)
+    client.force_login(user)
+    r = client.post(
+        reverse("vintage-add", kwargs={"wine_pk": wine.pk}),
+        {"year": 2020, "image_front": invalid_image("front.png")},
+    )
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["form"].errors["image_front"]
+    assert not Vintage.objects.filter(wine=wine, year=2020).exists()
+
+
+@pytest.mark.django_db
+def test_vintage_update_add_image_succeeds(
+    client, user, wine_factory, vintage_factory, clear_image_folder
+):
+    """Uploading an image via vintage-edit (not just vintage-add) should
+    create the WineImage row - VintageUpdateView.form_valid's image handling
+    was previously untested."""
+    wine = wine_factory(user=user, _create_default_vintage=False)
+    vintage = vintage_factory(wine=wine, year=2020)
+    client.force_login(user)
+    r = client.post(
+        reverse("vintage-edit", kwargs={"wine_pk": wine.pk, "pk": vintage.pk}),
+        {"year": 2020, "image_front": random_png("front.png")},
+        follow=True,
+    )
+    assert r.status_code == HTTPStatus.OK
+    image = WineImage.objects.get(vintage=vintage, image_type=ImageType.FRONT)
+    assert image.thumbnail
+
+
+@pytest.mark.django_db
+def test_vintage_update_with_back_image_succeeds(
+    client, user, wine_factory, vintage_factory, clear_image_folder
+):
+    wine = wine_factory(user=user, _create_default_vintage=False)
+    vintage = vintage_factory(wine=wine, year=2020)
+    client.force_login(user)
+    r = client.post(
+        reverse("vintage-edit", kwargs={"wine_pk": wine.pk, "pk": vintage.pk}),
+        {"year": 2020, "image_back": random_png("back.png")},
+        follow=True,
+    )
+    assert r.status_code == HTTPStatus.OK
+    assert WineImage.objects.filter(
+        vintage=vintage, image_type=ImageType.BACK
+    ).exists()
+
+
+@pytest.mark.django_db
+def test_vintage_update_replace_image_succeeds(
+    client, user, wine_factory, vintage_factory, wine_image_factory, clear_image_folder
+):
+    """Replacing an existing vintage image on edit must overwrite the row in
+    place, not leave a duplicate behind."""
+    wine = wine_factory(user=user, _create_default_vintage=False)
+    vintage = vintage_factory(wine=wine, year=2020)
+    wine_image_factory(
+        vintage=vintage,
+        user=user,
+        image_type=ImageType.FRONT,
+        image=random_png("front_old.png"),
+    )
+    client.force_login(user)
+    r = client.post(
+        reverse("vintage-edit", kwargs={"wine_pk": wine.pk, "pk": vintage.pk}),
+        {"year": 2020, "image_front": random_png("front_new.png")},
+        follow=True,
+    )
+    assert r.status_code == HTTPStatus.OK
+    images = WineImage.objects.filter(vintage=vintage, image_type=ImageType.FRONT)
+    assert images.count() == 1
+    assert "front_new" in images.first().image.name
+    assert "front_old" not in images.first().image.name
+
+
+@pytest.mark.django_db
+def test_vintage_update_clear_image_removes_it(
+    client, user, wine_factory, vintage_factory, wine_image_factory, clear_image_folder
+):
+    """Checking the widget's clear checkbox must delete the WineImage row
+    (and its files), not leave it dangling or recreate it."""
+    wine = wine_factory(user=user, _create_default_vintage=False)
+    vintage = vintage_factory(wine=wine, year=2020)
+    wine_image_factory(
+        vintage=vintage,
+        user=user,
+        image_type=ImageType.FRONT,
+        image=random_png("front.png"),
+    )
+    client.force_login(user)
+    r = client.post(
+        reverse("vintage-edit", kwargs={"wine_pk": wine.pk, "pk": vintage.pk}),
+        {"year": 2020, "image_front-clear": "on"},
+        follow=True,
+    )
+    assert r.status_code == HTTPStatus.OK
+    assert not WineImage.objects.filter(
+        vintage=vintage, image_type=ImageType.FRONT
+    ).exists()
+
+
+@pytest.mark.django_db
+def test_vintage_update_without_touching_image_preserves_it(
+    client, user, wine_factory, vintage_factory, wine_image_factory, clear_image_folder
+):
+    """Editing unrelated fields while leaving the image inputs untouched must
+    not be misread as a "clear" - the existing WineImage should survive."""
+    wine = wine_factory(user=user, _create_default_vintage=False)
+    vintage = vintage_factory(wine=wine, year=2020, comment="")
+    image = wine_image_factory(
+        vintage=vintage,
+        user=user,
+        image_type=ImageType.FRONT,
+        image=random_png("front.png"),
+    )
+    client.force_login(user)
+    r = client.post(
+        reverse("vintage-edit", kwargs={"wine_pk": wine.pk, "pk": vintage.pk}),
+        {"year": 2020, "comment": "updated"},
+        follow=True,
+    )
+    assert r.status_code == HTTPStatus.OK
+    vintage.refresh_from_db()
+    assert vintage.comment == "updated"
+    assert WineImage.objects.filter(pk=image.pk).exists()
+
+
+@pytest.mark.django_db
+def test_vintage_update_with_invalid_image_shows_form_error(
+    client, user, wine_factory, vintage_factory
+):
+    wine = wine_factory(user=user, _create_default_vintage=False)
+    vintage = vintage_factory(wine=wine, year=2020, comment="original")
+    client.force_login(user)
+    r = client.post(
+        reverse("vintage-edit", kwargs={"wine_pk": wine.pk, "pk": vintage.pk}),
+        {"year": 2020, "comment": "hacked", "image_front": invalid_image("front.png")},
+    )
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["form"].errors["image_front"]
+    vintage.refresh_from_db()
+    assert vintage.comment == "original"
 
 
 @pytest.mark.django_db
