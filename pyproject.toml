@@ -74,10 +74,15 @@ DJANGO_SETTINGS_MODULE = "wine_cellar.conf.test"
 python_files = ["test_*.py", "*_test.py"]
 # e2e tests are opt-in (slow, need `uv run playwright install chromium`) -
 # excluded by default so plain `py.test`/CI runs stay fast; run them
-# explicitly with `make e2e` or `pytest -m e2e`.
-addopts = "-m 'not e2e'"
+# explicitly with `make e2e` or `pytest -m e2e`. migration tests are opt-in
+# too - they exercise already-shipped data migrations against historical
+# schema states (slow `migrator` fixture) and no longer need to run on
+# every install; run them explicitly with `make migration-tests` or
+# `pytest -m migration`.
+addopts = "-m 'not e2e and not migration'"
 markers = [
     "e2e: end-to-end browser test driven by Playwright, launches a real browser via pytest-playwright",
+    "migration: regression test for an already-shipped data migration, driven via django-test-migrations",
 ]
 
 [tool.setuptools]

@@ -84,6 +84,10 @@ pytest-postgres:
 	SQL_PORT=5433 \
 	$(VIRTUAL_ENV)/bin/py.test $(ARGUMENTS)
 
+.PHONY: migration-tests
+migration-tests:
+	$(VIRTUAL_ENV)/bin/py.test -m migration --reuse-db
+
 .PHONY: e2e
 e2e:
 	$(VIRTUAL_ENV)/bin/playwright install chromium
