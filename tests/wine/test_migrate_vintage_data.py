@@ -15,7 +15,12 @@ there's never a "next" test to trigger that restore, so it would silently
 leave the shared `--reuse-db` sqlite file's reference data wiped for good.
 `_restore_reference_data` below explicitly reseeds it once, after every
 test in this module has finished, sidestepping that gap directly instead
-of relying on serialized_rollback here."""
+of relying on serialized_rollback here.
+
+Marked `migration` and excluded from the default run (see pyproject.toml) -
+0020 already shipped and ran against every install, so these only guard
+against a regression in migration code nothing exercises anymore; run them
+explicitly with `make migration-tests` after touching this migration."""
 
 import importlib
 from decimal import Decimal
@@ -27,7 +32,7 @@ fold_migration = importlib.import_module(
     "wine_cellar.apps.wine.migrations.0020_migrate_vintage_data"
 )
 
-pytestmark = pytest.mark.django_db(transaction=True)
+pytestmark = [pytest.mark.django_db(transaction=True), pytest.mark.migration]
 
 # Mirrors wine/0002_add_common_sizes.py's seed list.
 _COMMON_SIZES = [0.1875, 0.375, 0.5, 0.75, 1.0, 1.5, 3.0, 4.5]
