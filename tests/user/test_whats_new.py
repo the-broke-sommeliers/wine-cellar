@@ -15,6 +15,7 @@ from wine_cellar.apps.user.whats_new import (
     get_unseen_releases,
 )
 
+
 # The test settings default ENABLE_WHATS_NEW to False (see
 # wine_cellar/conf/test.py) so the overlay doesn't block clicks throughout
 # the rest of the suite - this file is the one place that needs it back on
