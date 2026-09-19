@@ -919,19 +919,22 @@ def _unique_wine_constraint_fields():
 _WINE_MATCH_FIELDS = _unique_wine_constraint_fields()
 
 
-def _find_matching_wine(initial, user):
+def _find_matching_wine(initial, user, case_insensitive=False):
     """Return the existing Wine matching the AI-extracted ``initial`` payload's
     unique-constraint fields, or None if AI didn't extract all of them or no
-    match exists. Deliberately an exact, case-sensitive match mirroring
-    Wine.Meta's "unique wine" constraint - not fuzzy, by design."""
+    match exists. Exact match mirroring Wine.Meta's "unique wine" constraint
+    - not fuzzy, by design - except ``name`` is matched case-insensitively
+    when ``case_insensitive`` is set, since the AI extraction isn't guaranteed
+    to return the same casing for the same label on repeat scans."""
     if not all(field in initial for field in _WINE_MATCH_FIELDS):
         return None
+    name_lookup = {"name__iexact" if case_insensitive else "name": initial["name"]}
     return Wine.objects.filter(
         user=user,
-        name=initial["name"],
         wine_type=initial["wine_type"],
         size_id=initial["size"],
         country=initial["country"],
+        **name_lookup,
     ).first()
 
 
@@ -1011,7 +1014,9 @@ class WineUploadAIPollView(View):
             )
         if entry.get("status") == "done":
             token = self.kwargs["token"]
-            if _find_matching_wine(entry.get("initial", {}), request.user):
+            if _find_matching_wine(
+                entry.get("initial", {}), request.user, case_insensitive=True
+            ):
                 redirect_url = reverse(
                     "wine-ai-existing-match", kwargs={"token": token}
                 )
@@ -1037,12 +1042,15 @@ class WineAiExistingMatchView(View):
         if not entry or entry.get("status") != "done":
             return redirect(fallback)
         ai_initial = entry.get("initial", {})
-        match = _find_matching_wine(ai_initial, request.user)
+        match = _find_matching_wine(ai_initial, request.user, case_insensitive=True)
         if not match:
             # Stale/tampered token, or the matching wine was deleted/edited
             # since the poll redirect was computed - fall back gracefully.
             return redirect(fallback)
         context = {"wine": match, "prefill_token": token}
+        ai_name = ai_initial.get("name")
+        if ai_name is not None and ai_name != match.name:
+            context["name_case_differs"] = True
         year = ai_initial.get("year")
         if (
             year is not None
