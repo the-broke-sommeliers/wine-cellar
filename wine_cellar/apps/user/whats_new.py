@@ -23,6 +23,16 @@ class WhatsNewRelease:
 # Not every release needs an entry, only ones with user-facing highlights.
 WHATS_NEW_RELEASES = [
     WhatsNewRelease(
+        version="0.15.0",
+        items=[
+            _(
+                "Adding a wine via AI now checks if you already have it. If a"
+                " match is found, you can add it as a new vintage of that wine"
+                " instead of accidentally creating a duplicate."
+            ),
+        ],
+    ),
+    WhatsNewRelease(
         version="0.14.0",
         items=[
             _(

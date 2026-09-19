@@ -149,7 +149,7 @@ def test_history_pagination(
     for _ in range(11):
         storage_item_event_factory(storage_item=item, user=user)
 
-    with django_assert_num_queries(5):
+    with django_assert_num_queries(4):
         r = client.get(reverse("stock-history"))
     assert r.status_code == HTTPStatus.OK
     assert len(r.context["events"]) == 10

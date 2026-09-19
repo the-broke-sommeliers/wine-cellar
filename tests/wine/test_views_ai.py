@@ -10,6 +10,7 @@ from django.test import override_settings
 from django.urls import resolve, reverse
 
 from tests.helpers import random_png
+from wine_cellar.apps.wine.models import Size
 
 wine_prefill_cache = caches["wine_prefill"]
 
@@ -598,3 +599,234 @@ def test_ai_upload_dispatch_failure_shows_form_error(mock_delay, client, user):
     r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
     assert r.status_code == HTTPStatus.BAD_REQUEST
     assert r.json()["errors"]["__all__"]
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("litellm.completion")
+def test_ai_upload_poll_done_with_match_redirects_to_existing_match_view(
+    mock_completion, client, user, wine_factory
+):
+    """When the AI-extracted name/type/size/country match a wine the user
+    already has, the poll should route to the disambiguation page instead
+    of straight to the create form."""
+    size = Size.objects.get(name=0.75)
+    wine_factory(user=user, name="Merlot", wine_type="RE", size=size, country="DE")
+    mock_completion.return_value = _mock_response(
+        '{"name": "Merlot", "country": "DE", "type": "red", "size": "0.75"}'
+    )
+    client.force_login(user)
+    r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
+    assert r.status_code == HTTPStatus.OK
+    poll = _poll(client, r.json()["poll_url"])
+    assert poll["status"] == "done"
+    assert resolve(urlparse(poll["redirect"]).path).url_name == "wine-ai-existing-match"
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("litellm.completion")
+def test_ai_upload_poll_done_partial_initial_skips_match_check(
+    mock_completion, client, user, wine_factory
+):
+    """If the AI couldn't resolve a size (never present in `initial`), there
+    isn't enough information to match against the DB's uniqueness rule -
+    behavior must stay exactly as before this feature, even if a same-named
+    wine exists."""
+    wine_factory(user=user, name="Merlot", wine_type="RE", country="DE")
+    mock_completion.return_value = _mock_response(
+        '{"name": "Merlot", "country": "DE", "type": "red"}'
+    )
+    client.force_login(user)
+    r = client.post(reverse("wine-ai-upload"), data={"front": random_png("front.png")})
+    assert r.status_code == HTTPStatus.OK
+    poll = _poll(client, r.json()["poll_url"])
+    assert poll["status"] == "done"
+    assert reverse("wine-add") in poll["redirect"]
+
+
+@pytest.mark.django_db
+def test_ai_existing_match_view_renders_matched_wine(client, user, wine_factory):
+    size = Size.objects.get(name=0.75)
+    wine = wine_factory(
+        user=user, name="Merlot", wine_type="RE", size=size, country="DE"
+    )
+    token = "match-token"
+    wine_prefill_cache.set(
+        f"wine_prefill_{token}",
+        {
+            "status": "done",
+            "initial": {
+                "name": "Merlot",
+                "wine_type": "RE",
+                "size": size.pk,
+                "country": "DE",
+            },
+            "images": {},
+            "user_id": user.pk,
+        },
+        timeout=60,
+    )
+    client.force_login(user)
+    r = client.get(reverse("wine-ai-existing-match", kwargs={"token": token}))
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["wine"] == wine
+    assert r.context["prefill_token"] == token
+    assert "existing_vintage_year" not in r.context
+
+
+@pytest.mark.django_db
+def test_ai_existing_match_view_flags_colliding_vintage_year(
+    client, user, wine_factory, vintage_factory
+):
+    """When the AI also extracted a year that collides with an existing
+    vintage of the matched wine, the disambiguation page should surface
+    that up front, not just let the user hit the error after submitting
+    the add-vintage form."""
+    size = Size.objects.get(name=0.75)
+    wine = wine_factory(
+        user=user,
+        name="Merlot",
+        wine_type="RE",
+        size=size,
+        country="DE",
+        _create_default_vintage=False,
+    )
+    vintage_factory(wine=wine, year=2020)
+    token = "match-token-with-year"
+    wine_prefill_cache.set(
+        f"wine_prefill_{token}",
+        {
+            "status": "done",
+            "initial": {
+                "name": "Merlot",
+                "wine_type": "RE",
+                "size": size.pk,
+                "country": "DE",
+                "year": 2020,
+            },
+            "images": {},
+            "user_id": user.pk,
+        },
+        timeout=60,
+    )
+    client.force_login(user)
+    r = client.get(reverse("wine-ai-existing-match", kwargs={"token": token}))
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["existing_vintage_year"] == 2020
+    assert "2020" in r.content.decode()
+
+
+@pytest.mark.django_db
+def test_ai_existing_match_view_no_vintage_warning_for_new_year(
+    client, user, wine_factory, vintage_factory
+):
+    size = Size.objects.get(name=0.75)
+    wine = wine_factory(
+        user=user,
+        name="Merlot",
+        wine_type="RE",
+        size=size,
+        country="DE",
+        _create_default_vintage=False,
+    )
+    vintage_factory(wine=wine, year=2019)
+    token = "match-token-different-year"
+    wine_prefill_cache.set(
+        f"wine_prefill_{token}",
+        {
+            "status": "done",
+            "initial": {
+                "name": "Merlot",
+                "wine_type": "RE",
+                "size": size.pk,
+                "country": "DE",
+                "year": 2020,
+            },
+            "images": {},
+            "user_id": user.pk,
+        },
+        timeout=60,
+    )
+    client.force_login(user)
+    r = client.get(reverse("wine-ai-existing-match", kwargs={"token": token}))
+    assert r.status_code == HTTPStatus.OK
+    assert "existing_vintage_year" not in r.context
+
+
+@pytest.mark.django_db
+def test_ai_existing_match_view_no_longer_matching_redirects_to_wine_add(client, user):
+    """The token's initial payload looks like a match, but no such wine
+    actually exists (e.g. it was deleted or edited after the poll computed
+    the redirect) - fall back gracefully to the normal create form."""
+    token = "stale-token"
+    wine_prefill_cache.set(
+        f"wine_prefill_{token}",
+        {
+            "status": "done",
+            "initial": {
+                "name": "Merlot",
+                "wine_type": "RE",
+                "size": 1,
+                "country": "DE",
+            },
+            "images": {},
+            "user_id": user.pk,
+        },
+        timeout=60,
+    )
+    client.force_login(user)
+    r = client.get(reverse("wine-ai-existing-match", kwargs={"token": token}))
+    assert r.status_code == HTTPStatus.FOUND
+    assert r.url == f"{reverse('wine-add')}?prefill_token={token}"
+
+
+@pytest.mark.django_db
+def test_ai_existing_match_view_expired_token_redirects_to_wine_add(client, user):
+    client.force_login(user)
+    r = client.get(reverse("wine-ai-existing-match", kwargs={"token": "bogus"}))
+    assert r.status_code == HTTPStatus.FOUND
+    assert r.url == f"{reverse('wine-add')}?prefill_token=bogus"
+
+
+@pytest.mark.django_db
+def test_ai_existing_match_view_other_users_token_redirects_to_wine_add(
+    client, user, user_factory, wine_factory
+):
+    size = Size.objects.get(name=0.75)
+    wine_factory(user=user, name="Merlot", wine_type="RE", size=size, country="DE")
+    token = "shared-token"
+    wine_prefill_cache.set(
+        f"wine_prefill_{token}",
+        {
+            "status": "done",
+            "initial": {
+                "name": "Merlot",
+                "wine_type": "RE",
+                "size": size.pk,
+                "country": "DE",
+            },
+            "images": {},
+            "user_id": user.pk,
+        },
+        timeout=60,
+    )
+    other_user = user_factory()
+    client.force_login(other_user)
+    r = client.get(reverse("wine-ai-existing-match", kwargs={"token": token}))
+    assert r.status_code == HTTPStatus.FOUND
+    assert r.url == f"{reverse('wine-add')}?prefill_token={token}"
+
+
+@pytest.mark.django_db
+def test_ai_existing_match_view_pending_status_redirects_to_wine_add(client, user):
+    token = "pending-token"
+    wine_prefill_cache.set(
+        f"wine_prefill_{token}",
+        {"status": "pending", "user_id": user.pk},
+        timeout=60,
+    )
+    client.force_login(user)
+    r = client.get(reverse("wine-ai-existing-match", kwargs={"token": token}))
+    assert r.status_code == HTTPStatus.FOUND
+    assert r.url == f"{reverse('wine-add')}?prefill_token={token}"

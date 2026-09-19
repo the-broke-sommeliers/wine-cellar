@@ -584,6 +584,9 @@ class VintageForm(forms.Form):
         required=False,
         help_text=_("Upload a photo of the back of the bottle label."),
     )
+    prefill_token = forms.CharField(
+        widget=forms.HiddenInput(), label="", required=False
+    )
 
 
 class WineFilterForm(TomSelectMixin, WineFormPostCleanMixin, forms.Form):

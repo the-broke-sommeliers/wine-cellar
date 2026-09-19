@@ -6,6 +6,12 @@ MEDIA_ROOT = BASE_DIR / "test_media/"  # noqa: F405
 
 CELERY_TASK_ALWAYS_EAGER = True
 
+# A freshly created test user has never "seen" a What's New release, so the
+# full-viewport overlay (base.html) would render - and intercept clicks - on
+# every page in every test. Off by default here; tests that specifically
+# exercise the What's New feature (tests/user/test_whats_new.py) opt back in.
+ENABLE_WHATS_NEW = os.environ.get("DJANGO_ENABLE_WHATS_NEW", "False") == "True"
+
 STATIC_ROOT = BASE_DIR / "static"  # noqa: F405
 
 SQL_ENGINE = os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3")

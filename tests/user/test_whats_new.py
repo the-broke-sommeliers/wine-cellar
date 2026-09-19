@@ -15,6 +15,15 @@ from wine_cellar.apps.user.whats_new import (
     get_unseen_releases,
 )
 
+# The test settings default ENABLE_WHATS_NEW to False (see
+# wine_cellar/conf/test.py) so the overlay doesn't block clicks throughout
+# the rest of the suite - this file is the one place that needs it back on
+# to actually exercise the feature it tests. `test_whats_new_hidden_when_disabled`
+# below still overrides it back to False for its own single test.
+@pytest.fixture(autouse=True)
+def _enable_whats_new(settings):
+    settings.ENABLE_WHATS_NEW = True
+
 
 @pytest.mark.django_db
 def test_whats_new_shown_for_user_with_no_settings_row(client, user):
