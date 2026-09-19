@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 from django.utils.csp import CSP
@@ -222,6 +223,57 @@ ACCOUNT_SIGNUP_FIELDS = ["email", "username*", "password1*", "password2*"]
 SOCIALACCOUNT_EMAIL_AUTHENTICATION = False
 SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = False
 SOCIALACCOUNT_EMAIL_VERIFICATION = "optional"
+
+# Django's default logging config only sends the "console" handler output
+# when DEBUG=True, so without this override nothing reaches the production
+# docker logs. This makes errors (unhandled exceptions, 500s) always show up
+# on stdout/stderr, where `docker compose logs` picks them up.
+LOG_LEVEL = os.environ.get("DJANGO_LOG_LEVEL", "WARNING")
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{asctime} {levelname} {name}: {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": LOG_LEVEL,
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": LOG_LEVEL,
+            "propagate": False,
+        },
+        # Unhandled exceptions in views (500s) are logged here with a full
+        # traceback; always surface those regardless of DJANGO_LOG_LEVEL.
+        "django.request": {
+            "handlers": ["console"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "django.security": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        "wine_cellar": {
+            "handlers": ["console"],
+            "level": LOG_LEVEL,
+            "propagate": False,
+        },
+    },
+}
 
 SECURE_CSP = {
     "default-src": [CSP.SELF],
