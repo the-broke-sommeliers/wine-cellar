@@ -151,7 +151,23 @@ class WineFormPostCleanMixin:
             )
 
 
-class WineForm(TomSelectMixin, WineFormPostCleanMixin, forms.Form):
+class PrefillTokenFormMixin(forms.Form):
+    """Adds the hidden ``prefill_token`` field shared by WineForm and
+    VintageForm for the AI-assisted add flow (see AiPrefillMixin).
+
+    Must itself subclass forms.Form (not a plain mixin) - Django's
+    DeclarativeFieldsMetaclass only picks up declared fields from base
+    classes that already went through that metaclass, so a plain class
+    here would silently drop prefill_token from every form using it."""
+
+    prefill_token = forms.CharField(
+        widget=forms.HiddenInput(), label="", required=False
+    )
+
+
+class WineForm(
+    TomSelectMixin, WineFormPostCleanMixin, PrefillTokenFormMixin, forms.Form
+):
 
     def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
@@ -434,12 +450,9 @@ class WineForm(TomSelectMixin, WineFormPostCleanMixin, forms.Form):
             validators.MaxValueValidator(5),
         ],
     )
-    prefill_token = forms.CharField(
-        widget=forms.HiddenInput(), label="", required=False
-    )
 
 
-class VintageForm(forms.Form):
+class VintageForm(PrefillTokenFormMixin, forms.Form):
 
     def __init__(self, *args, user=None, wine=None, instance=None, **kwargs):
         super().__init__(*args, **kwargs)
@@ -583,9 +596,6 @@ class VintageForm(forms.Form):
         widget=NoFilenameClearableFileInput(attrs={"accept": "image/*"}),
         required=False,
         help_text=_("Upload a photo of the back of the bottle label."),
-    )
-    prefill_token = forms.CharField(
-        widget=forms.HiddenInput(), label="", required=False
     )
 
 

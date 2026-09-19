@@ -34,25 +34,30 @@ def make_thumbnail(instance, height=225):
     full_path = os.path.join(settings.MEDIA_ROOT, image_path)
     img = Image.open(full_path)
 
-    try:
-        for orientation in ExifTags.TAGS.keys():
-            if ExifTags.TAGS[orientation] == "Orientation":
-                break
-        exif = img._getexif()
-        if exif:
-            orientation_value = exif.get(orientation)
-            if orientation_value == 3:
-                img = img.rotate(180, expand=True)
-            elif orientation_value == 6:
-                img = img.rotate(270, expand=True)
-            elif orientation_value == 8:
-                img = img.rotate(90, expand=True)
-    except Exception:
-        logger.warning(
-            "Failed to read EXIF orientation while creating thumbnail for %s",
-            image_path,
-            exc_info=True,
-        )
+    # Formats with no _getexif() at all (PNG, BMP, ...) are a routine,
+    # expected case - only warn when the format claims EXIF support but
+    # reading it still fails (corrupt/malformed data).
+    get_exif = getattr(img, "_getexif", None)
+    if callable(get_exif):
+        try:
+            for orientation in ExifTags.TAGS.keys():
+                if ExifTags.TAGS[orientation] == "Orientation":
+                    break
+            exif = get_exif()
+            if exif:
+                orientation_value = exif.get(orientation)
+                if orientation_value == 3:
+                    img = img.rotate(180, expand=True)
+                elif orientation_value == 6:
+                    img = img.rotate(270, expand=True)
+                elif orientation_value == 8:
+                    img = img.rotate(90, expand=True)
+        except Exception:
+            logger.warning(
+                "Failed to read EXIF orientation while creating thumbnail for %s",
+                image_path,
+                exc_info=True,
+            )
 
     aspect = img.width / img.height
     width = int(height * aspect)

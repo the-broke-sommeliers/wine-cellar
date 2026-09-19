@@ -20,7 +20,7 @@ python manage.py migrate
 python manage.py collectstatic --no-input --clear
 python manage.py compilemessages
 
-cat <<EOF | python manage.py shell
+cat <<EOF | python manage.py shell || echo "Warning: admin superuser bootstrap failed" >&2
 from django.contrib.auth import get_user_model
 
 User = get_user_model()  # get the currently active user model,
