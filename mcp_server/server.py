@@ -7,7 +7,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "wine_cellar.conf.dev")
 
 django.setup()
 
-from wine_cellar.apps.wine.models import Wine  # noqa: E402
+from wine_cellar.apps.wine.models import Wine, WineType  # noqa: E402
 
 mcp = FastMCP("wine-cellar")
 
@@ -18,7 +18,7 @@ def list_wines_in_stock() -> str:
     wines_in_stock = Wine.objects.filter(
         vintages__storageitem__isnull=False,
         vintages__storageitem__deleted=False,
-    )
+    ).distinct()
 
     lines = []
     for wine in wines_in_stock:
@@ -39,6 +39,45 @@ def check_stock(wine_name: str) -> str:
     for wine in wines:
         count = wine.total_stock
         lines.append(f"{wine.name}: {count} bottle(s) in stock.")
+
+    return "\n".join(lines)
+
+
+@mcp.tool()
+def food_pairing(food_name: str) -> str:
+    """Check food pairing for a wine."""
+    wines = Wine.objects.filter(food_pairings__name__icontains=food_name).distinct()
+
+    if not wines.exists():
+        return f"No wine found for '{food_name}'."
+
+    lines = []
+    for wine in wines:
+        lines.append(f"{wine.name}: {wine.get_food_pairings}")
+
+    return "\n".join(lines)
+
+
+@mcp.tool()
+def wines_by_type(wine_type: str) -> str:
+    """List wines of a given type (e.g. red, white, sparkling)."""
+    matched_code = None
+    for code, label in WineType.choices:
+        if label.lower() == wine_type.lower():
+            matched_code = code
+            break
+
+    if not matched_code:
+        return f"'{wine_type}' is not a recognised wine type."
+
+    wines = Wine.objects.filter(wine_type=matched_code)
+
+    if not wines.exists():
+        return f"No '{wine_type}' wines found."
+
+    lines = [f"There are {wines.count()} '{wine_type}' wines in the database"]
+    for wine in wines:
+        lines.append(f"{wine.name}")
 
     return "\n".join(lines)
 
