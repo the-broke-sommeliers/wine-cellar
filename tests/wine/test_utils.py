@@ -213,6 +213,36 @@ def test_make_thumbnail_corrupt_exif_falls_back(
 
 
 @pytest.mark.django_db
+def test_make_thumbnail_falls_back_on_unusual_exif_errors(
+    clear_image_folder,
+    user,
+    wine_factory,
+    wine_image_factory,
+    caplog,
+):
+    """Real phone/editing-app EXIF blocks can be malformed in ways that make
+    Pillow's `_getexif()` raise exception types other than AttributeError/
+    KeyError/IndexError (e.g. SyntaxError, struct.error) - those must also
+    fall back to an unrotated thumbnail instead of turning the upload into a
+    500, matching a reported production crash when adding a vintage photo.
+    The failure should still be visible in the logs, though."""
+    vintage = wine_factory(user=user).latest_vintage
+    with patch.object(JpegImageFile, "_getexif", side_effect=SyntaxError):
+        with caplog.at_level("WARNING"):
+            wine_image = wine_image_factory(
+                user=user,
+                vintage=vintage,
+                image=SimpleUploadedFile(
+                    "weird_exif.jpg", _half_split_jpeg(), content_type="image/jpeg"
+                ),
+            )
+    thumb = Image.open(wine_image.thumbnail.path)
+    assert thumb.size == (40, 20)
+    assert thumb.getpixel((2, 2)) == (254, 0, 0)
+    assert "Failed to read EXIF orientation" in caplog.text
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize(
     "orientation,expected_size,top_left,top_right,bottom_left,bottom_right",
     [
