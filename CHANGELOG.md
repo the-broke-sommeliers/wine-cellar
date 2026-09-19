@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.14.2 (2026-09-19)
+
+### fix
+
+- rename duplicate wines which haven't been folded into another wine as vintage
+
+
+
 ## 0.14.1 (2026-09-14)
 
 ### fix
@@ -555,17 +563,6 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **stock**: add option to add the bottle price to a stock item    
     - show average price across all bottles of a wine in wine detail view
 
-
-### fix
-
-- **stock**: make adding a bottle to a previously occupied slot work.
-- **deps**: update react monorepo to v19.2.3
-
-
-## 0.2.0 (2025-12-13)
-
-### feat
-
 - **wine**: allow uploading multiple images of a wine    
     This allows uploading images for front, back, label front, label back.
     Additionally, previews are now shown in the form and images can be
@@ -581,6 +578,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### fix
 
+- **stock**: make adding a bottle to a previously occupied slot work.
+- **deps**: update react monorepo to v19.2.3
 - **wine_card**: wrap image in a fixed-size container
 - **deps**: update react monorepo to v19.2.1
 - **wine detail**: fix image carousel buttons not working    
