@@ -1,4 +1,5 @@
 import json
+import logging
 from datetime import timedelta
 
 import pycountry
@@ -21,6 +22,8 @@ from wine_cellar.apps.wine.utils import (
     match_choice_label,
     wine_prefill_cache,
 )
+
+logger = logging.getLogger(__name__)
 
 AI_REQUEST_TIMEOUT = 60  # seconds
 AI_REPROMPT_TIMEOUT = 20  # seconds
@@ -136,6 +139,7 @@ def _reprompt_field(ai_json, field, ask):
         AttributeError,
         IndexError,
     ):
+        logger.warning("AI reprompt for field %r failed", field, exc_info=True)
         return None
 
 
@@ -227,6 +231,7 @@ def process_ai_wine_upload(
             timeout=AI_REQUEST_TIMEOUT,
         )
     except litellm.exceptions.AuthenticationError:
+        logger.error("AI request failed: invalid API key")
         _set_prefill_error(
             token,
             user_id,
@@ -237,6 +242,7 @@ def process_ai_wine_upload(
         )
         return
     except litellm.exceptions.RateLimitError:
+        logger.warning("AI request failed: rate limit reached")
         _set_prefill_error(
             token,
             user_id,
@@ -251,6 +257,7 @@ def process_ai_wine_upload(
         litellm.exceptions.BadGatewayError,
         litellm.exceptions.InternalServerError,
     ):
+        logger.exception("AI service is temporarily unavailable")
         _set_prefill_error(
             token,
             user_id,
@@ -261,9 +268,11 @@ def process_ai_wine_upload(
         )
         return
     except litellm.exceptions.Timeout:
+        logger.warning("AI request timed out")
         _set_prefill_error(token, user_id, _("AI request timed out. Please try again."))
         return
     except litellm.exceptions.APIConnectionError:
+        logger.exception("Could not connect to the AI service")
         _set_prefill_error(
             token,
             user_id,
@@ -274,6 +283,7 @@ def process_ai_wine_upload(
         )
         return
     except litellm.exceptions.APIError:
+        logger.exception("AI request failed")
         _set_prefill_error(
             token,
             user_id,
@@ -286,6 +296,7 @@ def process_ai_wine_upload(
     try:
         ai_json = _parse_ai_json(ai_text)
     except json.JSONDecodeError:
+        logger.warning("Failed to parse AI response as JSON", exc_info=True)
         _set_prefill_error(
             token,
             user_id,

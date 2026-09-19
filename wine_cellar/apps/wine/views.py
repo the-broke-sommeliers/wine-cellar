@@ -1,4 +1,5 @@
 import base64
+import logging
 import uuid
 from decimal import Decimal
 
@@ -49,6 +50,8 @@ from wine_cellar.apps.wine.utils import (
     wine_prefill_cache,
     wine_to_json,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class HomePageView(TemplateView):
@@ -850,6 +853,7 @@ class WineUploadAIView(FormView):
                 barcode=self.request.GET.get("barcode"),
             )
         except Exception:
+            logger.exception("Failed to queue AI wine upload task")
             wine_prefill_cache.delete(f"wine_prefill_{token}")
             return JsonResponse(
                 {
