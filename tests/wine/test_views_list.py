@@ -214,7 +214,7 @@ def test_wine_list_effective_price_not_skewed_by_fan_out(
     storage_item_factory(storage=storage, vintage=vintage_a, price=None)
     storage_item_factory(storage=storage, vintage=vintage_b, price=None)
     client.force_login(user)
-    with django_assert_num_queries(15):
+    with django_assert_num_queries(14):
         r = client.get(reverse("wine-list"))
     assert r.status_code == HTTPStatus.OK
     result = next(w for w in r.context_data["wines"] if w.pk == wine.pk)

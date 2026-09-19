@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+{% block title %}
+    {% translate "Possible existing wine" %}
+{% endblock title %}
+{% block header %}
+    <h1 class="header__title">{% translate "This might already be in your cellar" %}</h1>
+{% endblock header %}
+{% block content %}
+    <div class="pure-g">
+        <div class="pure-u-1 pure-u-lg-1-2 m-auto">
+            <div class="card">
+                <p class="text--gray">
+                    {% translate "The details we extracted match a wine you already have:" %}
+                </p>
+                <ul class="wine-card__list">
+                    {% include 'wine_card.html' with wine=wine %}
+                </ul>
+                <p class="text--gray">{% translate "Is this the same wine?" %}</p>
+                {% if existing_vintage_year %}
+                    <p class="form-warning">
+                        {% blocktranslate trimmed with year=existing_vintage_year %}
+                            You already have a {{ year }} vintage of this wine. Adding another vintage for that year will fail unless you change the year.
+                        {% endblocktranslate %}
+                    </p>
+                {% endif %}
+                <div class="wine__add-buttons">
+                    <a href="{% url 'vintage-add' wine.pk %}?prefill_token={{ prefill_token }}"
+                       class="pure-button button__primary">
+                        {% translate "Yes, add a new vintage to it" %}
+                    </a>
+                    <a href="{% url 'wine-add' %}?prefill_token={{ prefill_token }}"
+                       class="pure-button button__neutral">
+                        {% translate "No, add as a new wine" %}
+                    </a>
+                </div>
+                <p class="form-hint">
+                    {% translate "If you choose to add it as a new wine, at least one of name, type, size, or country will need to be different, or saving will fail." %}
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

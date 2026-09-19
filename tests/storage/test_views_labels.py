@@ -81,7 +81,7 @@ def test_storage_detail_attaches_labels(
     storage_item_factory(
         storage=storage, vintage=wine.latest_vintage, row=1, column=2, user=user
     )
-    with django_assert_num_queries(11):
+    with django_assert_num_queries(10):
         r = client.get(reverse("storage-detail", kwargs={"pk": storage.pk}))
     assert r.status_code == HTTPStatus.OK
     item = next(
@@ -432,7 +432,7 @@ def test_storage_labels_get_paginates_at_25(
 ):
     client.force_login(user)
     storage = storage_factory(user=user, rows=60, columns=1)
-    with django_assert_num_queries(5):
+    with django_assert_num_queries(4):
         r = client.get(
             reverse("storage-labels", kwargs={"pk": storage.pk, "axis": "row"})
         )

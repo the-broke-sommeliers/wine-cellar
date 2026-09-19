@@ -310,7 +310,7 @@ def test_storage_can_delete_multiple(client, user, storage_factory):
 @pytest.mark.django_db
 def test_storage_list_view(client, user, django_assert_num_queries):
     client.force_login(user)
-    with django_assert_num_queries(6):
+    with django_assert_num_queries(5):
         r = client.get(reverse("storage-list"))
     assert r.status_code == HTTPStatus.OK
     assertTemplateUsed(response=r, template_name="storage_list.html")
@@ -339,7 +339,7 @@ def test_storage_detail_view(
     wine = wine_factory(user=user)
     storage_item_factory(storage=storage, vintage=wine.latest_vintage)
     client.force_login(user)
-    with django_assert_num_queries(9):
+    with django_assert_num_queries(8):
         r = client.get(reverse("storage-detail", kwargs={"pk": storage.pk}))
     assert r.status_code == HTTPStatus.OK
     assertTemplateUsed(response=r, template_name="storage_detail.html")

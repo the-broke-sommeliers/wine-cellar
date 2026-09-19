@@ -21,7 +21,7 @@ from django.db.models import (
 from django.db.models.functions import Coalesce
 from django.forms import model_to_dict
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils.formats import number_format
 from django.utils.translation import gettext_lazy as _
@@ -242,21 +242,72 @@ class WineBaseView(OpenChoiceModelFormViewMixin, FormView):
         return wine
 
 
+class AiPrefillMixin:
+    """Shared helpers for views that can be pre-filled from a completed AI
+    wine-upload cache entry, identified by a ``prefill_token`` GET/POST param."""
+
+    def _get_prefill_token(self):
+        return self.request.POST.get("prefill_token") or self.request.GET.get(
+            "prefill_token"
+        )
+
+    def _get_prefill_data(self):
+        data = _get_owned_prefill_entry(self._get_prefill_token(), self.request.user)
+        if not data or data.get("status") != "done":
+            # Missing, expired, belonging to a different user, or not yet
+            # (or no longer) finished processing - all behave like no token.
+            return {}
+        return data
+
+
+_AI_IMAGE_FIELD_MAP = {"front": "image_front", "back": "image_back"}
+
+
+def _ai_image_data_url(image):
+    content_type = image.get("content_type") or "image/jpeg"
+    return f"data:{content_type};base64,{image['data']}"
+
+
+def _stash_pending_ai_images(initial, images):
+    """Populate ``initial[form_field]`` with a _PendingAiImage placeholder for
+    each AI-stashed image present in ``images`` (keyed "front"/"back")."""
+    for key, form_field in _AI_IMAGE_FIELD_MAP.items():
+        if stashed := images.get(key):
+            initial[form_field] = _PendingAiImage(_ai_image_data_url(stashed))
+
+
+def _apply_pending_ai_images(form, images):
+    """Swap any still-pending _PendingAiImage cleaned_data values for the real
+    stashed ContentFile, unless the user cleared or replaced them."""
+    for key, form_field in _AI_IMAGE_FIELD_MAP.items():
+        value = form.cleaned_data.get(form_field)
+        # `False` means the user explicitly cleared it via the widget's clear
+        # checkbox, and a real uploaded file means they replaced it - in both
+        # cases the stashed AI image should not be applied.
+        if value is False or (value and not isinstance(value, _PendingAiImage)):
+            continue
+        stashed = images.get(key)
+        if not stashed:
+            continue
+        form.cleaned_data[form_field] = ContentFile(
+            base64.b64decode(stashed["data"]), name=stashed["name"]
+        )
+
+
 class _PendingAiImage:
     """Placeholder ``initial`` value for an image stashed by the AI upload flow.
 
     It only exposes ``url`` (a data URI) so that ``NoFilenameClearableFileInput``
     renders its normal preview/clear-button UI for an image that hasn't actually
-    been saved anywhere yet. It is never a real file - :meth:`WineCreateView.
-    _apply_ai_images` swaps it out for the real, stashed ``ContentFile`` once the
-    form is submitted.
+    been saved anywhere yet. It is never a real file - `_apply_pending_ai_images`
+    swaps it out for the real, stashed ``ContentFile`` once the form is submitted.
     """
 
     def __init__(self, url):
         self.url = url
 
 
-class WineCreateView(WineBaseView):
+class WineCreateView(AiPrefillMixin, WineBaseView):
     template_name = "wine_create.html"
     success_url = reverse_lazy("wine-list")
 
@@ -267,10 +318,7 @@ class WineCreateView(WineBaseView):
             initial.update(WineAiSerializer().deserialize_ai_payload(data["initial"]))
         if token := self._get_prefill_token():
             initial["prefill_token"] = token
-        images = data.get("images", {})
-        for key, form_field in {"front": "image_front", "back": "image_back"}.items():
-            if stashed := images.get(key):
-                initial[form_field] = _PendingAiImage(self._ai_image_data_url(stashed))
+        _stash_pending_ai_images(initial, data.get("images", {}))
         return initial
 
     def get_wine_instance(self):
@@ -287,40 +335,6 @@ class WineCreateView(WineBaseView):
         context["ai_image_back_name"] = images.get("back", {}).get("name")
         return context
 
-    def _get_prefill_token(self):
-        return self.request.POST.get("prefill_token") or self.request.GET.get(
-            "prefill_token"
-        )
-
-    def _get_prefill_data(self):
-        data = _get_owned_prefill_entry(self._get_prefill_token(), self.request.user)
-        if not data or data.get("status") != "done":
-            # Missing, expired, belonging to a different user, or not yet
-            # (or no longer) finished processing - all behave like no token.
-            return {}
-        return data
-
-    @staticmethod
-    def _ai_image_data_url(image):
-        content_type = image.get("content_type") or "image/jpeg"
-        return f"data:{content_type};base64,{image['data']}"
-
-    def _apply_ai_images(self, form, images):
-        field_map = {"front": "image_front", "back": "image_back"}
-        for key, form_field in field_map.items():
-            value = form.cleaned_data.get(form_field)
-            # `False` means the user explicitly cleared it via the widget's clear
-            # checkbox, and a real uploaded file means they replaced it - in both
-            # cases the stashed AI image should not be applied.
-            if value is False or (value and not isinstance(value, _PendingAiImage)):
-                continue
-            stashed = images.get(key)
-            if not stashed:
-                continue
-            form.cleaned_data[form_field] = ContentFile(
-                base64.b64decode(stashed["data"]), name=stashed["name"]
-            )
-
     def form_valid(self, form):
         form_step = form.cleaned_data.get("form_step", 5)
 
@@ -330,7 +344,7 @@ class WineCreateView(WineBaseView):
             token = form.cleaned_data.get("prefill_token")
             prefill_data = self._get_prefill_data() if token else {}
             if prefill_data.get("images"):
-                self._apply_ai_images(form, prefill_data["images"])
+                _apply_pending_ai_images(form, prefill_data["images"])
             try:
                 with transaction.atomic():
                     wine = self.update_wine_from_cleaned_data(
@@ -595,7 +609,7 @@ class WineDeleteView(DeleteView):
         return redirect(success_url)
 
 
-class VintageCreateView(FormView):
+class VintageCreateView(AiPrefillMixin, FormView):
     template_name = "vintage_form.html"
     form_class = VintageForm
 
@@ -612,6 +626,22 @@ class VintageCreateView(FormView):
             )
         return self._wine
 
+    def get_initial(self):
+        initial = super().get_initial()
+        data = self._get_prefill_data()
+        ai_initial = data.get("initial", {})
+        # The only VINTAGE_FIELDS the AI flow ever populates - a deliberately
+        # narrower whitelist than VINTAGE_FIELDS so a careless future change to
+        # WineAiSerializer.serialize_ai_payload can't silently start prefilling
+        # comment/drink_by/price/rating here too.
+        for field in ("year", "abv", "barcode"):
+            if field in ai_initial:
+                initial[field] = ai_initial[field]
+        if token := self._get_prefill_token():
+            initial["prefill_token"] = token
+        _stash_pending_ai_images(initial, data.get("images", {}))
+        return initial
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["wine"] = self.get_wine()
@@ -621,6 +651,11 @@ class VintageCreateView(FormView):
         wine = self.get_wine()
         cleaned_data = form.cleaned_data
         user = self.request.user
+        token = cleaned_data.get("prefill_token")
+        prefill_data = self._get_prefill_data() if token else {}
+        if prefill_data.get("images"):
+            _apply_pending_ai_images(form, prefill_data["images"])
+            cleaned_data = form.cleaned_data
         vintage = Vintage(wine=wine, user=user)
         for field in VINTAGE_FIELDS:
             setattr(vintage, field, cleaned_data.get(field))
@@ -639,6 +674,8 @@ class VintageCreateView(FormView):
                 WineImage.objects.get_or_create(
                     image=image, vintage=vintage, user=user, image_type=image_type
                 )
+        if prefill_data:
+            wine_prefill_cache.delete(f"wine_prefill_{token}")
         self.success_url = reverse_lazy("wine-detail", kwargs={"pk": wine.pk})
         return super().form_valid(form)
 
@@ -810,6 +847,25 @@ def _get_owned_prefill_entry(token, user):
     return data
 
 
+_WINE_MATCH_FIELDS = ("name", "wine_type", "size", "country")
+
+
+def _find_matching_wine(initial, user):
+    """Return the existing Wine matching the AI-extracted ``initial`` payload's
+    unique-constraint fields, or None if AI didn't extract all of them or no
+    match exists. Deliberately an exact, case-sensitive match mirroring
+    Wine.Meta's "unique wine" constraint - not fuzzy, by design."""
+    if not all(field in initial for field in _WINE_MATCH_FIELDS):
+        return None
+    return Wine.objects.filter(
+        user=user,
+        name=initial["name"],
+        wine_type=initial["wine_type"],
+        size_id=initial["size"],
+        country=initial["country"],
+    ).first()
+
+
 class WineUploadAIView(FormView):
     template_name = "wine_upload_ai.html"
     form_class = WineUploadAIForm
@@ -885,19 +941,46 @@ class WineUploadAIPollView(View):
                 }
             )
         if entry.get("status") == "done":
-            return JsonResponse(
-                {
-                    "status": "done",
-                    "redirect": (
-                        f"{reverse('wine-add')}?prefill_token={self.kwargs['token']}"
-                    ),
-                }
-            )
+            token = self.kwargs["token"]
+            if _find_matching_wine(entry.get("initial", {}), request.user):
+                redirect_url = reverse(
+                    "wine-ai-existing-match", kwargs={"token": token}
+                )
+            else:
+                redirect_url = f"{reverse('wine-add')}?prefill_token={token}"
+            return JsonResponse({"status": "done", "redirect": redirect_url})
         if entry.get("status") == "error":
             return JsonResponse(
                 {"status": "error", "message": entry.get("message", "")}
             )
         return JsonResponse({"status": "pending", "stage": entry.get("stage")})
+
+
+class WineAiExistingMatchView(View):
+    template_name = "wine_ai_existing_match.html"
+
+    def get(self, request, *args, **kwargs):
+        token = self.kwargs["token"]
+        fallback = f"{reverse('wine-add')}?prefill_token={token}"
+        entry = _get_owned_prefill_entry(token, request.user)
+        if not entry or entry.get("status") != "done":
+            return redirect(fallback)
+        ai_initial = entry.get("initial", {})
+        match = _find_matching_wine(ai_initial, request.user)
+        if not match:
+            # Stale/tampered token, or the matching wine was deleted/edited
+            # since the poll redirect was computed - fall back gracefully.
+            return redirect(fallback)
+        context = {"wine": match, "prefill_token": token}
+        year = ai_initial.get("year")
+        if (
+            year is not None
+            and Vintage.objects.filter(
+                wine=match, user=request.user, year=year
+            ).exists()
+        ):
+            context["existing_vintage_year"] = year
+        return render(request, self.template_name, context)
 
 
 @login_not_required

@@ -1,16 +1,20 @@
+import base64
 from http import HTTPStatus
 
 import pytest
+from django.core.cache import caches
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects, assertTemplateUsed
 
+from tests.helpers import exif_jpeg, invalid_image, random_png
 from wine_cellar.apps.storage.models import (
     StorageItem,
     StorageItemEvent,
     StorageItemEventType,
 )
-from tests.helpers import exif_jpeg, invalid_image, random_png
 from wine_cellar.apps.wine.models import ImageType, Size, Vintage, Wine, WineImage
+
+wine_prefill_cache = caches["wine_prefill"]
 
 
 @pytest.mark.django_db
@@ -19,7 +23,7 @@ def test_wine_detail_authenticated(
 ):
     wine = wine_factory(user=user)
     client.force_login(user)
-    with django_assert_num_queries(23):
+    with django_assert_num_queries(22):
         r = client.get(reverse("wine-detail", kwargs={"pk": wine.pk}))
     assert r.status_code == HTTPStatus.OK
     assertTemplateUsed(response=r, template_name="wine_detail.html")
@@ -445,6 +449,167 @@ def test_vintage_create_duplicate_year_shows_form_error(
 
 
 @pytest.mark.django_db
+def test_vintage_create_prefill_token_populates_year_abv_barcode(
+    client, user, wine_factory
+):
+    wine = wine_factory(user=user, _create_default_vintage=False)
+    token = "vintage-prefill-token"
+    wine_prefill_cache.set(
+        f"wine_prefill_{token}",
+        {
+            "status": "done",
+            "initial": {
+                "name": "Merlot",
+                "year": 2020,
+                "abv": 13.5,
+                "barcode": "12345",
+            },
+            "images": {},
+            "user_id": user.pk,
+        },
+        timeout=60,
+    )
+    client.force_login(user)
+    r = client.get(
+        reverse("vintage-add", kwargs={"wine_pk": wine.pk}) + f"?prefill_token={token}"
+    )
+    assert r.status_code == HTTPStatus.OK
+    initial = r.context["form"].initial
+    assert initial["year"] == 2020
+    assert initial["abv"] == 13.5
+    assert initial["barcode"] == "12345"
+    # comment/drink_by/price/rating are never AI-sourced - must not appear
+    assert "comment" not in initial
+
+
+@pytest.mark.django_db
+def test_vintage_create_prefill_token_populates_pending_images(
+    client, user, wine_factory
+):
+    wine = wine_factory(user=user, _create_default_vintage=False)
+    token = "vintage-prefill-images-token"
+    encoded = base64.b64encode(b"fake-image-bytes").decode()
+    wine_prefill_cache.set(
+        f"wine_prefill_{token}",
+        {
+            "status": "done",
+            "initial": {},
+            "images": {
+                "front": {
+                    "data": encoded,
+                    "name": "front.png",
+                    "content_type": "image/png",
+                }
+            },
+            "user_id": user.pk,
+        },
+        timeout=60,
+    )
+    client.force_login(user)
+    r = client.get(
+        reverse("vintage-add", kwargs={"wine_pk": wine.pk}) + f"?prefill_token={token}"
+    )
+    assert r.status_code == HTTPStatus.OK
+    pending_image = r.context["form"].initial["image_front"]
+    assert pending_image.url == f"data:image/png;base64,{encoded}"
+
+
+@pytest.mark.django_db
+def test_vintage_create_with_prefill_token_saves_vintage_and_deletes_cache_entry(
+    client, user, wine_factory, clear_image_folder
+):
+    wine = wine_factory(user=user, _create_default_vintage=False)
+    token = "vintage-prefill-save-token"
+    encoded = base64.b64encode(random_png("front.png").read()).decode()
+    wine_prefill_cache.set(
+        f"wine_prefill_{token}",
+        {
+            "status": "done",
+            "initial": {"year": 2020, "abv": 13.5},
+            "images": {
+                "front": {
+                    "data": encoded,
+                    "name": "front.png",
+                    "content_type": "image/png",
+                }
+            },
+            "user_id": user.pk,
+        },
+        timeout=60,
+    )
+    client.force_login(user)
+    r = client.post(
+        reverse("vintage-add", kwargs={"wine_pk": wine.pk}),
+        {"year": 2020, "abv": 13.5, "prefill_token": token},
+        follow=True,
+    )
+    assert r.status_code == HTTPStatus.OK
+    vintage = Vintage.objects.get(wine=wine, year=2020)
+    assert vintage.abv == 13.5
+    image = WineImage.objects.get(vintage=vintage, image_type=ImageType.FRONT)
+    assert image.image
+    assert wine_prefill_cache.get(f"wine_prefill_{token}") is None
+
+
+@pytest.mark.django_db
+def test_vintage_create_with_prefill_token_duplicate_year_keeps_cache_entry(
+    client, user, wine_factory, vintage_factory
+):
+    """A collision on the AI-supplied year should surface the usual
+    clean_year() error, but must not consume the token - the user should be
+    able to correct the year and retry without re-running AI extraction."""
+    wine = wine_factory(user=user, _create_default_vintage=False)
+    vintage_factory(wine=wine, year=2020)
+    token = "vintage-prefill-dup-token"
+    wine_prefill_cache.set(
+        f"wine_prefill_{token}",
+        {
+            "status": "done",
+            "initial": {"year": 2020},
+            "images": {},
+            "user_id": user.pk,
+        },
+        timeout=60,
+    )
+    client.force_login(user)
+    r = client.post(
+        reverse("vintage-add", kwargs={"wine_pk": wine.pk}),
+        {"year": 2020, "prefill_token": token},
+    )
+    assert r.status_code == HTTPStatus.OK
+    assert r.context["form"].errors["year"]
+    assert Vintage.objects.filter(wine=wine).count() == 1
+    assert wine_prefill_cache.get(f"wine_prefill_{token}") is not None
+
+
+@pytest.mark.django_db
+def test_vintage_create_with_other_users_prefill_token_ignored(
+    client, user, user_factory, wine_factory
+):
+    other_user = user_factory()
+    token = "vintage-prefill-foreign-token"
+    wine_prefill_cache.set(
+        f"wine_prefill_{token}",
+        {
+            "status": "done",
+            "initial": {"year": 2020, "abv": 13.5},
+            "images": {},
+            "user_id": other_user.pk,
+        },
+        timeout=60,
+    )
+    wine = wine_factory(user=user, _create_default_vintage=False)
+    client.force_login(user)
+    r = client.get(
+        reverse("vintage-add", kwargs={"wine_pk": wine.pk}) + f"?prefill_token={token}"
+    )
+    assert r.status_code == HTTPStatus.OK
+    initial = r.context["form"].initial
+    assert initial.get("year") is None
+    assert initial.get("abv") is None
+
+
+@pytest.mark.django_db
 def test_vintage_create_with_image_succeeds(
     client, user, wine_factory, clear_image_folder
 ):
@@ -497,9 +662,7 @@ def test_vintage_create_with_back_image_succeeds(
     )
     assert r.status_code == HTTPStatus.OK
     vintage = Vintage.objects.get(wine=wine, year=2020)
-    assert WineImage.objects.filter(
-        vintage=vintage, image_type=ImageType.BACK
-    ).exists()
+    assert WineImage.objects.filter(vintage=vintage, image_type=ImageType.BACK).exists()
 
 
 @pytest.mark.django_db
@@ -553,9 +716,7 @@ def test_vintage_update_with_back_image_succeeds(
         follow=True,
     )
     assert r.status_code == HTTPStatus.OK
-    assert WineImage.objects.filter(
-        vintage=vintage, image_type=ImageType.BACK
-    ).exists()
+    assert WineImage.objects.filter(vintage=vintage, image_type=ImageType.BACK).exists()
 
 
 @pytest.mark.django_db
