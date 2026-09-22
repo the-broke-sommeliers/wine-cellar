@@ -7,7 +7,13 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "wine_cellar.conf.dev")
 
 django.setup()
 
+from typing import Literal  # noqa: E402
+
 from wine_cellar.apps.wine.models import Wine, WineType  # noqa: E402
+from wine_cellar.apps.wine.views import _total_stock_count  # noqa: E402
+
+_WINE_TYPE_BY_LABEL = {str(label): code for code, label in WineType.choices}
+WineTypeName = Literal[tuple(_WINE_TYPE_BY_LABEL.keys())]
 
 mcp = FastMCP("wine-cellar")
 
@@ -15,10 +21,14 @@ mcp = FastMCP("wine-cellar")
 @mcp.tool()
 def list_wines_in_stock() -> str:
     """List all wines in stock."""
-    wines_in_stock = Wine.objects.filter(
-        vintages__storageitem__isnull=False,
-        vintages__storageitem__deleted=False,
-    ).distinct()
+    wines_in_stock = (
+        Wine.objects.filter(
+            vintages__storageitem__isnull=False,
+            vintages__storageitem__deleted=False,
+        )
+        .distinct()
+        .annotate(total_stock_count=_total_stock_count())
+    )
 
     lines = []
     for wine in wines_in_stock:
@@ -30,7 +40,9 @@ def list_wines_in_stock() -> str:
 @mcp.tool()
 def check_stock(wine_name: str) -> str:
     """Check if a wine is in stock."""
-    wines = Wine.objects.filter(name__icontains=wine_name)
+    wines = Wine.objects.filter(name__icontains=wine_name).annotate(
+        total_stock_count=_total_stock_count()
+    )
 
     if not wines.exists():
         return f"No stock found for '{wine_name}'."
@@ -46,7 +58,11 @@ def check_stock(wine_name: str) -> str:
 @mcp.tool()
 def food_pairing(food_name: str) -> str:
     """Check food pairing for a wine."""
-    wines = Wine.objects.filter(food_pairings__name__icontains=food_name).distinct()
+    wines = (
+        Wine.objects.filter(food_pairings__name__icontains=food_name)
+        .distinct()
+        .prefetch_related("food_pairings")
+    )
 
     if not wines.exists():
         return f"No wine found for '{food_name}'."
@@ -59,13 +75,9 @@ def food_pairing(food_name: str) -> str:
 
 
 @mcp.tool()
-def wines_by_type(wine_type: str) -> str:
+def wines_by_type(wine_type: WineTypeName) -> str:
     """List wines of a given type (e.g. red, white, sparkling)."""
-    matched_code = None
-    for code, label in WineType.choices:
-        if label.lower() == wine_type.lower():
-            matched_code = code
-            break
+    matched_code = _WINE_TYPE_BY_LABEL.get(wine_type)
 
     if not matched_code:
         return f"'{wine_type}' is not a recognised wine type."
