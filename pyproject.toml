@@ -17,11 +17,11 @@ classifiers = [
 dependencies = [
     "Django==6.1.1",
     "celery==5.6.3",
-    "django-allauth[socialaccount]==65.19.3",
+    "django-allauth[socialaccount]==65.19.4",
     "django-filter==26.1",
     "django-webpack-loader==3.2.4",
     "django-widget-tweaks==1.5.1",
-    "litellm==1.100.1",
+    "litellm==1.101.0",
     "pillow==12.3.0",
     "pycountry==26.2.16",
     "requests==2.34.2",
@@ -30,7 +30,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "Faker==40.38.0",
+    "Faker==40.39.0",
     "black==26.5.1",
     "django-debug-toolbar==8.0.0",
     "django-test-migrations==1.6.0",
@@ -38,21 +38,21 @@ dev = [
     "factory-boy==3.3.3",
     "flake8==7.3.0",
     "isort==9.0.1",
-    "playwright==1.62.0",
-    "psycopg[binary]==3.3.5",
+    "playwright==1.63.0",
+    "psycopg[binary]==3.3.6",
     "pytest-cov==7.1.0",
     "pytest-django==4.14.0",
     "pytest-factoryboy==2.8.1",
     "pytest-playwright==0.9.0",
     "pytest==9.1.1",
-    "commitizen==4.18.0",
-    "zensical==0.0.61",
+    "commitizen==4.18.1",
+    "zensical==0.0.63",
 ]
 prod = [
-    "psycopg[c]==3.3.5",
+    "psycopg[c]==3.3.6",
     "gunicorn==26.2.0",
     "redis==8.1.0",
-    "sentry-sdk==2.69.1",
+    "sentry-sdk==2.69.2",
 ]
 
 [tool.uv]
