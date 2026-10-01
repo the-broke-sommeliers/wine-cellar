@@ -23,7 +23,7 @@ services:
       retries: 5
       start_period: 20s
   db:
-    image: postgres:16@sha256:f1c3376c26f2609ab9f29f71f824103fe2fcd8ee0346485cb6122a4f93df6f94
+    image: postgres:16@sha256:1a6ab3f5345eb6dbe04a1349529caabdb0ab09293a09590fad07b2246bfa4b54
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
