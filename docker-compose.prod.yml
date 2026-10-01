@@ -27,7 +27,7 @@ services:
     env_file:
       - ./.env.prod.db
   caddy:
-    image: caddy:2@sha256:13ba145cba2f3e28fa801994876e4c086d1b95d5aa2a520a734765ffb6b12017
+    image: caddy:2@sha256:0c994536bddb66445885237f1a5dcc1916bccea922661c76b4e9fc24061f9b52
     restart: unless-stopped
     ports:
       - 127.0.0.1:8085:80
