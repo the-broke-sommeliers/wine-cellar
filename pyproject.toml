@@ -18,7 +18,7 @@ dependencies = [
     "Django==6.1.1",
     "celery==5.6.3",
     "django-allauth[socialaccount]==65.19.7",
-    "django-filter==26.1",
+    "django-filter==26.2",
     "django-webpack-loader==3.2.4",
     "django-widget-tweaks==1.5.1",
     "fastmcp==4.0.10",
@@ -46,7 +46,7 @@ dev = [
     "pytest-factoryboy==2.8.1",
     "pytest-playwright==0.9.0",
     "pytest==9.1.1",
-    "commitizen==4.19.0",
+    "commitizen==4.19.1",
     "zensical==0.0.67",
 ]
 prod = [
