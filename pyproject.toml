@@ -22,7 +22,7 @@ dependencies = [
     "django-webpack-loader==3.2.4",
     "django-widget-tweaks==1.5.1",
     "fastmcp==4.0.10",
-    "litellm==1.103.2",
+    "litellm==1.104.0",
     "pillow==12.3.0",
     "pycountry==26.2.16",
     "requests==2.34.2",
