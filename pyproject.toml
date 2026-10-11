@@ -21,7 +21,7 @@ dependencies = [
     "django-filter==26.2",
     "django-webpack-loader==3.2.4",
     "django-widget-tweaks==1.5.1",
-    "fastmcp==4.0.10",
+    "fastmcp==4.0.11",
     "litellm==1.104.0",
     "pillow==12.3.0",
     "pycountry==26.2.16",
@@ -32,7 +32,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     "Faker==40.40.0",
-    "black==26.5.1",
+    "black==26.10.0",
     "django-debug-toolbar==8.0.0",
     "django-test-migrations==1.7.0",
     "djlint==1.46.4",
