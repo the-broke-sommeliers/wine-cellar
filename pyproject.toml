@@ -15,14 +15,14 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 dependencies = [
-    "Django==6.1.1",
+    "Django==6.1.2",
     "celery==5.6.3",
     "django-allauth[socialaccount]==65.19.7",
     "django-filter==26.2",
     "django-webpack-loader==3.2.4",
     "django-widget-tweaks==1.5.1",
-    "fastmcp==4.0.11",
-    "litellm==1.104.0",
+    "fastmcp==4.1.0",
+    "litellm==1.104.2",
     "pillow==12.3.0",
     "pycountry==26.2.16",
     "requests==2.34.2",
@@ -31,8 +31,8 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "Faker==40.40.0",
-    "black==26.10.0",
+    "Faker==40.43.0",
+    "black==26.10.1",
     "django-debug-toolbar==8.0.0",
     "django-test-migrations==1.7.0",
     "djlint==1.46.4",
@@ -44,10 +44,10 @@ dev = [
     "pytest-cov==7.1.0",
     "pytest-django==4.14.0",
     "pytest-factoryboy==2.8.1",
-    "pytest-playwright==0.9.0",
+    "pytest-playwright==0.10.0",
     "pytest==9.1.1",
-    "commitizen==4.19.1",
-    "zensical==0.0.67",
+    "commitizen==4.19.2",
+    "zensical==0.0.69",
 ]
 prod = [
     "psycopg[c]==3.3.6",
