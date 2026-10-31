@@ -23,7 +23,7 @@ dependencies = [
     "django-widget-tweaks==1.5.1",
     "fastmcp==4.1.3",
     "litellm==1.106.2",
-    "pillow==12.3.0",
+    "pillow==13.0.0",
     "pycountry==26.2.16",
     "requests==2.34.2",
     "whitenoise[brotli]==6.12.0",
