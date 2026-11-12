@@ -1,5 +1,5 @@
 # pull official base image
-FROM python:3.15.1-slim-bookworm@sha256:575f8bc12ec26542e0678bc6b60e385218248019d433157ec327264a78c3a853
+FROM python:3.14.7-slim-bookworm@sha256:9ab8d9c8514b44f90cf0029dd42fdd7e9e211e639c8b995304cc04568dee900f
 
 # set work directory
 WORKDIR /usr/src/app
@@ -8,6 +8,8 @@ WORKDIR /usr/src/app
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV UV_PROJECT_ENVIRONMENT=/opt/venv
+ENV UV_PYTHON=/usr/local/bin/python3
+ENV UV_PYTHON_DOWNLOADS=never
 ENV PATH="/opt/venv/bin:$PATH"
 
 
