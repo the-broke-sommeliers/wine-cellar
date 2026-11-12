@@ -16,6 +16,11 @@
     {
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "all non-major dependencies"
+    },
+    {
+      "description": "Hold python below 3.15 until fastuuid (via litellm) ships 3.15 wheels",
+      "matchPackageNames": ["python"],
+      "allowedVersions": "<3.15"
     }
   ],
   "digest": {
