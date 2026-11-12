@@ -882,3 +882,106 @@ def test_ai_existing_match_view_pending_status_redirects_to_wine_add(client, use
     r = client.get(reverse("wine-ai-existing-match", kwargs={"token": token}))
     assert r.status_code == HTTPStatus.FOUND
     assert r.url == f"{reverse('wine-add')}?prefill_token={token}"
+
+
+def _prompt_text(mock_completion):
+    return mock_completion.call_args_list[0].kwargs["messages"][0]["content"][0]["text"]
+
+
+@pytest.mark.django_db
+def test_ai_upload_menu_without_image_rejected(client, user):
+    client.force_login(user)
+    r = client.post(
+        reverse("wine-ai-upload"),
+        data={"source": "menu", "front": random_png("front.png")},
+    )
+    assert r.status_code == HTTPStatus.BAD_REQUEST
+    assert r.json()["errors"]
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("litellm.completion")
+def test_ai_upload_menu_success_uses_menu_prompt_with_hint(
+    mock_completion, client, user
+):
+    mock_completion.return_value = _mock_response('{"name": "Barolo"}')
+    client.force_login(user)
+    r = client.post(
+        reverse("wine-ai-upload"),
+        data={
+            "source": "menu",
+            "menu": random_png("menu.png"),
+            "hint": "2019 Barolo",
+        },
+    )
+    assert r.status_code == HTTPStatus.OK
+    assert _poll(client, r.json()["poll_url"])["status"] == "done"
+    prompt = _prompt_text(mock_completion)
+    assert "restaurant menu" in prompt
+    assert '"2019 Barolo"' in prompt
+    assert "back label" not in prompt
+    content = mock_completion.call_args_list[0].kwargs["messages"][0]["content"]
+    assert len([c for c in content if c["type"] == "image_url"]) == 1
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("litellm.completion")
+def test_ai_upload_menu_without_hint_picks_most_prominent(
+    mock_completion, client, user
+):
+    mock_completion.return_value = _mock_response('{"name": "Barolo"}')
+    client.force_login(user)
+    client.post(
+        reverse("wine-ai-upload"),
+        data={"source": "menu", "menu": random_png("menu.png")},
+    )
+    assert "most prominent" in _prompt_text(mock_completion)
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("litellm.completion")
+def test_ai_upload_menu_never_stashes_images(mock_completion, client, user):
+    mock_completion.return_value = _mock_response('{"name": "Barolo"}')
+    client.force_login(user)
+    r = client.post(
+        reverse("wine-ai-upload"),
+        data={
+            "source": "menu",
+            "menu": random_png("menu.png"),
+            "use_as_wine_images": "on",
+        },
+    )
+    assert _prefill_data(r.json()["poll_url"])["images"] == {}
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("litellm.completion")
+def test_ai_upload_menu_no_match_shows_error(mock_completion, client, user):
+    mock_completion.return_value = _mock_response("{}")
+    client.force_login(user)
+    r = client.post(
+        reverse("wine-ai-upload"),
+        data={"source": "menu", "menu": random_png("menu.png"), "hint": "Riesling"},
+    )
+    poll = _poll(client, r.json()["poll_url"])
+    assert poll["status"] == "error"
+    assert "No matching wine" in poll["message"]
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("litellm.completion")
+def test_ai_upload_bottle_uses_label_prompt(mock_completion, client, user):
+    mock_completion.return_value = _mock_response('{"name": "Test Wine"}')
+    client.force_login(user)
+    client.post(
+        reverse("wine-ai-upload"),
+        data={"source": "bottle", "front": random_png("front.png")},
+    )
+    prompt = _prompt_text(mock_completion)
+    assert "back label" in prompt
+    assert "restaurant menu" not in prompt
