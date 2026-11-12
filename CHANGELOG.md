@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.15.0-rc.1 (2026-11-11)
+## 0.15.0-rc.2 (2026-11-12)
 
 ### feat
 
@@ -20,6 +20,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### fix
 
+- **docker**: revert to python 3.14 and pin uv to the image python
 - **deps**: update all non-major dependencies
 - **deps**: update all non-major dependencies
 - **deps**: update all non-major dependencies
