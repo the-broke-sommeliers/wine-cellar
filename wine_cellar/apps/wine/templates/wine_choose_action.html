@@ -15,7 +15,7 @@
                 <a href="{% url 'wine-ai-upload' %}?barcode={{ barcode }}" class="wine-choose__card{% if not ai_enabled %} wine-choose__card--disabled{% endif %}">
                     <span class="wine-choose__icon"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
                     <span class="wine-choose__title">{% translate "AI Upload" %}</span>
-                    <span class="wine-choose__desc">{% translate "Upload a photo of the bottle label and let AI fill in the details." %}</span>
+                    <span class="wine-choose__desc">{% translate "Upload a photo of the bottle label or a menu and let AI fill in the details." %}</span>
                 </a>
             </div>
             {% if not ai_enabled %}

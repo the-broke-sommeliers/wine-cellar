@@ -31,11 +31,42 @@ AI_REPROMPT_TIMEOUT = 20  # seconds
 _wine_types = ", ".join([choice.label.lower() for choice in WineType])
 _sweetness_categories = ", ".join([choice.label.lower() for choice in Category])
 
-MODEL_INSTRUCTIONS = f"""
+BOTTLE_INTRO = """
 You are shown one or two photos of a wine bottle - front and/or back label.
 Examine both images closely, including any small or dense print on the back
 label, and extract the following details.
+"""
 
+MENU_INTRO = """
+You are shown a photo of a restaurant menu, wine list or price list. Entries
+are short and often abbreviated (producer, appellation, vintage, price).
+Choose ONE wine: {selection}
+Expand abbreviations where you are confident (e.g. "Ch." -> "Château").
+Ignore prices and section headings except as context (a heading like
+"Rotweine" or "Champagne" implies the type). If no wine matches, return {{}}.
+Otherwise extract the following details for the chosen wine.
+"""
+
+MENU_SELECTION_HINT = (
+    'The user is looking for: "{hint}". Choose the entry that best matches it.'
+)
+MENU_SELECTION_DEFAULT = "the only wine listed, or else the most prominent one."
+
+BOTTLE_SIZE = "float, bottle size in liters, e.g. 0.75, if no value guess"
+MENU_SIZE = (
+    "float, bottle size in liters if the menu gives one (e.g. 0.375, 0.75,\n"
+    "  1.5); ignore glass pour sizes such as 0.1 or 0.15; if unclear use 0.75"
+)
+
+BOTTLE_VINTAGE = """four-digit harvest year as an integer, e.g. 2018. Look carefully
+  at both label images for a year printed anywhere on the bottle, including
+  large standalone numerals on the back label - it is not always next to
+  the wine name. Only omit this field if no year appears anywhere."""
+MENU_VINTAGE = """four-digit harvest year as an integer, e.g. 2018, as listed
+  with the entry - menus often put it in its own column or after the name.
+  Omit if no year is listed for the chosen wine."""
+
+FIELD_SPEC = f"""
 Return JSON only, with no surrounding commentary or markdown, containing
 these fields. Unless a field's description below says otherwise, omit it
 rather than guessing if it cannot be determined.
@@ -43,16 +74,12 @@ rather than guessing if it cannot be determined.
 name: wine name
 country: ISO2 code
 type: {_wine_types}
-size: float, bottle size in liters, e.g. 0.75, if no value guess
-grapes: list of grapes. If not printed on the label, infer the likely
-  grape(s) from the wine's type, region, and appellation when they strongly
-  imply a variety (e.g. a red Burgundy is pinot noir, a Chablis is
-  chardonnay, a Barolo is nebbiolo). Leave empty only if no variety can be
-  reasonably inferred.
-vintage: four-digit harvest year as an integer, e.g. 2018. Look carefully
-  at both label images for a year printed anywhere on the bottle, including
-  large standalone numerals on the back label - it is not always next to
-  the wine name. Only omit this field if no year appears anywhere.
+size: {{size}}
+grapes: list of grapes. If not printed, infer the likely grape(s) from the
+  wine's type, region, and appellation when they strongly imply a variety
+  (e.g. a red Burgundy is pinot noir, a Chablis is chardonnay, a Barolo is
+  nebbiolo). Leave empty only if no variety can be reasonably inferred.
+vintage: {{vintage}}
 abs: float, alcohol %
 sweetness: {_sweetness_categories}
 vineyard: list of vineyard names
@@ -60,6 +87,20 @@ region: region
 appellation: appellation
 location: lat,long; if unknown use region or omit
 """
+
+
+def build_model_instructions(source="bottle", hint=None):
+    if source == "menu":
+        hint = (hint or "").strip()
+        selection = (
+            MENU_SELECTION_HINT.format(hint=hint) if hint else MENU_SELECTION_DEFAULT
+        )
+        intro = MENU_INTRO.format(selection=selection)
+        spec = FIELD_SPEC.format(size=MENU_SIZE, vintage=MENU_VINTAGE)
+    else:
+        intro = BOTTLE_INTRO
+        spec = FIELD_SPEC.format(size=BOTTLE_SIZE, vintage=BOTTLE_VINTAGE)
+    return intro + spec
 
 
 @shared_task(name="drink_by_reminder")
@@ -220,14 +261,21 @@ def _set_prefill_error(token, user_id, message):
 
 @shared_task(name="process_ai_wine_upload")
 def process_ai_wine_upload(
-    token, user_id, front=None, back=None, use_as_wine_images=False, barcode=None
+    token,
+    user_id,
+    front=None,
+    back=None,
+    use_as_wine_images=False,
+    barcode=None,
+    source="bottle",
+    hint=None,
 ):
     # See the comment in `_reprompt_field` - `litellm` import is deferred to
     # task runtime to keep it out of Django's module-loading path.
     import litellm.exceptions
     from litellm import completion
 
-    content = [{"type": "text", "text": MODEL_INSTRUCTIONS}]
+    content = [{"type": "text", "text": build_model_instructions(source, hint)}]
     if front:
         content.append(
             {"type": "image_url", "image_url": {"url": _image_data_url(front)}}
@@ -321,6 +369,17 @@ def process_ai_wine_upload(
         )
         return
 
+    if source == "menu" and not ai_json.get("name"):
+        _set_prefill_error(
+            token,
+            user_id,
+            _(
+                "No matching wine found on the menu. "
+                "Try a clearer photo or a more specific hint."
+            ),
+        )
+        return
+
     _reprompt_and_fix(
         token,
         user_id,
@@ -357,7 +416,7 @@ def process_ai_wine_upload(
         initial["barcode"] = barcode
 
     images = {}
-    if use_as_wine_images:
+    if use_as_wine_images and source != "menu":
         if front:
             images["front"] = front
         if back:

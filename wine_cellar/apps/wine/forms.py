@@ -618,6 +618,13 @@ class WineFilterForm(TomSelectMixin, WineFormPostCleanMixin, forms.Form):
 class WineUploadAIForm(forms.Form):
     template_name = "wine_filter_field.html"
 
+    source = forms.ChoiceField(
+        choices=[("bottle", _("Bottle label")), ("menu", _("Menu / wine list"))],
+        widget=forms.RadioSelect,
+        initial="bottle",
+        required=False,
+        label=_("Source"),
+    )
     front = forms.ImageField(
         widget=NoFilenameClearableFileInput(attrs={"accept": "image/*"}),
         required=False,
@@ -637,9 +644,25 @@ class WineUploadAIForm(forms.Form):
             "new wine as its front and back photos."
         ),
     )
+    menu = ImageField(
+        widget=NoFilenameClearableFileInput(attrs={"accept": "image/*"}),
+        required=False,
+        help_text=_("Upload a photo of the menu or wine list."),
+    )
+    hint = forms.CharField(
+        required=False,
+        max_length=200,
+        label=_("Which wine?"),
+        help_text=_("Which wine on the menu? e.g. '2019 Barolo, Vietti'"),
+    )
 
     def clean(self):
         cleaned_data = super().clean()
+        cleaned_data["source"] = cleaned_data.get("source") or "bottle"
+        if cleaned_data["source"] == "menu":
+            if not cleaned_data.get("menu"):
+                raise forms.ValidationError(_("A photo of the menu must be uploaded."))
+            return cleaned_data
         front = cleaned_data.get("front")
         back = cleaned_data.get("back")
         if not front and not back:
