@@ -12,10 +12,10 @@
     {{ form.media.css }}
 {% endblock styles %}
 {% block title %}
-    Create Wine from Image
+    Create Wine with AI
 {% endblock title %}
 {% block header %}
-    <h1 class="header__title">{% translate 'Create Wine from Image' %}</h1>
+    <h1 class="header__title">{% translate 'Create Wine with AI' %}</h1>
 {% endblock header %}
 {% block content %}
     <div class="pure-g">
@@ -41,9 +41,16 @@
                             aria-live="assertive"
                             aria-atomic="true"></ul>
                         <div class="form__fields">
-                            {% for field in form %}
-                                {% include 'forms/form_field.html' %}
-                            {% endfor %}
+                            {% include 'forms/form_field.html' with field=form.source %}
+                            <div data-ai-source="bottle">
+                                {% include 'forms/form_field.html' with field=form.front %}
+                                {% include 'forms/form_field.html' with field=form.back %}
+                                {% include 'forms/form_field.html' with field=form.use_as_wine_images %}
+                            </div>
+                            <div data-ai-source="menu" class="hidden">
+                                {% include 'forms/form_field.html' with field=form.menu %}
+                                {% include 'forms/form_field.html' with field=form.hint %}
+                            </div>
                         </div>
                         <div class="pure-controls">
                             <button type="submit" class="pure-button button__primary">{% translate "Upload" %}</button>

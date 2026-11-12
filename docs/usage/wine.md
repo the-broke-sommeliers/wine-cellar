@@ -33,7 +33,7 @@ This separation allows you to:
 Wines can be added in two ways from the **Add Wine** page:
 
 - **Manual entry** — a guided 5-step wizard covering basic info, details, region, sourcing, and notes/images. You can move forward and back between steps without losing data.
-- **AI label scan** — upload a photo of the front and/or back label; an LLM extracts the name, vintage, country, grapes, region, and other fields and pre-fills the form for review before saving. Requires `AI_MODEL` and `AI_API_KEY` to be configured (see [Deployment](../setup/deployment.md#ai-setup)).
+- **AI scan** — upload a photo of the front and/or back label, or switch to **Menu / wine list** and upload a photo of a menu (optionally with a hint such as "2019 Barolo" to pick one entry). The LLM extracts the name, vintage, country, grapes, region, and other fields and pre-fills the form for review before saving. Requires `AI_MODEL` and `AI_API_KEY` to be configured (see [Deployment](../setup/deployment.md#ai-setup)).
 
 **Barcode scanning** is available from the navbar. Scanning a barcode takes you directly to the wine's detail page if it already exists in your cellar, or pre-fills the barcode in the creation form if it doesn't.
 

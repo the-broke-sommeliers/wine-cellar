@@ -962,8 +962,14 @@ class WineUploadAIView(FormView):
         }
 
     def form_valid(self, form):
-        front = self._encode_image(form.cleaned_data.get("front"))
-        back = self._encode_image(form.cleaned_data.get("back"))
+        data = form.cleaned_data
+        source = data.get("source")
+        if source == "menu":
+            front = self._encode_image(data.get("menu"))
+            back = None
+        else:
+            front = self._encode_image(data.get("front"))
+            back = self._encode_image(data.get("back"))
 
         token = uuid.uuid4().hex
         wine_prefill_cache.set(
@@ -977,8 +983,12 @@ class WineUploadAIView(FormView):
                 user_id=self.request.user.pk,
                 front=front,
                 back=back,
-                use_as_wine_images=form.cleaned_data.get("use_as_wine_images"),
+                use_as_wine_images=(
+                    source != "menu" and data.get("use_as_wine_images")
+                ),
                 barcode=self.request.GET.get("barcode"),
+                source=source,
+                hint=data.get("hint") if source == "menu" else None,
             )
         except Exception:
             logger.exception("Failed to queue AI wine upload task")

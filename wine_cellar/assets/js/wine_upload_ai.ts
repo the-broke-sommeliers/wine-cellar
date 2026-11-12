@@ -33,9 +33,31 @@ function initWineUploadAi() {
   const retryButton = document.getElementById('ai-upload-retry-button')
 
   const UPLOADING_MESSAGE = gettext('Uploading your photos…')
-  const ANALYZING_MESSAGE = gettext(
+  const ANALYZING_LABEL_MESSAGE = gettext(
     'Analyzing your label with AI… this can take up to a minute.'
   )
+  const ANALYZING_MENU_MESSAGE = gettext(
+    'Reading the menu with AI… this can take up to a minute.'
+  )
+
+  function currentSource(): string {
+    const checked = form?.querySelector<HTMLInputElement>(
+      'input[name="source"]:checked'
+    )
+    return checked?.value || 'bottle'
+  }
+
+  function updateSourceGroups() {
+    const source = currentSource()
+    form?.querySelectorAll<HTMLElement>('[data-ai-source]').forEach((group) => {
+      group.classList.toggle('hidden', group.dataset.aiSource !== source)
+    })
+  }
+
+  form.querySelectorAll('input[name="source"]').forEach((input) => {
+    input.addEventListener('change', updateSourceGroups)
+  })
+  updateSourceGroups()
 
   function showFormSection() {
     formSection?.classList.remove('hidden')
@@ -139,7 +161,11 @@ function initWineUploadAi() {
   function startPolling(pollUrl: string) {
     attempts = 0
     shownStage = null
-    showPending(ANALYZING_MESSAGE)
+    showPending(
+      currentSource() === 'menu'
+        ? ANALYZING_MENU_MESSAGE
+        : ANALYZING_LABEL_MESSAGE
+    )
     poll(pollUrl)
   }
 
