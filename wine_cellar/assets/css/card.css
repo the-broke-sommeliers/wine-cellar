@@ -3,8 +3,6 @@
   padding: 0;
   display: flex;
   width: 100%;
-  align-items: stretch;
-  flex-direction: row;
   flex-wrap: wrap;
   gap: 16px;
   margin-block-start: 0;
@@ -18,17 +16,14 @@
   background-color: white;
   padding: 20px 20px 12px 20px;
   border-radius: var(--border-radius);
-  width: 100%;
+  flex: 1 1 320px;
+  min-width: 200px;
   overflow: hidden;
   transition: box-shadow 0.18s ease;
   box-shadow: var(--container-box-shadow);
 
   p {
     margin: 0;
-  }
-
-  @media screen and (min-width: 64em) {
-    width: calc(50% - 8px);
   }
 }
 

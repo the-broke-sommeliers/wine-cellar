@@ -36,6 +36,14 @@ html {
   text-align: center;
 }
 
+@media screen and (min-width: 1400px) {
+  .main {
+    max-width: none;
+    padding-inline: 8rem;
+  }
+}
+
+
 /* not strickly user in header element but here for convenience */
 h2.header__title {
   font-size: var(--font-lg);
