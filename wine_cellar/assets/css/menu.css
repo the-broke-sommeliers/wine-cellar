@@ -28,6 +28,13 @@
   margin: 0 auto;
 }
 
+@media screen and (min-width: 1400px) {
+  .menu__container {
+    max-width: none;
+    padding-inline: 8rem;
+  }
+}
+
 /* responsive styling for large and small menus */
 .menu__md {
   display: none;

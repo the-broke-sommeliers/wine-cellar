@@ -101,14 +101,14 @@ def test_clear_link_resets_filters(live_server, page, login, user, wine_factory)
 
 @pytest.mark.django_db
 def test_pagination_across_multiple_pages(live_server, page, login, user, wine_factory):
-    for i in range(12):
+    for i in range(18):
         wine_factory(user=user, name=f"Wine {i:02d}")
     login(user)
     page.goto(f"{live_server.url}{reverse('wine-list')}")
 
-    assert page.locator("ul.wine-card__list li.wine-card").count() == 10
-    assert page.locator("ul.pagination li").count() >= 3  # prev, 1, 2, next
+    assert page.locator("ul.wine-card__list li.wine-card").count() == 12
+    assert page.locator("ul.pagination li").count() >= 4  # prev, 1, 2, next
 
     page.locator("ul.pagination a", has_text="2").click()
     page.wait_for_url("**page=2**")
-    assert page.locator("ul.wine-card__list li.wine-card").count() == 2
+    assert page.locator("ul.wine-card__list li.wine-card").count() == 6
