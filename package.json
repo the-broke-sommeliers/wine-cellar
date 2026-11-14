@@ -22,10 +22,10 @@
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "react-leaflet": "5.0.0",
-    "tom-select": "2.6.2"
+    "tom-select": "2.7.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.6.5",
+    "@biomejs/biome": "2.6.6",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "autoprefixer": "10.6.2",
