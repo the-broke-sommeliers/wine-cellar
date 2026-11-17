@@ -23,6 +23,15 @@ class WhatsNewRelease:
 # Not every release needs an entry, only ones with user-facing highlights.
 WHATS_NEW_RELEASES = [
     WhatsNewRelease(
+        version="0.16.0",
+        items=[
+            _(
+                "You can now add a wine from a photo of a menu or wine list."
+                " Optionally tell the AI which wine you mean."
+            ),
+        ],
+    ),
+    WhatsNewRelease(
         version="0.15.0",
         items=[
             _(
