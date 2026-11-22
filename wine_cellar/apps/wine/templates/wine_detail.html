@@ -5,6 +5,7 @@
     {{ block.super }}
     {% render_bundle 'wine_carousel' 'js' attrs='type="module" defer' %}
     {% render_bundle 'vintage_tabs' 'js' attrs='type="module" defer' %}
+    {% render_bundle 'ai_generate' 'js' attrs='type="module" defer' %}
     {% render_bundle 'maps' 'js' %}
 {% endblock extra_js %}
 {% block styles %}
@@ -134,7 +135,7 @@
                     {% endif %}
                 </div>
 
-                {% if wine.get_attributes or wine.get_sources or wine.get_food_pairings %}
+                {% if wine.get_attributes or wine.get_sources %}
                     <div class="card__fields card__fields--standalone">
                         {% if wine.get_attributes %}
                             <div class="card__field">
@@ -148,14 +149,19 @@
                                 <span class="card__field-value">{{ wine.get_sources | linebreaksbr }}</span>
                             </div>
                         {% endif %}
-                        {% if wine.get_food_pairings %}
-                            <div class="card__field">
-                                <span class="card__field-label">{% translate "Food Pairings" %}</span>
-                                <span class="card__field-value">{{ wine.get_food_pairings | linebreaksbr }}</span>
-                            </div>
-                        {% endif %}
                     </div>
                 {% endif %}
+
+                {% url 'wine-ai-food-pairings' wine.pk as generate_url %}
+                {% url 'wine-edit' wine.pk as wine_edit_url %}
+                {% url 'wine-food-pairings-delete' wine.pk as delete_url %}
+                {% translate "Food Pairings" as label %}
+                {% if ai_enabled %}
+                    {% translate "Let the AI suggest food pairings based on the wine's details, or add them yourself with Edit." as empty_message %}
+                {% else %}
+                    {% translate "Use Edit to add food pairings." as empty_message %}
+                {% endif %}
+                {% include "includes/ai_box.html" with value=wine.food_pairings.all as_list=True edit_url=wine_edit_url|add:"#field-food_pairings" %}
 
                 {% if vintages %}
                     {% url 'vintage-edit' wine.pk vintages.0.pk as vintage_edit_url %}
@@ -237,10 +243,27 @@
                                         </div>
                                     {% endif %}
                                 </div>
+                                {% if vintage.tasting_notes %}
+                                    <div class="vintage-panel__comment">
+                                        <span class="card__field-label">{% translate "Tasting Notes" %}</span>
+                                        <p class="card__field-value">{{ vintage.tasting_notes|linebreaksbr }}</p>
+                                    </div>
+                                {% endif %}
+                                {% url 'vintage-ai-tasting-notes' wine.pk vintage.pk as generate_url %}
+                                {% url 'vintage-ai-tasting-notes-edit' wine.pk vintage.pk as edit_url %}
+                                {% url 'vintage-ai-tasting-notes-delete' wine.pk vintage.pk as delete_url %}
+                                {% translate "AI Tasting Notes" as label %}
+                                {% translate "AI suggestion based on the wine's details, not an actual tasting." as done_message %}
+                                {% if ai_enabled %}
+                                    {% translate "Let the AI suggest how this wine probably tastes, based on its details, or add notes yourself with Edit." as empty_message %}
+                                {% else %}
+                                    {% translate "Use Edit to paste tasting notes from an AI tool of your choice." as empty_message %}
+                                {% endif %}
+                                {% include "includes/ai_box.html" with value=vintage.ai_tasting_notes %}
                                 {% if vintage.comment %}
                                     <div class="vintage-panel__comment">
                                         <span class="card__field-label">{% translate "Comment" %}</span>
-                                        <p class="card__field-value">{{ vintage.comment }}</p>
+                                        <p class="card__field-value">{{ vintage.comment|linebreaksbr }}</p>
                                     </div>
                                 {% endif %}
                             </div>

@@ -407,8 +407,12 @@ class WineForm(
             " on the label or scan using the button below."
         ),
     )
+    tasting_notes = forms.CharField(
+        required=False,
+        widget=forms.Textarea,
+        help_text=_("Describe how the wine looks, smells and tastes."),
+    )
     comment = forms.CharField(
-        max_length=250,
         required=False,
         widget=forms.Textarea,
         help_text=_(
@@ -568,8 +572,12 @@ class VintageForm(PrefillTokenFormMixin, forms.Form):
         validators=[MinValueValidator(0), MaxValueValidator(10)],
         help_text=_("Rate this wine on a scale from 0 to 10."),
     )
+    tasting_notes = forms.CharField(
+        required=False,
+        widget=forms.Textarea,
+        help_text=_("Describe how the wine looks, smells and tastes."),
+    )
     comment = forms.CharField(
-        max_length=250,
         required=False,
         widget=forms.Textarea,
         help_text=_(
@@ -596,6 +604,18 @@ class VintageForm(PrefillTokenFormMixin, forms.Form):
         widget=NoFilenameClearableFileInput(attrs={"accept": "image/*"}),
         required=False,
         help_text=_("Upload a photo of the back of the bottle label."),
+    )
+
+
+class AiTastingNotesForm(forms.Form):
+    ai_tasting_notes = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={"rows": 12}),
+        label=_("AI Tasting Notes"),
+        help_text=_(
+            "Edit the text or paste tasting notes from another AI tool."
+            " Leave empty to remove them."
+        ),
     )
 
 

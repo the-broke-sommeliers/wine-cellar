@@ -22,7 +22,7 @@ from django.db.models import (
 )
 from django.db.models.functions import Coalesce
 from django.forms import model_to_dict
-from django.http import JsonResponse
+from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils.formats import number_format
@@ -40,6 +40,7 @@ from wine_cellar.apps.user.views import get_user_settings
 from wine_cellar.apps.wine.fields import OpenChoiceModelFormViewMixin
 from wine_cellar.apps.wine.filters import WineFilter, WineMapFilter
 from wine_cellar.apps.wine.forms import (
+    AiTastingNotesForm,
     VintageForm,
     WineForm,
     WineUploadAIForm,
@@ -47,9 +48,16 @@ from wine_cellar.apps.wine.forms import (
 )
 from wine_cellar.apps.wine.models import ImageType, Vintage, Wine, WineImage
 from wine_cellar.apps.wine.serializers import WineAiSerializer
-from wine_cellar.apps.wine.tasks import process_ai_wine_upload
+from wine_cellar.apps.wine.tasks import (
+    generate_ai_food_pairings,
+    generate_ai_tasting_notes,
+    process_ai_wine_upload,
+)
 from wine_cellar.apps.wine.utils import (
     WINE_PREFILL_TIMEOUT,
+    ai_enabled,
+    ai_food_pairings_cache_key,
+    ai_tasting_notes_cache_key,
     wine_prefill_cache,
     wine_to_json,
 )
@@ -127,10 +135,7 @@ class WineChooseActionView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        ai_enabled = all(
-            [getattr(settings, "AI_MODEL", None), getattr(settings, "AI_API_KEY", None)]
-        )
-        context.update({"ai_enabled": ai_enabled})
+        context.update({"ai_enabled": ai_enabled()})
         if barcode := self.request.GET.get("barcode"):
             context.update({"barcode": barcode})
             token = uuid.uuid4().hex
@@ -149,7 +154,16 @@ class WineChooseActionView(TemplateView):
 
 
 WINE_FIELDS = ["category", "country", "name", "wine_type", "location"]
-VINTAGE_FIELDS = ["abv", "barcode", "comment", "year", "drink_by", "price", "rating"]
+VINTAGE_FIELDS = [
+    "abv",
+    "barcode",
+    "comment",
+    "tasting_notes",
+    "year",
+    "drink_by",
+    "price",
+    "rating",
+]
 
 
 def latest_vintage_prefetch():
@@ -251,7 +265,8 @@ class WineBaseView(OpenChoiceModelFormViewMixin, FormView):
 
         vintage = self.get_vintage_instance(wine)
         for field in VINTAGE_FIELDS:
-            setattr(vintage, field, cleaned_data.get(field))
+            if field in form.fields:
+                setattr(vintage, field, cleaned_data.get(field))
         vintage.user = user
         try:
             vintage.save()
@@ -455,6 +470,12 @@ class WineUpdateView(WineBaseView):
     def get_vintage_instance(self, wine):
         return wine.latest_vintage or Vintage(wine=wine)
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        # Edited per vintage via VintageUpdateView instead.
+        del form.fields["tasting_notes"]
+        return form
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["wine"] = self.get_wine_instance()
@@ -480,6 +501,8 @@ class WineUpdateView(WineBaseView):
                     _("A wine with these details already exists in your cellar."),
                 )
             return super().form_invalid(form)
+        # Cancel a pending AI job so it can't add pairings the user didn't see.
+        wine_prefill_cache.delete(ai_food_pairings_cache_key(wine.pk))
         self.success_url = reverse_lazy("wine-detail", kwargs={"pk": wine.pk})
         return super().form_valid(form)
 
@@ -508,6 +531,7 @@ class WineDetailView(DetailView):
                 to_attr="_prefetched_front_images",
             )
         )
+        context["ai_enabled"] = ai_enabled()
         return context
 
 
@@ -823,6 +847,151 @@ class VintageUpdateView(FormView):
         return super().form_valid(form)
 
 
+class AiJobMixin:
+
+    require_ai = True
+
+    def get_ai_target(self):
+        raise NotImplementedError
+
+    def get_cache_key(self):
+        raise NotImplementedError
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.require_ai and not ai_enabled():
+            raise Http404
+        self.target = self.get_ai_target()
+        self.cache_key = self.get_cache_key()
+        return super().dispatch(request, *args, **kwargs)
+
+
+class AiJobStartView(AiJobMixin, View):
+    http_method_names = ["post"]
+    task = None
+    poll_url_name = None
+
+    def post(self, request, *args, **kwargs):
+        job_id = uuid.uuid4().hex
+        wine_prefill_cache.set(
+            self.cache_key,
+            {"status": "pending", "user_id": request.user.pk, "job_id": job_id},
+            timeout=WINE_PREFILL_TIMEOUT,
+        )
+        try:
+            self.task.delay(self.target.pk, request.user.pk, job_id)
+        except Exception:
+            logger.exception("Failed to queue AI task %s", self.task.name)
+            wine_prefill_cache.delete(self.cache_key)
+            message = _("Could not start the AI request. Please try again.")
+            return JsonResponse({"message": str(message)}, status=400)
+        return JsonResponse({"poll_url": reverse(self.poll_url_name, kwargs=kwargs)})
+
+
+class AiJobPollView(AiJobMixin, View):
+    http_method_names = ["get"]
+
+    def get_result(self):
+        raise NotImplementedError
+
+    def get(self, request, *args, **kwargs):
+        entry = wine_prefill_cache.get(self.cache_key)
+        if not entry or entry.get("user_id") != request.user.pk:
+            return JsonResponse(
+                {"status": "error", "message": str(_("This AI request has expired."))}
+            )
+        status = entry.get("status")
+        if status == "done":
+            return JsonResponse({"status": "done", **self.get_result()})
+        if status == "error":
+            return JsonResponse(
+                {"status": "error", "message": entry.get("message", "")}
+            )
+        return JsonResponse({"status": "pending"})
+
+
+class VintageAiTastingNotesMixin(AiJobMixin):
+    def get_ai_target(self):
+        return get_object_or_404(
+            Vintage.objects.select_related("wine"),
+            pk=self.kwargs["pk"],
+            wine__pk=self.kwargs["wine_pk"],
+            wine__user=self.request.user,
+        )
+
+    def get_cache_key(self):
+        return ai_tasting_notes_cache_key(self.target.pk)
+
+
+class VintageAiTastingNotesView(VintageAiTastingNotesMixin, AiJobStartView):
+    task = generate_ai_tasting_notes
+    poll_url_name = "vintage-ai-tasting-notes-poll"
+
+
+class VintageAiTastingNotesPollView(VintageAiTastingNotesMixin, AiJobPollView):
+    def get_result(self):
+        return {"text": self.target.ai_tasting_notes}
+
+
+class VintageAiTastingNotesEditView(VintageAiTastingNotesMixin, FormView):
+    template_name = "vintage_ai_tasting_notes_form.html"
+    form_class = AiTastingNotesForm
+    require_ai = False
+
+    def get_initial(self):
+        return {"ai_tasting_notes": self.target.ai_tasting_notes}
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["wine"] = self.target.wine
+        context["vintage"] = self.target
+        return context
+
+    def form_valid(self, form):
+        self.target.ai_tasting_notes = form.cleaned_data["ai_tasting_notes"]
+        self.target.save(update_fields=["ai_tasting_notes"])
+        wine_prefill_cache.delete(self.cache_key)
+        return redirect("wine-detail", pk=self.target.wine_id)
+
+
+class VintageAiTastingNotesDeleteView(VintageAiTastingNotesMixin, View):
+    http_method_names = ["post"]
+    require_ai = False
+
+    def post(self, request, *args, **kwargs):
+        self.target.ai_tasting_notes = ""
+        self.target.save(update_fields=["ai_tasting_notes"])
+        wine_prefill_cache.delete(self.cache_key)
+        return redirect("wine-detail", pk=self.target.wine_id)
+
+
+class WineAiFoodPairingsMixin(AiJobMixin):
+    def get_ai_target(self):
+        return get_object_or_404(Wine, pk=self.kwargs["pk"], user=self.request.user)
+
+    def get_cache_key(self):
+        return ai_food_pairings_cache_key(self.target.pk)
+
+
+class WineAiFoodPairingsView(WineAiFoodPairingsMixin, AiJobStartView):
+    task = generate_ai_food_pairings
+    poll_url_name = "wine-ai-food-pairings-poll"
+
+
+class WineAiFoodPairingsPollView(WineAiFoodPairingsMixin, AiJobPollView):
+    def get_result(self):
+        return {"items": [str(p) for p in self.target.food_pairings.all()]}
+
+
+class WineFoodPairingsDeleteView(WineAiFoodPairingsMixin, View):
+    http_method_names = ["post"]
+    require_ai = False
+
+    def post(self, request, *args, **kwargs):
+        self.target.food_pairings.clear()
+        wine_prefill_cache.delete(self.cache_key)
+        return redirect("wine-detail", pk=self.target.pk)
+
+
 class VintageDeleteView(DeleteView):
     model = Vintage
     template_name = "vintage_confirm_delete.html"
@@ -959,11 +1128,7 @@ class WineUploadAIView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        ai_enabled = False
-        if hasattr(settings, "AI_MODEL") and hasattr(settings, "AI_API_KEY"):
-            if settings.AI_MODEL and settings.AI_API_KEY:
-                ai_enabled = True
-        context.update({"ai_enabled": ai_enabled})
+        context.update({"ai_enabled": ai_enabled()})
         return context
 
     @staticmethod

@@ -248,7 +248,8 @@ def test_wine_create_post_with_steps(client, user, region_factory, appellation_f
     # post form step 4
     data_step4 = {
         "rating": 5,
-        "comment": "Good wine",
+        "tasting_notes": "Cherry and leather",
+        "comment": "Good wine. " * 40 + "End",
     }
     initial = r.context_data["form"].data.copy()
     assert initial["form_step"] == 4
@@ -282,6 +283,7 @@ def test_wine_create_post_with_steps(client, user, region_factory, appellation_f
     assert wine.appellation == appellation
     assert wine.latest_vintage.year == data["year"]
     assert wine.latest_vintage.comment == data["comment"]
+    assert wine.latest_vintage.tasting_notes == data["tasting_notes"]
     assert wine.latest_vintage.rating == data["rating"]
 
 
@@ -1189,3 +1191,27 @@ def test_wine_create_new_open_field_value_preserved_across_steps(client, user):
     assert form.data["form_step"] == 1
     tom_config = json.loads(form.fields["grapes"].widget.attrs["data-tom_config"])
     assert "Chardonnay" in tom_config.get("items", [])
+
+
+@pytest.mark.django_db
+def test_wine_update_hides_and_keeps_tasting_notes(client, user, wine):
+    vintage = wine.latest_vintage
+    vintage.year = 2015
+    vintage.tasting_notes = "Plum and spice"
+    vintage.save()
+    client.force_login(user)
+    url = reverse("wine-edit", kwargs={"pk": wine.pk})
+    assert "tasting_notes" not in client.get(url).context_data["form"].fields
+
+    data = {
+        "name": wine.name,
+        "wine_type": wine.wine_type,
+        "category": "DR",
+        "size": Size.objects.get(name=0.75).pk,
+        "country": wine.country,
+        "year": vintage.year,
+        "tasting_notes": "ignored",
+    }
+    assert client.post(url, data).status_code == HTTPStatus.FOUND
+    vintage.refresh_from_db()
+    assert vintage.tasting_notes == "Plum and spice"

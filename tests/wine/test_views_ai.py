@@ -62,10 +62,6 @@ def test_wine_choose_action_ai_enabled(client, user):
 
 @pytest.mark.django_db
 def test_wine_upload_ai_page_ai_disabled_by_default(client, user):
-    """`WineUploadAIView.get_context_data` computes its own `ai_enabled`
-    flag independently of `WineChooseActionView`'s (different `hasattr`-
-    based implementation) - assert it directly rather than relying on the
-    other view's test to catch a regression here."""
     client.force_login(user)
     r = client.get(reverse("wine-ai-upload"))
     assert r.status_code == HTTPStatus.OK

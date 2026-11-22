@@ -47,10 +47,17 @@ Wines with a geographic location set can also be viewed on an interactive **map*
 
 ## Ratings and Tasting Notes
 
-Each wine record can store:
+Each vintage can store:
 
 - A numeric **rating** from 0 to 10
-- A free-text **comment** for tasting notes or any other remarks
+- Your own **tasting notes**: how the wine looks, smells and tastes
+- A free-text **comment** for any other remarks
+
+The vintage section on the wine's detail page also has an **AI Tasting Notes** box, kept separate from your own notes. Use **Edit** to write or paste notes from an AI tool of your choice. If AI is configured (see [Deployment](../setup/deployment.md#ai-setup)), **Generate** lets the AI describe how the wine probably tastes, based on its details (grapes, region, vintage and so on); without AI configuration the button is disabled. Once notes exist, **Remove** deletes them so you can generate new ones.
+
+## Food Pairings
+
+Food pairings belong to the wine, not a single vintage, so they are shared by all its vintages and power the wine list's food pairing filter. The **Food Pairings** box on the wine's detail page works like the AI Tasting Notes box: with AI configured, **Generate** suggests a few dishes based on the wine's details, reusing names you already have where they fit, and adds them to the wine. **Edit** opens the wine's edit form at the food pairings field, and **Remove** clears the wine's pairings (the pairing names themselves stay available for other wines).
 
 ## Related Topics
 

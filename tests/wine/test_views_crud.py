@@ -903,3 +903,21 @@ def test_wine_update_duplicate_vintage_year_shows_vintage_specific_message(
     assert "vintage with this year" in str(errors["year"])
     latest.refresh_from_db()
     assert latest.year == 2021
+
+
+@pytest.mark.django_db
+def test_vintage_update_saves_tasting_notes_and_keeps_ai_notes(
+    client, user, wine_factory, vintage_factory
+):
+    wine = wine_factory(user=user, _create_default_vintage=False)
+    vintage = vintage_factory(wine=wine, year=2020, ai_tasting_notes="AI text")
+    client.force_login(user)
+    r = client.post(
+        reverse("vintage-edit", kwargs={"wine_pk": wine.pk, "pk": vintage.pk}),
+        {"year": 2020, "tasting_notes": "Plum, oak", "comment": "x" * 500},
+    )
+    assert r.status_code == HTTPStatus.FOUND
+    vintage.refresh_from_db()
+    assert vintage.tasting_notes == "Plum, oak"
+    assert vintage.comment == "x" * 500
+    assert vintage.ai_tasting_notes == "AI text"
