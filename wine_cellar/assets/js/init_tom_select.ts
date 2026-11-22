@@ -48,11 +48,7 @@ function initTomSelect(): void {
         }
       }
     }
-    // Only offer a clear button where clearing leaves a valid value:
-    // multi-selects (deselecting all is fine) or selects that already
-    // render a blank option (so there's something to clear to). Required
-    // single-selects with no blank option (e.g. wine_type, country) are
-    // left alone.
+    // Only clearable if clearing leaves a valid value.
     const hasEmptyOption = Array.from(el.options).some((o) => o.value === '')
     if (el.multiple || hasEmptyOption) {
       config.plugins = ['clear_button']
