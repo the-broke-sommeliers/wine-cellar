@@ -981,3 +981,49 @@ def test_ai_upload_bottle_uses_label_prompt(mock_completion, client, user):
     prompt = _prompt_text(mock_completion)
     assert "back label" in prompt
     assert "restaurant menu" not in prompt
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("litellm.completion")
+def test_ai_upload_menu_list_response_uses_first_wine(mock_completion, client, user):
+    mock_completion.return_value = _mock_response(
+        '[{"name": "Barolo"}, {"name": "Chianti"}]'
+    )
+    client.force_login(user)
+    r = client.post(
+        reverse("wine-ai-upload"),
+        data={"source": "menu", "menu": random_png("menu.png")},
+    )
+    poll_url = r.json()["poll_url"]
+    _poll(client, poll_url)
+    data = _prefill_data(poll_url)
+    assert data["status"] == "done"
+    assert data["initial"]["name"] == "Barolo"
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("litellm.completion")
+def test_ai_upload_non_object_response_shows_error(mock_completion, client, user):
+    mock_completion.return_value = _mock_response('"just a string"')
+    client.force_login(user)
+    r = client.post(
+        reverse("wine-ai-upload"),
+        data={"source": "menu", "menu": random_png("menu.png")},
+    )
+    poll = _poll(client, r.json()["poll_url"])
+    assert poll["status"] == "error"
+    assert "Failed to process AI response" in poll["message"]
+
+
+@pytest.mark.django_db
+@override_settings(AI_MODEL="test-model", AI_API_KEY="test-key")
+@patch("litellm.completion")
+def test_ai_upload_unexpected_error_shows_error(mock_completion, client, user):
+    mock_completion.side_effect = RuntimeError("boom")
+    client.force_login(user)
+    r = client.post(reverse("wine-ai-upload"), data={"front": random_png("f.png")})
+    poll = _poll(client, r.json()["poll_url"])
+    assert poll["status"] == "error"
+    assert poll["message"] == "The AI request failed. Please try again."

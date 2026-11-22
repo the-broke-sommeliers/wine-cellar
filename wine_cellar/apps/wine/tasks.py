@@ -307,7 +307,15 @@ def _ai_error_message(exc):
 
 
 @shared_task(name="process_ai_wine_upload")
-def process_ai_wine_upload(
+def process_ai_wine_upload(token, user_id, **kwargs):
+    try:
+        _process_ai_wine_upload(token, user_id, **kwargs)
+    except Exception:
+        _set_prefill_error(token, user_id, AI_UNEXPECTED_ERROR)
+        raise
+
+
+def _process_ai_wine_upload(
     token,
     user_id,
     front=None,
@@ -349,7 +357,11 @@ def process_ai_wine_upload(
 
     try:
         ai_json = _parse_ai_json(ai_text)
-    except json.JSONDecodeError:
+        if isinstance(ai_json, list) and ai_json:
+            ai_json = ai_json[0]
+        if not isinstance(ai_json, dict):
+            raise ValueError("AI response is not a JSON object")
+    except (json.JSONDecodeError, ValueError):
         logger.warning("Failed to parse AI response as JSON", exc_info=True)
         _set_prefill_error(
             token,
