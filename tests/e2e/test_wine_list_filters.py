@@ -46,7 +46,6 @@ def test_stock_yes_filter_shows_only_wines_in_stock(
     page.goto(f"{live_server.url}{reverse('wine-list')}")
 
     tom_select_pick(page, "id_stock", "Yes")
-    visible_filter_form(page).get_by_role("button", name="Filter", exact=True).click()
     page.wait_for_url("**stock=1**")
 
     cards = page.locator("ul.wine-card__list li.wine-card")
@@ -62,7 +61,6 @@ def test_wine_type_filter(live_server, page, login, user, wine_factory):
     page.goto(f"{live_server.url}{reverse('wine-list')}")
 
     tom_select_pick(page, "id_wine_type", "Red")
-    visible_filter_form(page).get_by_role("button", name="Filter", exact=True).click()
     page.wait_for_url("**wine_type=RE**")
 
     cards = page.locator("ul.wine-card__list li.wine-card")
@@ -78,7 +76,6 @@ def test_order_by_name_ascending(live_server, page, login, user, wine_factory):
     page.goto(f"{live_server.url}{reverse('wine-list')}")
 
     tom_select_pick(page, "id_order", "Name Ascending")
-    visible_filter_form(page).get_by_role("button", name="Filter", exact=True).click()
     page.wait_for_url("**order=name**")
 
     first_card = page.locator("ul.wine-card__list li.wine-card").first
