@@ -11,9 +11,11 @@
       "category": "DR",
       "size": 4,
       "country": "FR",
-      "region": 1,
-      "appellation": 1,
-      "grapes": [1],
+      "region": 15,
+      "appellation": 15,
+      "grapes": [
+        1
+      ],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -32,9 +34,14 @@
       "category": "DR",
       "size": 4,
       "country": "US",
-      "region": 2,
+      "region": 1,
       "appellation": 1,
-      "grapes": [2],
+      "grapes": [
+        2,
+        6,
+        13,
+        14
+      ],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -55,7 +62,9 @@
       "country": "FR",
       "region": 2,
       "appellation": 2,
-      "grapes": [3],
+      "grapes": [
+        3
+      ],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -76,7 +85,9 @@
       "country": "FR",
       "region": 3,
       "appellation": 3,
-      "grapes": [4],
+      "grapes": [
+        4
+      ],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -95,7 +106,11 @@
       "category": "DR",
       "size": 4,
       "country": "AU",
-      "grapes": [5],
+      "region": 4,
+      "appellation": 4,
+      "grapes": [
+        5
+      ],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -111,10 +126,16 @@
       "user": 1,
       "name": "Bordeaux Merlot",
       "wine_type": "RE",
-      "category": "SD",
+      "category": "DR",
       "size": 4,
       "country": "FR",
-      "grapes": [6],
+      "region": 5,
+      "appellation": 5,
+      "grapes": [
+        6,
+        2,
+        13
+      ],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -133,7 +154,10 @@
       "category": "DR",
       "size": 4,
       "country": "US",
-      "grapes": [7],
+      "region": 1,
+      "grapes": [
+        7
+      ],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -152,7 +176,9 @@
       "category": "DR",
       "size": 4,
       "country": "AR",
-      "grapes": [8],
+      "grapes": [
+        8
+      ],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -171,7 +197,12 @@
       "category": "DR",
       "size": 4,
       "country": "ES",
-      "grapes": [9],
+      "region": 6,
+      "appellation": 6,
+      "grapes": [
+        9,
+        11
+      ],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -190,7 +221,11 @@
       "category": "MS",
       "size": 4,
       "country": "IT",
-      "grapes": [10],
+      "region": 7,
+      "appellation": 7,
+      "grapes": [
+        10
+      ],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -209,7 +244,13 @@
       "category": "DR",
       "size": 4,
       "country": "FR",
-      "grapes": [7],
+      "region": 14,
+      "appellation": 14,
+      "grapes": [
+        7,
+        3,
+        15
+      ],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -223,12 +264,18 @@
       "created": "2025-10-02T08:00:00.000Z",
       "modified": "2025-10-02T08:00:00.000Z",
       "user": 1,
-      "name": "Vintage Port 20 Years",
+      "name": "Douro Vintage Port",
       "wine_type": "FO",
       "category": "SW",
       "size": 4,
       "country": "PT",
-      "grapes": [5],
+      "region": 12,
+      "appellation": 12,
+      "grapes": [
+        17,
+        26,
+        9
+      ],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -245,9 +292,14 @@
       "name": "Tokaji Aszú 5 Puttonyos",
       "wine_type": "DE",
       "category": "SW",
-      "size": 4,
+      "size": 3,
       "country": "HU",
-      "grapes": [10],
+      "region": 8,
+      "appellation": 8,
+      "grapes": [
+        21,
+        29
+      ],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -266,7 +318,11 @@
       "category": "MS",
       "size": 4,
       "country": "FR",
-      "grapes": [3],
+      "region": 15,
+      "grapes": [
+        31,
+        13
+      ],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -285,7 +341,12 @@
       "category": "DR",
       "size": 4,
       "country": "IT",
-      "grapes": [9],
+      "region": 9,
+      "appellation": 9,
+      "grapes": [
+        22,
+        27
+      ],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -302,9 +363,14 @@
       "name": "Sauternes Château Suduiraut",
       "wine_type": "DE",
       "category": "SW",
-      "size": 4,
+      "size": 2,
       "country": "FR",
-      "grapes": [7],
+      "region": 5,
+      "appellation": 16,
+      "grapes": [
+        16,
+        1
+      ],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -323,7 +389,13 @@
       "category": "DR",
       "size": 4,
       "country": "ES",
-      "grapes": [7],
+      "region": 10,
+      "appellation": 10,
+      "grapes": [
+        18,
+        19,
+        20
+      ],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -342,9 +414,14 @@
       "category": "SD",
       "size": 4,
       "country": "FR",
-      "region": 6,
+      "region": 11,
       "appellation": 11,
-      "grapes": [3],
+      "grapes": [
+        11,
+        28,
+        5,
+        12
+      ],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -363,7 +440,11 @@
       "category": "SW",
       "size": 4,
       "country": "PT",
-      "grapes": [5],
+      "region": 13,
+      "appellation": 13,
+      "grapes": [
+        30
+      ],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -382,7 +463,126 @@
       "category": "DR",
       "size": 4,
       "country": "NZ",
-      "grapes": [1],
+      "grapes": [
+        1
+      ],
+      "attributes": [],
+      "food_pairings": [],
+      "vineyard": [],
+      "source": []
+    }
+  },
+  {
+    "model": "wine.wine",
+    "pk": 21,
+    "fields": {
+      "created": "2025-09-06T08:00:00.000Z",
+      "modified": "2025-09-06T08:00:00.000Z",
+      "user": 1,
+      "name": "Barolo",
+      "wine_type": "RE",
+      "category": "DR",
+      "size": 4,
+      "country": "IT",
+      "region": 7,
+      "appellation": 17,
+      "grapes": [
+        23
+      ],
+      "attributes": [],
+      "food_pairings": [],
+      "vineyard": [],
+      "source": []
+    }
+  },
+  {
+    "model": "wine.wine",
+    "pk": 22,
+    "fields": {
+      "created": "2025-09-04T08:00:00.000Z",
+      "modified": "2025-09-04T08:00:00.000Z",
+      "user": 1,
+      "name": "Châteauneuf-du-Pape Magnum",
+      "wine_type": "RE",
+      "category": "DR",
+      "size": 6,
+      "country": "FR",
+      "region": 16,
+      "appellation": 18,
+      "grapes": [
+        11,
+        5,
+        12,
+        28
+      ],
+      "attributes": [],
+      "food_pairings": [],
+      "vineyard": [],
+      "source": []
+    }
+  },
+  {
+    "model": "wine.wine",
+    "pk": 23,
+    "fields": {
+      "created": "2025-09-02T08:00:00.000Z",
+      "modified": "2025-09-02T08:00:00.000Z",
+      "user": 1,
+      "name": "Condrieu Viognier",
+      "wine_type": "WH",
+      "category": "DR",
+      "size": 4,
+      "country": "FR",
+      "region": 16,
+      "appellation": 19,
+      "grapes": [
+        24
+      ],
+      "attributes": [],
+      "food_pairings": [],
+      "vineyard": [],
+      "source": []
+    }
+  },
+  {
+    "model": "wine.wine",
+    "pk": 24,
+    "fields": {
+      "created": "2025-08-31T08:00:00.000Z",
+      "modified": "2025-08-31T08:00:00.000Z",
+      "user": 1,
+      "name": "Alsace Gewürztraminer",
+      "wine_type": "WH",
+      "category": "MS",
+      "size": 4,
+      "country": "FR",
+      "region": 3,
+      "appellation": 3,
+      "grapes": [
+        25
+      ],
+      "attributes": [],
+      "food_pairings": [],
+      "vineyard": [],
+      "source": []
+    }
+  },
+  {
+    "model": "wine.wine",
+    "pk": 25,
+    "fields": {
+      "created": "2025-08-29T08:00:00.000Z",
+      "modified": "2025-08-29T08:00:00.000Z",
+      "user": 1,
+      "name": "Mosel Riesling Kabinett",
+      "wine_type": "WH",
+      "category": "SD",
+      "size": 4,
+      "country": "DE",
+      "region": 17,
+      "grapes": [
+        4
+      ],
       "attributes": [],
       "food_pairings": [],
       "vineyard": [],
@@ -743,6 +943,618 @@
       "price": 14.0,
       "drink_by": "2025-10-11",
       "comment": "An earlier vintage of the same wine, sharing its barcode.",
+      "rating": 4
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 22,
+    "fields": {
+      "created": "2025-10-11T14:42:05.922Z",
+      "modified": "2025-10-11T14:42:05.922Z",
+      "user": 1,
+      "wine": 1,
+      "year": 2022,
+      "abv": 12.5,
+      "barcode": "",
+      "price": 15.5,
+      "drink_by": "2026-12-15",
+      "comment": "Flinty and crisp with lemon zest.",
+      "rating": 4
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 23,
+    "fields": {
+      "created": "2025-10-11T14:42:05.922Z",
+      "modified": "2025-10-11T14:42:05.922Z",
+      "user": 1,
+      "wine": 1,
+      "year": 2019,
+      "abv": 13.0,
+      "barcode": "",
+      "price": 13.0,
+      "drink_by": "2024-06-01",
+      "comment": "Past its best, fading fruit.",
+      "rating": 3
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 24,
+    "fields": {
+      "created": "2025-10-11T14:42:05.922Z",
+      "modified": "2025-10-11T14:42:05.922Z",
+      "user": 1,
+      "wine": 1,
+      "year": 2018,
+      "abv": 12.5,
+      "barcode": "",
+      "price": 12.0,
+      "drink_by": null,
+      "comment": "",
+      "rating": null
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 25,
+    "fields": {
+      "created": "2025-10-10T10:00:00.000Z",
+      "modified": "2025-10-10T10:00:00.000Z",
+      "user": 1,
+      "wine": 2,
+      "year": 2018,
+      "abv": 14.5,
+      "barcode": "",
+      "price": 52.0,
+      "drink_by": "2034-12-31",
+      "comment": "Dense cassis and cedar, needs time.",
+      "rating": 5
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 26,
+    "fields": {
+      "created": "2025-10-10T10:00:00.000Z",
+      "modified": "2025-10-10T10:00:00.000Z",
+      "user": 1,
+      "wine": 2,
+      "year": 2016,
+      "abv": 14.0,
+      "barcode": "",
+      "price": 60.0,
+      "drink_by": "2030-01-01",
+      "comment": "Mature with tobacco and graphite.",
+      "rating": 5
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 27,
+    "fields": {
+      "created": "2025-10-09T09:30:00.000Z",
+      "modified": "2025-10-09T09:30:00.000Z",
+      "user": 1,
+      "wine": 3,
+      "year": 2019,
+      "abv": 13.0,
+      "barcode": "",
+      "price": 42.0,
+      "drink_by": "2028-01-01",
+      "comment": "Red berries and forest floor.",
+      "rating": 4
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 28,
+    "fields": {
+      "created": "2025-10-07T07:00:00.000Z",
+      "modified": "2025-10-07T07:00:00.000Z",
+      "user": 1,
+      "wine": 5,
+      "year": 2018,
+      "abv": 14.5,
+      "barcode": "",
+      "price": 34.0,
+      "drink_by": "2033-01-01",
+      "comment": "Blackberry, licorice, and smoke.",
+      "rating": 4
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 29,
+    "fields": {
+      "created": "2025-10-07T07:00:00.000Z",
+      "modified": "2025-10-07T07:00:00.000Z",
+      "user": 1,
+      "wine": 5,
+      "year": 2015,
+      "abv": 15.0,
+      "barcode": "",
+      "price": 38.0,
+      "drink_by": "2030-01-01",
+      "comment": "Leathery and opulent.",
+      "rating": 5
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 30,
+    "fields": {
+      "created": "2025-10-07T07:00:00.000Z",
+      "modified": "2025-10-07T07:00:00.000Z",
+      "user": 1,
+      "wine": 5,
+      "year": 2012,
+      "abv": 14.5,
+      "barcode": "",
+      "price": 45.0,
+      "drink_by": "2027-01-01",
+      "comment": "Fully mature, savory finish.",
+      "rating": 4
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 31,
+    "fields": {
+      "created": "2025-10-06T06:30:00.000Z",
+      "modified": "2025-10-06T06:30:00.000Z",
+      "user": 1,
+      "wine": 6,
+      "year": 2019,
+      "abv": 13.5,
+      "barcode": "",
+      "price": 26.0,
+      "drink_by": "2031-01-01",
+      "comment": "Plum and cedar, firm tannins.",
+      "rating": 4
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 32,
+    "fields": {
+      "created": "2025-10-06T06:30:00.000Z",
+      "modified": "2025-10-06T06:30:00.000Z",
+      "user": 1,
+      "wine": 6,
+      "year": 2016,
+      "abv": 14.0,
+      "barcode": "",
+      "price": 30.0,
+      "drink_by": "2032-01-01",
+      "comment": "Structured, excellent vintage.",
+      "rating": 5
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 33,
+    "fields": {
+      "created": "2025-10-06T06:30:00.000Z",
+      "modified": "2025-10-06T06:30:00.000Z",
+      "user": 1,
+      "wine": 6,
+      "year": 2015,
+      "abv": 13.5,
+      "barcode": "",
+      "price": 28.0,
+      "drink_by": "2028-01-01",
+      "comment": "Ripe and round.",
+      "rating": 4
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 34,
+    "fields": {
+      "created": "2025-10-06T06:30:00.000Z",
+      "modified": "2025-10-06T06:30:00.000Z",
+      "user": 1,
+      "wine": 6,
+      "year": 2010,
+      "abv": 13.5,
+      "barcode": "",
+      "price": 40.0,
+      "drink_by": "2026-12-01",
+      "comment": "Tertiary notes, drink now.",
+      "rating": 5
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 35,
+    "fields": {
+      "created": "2025-10-04T06:33:00.000Z",
+      "modified": "2025-10-04T06:33:00.000Z",
+      "user": 1,
+      "wine": 9,
+      "year": 2017,
+      "abv": 13.5,
+      "barcode": "",
+      "price": 18.0,
+      "drink_by": "2028-12-01",
+      "comment": "Strawberry and dill.",
+      "rating": 3
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 36,
+    "fields": {
+      "created": "2025-10-04T06:33:00.000Z",
+      "modified": "2025-10-04T06:33:00.000Z",
+      "user": 1,
+      "wine": 9,
+      "year": 2015,
+      "abv": 14.0,
+      "barcode": "",
+      "price": 21.0,
+      "drink_by": "2027-01-01",
+      "comment": "Soft and savory.",
+      "rating": 4
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 37,
+    "fields": {
+      "created": "2025-10-03T08:00:00.000Z",
+      "modified": "2025-10-03T08:00:00.000Z",
+      "user": 1,
+      "wine": 11,
+      "year": null,
+      "abv": 12.0,
+      "barcode": "3185370000335",
+      "price": 39.0,
+      "drink_by": null,
+      "comment": "Non-vintage house blend.",
+      "rating": 4
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 38,
+    "fields": {
+      "created": "2025-10-02T08:00:00.000Z",
+      "modified": "2025-10-02T08:00:00.000Z",
+      "user": 1,
+      "wine": 12,
+      "year": 2011,
+      "abv": 20.0,
+      "barcode": "",
+      "price": 80.0,
+      "drink_by": "2050-01-01",
+      "comment": "Powerful and inky, very young.",
+      "rating": 5
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 39,
+    "fields": {
+      "created": "2025-10-02T08:00:00.000Z",
+      "modified": "2025-10-02T08:00:00.000Z",
+      "user": 1,
+      "wine": 12,
+      "year": 2017,
+      "abv": 19.5,
+      "barcode": "",
+      "price": 70.0,
+      "drink_by": "2055-01-01",
+      "comment": "Violets and blackberry jam.",
+      "rating": null
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 40,
+    "fields": {
+      "created": "2025-09-30T08:00:00.000Z",
+      "modified": "2025-09-30T08:00:00.000Z",
+      "user": 1,
+      "wine": 13,
+      "year": 2013,
+      "abv": 11.0,
+      "barcode": "",
+      "price": 55.0,
+      "drink_by": "2040-01-01",
+      "comment": "Marmalade and saffron.",
+      "rating": 5
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 41,
+    "fields": {
+      "created": "2025-09-25T08:00:00.000Z",
+      "modified": "2025-09-25T08:00:00.000Z",
+      "user": 1,
+      "wine": 15,
+      "year": 2019,
+      "abv": 13.5,
+      "barcode": "",
+      "price": 24.0,
+      "drink_by": "2031-01-01",
+      "comment": "Sour cherry and violet.",
+      "rating": 5
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 42,
+    "fields": {
+      "created": "2025-09-25T08:00:00.000Z",
+      "modified": "2025-09-25T08:00:00.000Z",
+      "user": 1,
+      "wine": 15,
+      "year": 2018,
+      "abv": 13.0,
+      "barcode": "",
+      "price": 21.0,
+      "drink_by": "2027-06-01",
+      "comment": "Lighter, herbal.",
+      "rating": 3
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 43,
+    "fields": {
+      "created": "2025-09-25T08:00:00.000Z",
+      "modified": "2025-09-25T08:00:00.000Z",
+      "user": 1,
+      "wine": 15,
+      "year": 2016,
+      "abv": 13.5,
+      "barcode": "",
+      "price": 27.0,
+      "drink_by": "2029-01-01",
+      "comment": "Classic and long.",
+      "rating": 5
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 44,
+    "fields": {
+      "created": "2025-09-20T08:00:00.000Z",
+      "modified": "2025-09-20T08:00:00.000Z",
+      "user": 1,
+      "wine": 16,
+      "year": 2009,
+      "abv": 14.0,
+      "barcode": "",
+      "price": 110.0,
+      "drink_by": "2040-12-31",
+      "comment": "Rich botrytis, crème brûlée.",
+      "rating": 5
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 45,
+    "fields": {
+      "created": "2025-08-31T08:00:00.000Z",
+      "modified": "2025-08-31T08:00:00.000Z",
+      "user": 1,
+      "wine": 24,
+      "year": 2022,
+      "abv": 13.0,
+      "barcode": "",
+      "price": 19.0,
+      "drink_by": "2027-01-01",
+      "comment": "Lychee and rose petal.",
+      "rating": 4
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 46,
+    "fields": {
+      "created": "2025-08-31T08:00:00.000Z",
+      "modified": "2025-08-31T08:00:00.000Z",
+      "user": 1,
+      "wine": 24,
+      "year": 2020,
+      "abv": 13.5,
+      "barcode": "",
+      "price": 17.0,
+      "drink_by": "2026-12-01",
+      "comment": "Spicy, off-dry.",
+      "rating": 3
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 47,
+    "fields": {
+      "created": "2025-09-06T08:00:00.000Z",
+      "modified": "2025-09-06T08:00:00.000Z",
+      "user": 1,
+      "wine": 21,
+      "year": 2019,
+      "abv": 14.0,
+      "barcode": "8001234567890",
+      "price": 55.0,
+      "drink_by": "2040-01-01",
+      "comment": "Tar and roses, very tannic.",
+      "rating": 5
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 48,
+    "fields": {
+      "created": "2025-09-06T08:00:00.000Z",
+      "modified": "2025-09-06T08:00:00.000Z",
+      "user": 1,
+      "wine": 21,
+      "year": 2017,
+      "abv": 14.0,
+      "barcode": "",
+      "price": 48.0,
+      "drink_by": "2032-01-01",
+      "comment": "Warm vintage, approachable.",
+      "rating": 4
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 49,
+    "fields": {
+      "created": "2025-09-06T08:00:00.000Z",
+      "modified": "2025-09-06T08:00:00.000Z",
+      "user": 1,
+      "wine": 21,
+      "year": 2016,
+      "abv": 14.5,
+      "barcode": "",
+      "price": 75.0,
+      "drink_by": "2045-01-01",
+      "comment": "Benchmark vintage.",
+      "rating": 5
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 50,
+    "fields": {
+      "created": "2025-09-06T08:00:00.000Z",
+      "modified": "2025-09-06T08:00:00.000Z",
+      "user": 1,
+      "wine": 21,
+      "year": 2015,
+      "abv": 14.5,
+      "barcode": "",
+      "price": 60.0,
+      "drink_by": "2035-01-01",
+      "comment": "Ripe and generous.",
+      "rating": 4
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 51,
+    "fields": {
+      "created": "2025-09-06T08:00:00.000Z",
+      "modified": "2025-09-06T08:00:00.000Z",
+      "user": 1,
+      "wine": 21,
+      "year": 2013,
+      "abv": 14.0,
+      "barcode": "",
+      "price": 65.0,
+      "drink_by": "2033-01-01",
+      "comment": "Classic structure, opening up.",
+      "rating": 5
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 52,
+    "fields": {
+      "created": "2025-09-04T08:00:00.000Z",
+      "modified": "2025-09-04T08:00:00.000Z",
+      "user": 1,
+      "wine": 22,
+      "year": 2020,
+      "abv": 15.0,
+      "barcode": "",
+      "price": 95.0,
+      "drink_by": "2038-01-01",
+      "comment": "Garrigue, kirsch, and spice.",
+      "rating": 5
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 53,
+    "fields": {
+      "created": "2025-09-04T08:00:00.000Z",
+      "modified": "2025-09-04T08:00:00.000Z",
+      "user": 1,
+      "wine": 22,
+      "year": 2017,
+      "abv": 14.5,
+      "barcode": "",
+      "price": 85.0,
+      "drink_by": "2032-01-01",
+      "comment": "Concentrated and warm.",
+      "rating": 4
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 54,
+    "fields": {
+      "created": "2025-09-02T08:00:00.000Z",
+      "modified": "2025-09-02T08:00:00.000Z",
+      "user": 1,
+      "wine": 23,
+      "year": 2022,
+      "abv": 14.0,
+      "barcode": "",
+      "price": null,
+      "drink_by": null,
+      "comment": "",
+      "rating": null
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 55,
+    "fields": {
+      "created": "2025-08-29T08:00:00.000Z",
+      "modified": "2025-08-29T08:00:00.000Z",
+      "user": 1,
+      "wine": 25,
+      "year": 2022,
+      "abv": 8.5,
+      "barcode": "4012345678901",
+      "price": 14.0,
+      "drink_by": "2032-01-01",
+      "comment": "Racy acidity, green apple, slate.",
+      "rating": 5
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 56,
+    "fields": {
+      "created": "2025-08-29T08:00:00.000Z",
+      "modified": "2025-08-29T08:00:00.000Z",
+      "user": 1,
+      "wine": 25,
+      "year": 2021,
+      "abv": 8.0,
+      "barcode": "",
+      "price": 13.0,
+      "drink_by": "2030-01-01",
+      "comment": "Light and lean.",
+      "rating": 4
+    }
+  },
+  {
+    "model": "wine.vintage",
+    "pk": 57,
+    "fields": {
+      "created": "2025-08-29T08:00:00.000Z",
+      "modified": "2025-08-29T08:00:00.000Z",
+      "user": 1,
+      "wine": 25,
+      "year": 2020,
+      "abv": 8.5,
+      "barcode": "",
+      "price": 13.5,
+      "drink_by": "2029-01-01",
+      "comment": "Peach and honey.",
       "rating": 4
     }
   }
