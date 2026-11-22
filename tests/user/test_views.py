@@ -17,6 +17,7 @@ def test_user_settings_page(client, user):
     data = {
         "language": "de-DE",
         "currency": "EUR",
+        "max_wines_per_row": 0,
         "notifications": True,
     }
     r = client.post(reverse("user-settings"), data, follow=True)
@@ -30,6 +31,7 @@ def test_user_settings_page(client, user):
     data = {
         "language": "en-gb",
         "currency": "EUR",
+        "max_wines_per_row": 0,
         "notifications": False,
     }
     r = client.post(reverse("user-settings"), data, follow=True)
@@ -38,6 +40,36 @@ def test_user_settings_page(client, user):
     assert user_settings.language == "en-gb"
     assert user_settings.currency == "EUR"
     assert not user_settings.notifications
+
+
+@pytest.mark.django_db
+def test_user_settings_max_wines_per_row(client, user):
+    client.force_login(user)
+    data = {"language": "en-gb", "currency": "EUR", "max_wines_per_row": "4"}
+    client.post(reverse("user-settings"), data)
+    assert user.user_settings.max_wines_per_row == 4
+
+    data["max_wines_per_row"] = "0"
+    client.post(reverse("user-settings"), data)
+    user.user_settings.refresh_from_db()
+    assert user.user_settings.max_wines_per_row == 0
+
+    data["max_wines_per_row"] = "6"
+    r = client.post(reverse("user-settings"), data)
+    assert r.status_code == HTTPStatus.OK
+    assert "max_wines_per_row" in r.context_data["form"].errors
+
+
+@pytest.mark.django_db
+def test_user_settings_compact_wine_list(client, user):
+    client.force_login(user)
+    data = {"language": "en-gb", "currency": "EUR", "max_wines_per_row": "0"}
+    client.post(reverse("user-settings"), {**data, "compact_wine_list": "on"})
+    assert user.user_settings.compact_wine_list
+
+    client.post(reverse("user-settings"), data)
+    user.user_settings.refresh_from_db()
+    assert not user.user_settings.compact_wine_list
 
 
 @pytest.mark.django_db

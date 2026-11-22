@@ -1,5 +1,6 @@
 import base64
 import logging
+import math
 import uuid
 from decimal import Decimal
 from urllib.parse import urlencode
@@ -524,6 +525,20 @@ class WineListView(FilterView):
     context_object_name = "wines"
     filterset_class = WineFilter
     paginate_by = 12
+
+    def get_paginate_by(self, queryset):
+        # At least paginate_by wines, rounded up to whole rows at the cap.
+        max_per_row = get_user_settings(self.request.user).max_wines_per_row
+        if not max_per_row:
+            return self.paginate_by
+        return math.ceil(self.paginate_by / max_per_row) * max_per_row
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user_settings = get_user_settings(self.request.user)
+        context["max_wines_per_row"] = user_settings.max_wines_per_row
+        context["compact_wine_list"] = user_settings.compact_wine_list
+        return context
 
     def get_queryset(self):
         qs = super().get_queryset().order_by("-created")

@@ -1,10 +1,31 @@
+/* Unitless so calc() can divide by them; multiply by 1px to use as lengths. */
+:root {
+  --card-min-width: 320;
+  --card-max-width: 420;
+  --card-gap: 16;
+}
+
 .wine-card__list {
   list-style: none;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  /* Columns are at least --card-min-width, and with --max-cols set (see
+     .wine-list--max-cols-N in forms.css) at least wide enough that no more
+     than that many fit. Without it, the 99 fallback makes the second max()
+     argument negative, so it's plain --card-min-width columns. */
+  grid-template-columns: repeat(
+      auto-fill,
+      minmax(
+        max(
+          calc(var(--card-min-width) * 1px),
+          (100% - (var(--max-cols, 99) - 1) * var(--card-gap) * 1px) /
+          var(--max-cols, 99)
+        ),
+        1fr
+      )
+    );
   width: 100%;
-  gap: 16px;
+  gap: calc(var(--card-gap) * 1px);
   margin-block-start: 0;
 }
 

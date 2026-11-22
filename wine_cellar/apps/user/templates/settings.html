@@ -26,6 +26,8 @@
                     <div class="form__fields">
                         {% include 'forms/form_field.html' with field=form.language %}
                         {% include 'forms/form_field.html' with field=form.currency %}
+                        {% include 'forms/form_field.html' with field=form.max_wines_per_row %}
+                        {% include 'forms/form_field.html' with field=form.compact_wine_list %}
                         {% include 'forms/form_field.html' with field=form.notifications %}
                     </div>
                     <div class="pure-controls">
