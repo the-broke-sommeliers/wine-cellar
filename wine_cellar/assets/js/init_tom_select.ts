@@ -17,6 +17,14 @@ function debounce(callback: () => void, delay: number): () => void {
   }
 }
 
+function submitForm(form: HTMLFormElement): void {
+  if (form.requestSubmit) {
+    form.requestSubmit()
+  } else {
+    form.submit()
+  }
+}
+
 function initTomSelect(): void {
   document.querySelectorAll('select').forEach((el) => {
     const rawConfig: string | undefined = el.dataset.tom_config
@@ -61,9 +69,7 @@ function initTomSelect(): void {
     // Auto-submit filter form on dropdown change
     const filterForm = el.closest('.filter-form') as HTMLFormElement | null
     if (filterForm) {
-      ts.on('change', () => {
-        filterForm.requestSubmit?.() ?? filterForm.submit()
-      })
+      ts.on('change', () => submitForm(filterForm))
     }
 
     if (!config.create) {
@@ -106,9 +112,7 @@ function initTomSelect(): void {
       const input = element as HTMLInputElement
       const filterForm = input.closest('.filter-form') as HTMLFormElement | null
       if (filterForm) {
-        const debouncedSubmit = debounce(() => {
-          filterForm.requestSubmit?.() ?? filterForm.submit()
-        }, 700)
+        const debouncedSubmit = debounce(() => submitForm(filterForm), 700)
 
         input.addEventListener('input', debouncedSubmit)
       }
