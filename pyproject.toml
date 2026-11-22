@@ -51,7 +51,7 @@ dev = [
 ]
 prod = [
     "psycopg[c]==3.3.9",
-    "gunicorn==26.2.0",
+    "gunicorn==27.0.1",
     "redis==8.1.0",
     "sentry-sdk==2.75.0",
 ]
