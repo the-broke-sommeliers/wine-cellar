@@ -171,6 +171,30 @@ p.form-hint {
   flex: 1 0 auto;
 }
 
+/* Show the clear button whenever the field has a value, not just on
+   hover/focus (tom-select's default), and make it bigger/higher-contrast
+   than its 1em default. */
+.plugin-clear_button {
+  --ts-pr-clear-button: 1.4em;
+}
+
+.plugin-clear_button .clear-button {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+/* .has-items and .ts-control > for specificity: tom-select's own
+   ".ts-wrapper.multi .ts-control > div" (multi-select item tags) otherwise
+   outweighs a plain ".clear-button" color rule and wins instead. */
+.plugin-clear_button.has-items .ts-control > .clear-button {
+  opacity: 1;
+  color: var(--text-color-gray);
+}
+
+.plugin-clear_button.has-items .ts-control > .clear-button:hover {
+  color: var(--darker-gray);
+}
+
 .form-errorlist {
   margin-top: 0;
   color: var(--red);
@@ -223,6 +247,18 @@ p.form-hint {
 @media screen and (min-width: 35.5em) {
   .wine-list__filter-col {
     padding-right: 1.25rem;
+  }
+}
+
+/* .main drops its max-width at this breakpoint (page-layout.css), so cap
+   the filter column instead of letting it keep growing with the page. */
+@media screen and (min-width: 1400px) {
+  .wine-list__filter-col {
+    max-width: 340px;
+  }
+
+  .wine-list__results-col {
+    flex: 1 1 auto;
   }
 }
 
