@@ -8,3 +8,5 @@ datasets/
 db.sqlite3
 media/
 test_db.sqlite3
+wine_cellar/static/
+staticfiles/

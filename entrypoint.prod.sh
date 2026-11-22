@@ -17,8 +17,12 @@ then
 
 chown -R $(id -u):$(id -g) /home/app/web/staticfiles || true
 python manage.py migrate
-python manage.py collectstatic --no-input --clear
-python manage.py compilemessages
+
+if ! cmp -s staticfiles_build/staticfiles.json staticfiles/staticfiles.json; then
+    echo "Updating static files..."
+    find staticfiles -mindepth 1 -delete
+    cp -a staticfiles_build/. staticfiles/
+fi
 
 cat <<EOF | python manage.py shell || echo "Warning: admin superuser bootstrap failed" >&2
 from django.contrib.auth import get_user_model
