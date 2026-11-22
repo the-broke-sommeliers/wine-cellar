@@ -1,0 +1,50 @@
+{% load i18n %}
+<div class="ai-box" data-ai-box data-ai-done-message="{{ done_message }}">
+    <div class="ai-box__header">
+        <span class="card__field-label">{{ label }}</span>
+        <div class="ai-box__actions">
+            {% if not value %}
+                {% if ai_enabled %}
+                    <button type="button"
+                            class="card__action-btn card__action-btn--add"
+                            data-ai-generate="{{ generate_url }}">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> <span>{% translate "Generate" %}</span>
+                    </button>
+                {% else %}
+                    <button type="button"
+                            class="card__action-btn"
+                            disabled
+                            title="{% translate "AI is not configured on this server." %}">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> <span>{% translate "Generate" %}</span>
+                    </button>
+                {% endif %}
+            {% endif %}
+            <a class="card__action-btn" href="{{ edit_url }}" data-ai-edit>
+                <i class="fa-regular fa-pen-to-square"></i> <span>{% translate "Edit" %}</span>
+            </a>
+            <form method="post"
+                  action="{{ delete_url }}"
+                  class="{% if not value %}hidden{% endif %}"
+                  data-ai-delete>
+                {% csrf_token %}
+                <button type="submit" class="card__action-btn card__action-btn--delete">
+                    <i class="fa-regular fa-trash-can"></i> <span>{% translate "Remove" %}</span>
+                </button>
+            </form>
+        </div>
+    </div>
+    {% if as_list %}
+        <ul class="ai-box__items" data-ai-text data-ai-list>
+            {% for item in value %}<li class="ai-box__item">{{ item }}</li>{% endfor %}
+        </ul>
+    {% else %}
+        <p class="card__field-value ai-box__text" data-ai-text>{{ value }}</p>
+    {% endif %}
+    <p class="form-hint" data-ai-status aria-live="polite">
+        {% if value %}
+            {{ done_message }}
+        {% else %}
+            {{ empty_message }}
+        {% endif %}
+    </p>
+</div>

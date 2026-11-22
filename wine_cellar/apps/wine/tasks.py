@@ -6,18 +6,28 @@ import pycountry
 from celery import shared_task
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.db.models import FETCH_RAISE
-from django.utils import timezone
+from django.db import IntegrityError, transaction
+from django.db.models import FETCH_RAISE, Q
+from django.utils import timezone, translation
 from django.utils.translation import gettext_lazy as _
 
+from wine_cellar.apps.user.views import get_user_settings
 from wine_cellar.apps.wine.emails import (
     send_drink_by_reminder,
     send_opened_bottle_reminder,
 )
-from wine_cellar.apps.wine.models import Category, Vintage, WineType
+from wine_cellar.apps.wine.models import (
+    Category,
+    FoodPairing,
+    Vintage,
+    Wine,
+    WineType,
+)
 from wine_cellar.apps.wine.serializers import WineAiSerializer
 from wine_cellar.apps.wine.utils import (
     WINE_PREFILL_TIMEOUT,
+    ai_food_pairings_cache_key,
+    ai_tasting_notes_cache_key,
     lat_long_to_geojson,
     match_choice_label,
     wine_prefill_cache,
@@ -27,6 +37,7 @@ logger = logging.getLogger(__name__)
 
 AI_REQUEST_TIMEOUT = 60  # seconds
 AI_REPROMPT_TIMEOUT = 20  # seconds
+AI_UNEXPECTED_ERROR = _("The AI request failed. Please try again.")
 
 _wine_types = ", ".join([choice.label.lower() for choice in WineType])
 _sweetness_categories = ", ".join([choice.label.lower() for choice in Category])
@@ -259,6 +270,42 @@ def _set_prefill_error(token, user_id, message):
     )
 
 
+def _ai_error_message(exc):
+    """Log a litellm error and return its user message, else None."""
+    import litellm.exceptions as e
+
+    if isinstance(exc, e.AuthenticationError):
+        logger.error("AI request failed: invalid API key")
+        return _("AI request failed: invalid API key. Please check your configuration.")
+    if isinstance(exc, e.RateLimitError):
+        logger.warning("AI request failed: rate limit reached")
+        return _(
+            "AI request failed: rate limit reached. "
+            "Please wait a moment and try again."
+        )
+    if isinstance(
+        exc, (e.ServiceUnavailableError, e.BadGatewayError, e.InternalServerError)
+    ):
+        logger.exception("AI service is temporarily unavailable")
+        return _(
+            "AI service is temporarily unavailable. "
+            "Please try again in a few minutes."
+        )
+    if isinstance(exc, e.Timeout):
+        logger.warning("AI request timed out")
+        return _("AI request timed out. Please try again.")
+    if isinstance(exc, e.APIConnectionError):
+        logger.exception("Could not connect to the AI service")
+        return _(
+            "Could not connect to the AI service. Please check your "
+            "network and configuration."
+        )
+    if isinstance(exc, e.APIError):
+        logger.exception("AI request failed")
+        return _("AI request failed. Please try again or check your configuration.")
+    return None
+
+
 @shared_task(name="process_ai_wine_upload")
 def process_ai_wine_upload(
     token,
@@ -272,7 +319,6 @@ def process_ai_wine_upload(
 ):
     # See the comment in `_reprompt_field` - `litellm` import is deferred to
     # task runtime to keep it out of Django's module-loading path.
-    import litellm.exceptions
     from litellm import completion
 
     content = [{"type": "text", "text": build_model_instructions(source, hint)}]
@@ -292,65 +338,11 @@ def process_ai_wine_upload(
             api_key=settings.AI_API_KEY,
             timeout=AI_REQUEST_TIMEOUT,
         )
-    except litellm.exceptions.AuthenticationError:
-        logger.error("AI request failed: invalid API key")
-        _set_prefill_error(
-            token,
-            user_id,
-            _(
-                "AI request failed: invalid API key. Please check your "
-                "configuration."
-            ),
-        )
-        return
-    except litellm.exceptions.RateLimitError:
-        logger.warning("AI request failed: rate limit reached")
-        _set_prefill_error(
-            token,
-            user_id,
-            _(
-                "AI request failed: rate limit reached. "
-                "Please wait a moment and try again."
-            ),
-        )
-        return
-    except (
-        litellm.exceptions.ServiceUnavailableError,
-        litellm.exceptions.BadGatewayError,
-        litellm.exceptions.InternalServerError,
-    ):
-        logger.exception("AI service is temporarily unavailable")
-        _set_prefill_error(
-            token,
-            user_id,
-            _(
-                "AI service is temporarily unavailable. "
-                "Please try again in a few minutes."
-            ),
-        )
-        return
-    except litellm.exceptions.Timeout:
-        logger.warning("AI request timed out")
-        _set_prefill_error(token, user_id, _("AI request timed out. Please try again."))
-        return
-    except litellm.exceptions.APIConnectionError:
-        logger.exception("Could not connect to the AI service")
-        _set_prefill_error(
-            token,
-            user_id,
-            _(
-                "Could not connect to the AI service. Please check your "
-                "network and configuration."
-            ),
-        )
-        return
-    except litellm.exceptions.APIError:
-        logger.exception("AI request failed")
-        _set_prefill_error(
-            token,
-            user_id,
-            _("AI request failed. Please try again or check your configuration."),
-        )
+    except Exception as exc:
+        message = _ai_error_message(exc)
+        if message is None:
+            raise
+        _set_prefill_error(token, user_id, message)
         return
 
     ai_text = response.choices[0].message.content.strip()
@@ -432,3 +424,240 @@ def process_ai_wine_upload(
         },
         timeout=WINE_PREFILL_TIMEOUT,
     )
+
+
+TASTING_NOTES_PROMPT = """
+You are a sommelier. Based only on the wine details below, describe how this
+wine is likely to look, smell and taste. You have not tasted it, so describe
+its expected profile instead of reviewing it. Cover appearance, nose, palate
+and finish, then suggest a serving temperature. Keep it to about 150 words of
+plain text without markdown. Write in {language}.
+
+Wine details:
+{details}
+"""
+
+FOOD_PAIRINGS_PROMPT = """
+You are a sommelier. Based on the wine details below, suggest 3 to 6 foods or
+dishes that pair well with this wine. Use short names of 1 to 4 words, e.g.
+"Roast lamb" or "Aged Comté".{existing} Write the names in {language}.
+Return JSON only, with no surrounding commentary or markdown:
+{{"food_pairings": ["...", "..."]}}
+
+Wine details:
+{details}
+"""
+
+FOOD_PAIRINGS_EXISTING = """
+Where they fit, reuse these names from the user's collection, spelled exactly
+as given: {names}."""
+
+MAX_AI_FOOD_PAIRINGS = 8
+MAX_EXISTING_FOOD_PAIRINGS = 200
+
+
+def _language_name(user):
+    language = get_user_settings(user).language
+    try:
+        return str(translation.get_language_info(language)["name"])
+    except KeyError:
+        return language
+
+
+def _wine_details(wine, vintage=None):
+    with translation.override("en"):
+        details = {
+            "Name": wine.name,
+            "Type": wine.get_type,
+            "Sweetness": wine.get_category,
+            "Grapes": ", ".join(g.name for g in wine.grapes.all()),
+            "Country": wine.country_name if wine.country else None,
+            "Region": wine.region.name if wine.region else None,
+            "Appellation": wine.appellation.name if wine.appellation else None,
+            "Vineyards": ", ".join(v.name for v in wine.vineyard.all()),
+        }
+        if vintage:
+            details["Vintage"] = vintage.year or "non-vintage"
+            details["ABV"] = f"{vintage.abv}%" if vintage.abv else None
+        return "\n".join(f"- {key}: {value}" for key, value in details.items() if value)
+
+
+def build_tasting_notes_prompt(vintage):
+    return TASTING_NOTES_PROMPT.format(
+        language=_language_name(vintage.wine.user),
+        details=_wine_details(vintage.wine, vintage),
+    )
+
+
+def build_food_pairings_prompt(wine, existing_names):
+    existing = ""
+    if existing_names:
+        existing = FOOD_PAIRINGS_EXISTING.format(
+            names=", ".join(f'"{name}"' for name in existing_names)
+        )
+    return FOOD_PAIRINGS_PROMPT.format(
+        existing=existing,
+        language=_language_name(wine.user),
+        details=_wine_details(wine, wine.latest_vintage),
+    )
+
+
+def _is_current_ai_job(cache_key, job_id):
+    # False once the user edited the target or started a newer job.
+    entry = wine_prefill_cache.get(cache_key)
+    return bool(entry) and entry.get("job_id") == job_id
+
+
+def _set_ai_job_status(cache_key, user_id, job_id, status, message=None):
+    if not _is_current_ai_job(cache_key, job_id):
+        return
+    entry = {"status": status, "user_id": user_id, "job_id": job_id}
+    if message:
+        entry["message"] = str(message)
+    wine_prefill_cache.set(cache_key, entry, timeout=WINE_PREFILL_TIMEOUT)
+
+
+def _run_ai_job(cache_key, user_id, job_id, func, *args):
+    try:
+        func(cache_key, user_id, job_id, *args)
+    except Exception:
+        _set_ai_job_status(cache_key, user_id, job_id, "error", AI_UNEXPECTED_ERROR)
+        raise
+
+
+def _ai_complete(prompt):
+    """Return `(text, error_message)` for a single-prompt completion."""
+    # See the comment in `_reprompt_field`.
+    from litellm import completion
+
+    try:
+        response = completion(
+            model=settings.AI_MODEL,
+            messages=[{"role": "user", "content": prompt}],
+            api_key=settings.AI_API_KEY,
+            timeout=AI_REQUEST_TIMEOUT,
+        )
+    except Exception as exc:
+        message = _ai_error_message(exc)
+        if message is None:
+            raise
+        return None, message
+    return (response.choices[0].message.content or "").strip(), None
+
+
+@shared_task(name="generate_ai_tasting_notes")
+def generate_ai_tasting_notes(vintage_id, user_id, job_id):
+    _run_ai_job(
+        ai_tasting_notes_cache_key(vintage_id),
+        user_id,
+        job_id,
+        _generate_ai_tasting_notes,
+        vintage_id,
+    )
+
+
+def _generate_ai_tasting_notes(cache_key, user_id, job_id, vintage_id):
+    vintage = (
+        Vintage.objects.filter(pk=vintage_id, wine__user_id=user_id)
+        .select_related("wine__region", "wine__appellation", "wine__user")
+        .first()
+    )
+    if not vintage:
+        _set_ai_job_status(
+            cache_key, user_id, job_id, "error", _("This vintage no longer exists.")
+        )
+        return
+
+    text, error = _ai_complete(build_tasting_notes_prompt(vintage))
+    if error:
+        _set_ai_job_status(cache_key, user_id, job_id, "error", error)
+        return
+    if not text:
+        _set_ai_job_status(
+            cache_key,
+            user_id,
+            job_id,
+            "error",
+            _("The AI returned no tasting notes. Please try again."),
+        )
+        return
+    if not _is_current_ai_job(cache_key, job_id):
+        return
+    vintage.ai_tasting_notes = text
+    vintage.save(update_fields=["ai_tasting_notes"])
+    _set_ai_job_status(cache_key, user_id, job_id, "done")
+
+
+def _clean_food_pairing_names(value):
+    if not isinstance(value, list):
+        return []
+    names = {}
+    for item in value:
+        if isinstance(item, str) and (name := item.strip()[:100]):
+            names.setdefault(name.casefold(), name)
+    return list(names.values())[:MAX_AI_FOOD_PAIRINGS]
+
+
+def _get_or_create_food_pairing(available, name, user_id):
+    pairing = available.filter(name__iexact=name).order_by("user_id").first()
+    if pairing:
+        return pairing
+    try:
+        with transaction.atomic():
+            return FoodPairing.objects.create(name=name, user_id=user_id)
+    except IntegrityError:
+        return FoodPairing.objects.get(name=name, user_id=user_id)
+
+
+@shared_task(name="generate_ai_food_pairings")
+def generate_ai_food_pairings(wine_id, user_id, job_id):
+    _run_ai_job(
+        ai_food_pairings_cache_key(wine_id),
+        user_id,
+        job_id,
+        _generate_ai_food_pairings,
+        wine_id,
+    )
+
+
+def _generate_ai_food_pairings(cache_key, user_id, job_id, wine_id):
+    wine = (
+        Wine.objects.filter(pk=wine_id, user_id=user_id)
+        .select_related("region", "appellation", "user")
+        .first()
+    )
+    if not wine:
+        _set_ai_job_status(
+            cache_key, user_id, job_id, "error", _("This wine no longer exists.")
+        )
+        return
+
+    available = FoodPairing.objects.filter(Q(user=None) | Q(user_id=user_id))
+    existing_names = sorted(set(available.values_list("name", flat=True)))[
+        :MAX_EXISTING_FOOD_PAIRINGS
+    ]
+    text, error = _ai_complete(build_food_pairings_prompt(wine, existing_names))
+    if error:
+        _set_ai_job_status(cache_key, user_id, job_id, "error", error)
+        return
+
+    try:
+        names = _clean_food_pairing_names(_parse_ai_json(text).get("food_pairings"))
+    except (json.JSONDecodeError, AttributeError, IndexError):
+        logger.warning("Failed to parse AI food pairings response", exc_info=True)
+        names = []
+    if not names:
+        _set_ai_job_status(
+            cache_key,
+            user_id,
+            job_id,
+            "error",
+            _("The AI returned no food pairings. Please try again."),
+        )
+        return
+
+    if not _is_current_ai_job(cache_key, job_id):
+        return
+    pairings = [_get_or_create_food_pairing(available, n, user_id) for n in names]
+    wine.food_pairings.add(*pairings)
+    _set_ai_job_status(cache_key, user_id, job_id, "done")

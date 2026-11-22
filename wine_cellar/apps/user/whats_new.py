@@ -38,6 +38,16 @@ WHATS_NEW_RELEASES = [
                 "Filters on the wine list now apply as soon as you change"
                 " them, no need to press the filter button anymore."
             ),
+            _(
+                "Vintages now have their own tasting notes field, and the"
+                " comment is no longer limited to 250 characters."
+            ),
+            _(
+                "The wine's detail page has an AI tasting notes box for each"
+                " vintage and a food pairings box for the wine. If AI is set"
+                " up, Generate fills them in for you. You can also edit them"
+                " or paste in notes from any AI tool you like."
+            ),
         ],
     ),
     WhatsNewRelease(

@@ -27,6 +27,8 @@ class VintageInline(admin.TabularInline):
         "price",
         "drink_by",
         "rating",
+        "tasting_notes",
+        "ai_tasting_notes",
         "comment",
         "user",
     ]
@@ -64,6 +66,8 @@ class VintageAdmin(admin.ModelAdmin):
         "price",
         "drink_by",
         "rating",
+        "tasting_notes",
+        "ai_tasting_notes",
         "comment",
         "user",
     ]

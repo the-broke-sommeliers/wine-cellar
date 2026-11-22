@@ -71,6 +71,9 @@ module.exports = {
     wine_upload_ai: {
       import: ['./wine_cellar/assets/js/wine_upload_ai.ts'],
     },
+    ai_generate: {
+      import: ['./wine_cellar/assets/js/ai_generate.ts'],
+    },
   },
   output: {
     path: path.resolve('./wine_cellar/static/'),

@@ -20,6 +20,20 @@ wine_prefill_cache = caches["wine_prefill"]
 WINE_PREFILL_TIMEOUT = 6 * 60 * 60  # seconds
 
 
+def ai_enabled():
+    return bool(
+        getattr(settings, "AI_MODEL", None) and getattr(settings, "AI_API_KEY", None)
+    )
+
+
+def ai_tasting_notes_cache_key(vintage_id):
+    return f"ai_tasting_notes_{vintage_id}"
+
+
+def ai_food_pairings_cache_key(wine_id):
+    return f"ai_food_pairings_{wine_id}"
+
+
 def user_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
     return "user_{0}/{1}".format(instance.user.pk, filename)

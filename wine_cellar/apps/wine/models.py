@@ -415,7 +415,9 @@ class Vintage(UserContentModel):
     barcode = models.CharField(max_length=100, null=True, blank=True)
     price = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
     drink_by = models.DateField(blank=True, null=True)
-    comment = models.CharField(max_length=250, blank=True)
+    comment = models.TextField(blank=True)
+    tasting_notes = models.TextField(blank=True)
+    ai_tasting_notes = models.TextField(blank=True)
     rating = models.PositiveIntegerField(
         null=True,
         blank=True,
