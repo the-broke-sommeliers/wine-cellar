@@ -248,6 +248,13 @@ p.form-hint {
   .wine-list__filter-col {
     padding-right: 1.25rem;
   }
+
+  /* The "Filter & Sorting" heading sits above .filter-form, pushing its
+     white box down - offset the cards column by the same amount so the
+     two white boxes start at the same height. */
+  .wine-list__results-col {
+    margin-top: 1.65rem;
+  }
 }
 
 /* .main drops its max-width at this breakpoint (page-layout.css), so cap
