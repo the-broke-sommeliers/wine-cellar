@@ -232,5 +232,279 @@
       "row": null,
       "column": null
     }
+  },
+  {
+    "model": "storage.storageitem",
+    "pk": 19,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T15:00:00.000Z",
+      "modified": "2025-10-11T15:00:00.000Z",
+      "storage": 1,
+      "vintage": 25,
+      "row": null,
+      "column": null,
+      "price": 52.0
+    }
+  },
+  {
+    "model": "storage.storageitem",
+    "pk": 20,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T15:00:01.000Z",
+      "modified": "2025-10-11T15:00:01.000Z",
+      "storage": 1,
+      "vintage": 29,
+      "row": null,
+      "column": null
+    }
+  },
+  {
+    "model": "storage.storageitem",
+    "pk": 21,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T15:00:02.000Z",
+      "modified": "2025-10-11T15:00:02.000Z",
+      "storage": 1,
+      "vintage": 29,
+      "row": null,
+      "column": null
+    }
+  },
+  {
+    "model": "storage.storageitem",
+    "pk": 22,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T15:00:03.000Z",
+      "modified": "2025-10-11T15:00:03.000Z",
+      "storage": 1,
+      "vintage": 32,
+      "row": null,
+      "column": null,
+      "price": 30.0
+    }
+  },
+  {
+    "model": "storage.storageitem",
+    "pk": 23,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T15:00:04.000Z",
+      "modified": "2025-10-11T15:00:04.000Z",
+      "storage": 1,
+      "vintage": 32,
+      "row": null,
+      "column": null,
+      "price": 30.0
+    }
+  },
+  {
+    "model": "storage.storageitem",
+    "pk": 24,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T15:00:05.000Z",
+      "modified": "2025-10-11T15:00:05.000Z",
+      "storage": 1,
+      "vintage": 32,
+      "row": null,
+      "column": null,
+      "price": 30.0
+    }
+  },
+  {
+    "model": "storage.storageitem",
+    "pk": 25,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T15:00:06.000Z",
+      "modified": "2025-10-11T15:00:06.000Z",
+      "storage": 1,
+      "vintage": 34,
+      "row": null,
+      "column": null
+    }
+  },
+  {
+    "model": "storage.storageitem",
+    "pk": 26,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T15:00:07.000Z",
+      "modified": "2025-10-11T15:00:07.000Z",
+      "storage": 1,
+      "vintage": 37,
+      "row": null,
+      "column": null,
+      "price": 39.0
+    }
+  },
+  {
+    "model": "storage.storageitem",
+    "pk": 27,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T15:00:08.000Z",
+      "modified": "2025-10-11T15:00:08.000Z",
+      "storage": 1,
+      "vintage": 37,
+      "row": null,
+      "column": null,
+      "price": 39.0
+    }
+  },
+  {
+    "model": "storage.storageitem",
+    "pk": 28,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T15:00:09.000Z",
+      "modified": "2025-10-11T15:00:09.000Z",
+      "storage": 1,
+      "vintage": 41,
+      "row": null,
+      "column": null
+    }
+  },
+  {
+    "model": "storage.storageitem",
+    "pk": 29,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T15:00:10.000Z",
+      "modified": "2025-10-11T15:00:10.000Z",
+      "storage": 1,
+      "vintage": 47,
+      "row": null,
+      "column": null,
+      "price": 55.0
+    }
+  },
+  {
+    "model": "storage.storageitem",
+    "pk": 30,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T15:00:11.000Z",
+      "modified": "2025-10-11T15:00:11.000Z",
+      "storage": 1,
+      "vintage": 47,
+      "row": null,
+      "column": null,
+      "price": 55.0
+    }
+  },
+  {
+    "model": "storage.storageitem",
+    "pk": 31,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T15:00:12.000Z",
+      "modified": "2025-10-11T15:00:12.000Z",
+      "storage": 1,
+      "vintage": 49,
+      "row": null,
+      "column": null,
+      "price": 75.0
+    }
+  },
+  {
+    "model": "storage.storageitem",
+    "pk": 32,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T15:00:13.000Z",
+      "modified": "2025-10-11T15:00:13.000Z",
+      "storage": 1,
+      "vintage": 51,
+      "row": null,
+      "column": null
+    }
+  },
+  {
+    "model": "storage.storageitem",
+    "pk": 33,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T15:00:14.000Z",
+      "modified": "2025-10-11T15:00:14.000Z",
+      "storage": 1,
+      "vintage": 52,
+      "row": null,
+      "column": null,
+      "price": 95.0
+    }
+  },
+  {
+    "model": "storage.storageitem",
+    "pk": 34,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T15:00:15.000Z",
+      "modified": "2025-10-11T15:00:15.000Z",
+      "storage": 1,
+      "vintage": 55,
+      "row": null,
+      "column": null,
+      "price": 14.0
+    }
+  },
+  {
+    "model": "storage.storageitem",
+    "pk": 35,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T15:00:16.000Z",
+      "modified": "2025-10-11T15:00:16.000Z",
+      "storage": 1,
+      "vintage": 55,
+      "row": null,
+      "column": null,
+      "price": 14.0
+    }
+  },
+  {
+    "model": "storage.storageitem",
+    "pk": 36,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T15:00:17.000Z",
+      "modified": "2025-10-11T15:00:17.000Z",
+      "storage": 1,
+      "vintage": 55,
+      "row": null,
+      "column": null,
+      "price": 14.0
+    }
+  },
+  {
+    "model": "storage.storageitem",
+    "pk": 37,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T15:00:18.000Z",
+      "modified": "2025-10-11T15:00:18.000Z",
+      "storage": 1,
+      "vintage": 55,
+      "row": null,
+      "column": null,
+      "price": 14.0
+    }
+  },
+  {
+    "model": "storage.storageitem",
+    "pk": 38,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T15:00:19.000Z",
+      "modified": "2025-10-11T15:00:19.000Z",
+      "storage": 1,
+      "vintage": 57,
+      "row": null,
+      "column": null
+    }
   }
 ]

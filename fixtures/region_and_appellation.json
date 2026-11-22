@@ -139,7 +139,36 @@
       "name": "Champagne"
     }
   },
-
+  {
+    "model": "wine.region",
+    "pk": 15,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Loire"
+    }
+  },
+  {
+    "model": "wine.region",
+    "pk": 16,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Rhône"
+    }
+  },
+  {
+    "model": "wine.region",
+    "pk": 17,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Mosel"
+    }
+  },
   {
     "model": "wine.appellation",
     "pk": 1,
@@ -278,6 +307,56 @@
       "created": "2025-10-11T14:41:54.575Z",
       "modified": "2025-10-11T14:41:54.575Z",
       "name": "Champagne AOC"
+    }
+  },
+  {
+    "model": "wine.appellation",
+    "pk": 15,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Sancerre AOC"
+    }
+  },
+  {
+    "model": "wine.appellation",
+    "pk": 16,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Sauternes AOC"
+    }
+  },
+  {
+    "model": "wine.appellation",
+    "pk": 17,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Barolo DOCG"
+    }
+  },
+  {
+    "model": "wine.appellation",
+    "pk": 18,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Châteauneuf-du-Pape AOC"
+    }
+  },
+  {
+    "model": "wine.appellation",
+    "pk": 19,
+    "fields": {
+      "user": 1,
+      "created": "2025-10-11T14:41:54.575Z",
+      "modified": "2025-10-11T14:41:54.575Z",
+      "name": "Condrieu AOC"
     }
   }
 ]
