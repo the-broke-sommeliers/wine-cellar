@@ -15,7 +15,7 @@
     "@maplibre/maplibre-gl-leaflet": "0.1.4",
     "@turf/boolean-point-in-polygon": "7.4.0",
     "@turf/helpers": "7.4.0",
-    "barcode-detector": "3.2.3",
+    "barcode-detector": "3.2.4",
     "leaflet": "1.9.4",
     "leaflet.markercluster": "1.5.3",
     "purecss": "3.1.0",
