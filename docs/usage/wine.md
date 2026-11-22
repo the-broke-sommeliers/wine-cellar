@@ -41,6 +41,8 @@ Wines can be added in two ways from the **Add Wine** page:
 
 The wine list supports filtering by type, country, vintage range, rating, and more. Results can be sorted by name, vintage, drink-by date, or price.
 
+On wide screens the list fits as many wines next to each other as there is room for. To cap that, set **Wines per Row** under **Settings** (1–5, or Automatic).
+
 Wines with a geographic location set can also be viewed on an interactive **map** (`/wines/map`).
 
 ## Ratings and Tasting Notes

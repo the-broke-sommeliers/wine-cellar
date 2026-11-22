@@ -267,6 +267,54 @@ p.form-hint {
   .wine-list__results-col {
     flex: 1 1 auto;
   }
+
+  .wine-list--compact {
+    justify-content: center;
+  }
+
+  /* Count the columns that fit at --card-min-width (capped at --max-cols)
+     and stop growing once they reach --card-max-width, so the filter bar
+     and list get centered instead of the cards stretching. The filter
+     column's width mirrors its pure-u-md-7-24 class and max-width above. */
+  .wine-list--compact .wine-list__results-col {
+    --gap: calc(var(--card-gap) * 1px);
+    --min-step: calc((var(--card-min-width) + var(--card-gap)) * 1px);
+    --max-step: calc((var(--card-max-width) + var(--card-gap)) * 1px);
+    --growth: calc(
+      (var(--card-max-width) + var(--card-gap)) /
+      (var(--card-min-width) + var(--card-gap))
+    );
+    --available: calc(100% - min(340px, 100% * 7 / 24));
+    max-width: min(
+      round(down, var(--available) + var(--gap), var(--min-step)) *
+      var(--growth) -
+      var(--gap),
+      var(--max-cols, 99) *
+      var(--max-step) -
+      var(--gap)
+    );
+  }
+}
+
+/* Matches MAX_WINES_PER_ROW_CHOICES in wine_cellar/apps/user/models.py */
+.wine-list--max-cols-1 {
+  --max-cols: 1;
+}
+
+.wine-list--max-cols-2 {
+  --max-cols: 2;
+}
+
+.wine-list--max-cols-3 {
+  --max-cols: 3;
+}
+
+.wine-list--max-cols-4 {
+  --max-cols: 4;
+}
+
+.wine-list--max-cols-5 {
+  --max-cols: 5;
 }
 
 .filter-form__sm-container {

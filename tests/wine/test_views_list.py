@@ -214,7 +214,7 @@ def test_wine_list_effective_price_not_skewed_by_fan_out(
     storage_item_factory(storage=storage, vintage=vintage_a, price=None)
     storage_item_factory(storage=storage, vintage=vintage_b, price=None)
     client.force_login(user)
-    with django_assert_num_queries(14):
+    with django_assert_num_queries(15):
         r = client.get(reverse("wine-list"))
     assert r.status_code == HTTPStatus.OK
     result = next(w for w in r.context_data["wines"] if w.pk == wine.pk)
@@ -386,3 +386,36 @@ def test_wine_sort_by_drink_by(client, user, wine_factory, vintage_factory):
     wines = list(r.context_data["wines"])
     # Soonest due date first, wines with no drink-by date sort last.
     assert wines.index(soon) < wines.index(later) < wines.index(no_date)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "max_wines_per_row, page_size",
+    [(0, 12), (3, 12), (4, 12), (5, 15)],
+)
+def test_wine_list_max_wines_per_row(
+    client, user, user_settings_factory, wine_factory, max_wines_per_row, page_size
+):
+    if max_wines_per_row:
+        user_settings_factory(user=user, max_wines_per_row=max_wines_per_row)
+    for i in range(25):
+        wine_factory(user=user, name=f"Wine {i:02d}")
+    client.force_login(user)
+    r = client.get(reverse("wine-list"))
+    assert r.status_code == HTTPStatus.OK
+    assert len(r.context_data["wines"]) == page_size
+    content = r.content.decode()
+    if max_wines_per_row:
+        assert f"wine-list--max-cols-{max_wines_per_row}" in content
+    else:
+        assert "wine-list--max-cols-" not in content
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("compact", [True, False])
+def test_wine_list_compact(client, user, user_settings_factory, compact):
+    user_settings_factory(user=user, compact_wine_list=compact)
+    client.force_login(user)
+    r = client.get(reverse("wine-list"))
+    assert r.status_code == HTTPStatus.OK
+    assert ("wine-list--compact" in r.content.decode()) == compact

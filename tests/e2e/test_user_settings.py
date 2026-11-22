@@ -16,19 +16,27 @@ def test_settings_save_and_persist(live_server, page, login, user):
     page.goto(f"{live_server.url}{reverse('user-settings')}")
 
     tom_select_pick(page, "id_currency", "Dollar")
+    tom_select_pick(page, "id_max_wines_per_row", "5")
+    page.locator("#id_compact_wine_list").check()
     page.locator("#id_notifications").uncheck()
     page.get_by_role("button", name="Save").click()
 
     page.wait_for_url(f"**{reverse('user-settings')}")
     assert page.eval_on_selector("#id_currency", "el => el.value") == "USD"
+    assert page.eval_on_selector("#id_max_wines_per_row", "el => el.value") == "5"
+    assert page.locator("#id_compact_wine_list").is_checked()
     assert not page.locator("#id_notifications").is_checked()
 
     page.reload()
     assert page.eval_on_selector("#id_currency", "el => el.value") == "USD"
+    assert page.eval_on_selector("#id_max_wines_per_row", "el => el.value") == "5"
+    assert page.locator("#id_compact_wine_list").is_checked()
     assert not page.locator("#id_notifications").is_checked()
 
     user.user_settings.refresh_from_db()
     assert user.user_settings.currency == "USD"
+    assert user.user_settings.max_wines_per_row == 5
+    assert user.user_settings.compact_wine_list is True
     assert user.user_settings.notifications is False
 
 
