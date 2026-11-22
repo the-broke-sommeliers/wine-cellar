@@ -29,6 +29,15 @@ WHATS_NEW_RELEASES = [
                 "You can now add a wine from a photo of a menu or wine list."
                 " Optionally tell the AI which wine you mean."
             ),
+            _(
+                "The wine list now makes better use of wide screens. Under"
+                " Settings you can choose how many wines are shown per row,"
+                " or keep the list compact."
+            ),
+            _(
+                "Filters on the wine list now apply as soon as you change"
+                " them, no need to press the filter button anymore."
+            ),
         ],
     ),
     WhatsNewRelease(
