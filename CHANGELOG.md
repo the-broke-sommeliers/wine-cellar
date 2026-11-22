@@ -3,6 +3,49 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.16.0-rc.0 (2026-11-22)
+
+### feat
+
+- add tasting notes and ai suggestions for tasting notes and food pairings
+
+- add wines per row setting for the wine list
+
+- keep card widths consistent
+    
+    Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+
+- auto-update form on input change
+    
+    Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+
+- support wider screens
+    
+    Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+
+- **wine**: add menu photo mode to ai upload
+
+### fix
+
+- avoid double submit of auto-submitted filter form
+
+- handle non-object and unexpected errors in ai upload task
+
+- add missing docs+whats new parts
+
+- use different secret for github workflow
+
+- **deps**: update all non-major dependencies
+- align filter box with first row of wine cards
+
+- **deps**: update all non-major dependencies
+
+### refactor
+
+- use tom-select's clear_button plugin instead of a hand-rolled one
+
+
+
 ## 0.15.0 (2026-11-12)
 
 ### feat
