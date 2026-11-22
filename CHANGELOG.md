@@ -12,17 +12,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - add wines per row setting for the wine list
 
 - keep card widths consistent
-    
-    Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
-
 - auto-update form on input change
-    
-    Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
-
 - support wider screens
-    
-    Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
-
 - **wine**: add menu photo mode to ai upload
 
 ### fix
