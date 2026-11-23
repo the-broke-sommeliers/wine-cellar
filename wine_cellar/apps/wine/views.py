@@ -43,10 +43,17 @@ from wine_cellar.apps.wine.forms import (
     AiTastingNotesForm,
     VintageForm,
     WineForm,
+    WineTastingNoteForm,
     WineUploadAIForm,
     image_fields_map,
 )
-from wine_cellar.apps.wine.models import ImageType, Vintage, Wine, WineImage
+from wine_cellar.apps.wine.models import (
+    ImageType,
+    Vintage,
+    Wine,
+    WineImage,
+    WineTastingNote,
+)
 from wine_cellar.apps.wine.serializers import WineAiSerializer
 from wine_cellar.apps.wine.tasks import (
     generate_ai_food_pairings,
@@ -531,8 +538,64 @@ class WineDetailView(DetailView):
                 to_attr="_prefetched_front_images",
             )
         )
+        context["tasting_notes"] = self.object.tasting_notes.select_related(
+            "vintage"
+        ).order_by("-created")
         context["ai_enabled"] = ai_enabled()
         return context
+
+
+class WineTastingNoteFormView(FormView):
+    template_name = "wine_tasting_note_form.html"
+    form_class = WineTastingNoteForm
+
+    def get_wine(self):
+        if not hasattr(self, "_wine"):
+            self._wine = get_object_or_404(
+                Wine, pk=self.kwargs["wine_pk"], user=self.request.user
+            )
+        return self._wine
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["wine"] = self.get_wine()
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["wine"] = self.get_wine()
+        return context
+
+    def form_valid(self, form):
+        tasting_note = form.save(commit=False)
+        tasting_note.wine = self.get_wine()
+        tasting_note.user = self.request.user
+        tasting_note.save()
+        return redirect("wine-detail", pk=tasting_note.wine_id)
+
+
+class WineTastingNoteDeleteView(DeleteView):
+    model = WineTastingNote
+    template_name = "wine_tasting_note_confirm_delete.html"
+
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .filter(
+                wine__pk=self.kwargs["wine_pk"],
+                wine__user=self.request.user,
+                user=self.request.user,
+            )
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["wine"] = self.object.wine
+        return context
+
+    def get_success_url(self):
+        return reverse("wine-detail", kwargs={"pk": self.object.wine_id})
 
 
 def _total_stock_count() -> Count:

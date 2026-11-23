@@ -289,6 +289,55 @@
         <div class="card__section">
             <div class="card">
                 <div class="card__header">
+                    <h3>{% translate "My Tasting Notes" %}</h3>
+                    <a href="{% url 'wine-tasting-note-add' wine.pk %}"
+                       class="card__action-btn card__action-btn--add">
+                        <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                        <span>{% translate "Add Note" %}</span>
+                    </a>
+                </div>
+                {% if tasting_notes %}
+                    <div class="tasting-notes">
+                        {% for tasting_note in tasting_notes %}
+                            <article class="tasting-note">
+                                <div class="tasting-note__header">
+                                    <p class="tasting-note__text">{{ tasting_note.note|linebreaksbr }}</p>
+                                    <time class="tasting-note__date"
+                                          datetime="{{ tasting_note.created|date:'c' }}">{{ tasting_note.created|date:"DATE_FORMAT" }}</time>
+                                </div>
+                                <div class="tasting-note__footer">
+                                    <div class="tasting-note__metadata">
+                                        {% if tasting_note.vintage %}
+                                            <div class="card__field">
+                                                <span class="card__field-label">{% translate "Vintage" %}</span>
+                                                <span class="card__field-value">{{ tasting_note.vintage.year|default:nv_label }}</span>
+                                            </div>
+                                        {% endif %}
+                                        {% if tasting_note.rating is not None %}
+                                            <div class="card__field">
+                                                <span class="card__field-label">{% translate "Score" %}</span>
+                                                <span class="card__field-value">{{ tasting_note.rating }}/5</span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <a class="card__action-btn card__action-btn--delete tasting-note__delete"
+                                       href="{% url 'wine-tasting-note-delete' wine.pk tasting_note.pk %}">
+                                        <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
+                                        <span>{% translate "Delete" %}</span>
+                                    </a>
+                                </div>
+                            </article>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text--gray">{% translate "No tasting notes yet." %}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card__section">
+            <div class="card">
+                <div class="card__header">
                     <h3>{% translate "Stock" %}</h3>
                     <div class="card__table-summary">
                         <span class="stock__count">

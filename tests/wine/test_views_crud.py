@@ -23,7 +23,7 @@ def test_wine_detail_authenticated(
 ):
     wine = wine_factory(user=user)
     client.force_login(user)
-    with django_assert_num_queries(22):
+    with django_assert_num_queries(23):
         r = client.get(reverse("wine-detail", kwargs={"pk": wine.pk}))
     assert r.status_code == HTTPStatus.OK
     assertTemplateUsed(response=r, template_name="wine_detail.html")

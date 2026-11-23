@@ -9,6 +9,7 @@ from wine_cellar.apps.wine.models import (
     Vineyard,
     Vintage,
     Wine,
+    WineTastingNote,
 )
 
 
@@ -71,6 +72,14 @@ class VintageAdmin(admin.ModelAdmin):
         "comment",
         "user",
     ]
+
+
+@admin.register(WineTastingNote)
+class WineTastingNoteAdmin(admin.ModelAdmin):
+    list_display = ["wine", "vintage", "rating", "user", "created"]
+    list_filter = ["rating"]
+    search_fields = ["wine__name", "note"]
+    readonly_fields = ["created", "modified"]
 
 
 @admin.register(Size)
