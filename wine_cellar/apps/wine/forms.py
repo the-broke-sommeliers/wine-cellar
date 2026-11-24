@@ -25,6 +25,7 @@ from wine_cellar.apps.wine.models import (
     Vineyard,
     Vintage,
     WineImage,
+    WineTastingNote,
     WineType,
 )
 from wine_cellar.apps.wine.widgets import (
@@ -617,6 +618,26 @@ class AiTastingNotesForm(forms.Form):
             " Leave empty to remove them."
         ),
     )
+
+
+class WineTastingNoteForm(forms.ModelForm):
+    class Meta:
+        model = WineTastingNote
+        fields = ["note", "rating", "vintage"]
+        widgets = {
+            "note": forms.Textarea(attrs={"rows": 5}),
+        }
+
+    def __init__(self, *args, wine, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["vintage"].queryset = Vintage.objects.filter(wine=wine).order_by(
+            "-year"
+        )
+        self.fields["vintage"].required = False
+        self.fields["vintage"].empty_label = _("Not specified")
+        self.fields["note"].label = _("Tasting Note")
+        self.fields["rating"].label = _("Score")
+        self.fields["rating"].help_text = _("Optional score from 0 to 5.")
 
 
 class WineFilterForm(TomSelectMixin, WineFormPostCleanMixin, forms.Form):

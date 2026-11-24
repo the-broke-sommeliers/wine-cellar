@@ -537,6 +537,28 @@ class Vintage(UserContentModel):
         ]
 
 
+class WineTastingNote(UserContentModel):
+    wine = models.ForeignKey(
+        Wine, on_delete=models.CASCADE, related_name="tasting_notes"
+    )
+    vintage = models.ForeignKey(
+        Vintage,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="wine_tasting_notes",
+    )
+    note = models.TextField()
+    rating = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0), MaxValueValidator(5)],
+    )
+
+    def __str__(self):
+        return f"{self.wine.name} tasting note"
+
+
 class WineImage(models.Model):
     image = models.ImageField(upload_to=user_directory_path)
     thumbnail = models.ImageField(upload_to=user_directory_path, blank=True, null=True)

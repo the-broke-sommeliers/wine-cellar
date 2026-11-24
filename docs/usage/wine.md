@@ -55,6 +55,8 @@ Each vintage can store:
 
 The vintage section on the wine's detail page also has an **AI Tasting Notes** box, kept separate from your own notes. Use **Edit** to write or paste notes from an AI tool of your choice. If AI is configured (see [Deployment](../setup/deployment.md#ai-setup)), **Generate** lets the AI describe how the wine probably tastes, based on its details (grapes, region, vintage and so on); without AI configuration the button is disabled. Once notes exist, **Remove** deletes them so you can generate new ones.
 
+The **My Tasting Notes** section lets you add multiple personal reviews to a wine. Each review contains a note, an optional score from 0 to 5, and an optional link to a vintage of that wine. Reviews show their creation date and can be deleted, but not edited. Deleting a vintage keeps its reviews and removes the vintage link.
+
 ## Food Pairings
 
 Food pairings belong to the wine, not a single vintage, so they are shared by all its vintages and power the wine list's food pairing filter. The **Food Pairings** box on the wine's detail page works like the AI Tasting Notes box: with AI configured, **Generate** suggests a few dishes based on the wine's details, reusing names you already have where they fit, and adds them to the wine. **Edit** opens the wine's edit form at the food pairings field, and **Remove** clears the wine's pairings (the pairing names themselves stay available for other wines).
